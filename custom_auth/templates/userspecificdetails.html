@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+{% block content %}
+<div>
+    {% check_vendor request.user.cin_number as vendor %}       
+    
+    {% comment %} <h4 class="from-head">Vendor Details   {% endcomment %}
+    {% if vendor %}
+        <h4 class="from-head">User Details
+    {%else%}
+        <h4 class="from-head">Vendor Details
+    {%endif%}                                                                                                                                                                                                                                                                                   </h4>
+    <div class="row">
+        <div class="col-9">
+            <button type="submit" class="btn btn-clr text-center" ><a href="{% url 'custom_auth:userpasswordreset' pk=user.id %}">Change Password</a></button>
+            <button type="submit" class="btn btn-clr text-center" ><a href="{% url 'custom_auth:usereditdetails' pk=user.id %}">Edit Profile</a></button>
+         {% if request.user.roles_id == 3  %}  
+            <button type="submit" class="btn btn-clr text-center assigned_projects" >Assigned Projects</button>
+          {% endif %}
+        </div>
+        <div class="col-3">
+            <button type="submit" class="btn btn-clr text-center" ><a href="{% url 'dashboard:dashboard' %}">Back</a></button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 user-viem-boxs">
+    <table class="user-view-page-ui user_profile">
+        <tbody>
+            <tr>
+                <th>First Name</th><td>{{user.name}}</td>
+            </tr>
+            <tr>
+                <th>Last Name</th><td>{{user.lastname|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+                <th>Designation</th><td>{{user.designation_role|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+                <th>Email</th><td>{{user.email}}</td>
+            </tr>
+            <tr>
+                <th>Official Phone Number (Land Line)</th><td>{{user.phone_countrycode|convertnum}}-{{user.areacode|default_if_none:"---"}}-{{user.phone|default_if_none:"---"}}-{{user.phone_number_extenstion|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+                <th>Official Phone Number (Mobile Line)</th><td>{{user.mobile_countrycode|convertnum}}-{{user.mobile|default_if_none:"---"}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    
+    <table class="user-view-page-ui assigned_projects_table" style="display:none">
+        <thead>
+            <th>S/N</th>
+            <th>Project Name</th>
+            {% comment %} <th></th> {% endcomment %}
+        </thead>
+        {% if project_user_count > 0 %}
+        {% for projects in project_user %}
+        <tbody>
+            <tr> 
+                <td>{{forloop.counter}}</td>
+                <td>{{projects.project.projectname.name}}</td>
+            </tr>
+            
+        </tbody>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="2" class="text-center">----</td>
+        </tr>
+        {% endif %}
+    </table>
+    </div>
+    </div>
+
+</div>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script type="text/javascript" src="{% static 'js/custom_auth/creditdispute.js' %}"></script>
+{% endblock %}

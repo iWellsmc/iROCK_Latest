@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+    
+    <h3 class="from-head">Create Master Project</h3>
+    <form method="POST" class="form-txt" >
+    {% csrf_token %}
+    <div class="col-sm-12 col-form-label" >
+    <button type="button" class="btn btn-clr btn-master-back"><a href="{% url 'projects:list_master' %}">Back</a></button>
+    <label for="inputAddress">{{ form.name.label }}*</label>
+    {% render_field form.name class="form-control" placeholder="Project Name" %}
+    </div>
+    <div class="col-sm-12 col-form-label">
+    <label for="inputAddress">{{ form.block_name.label }}*</label>
+    {% render_field form.block_name class="form-control" placeholder="Block Name" %}
+    </div>
+    <div class="col-sm-12 col-form-label">
+    <label for="inputAddress">{{ form.field_name.label }}*</label>
+    {% render_field form.field_name class="form-control" placeholder="Field Name" %}
+    </div>
+    <div class="col-sm-12 col-form-label" id="well-pad-id">
+    <label for="inputAddress">Well Pad Name</label>
+    <div id="wellpad0">
+    <input type="text" name="wellpadname" id="wellpad0" class="form-control" placeholder="Well Pad Name"/>
+    <button id='wellpad_add-row' class='btn btn-clr add-btn' type='button' value='Add'><i class="fa fa-plus"></i></button>
+    </div>
+    </div>
+    <div class="col-sm-12 col-form-label">
+    <label for="inputAddress">Create Well*</label><br>
+    <table>
+    <tbody id ="well_table">
+        <tr>
+            <td id="row0"><input type="text" name="well_name" class="form-control" placeholder="Well Name"></td>
+            <td><button id='add-row' class='btn btn-clr add-btn' type='button' value='Add'><i class="fa fa-plus"></i></button></td>
+        </tr>
+    </tbody>
+    </table>
+    </div>
+    <div class="text-center">
+    <button type="submit" class="btn btn-clr text-center">Submit</button>
+    </div>
+    </form>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/projects/masterproject.js' %}"></script>
+{% endblock %}
+
+<!--\ -->

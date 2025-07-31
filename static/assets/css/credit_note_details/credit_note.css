@@ -1,0 +1,31 @@
+/********** approvedcreditnotes.html **********/
+.td-center {
+    text-align: var(--centertext-align);
+} 
+/********** approvedcreditnotes.html **********/
+
+
+/********** pagination **********/
+
+#master_project_list_info {
+    color: #96183a;
+    font-weight: 600;
+}
+
+#master_project_list_paginate a {
+    margin-top: 10px !important;
+    color: #96183a !important;
+    font-weight: 600 !important;
+}
+#master_project_lists_info {
+    color: #96183a;
+    font-weight: 600;
+}
+
+#master_project_lists_paginate a {
+    margin-top: 10px !important;
+    color: #96183a !important;
+    font-weight: 600 !important;
+}
+
+/********** pagination **********/

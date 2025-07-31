@@ -1,0 +1,48 @@
+.tot-in th {
+    background-color: #fff !important;
+}
+
+.tot-in .table-list td:nth-child(2) {
+    text-align: var(--lefttext-align) !important;
+}
+
+.tot-in .table-list td:nth-child(4) {
+    text-align: var(--lefttext-align) !important;
+}
+#empty_class {
+    padding-left: 10px;
+  }
+.capitalize{
+    text-transform: none !important;
+}
+
+.cost-code-format td {
+    padding: 5px 5px;
+}
+
+.cost-code-format td:nth-child(1) {
+    width: 150px;
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.cost-code-format td:nth-child(2) {
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.cost-code-format td:nth-child(3) {
+    color: #000;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+#cc-center {
+    text-align:  var(--centertext-align) !important;
+}
+
+#text-initial {
+    text-transform: initial !important;
+}

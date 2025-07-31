@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+
+<div>
+
+    {% if messages %}
+    {% for msg in messages %}
+        {% if msg.tags %}  
+        <div class="alert alert-primary alert-dismissible fade show succ-msg" role="alert">
+            {{msg}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>    
+        {% endif %}
+    {% endfor %}
+
+    {% endif %} 
+
+    <h3 class="from-head"> List of Invited Vendors </h3>
+    <div class="row">
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+            <button type="button" class="btn btn-clr btn-master chck-tst"><a href="{% url 'projects:vendorinvite' %}">Invite Vendor</a></button>
+        </div>
+    </div>
+    <div class="row">
+      <div class="vends-invite-lists">
+        <table class="table settings-data-list-view data-list-view project_master vend-thead proj-lists master-pro vend-tt vend-border">
+            <thead >
+                <tr >
+                    <th>S/N</th> 
+                    <th>vendor Name</th>     
+                    <th>Contact Person Name</th>
+                    <th>Email</th>
+                    <th>Invite Sent Date</th>
+                </tr>
+            </thead>
+            <tbody class="table-list">
+                {% if invitevendor_count > 0 %}
+                  {% for vendor in invitevendors %}
+                  <tr>
+                  <td>{{forloop.counter|default_if_none:"---"}}</td>
+                  <td>{{vendor.vendorcompany}}</td>
+                  <td>{{vendor.contactpersonname}}</td>
+                  <td>{{vendor.contact_person_email	}}</td>
+                  <td>{{vendor.created_at|convertcompanytimezone:vendor.company.id}}</td>
+                  {% comment %} <td>{{vendor.id|covert_datetime:}}</td> {% endcomment %}
+                  {% comment %} <td>{{vendor.created_at|checktime:vendor.company.id}}</td> {% endcomment %}
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="7" class="cls-nil text-center">
+                      ---
+                    </td>
+                  </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+
+{%endblock%}

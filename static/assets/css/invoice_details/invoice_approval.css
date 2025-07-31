@@ -1,0 +1,123 @@
+.head-inv-pre {
+    color: #AF2B50 !important;
+    font-size: 1.5rem !important;
+    text-align: left !important;
+}
+
+.btn-space {
+    margin-bottom: 3px !important;
+}
+
+.color-btn button {
+    width: 100% !important;
+}
+
+.green  {
+    background-color: #27ae60 !important;
+}
+
+.dark_green {
+    background-color: #607e4b !important;
+}
+
+.proceed_blue {
+    background-color: #03a9f4 !important;
+}
+
+.blue {
+    background-color: #294999 !important;
+}
+
+.beige {
+    background-color: #c55e0b !important;
+}
+
+.red {
+    background-color: #be0201 !important;
+}
+
+.rose {
+    background-color: #bd2753 !important;
+    /* background-color: #8faadc !important; */
+}
+
+.violet {
+    background-color: #9C27B0 !important;
+}
+
+/********** Comment Pop-up **********/
+.comment-head {
+    background-color: #FFE9E9 !important;
+    border: none !important;
+}
+
+.comment-head button {
+    padding: 0px !important;
+}
+
+.comment-head span {
+    font-size: 28px;
+    color: #96193a !important;
+    /* padding: 0px 10px !important; */
+    line-height: 0 !important;
+    /* outline: 1px solid #96193a;
+    outline-offset: -10px;
+    border-radius: 25px; */
+    /* padding: 0px 12px 5px 12px !important; */
+    padding: 0px 12px 5.8px 12px !important;
+}
+
+.comment-body {
+    background-color: #FFE9E9 !important;
+}
+
+.comment-foot {
+    background-color: #FFE9E9 !important;
+    border: none;
+    /* justify-content: flex-start; */
+    justify-content: center;
+    padding: 10px 15px !important;
+}
+
+.comment-foot button {
+    background-color: #BD2753 !important;
+    margin: 0px !important;
+}
+
+.comment-foot button:hover {
+    box-shadow: 0 8px 10px -8px #8D1636 !important;
+}
+
+.modal-backdrop {
+    display:none
+}
+/********** Comment Pop-up **********/
+
+
+@media only screen and (min-width: 768px) and (max-width:1023px) {
+.m-commonbtn{
+line-height: 1;
+height: 50px;
+}
+}
+
+.inv_app_btn_cls{
+    width:19.333333% !important;
+}
+
+.error-border {
+    border: 1px solid red;
+}
+
+
+
+
+
+
+
+
+
+/************ credit note invoice approval ************/
+.creditnote-table {
+    width: 175%;
+}

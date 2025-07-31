@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% load cost_code_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/cost_code/import_cost_code_generate.css' %}">
+
+<div class="text-end">
+  <button type="button" class="btn btn-clr"><a href="{% url 'cost_code:costcodelist' %}">Back</a></button>
+</div>
+<form method="POST"  id="costcodeform">
+  {% csrf_token %}
+
+<div class="container">
+
+  <h3 class="from-head">Imported Cost Code Items</h3>
+
+  <div class="row">
+
+    <div class="col-4">
+        <input type="hidden" name="costcode_type" class="costcode_type" id="costcode_type" value={{cost_code_type2}}>
+        <input type="hidden" name="total_rows" class="total_rows" id="total_rows" value='1'>
+        <input type="hidden" name="level1_costcode" class="level1_costcode" id="level1_costcode" value={{cost_code}}>
+
+        <label for="staticEmail" class="col-form-label">Select Root Category<span
+            class="star-clr">*</span></label>
+
+          {% for discipline in alldiscipline %}
+              {% for development in development_type %}
+              {% get_discipline_name discipline.id development.id as disicpline_data %}
+                {% if level1 == disicpline_data %}
+                  <input type="hidden" name="level1_category" value="{{discipline.id}}_{{development.id}}">
+                  <input type="text" class="form-control" value="{{discipline.name}}({{development.development_type}})" readonly="true">
+                {% endif %}
+              {% endfor %}
+          {% endfor %} 
+
+        <!-- <select id="level1_category" name="level1_category" class="form-control level1_category">
+            <option value="" selected="selected">---Select---</option>
+            {% for discipline in alldiscipline %}
+                {% for development in development_type %}
+                {% get_discipline_name discipline.id development.id as disicpline_data %}
+                    <option class="leveloneoptions" data-id="" value="{{discipline.id}}_{{development.id}}" {% if level1 == disicpline_data %}selected {% endif %}>{{discipline.name}}({{development.development_type}})</option>
+                {% endfor %}
+            {% endfor %} 
+        </select> -->
+    </div>
+    <div class="col-4">
+        <label for="staticEmail" class="col-form-label">Select Sub Category<span
+            class="star-clr">*</span></label>
+        <input type="hidden" name="level2_costcode" class="level2_costcode" id="level2_costcode" value={{cost_code2}}>
+
+        {% for discipline in get_project_discipline %}
+          {% if get_sub_type.id == discipline.id %}
+            <input type="hidden" name="level2_category" value="{{discipline.id}}">
+            <input type="text" class="form-control" value="{{discipline.discipline_subtype}}" readonly="true">
+          {% endif %}
+        {% endfor %}
+
+        <!-- <select  id="level2_category" name="level2_category" class="form-control level2_category">
+          <option value="">--Select--</option>
+          {% for discipline in get_project_discipline %}
+          <option class="leveltwooptions" data-id="" value="{{discipline.id}}" {% if get_sub_type.id == discipline.id %}selected{% endif %}>{{discipline.discipline_subtype}}</option>
+          {% endfor %}
+        </select>
+        <input type="text" class="form-control new_level_cls" style="display:none"  data-id="{{request.company.id}}">
+        <input type="hidden" name="leveltype" class="leveltype"></input> -->
+
+    </div>
+</div>
+<br>
+
+  <table id="cost_code_table" class="import-costcode-table">
+    <thead>
+    <tr class='master_data' data-id='{{len_master}}'>
+      {% for cost in cost_code_id %}
+      <th class='empty-class col-form-label' id='id{{forloop.counter}}' data-id='{{cost.id}}'>Level {{forloop.counter|get_by_Levels}} - {{cost.level_name}}</th>
+      {% endfor %}
+      <th></th>
+    </tr>
+    </thead>
+  <tbody class='search_master'>
+    <!-- {% for file in file_data %}
+    {% check_data_add_class request.company.id file as validated_cls %}
+    <tr class="editabletr {% if validated_cls > 0 %}new_comp_cls{% endif %}">
+      {% for data in file %}
+      {% get_component_details request.company.id data forloop.counter0 as component_details %}
+      <td>
+        <input type="hidden" class="costcode_val" name="costcode_val{{forloop.parentloop.counter0}}" value="">
+        <input type="hidden" class="masterId" name="masterId{{forloop.parentloop.counter0}}" value="">
+        <input type="hidden" name= "maxcode{{forloop.parentloop.counter0}}" class="cost_code_static">
+        <input type="hidden" name="costcode{{forloop.parentloop.counter0}}" class="costcode">
+        {% if component_details %}
+          {% for options in sub_types %}
+            {% if options.cost_code__level_type_id == component_details.cost_code.level_type_id %}
+              {% if options.id == component_details.id %}
+                <input type="hidden" name="remaining_levels" class="form-control class{{forloop.parentloop.counter}} prev_cls commoncls subclass{{forloop.parentloop.counter}} remaining_levels costcodelevel" index="{{forloop.counter}}" value="{{options.id}}" cost_code="{{options.component_cost_code}}">
+                <input type="text" class="form-control" value="{{options.component_name}}" readonly="true">
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% else %}
+      <input type="text" name="remaining_levels" class="form-control prev_cls new_level_cls costcodelevel"  placeholder="Type New Component" data-id="{{request.company.id}}" value="{{data|default_if_none:"---"}}">
+
+      <input type="hidden" name="leveltype" class="leveltype"></input>
+      {% endif %}
+    </td>
+        {% endfor %}
+        <td>
+          <label>Code Preview</label>
+          <div class="cost_code_preview"></div>
+          <input type="hidden" name="costcodepreview0" class="costcodepreview">
+      </td>
+      <td><button type="button" class="btn btn-clr remove-btn">Remove</button></td>
+    </tr>
+    {% endfor %} -->
+    {% for component_data in sample_main_list %}
+      <tr class="editabletr old_data">
+        {% for component in component_data.components %}
+          <td>
+            <input type="hidden" class="costcode_val" name="costcode_val{{forloop.parentloop.counter0}}" value="{{component.component_cost_code}}">
+            <input type="hidden" class="masterId" name="masterId{{forloop.parentloop.counter0}}" value="{{component.cost_code.id}}">
+            <input type="hidden" class="parent_master_id" name="parent_master_id{{forloop.parentloop.counter0}}" value="{{component.cost_code.level_type_id}}">
+            <input type="hidden" name= "maxcode{{forloop.parentloop.counter0}}" class="cost_code_static" value="{{component.component_cost_code}}">
+            <input type="hidden" name="costcode{{forloop.parentloop.counter0}}" class="costcode" value="{{component.component_cost_code}}">
+            <input type="hidden" name="remaining_levels{{forloop.parentloop.counter0}}" class="form-control remaining_levels_data" placeholder="Type New Component" data-id="{{request.company.id}}" value="{{component.id}}">
+            <input type="text" class="form-control" value="{{component.component_name}}" readonly="true">
+          </td>
+        {% endfor %}
+        <td>
+            <label>Code Preview</label>
+            <div class="cost_code_preview">{{component_data.code_preview}}</div>
+            <input type="hidden" name="costcodepreview{{forloop.counter0}}" class="costcodepreview" value="{{component_data.code_preview}}">
+        </td>
+        <td><button type="button" class="btn btn-clr remove-btn">Remove</button></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+  </table>
+  <div class="row">
+    <div class="col-3">
+        <button type="button" class="btn btn-clr addnew-level" id="addnew-level">Add New</button>
+    </div>
+</div>
+  <div class="text-center btn-cls">
+    <button type="submit" class="btn btn-clr text-left final-cls waves-effect waves-float waves-light">Submit</button>
+</div>
+</form>
+
+{% endblock %}
+  
+{% block scripts %}
+{{ block.super }}
+<script>
+  var csrf_token = '{{csrf_token}}'
+var levelonesequencegap ='{{sequencegap}}'
+var levelstartwith = '{{levelstartwith}}'
+var disciplinestartwith = '{{disciplinestartwith}}'
+var disciplineseq = '{{disciplineseq}}'
+</script>
+<script src="{% static 'js/cost_code/import_cost_generate.js' %}"></script>
+<script src="/path/to/cdn/jquery.slim.min.js"></script>
+
+
+
+{% endblock %}

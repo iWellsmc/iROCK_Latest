@@ -1,0 +1,678 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load custom_tags %}
+{% load InvoiceGuardTags %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/editprojectuser.css' %}">
+
+<div class="row">
+  <div class="col-9"></div>
+  <div class="col-3">
+    <a class="btn btn-clr btn-master chck-tst mr-0 mr-2"
+        href="{% url 'projects:editprojectuser' pk %}">Back</a>
+  </div>
+</div>
+<form class="form-txt" id="addtaxformid" method="POST">
+  {% csrf_token %}
+  <div class="row align-items-baseline">
+      <div class="col-2">
+          <label class="col-form-label edit-user" data-id='{{pk}}'>Signatory Settings</label>
+          <input type="hidden" class="hidden_val" id="original_value" value="{{datas}}">
+      </div>
+      <div class="col-4">
+        <div class="down-arrow-sig">
+          <img src="../../../static/images/icons/icons8-down-arrow-18s.png" alt="">
+        </div>
+          <select id="sign_settings" name="sign_settings"
+          class="form-control input-size settings_sign">
+          <option value="">--Select--</option>
+          {% for type in key_val %}
+          <option value="{{type.id}}" {% if datas == type.id %}selected{% endif %}>{{type.settings_type}}</option>
+          {% endfor %}
+          </select>
+      </div>
+  </div>
+  {% comment %} <div class="project_sign dss-div">
+      <h4 class="from-head">Default Signatories Settings</h4>
+      <div class="col-9 show-noti pt-0">
+        <label for="">Select Signatory
+        <select class="select-style select-invoice">
+          <option value="1">With Invoice Amount</option>
+          <option value="2">Without Invoice Amount</option>
+        </select>
+      </label>
+      </div>
+      <table
+        class="table settings-data-list-view data-list-view project_master proj-lists creat-head pro-list all-tbl-hd list-user-table-width irock-table with_invoice dss-table"
+        >
+        <thead>
+          <tr>
+            <th class="wid-iin com_curency">Currency</th>
+            <th class="wid-iin">From Invoice Amount</th>
+            <th class="wid-iin">To Invoice Amount</th>
+            <th id="text-initial">No of Signatories</th>
+            <th>Users</th>
+          </tr>
+        </thead>
+        <tbody class="table-list">
+          {%for signatory in with_invoice %}
+          <tr>
+            <td>{{signatory.currency.currency_symbol}}-{{signatory.currency.currency}} ({{signatory.currency.name}})
+            </td>
+            <td>{{signatory.min_amount|add_seperator|default_if_none:''}}</td>
+            <td>{{signatory.max_amount|add_seperator|default_if_none:''}}</td>
+            <td>
+              <p class="txt-word-break">
+                {{signatory.id|no_of_users|default_if_none:"---"}}</p>
+            </td>
+            <td class="text-start">
+              {% for user in signatory|SignatoryUser %}
+              <p class="txt-word-break">{{user.user|default_if_none:"---"}}&nbsp;{{user.user.lastname|default_if_none:"---"}}
+              </p>
+              {% endfor %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9" class="cls-nil">
+              ---
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <table
+        class="table settings-data-list-view data-list-view project_master proj-lists creat-head pro-list all-tbl-hd list-user-table-width irock-table without_invoice dss-table"
+        style="display: none;">
+        <thead>
+          <tr>
+            <th class="wid-iin com_curency">Currency</th>
+            <th id="text-initial">No of Signatories</th>
+            <th>Users</th>
+          </tr>
+        </thead>
+      <tbody class="table-list">
+        {%for signatory in without_invoice %}
+        <tr>
+          <td>{{signatory.currency.currency_symbol}}-{{signatory.currency.currency}} ({{signatory.currency.name}})
+          </td>
+          <td>
+            <p class="txt-word-break">
+              {{signatory.id|no_of_users|default_if_none:"---"}}</p>
+          </td>
+          <td class="text-start">
+            {% for user in signatory|SignatoryUser %}
+            <p class="txt-word-break">{{user.user|default_if_none:"---"}}&nbsp;{{user.user.lastname|default_if_none:"---"}}
+            </p>
+            {% endfor %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="9" class="cls-nil">
+            ---
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  <div class="Default_sign pss-div">
+  <h4 class="from-head">Project Signatories Settings</h4>
+  <div class="col-9 show-noti pt-0">
+    <label for="">Select Signatory
+    <select class="select-style select-invoice-project">
+      <option value="1">With Invoice Amount</option>
+      <option value="2">Without Invoice Amount</option>
+    </select>
+  </label>
+  </div>
+  <table class="pss-table with_invoice_project" id="master_project_list">
+  <thead>
+      <tr>
+      <th class="currency">Currency</th>
+      <th class="wid-iin">From Invoice Amount</th>
+      <th class="wid-iin">To Invoice Amount</th>
+      <th class="nos-sig"><p>No of Signatories</p></th>
+      <th class="user">Users</th>
+      </tr>
+  </thead>
+  <tbody>
+  {%for company_signatory in signatory_with_invoice %}
+  <tr>
+      <input type="hidden" name="signatory_id" value="{{company_signatory.id}}">
+      <input type="hidden" name="invoice_type{{company_signatory.id}}" class="" value="1">
+      <td class="add-sign">
+      <div class='align_items'>
+          {% for countries in currency %}
+          <div>
+          {% if countries.id == company_signatory.currency.id %} {{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}}) {% endif %}
+          </div>
+          {% endfor %}
+      </div>
+      </td>
+      <td class="from-invoice">{{company_signatory.min_amount|add_seperator|default_if_none:''}}</td>
+      <td class="To-Invoice">{{company_signatory.max_amount|add_seperator|default_if_none:''}}</td>
+      <td class="small-td">
+        {{company_signatory.id|no_of_users}}
+      </td>
+      <td class="user-list">
+      {% for user in company_signatory|SignatoryUser %}
+            <p class="txt-word-break">{{user.user|default_if_none:"---"}}&nbsp;{{user.user.lastname|default_if_none:"---"}}
+            </p>
+            {% endfor %}
+      </td>
+  </tr>
+  {% empty %}
+          <tr>
+            <td colspan="9" class="cls-nil">
+              ---
+            </td>
+          </tr>
+  {% endfor %}
+</tbody>
+</table>
+<table class="pss-table without_invoice_project" id="master_project_list"  style="display: none;">
+  <thead>
+      <tr>
+      <th class="currency">Currency</th>
+      <th class="nos-sig"><p>No of Signatories</p></th>
+      <th class="user">Users</th>
+      </tr>
+  </thead>
+  <tbody>
+  {%for company_signatory in signatory_without_invoice %}
+  <tr>
+      <input type="hidden" name="signatory_id" value="{{company_signatory.id}}">
+      <input type="hidden" name="invoice_type{{company_signatory.id}}" class="" value="1">
+      <td class="add-sign">
+      <div class='align_items'>
+          {% for countries in currency %}
+          <div>
+          {% if countries.id == company_signatory.currency.id %} {{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}}) {% endif %}
+          </div>
+          {% endfor %}
+      </div>
+      </td>
+      <td class="small-td">
+        {{company_signatory.id|no_of_users}}
+      </td>
+      <td class="user-list">
+      {% for user in company_signatory|SignatoryUser %}
+            <p class="txt-word-break">{{user.user|default_if_none:"---"}}&nbsp;{{user.user.lastname|default_if_none:"---"}}
+            </p>
+            {% endfor %}
+      </td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="9" class="cls-nil">
+      ---
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+</table>  {% endcomment %}
+</div>
+</div>
+  <div class="text-center phase-vendor" id="btn">
+      <button type="submit" class="save-cls btn btn-clr text-right mt-4">Submit</button>
+  </div>
+</form>
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
+<script src="{% static 'js/projects/createsignatory.js'%}"></script>
+<script>
+  var csrf_token = '{{csrf_token}}'
+  var signatory_count='{{signatory_count}}'
+</script>
+
+<script>
+  newtrcount=1
+
+  $(document).ready(function(){
+    var selectedValue = $('#sign_settings :selected').val();
+    console.log('selectedValue',selectedValue)
+    if(selectedValue==2){
+        $('.project_sign').hide();
+        $('.Default_sign').show();
+    }
+    if(selectedValue==1){
+        $('.Default_sign').hide();
+        $('.project_sign').show();
+    }
+    if(selectedValue == ''){
+      
+      $('.Default_sign').hide();
+      $('.project_sign').hide();
+  }
+})
+
+$(document).on('click','.save-cls',function(e){
+  e.preventDefault();
+  if ($('#sign_settings :selected').val()== 1){
+    $('form')[0].submit();
+  }
+  if ($('#sign_settings :selected').val()== ''){
+    $('form')[0].submit();
+  }
+  if($('#sign_settings :selected').val()== 2){
+    $('.common_cls').not('[readonly]').each(function(index,val) {
+      // validate the input fields if empty then add the class
+      if ($(this).val() == '') {
+        $(this).addClass('con_error')
+      }else{
+        $(this).removeClass('con_error')
+      }
+    })
+    $('.common_select').not('[readonly]').each(function(index,val) {
+      // validate the input fields if empty then add the class
+      if ($(this).val() == '') {
+        $(this).addClass('con_error')
+      }else{
+        $(this).removeClass('con_error')
+      }
+    })
+    // if any input field is invalid then return false
+    if ($('.con_error').length > 0) {
+      e.preventDefault();
+    }
+    if($('.con_error').length == 0){
+      // if all the input fields are valid then call the ajax function
+      $(document).find('table tbody tr input[name="newtr"]').each(function(index,value){
+        $(value).closest('tr').find('.currency, .without-invoice').attr('name',`new_currency${index+1}`)
+        $(value).closest('tr').find('.min_amount, .min_amountn').attr('name',`new_min_amount${index+1}`)
+        $(value).closest('tr').find('.max_amount, .max_amountn').attr('name',`new_max_amount${index+1}`)
+        $(value).closest('tr').find('.new_tr').attr('name',`new_invoice_type${index+1}`)
+        $(value).closest('tr').find('.signatory-user').attr('name',`new_newuser${index+1}`)
+      })
+      $('form')[0].submit();
+    }
+  }
+
+});
+
+
+$(document).on('click','.add-without-invoice',function(e){
+  e.preventDefault();
+  $('html, body').animate({scrollTop:$(document).height()})
+    let form=`<tr><input type="hidden" name="newtr" value="new"><input type="hidden" name="new_invoice_type${newtrcount}" value="2"><td class="add-sign"> <div class='align_items'><button id="delete" class="btn btn-clr delete-btn delete-usaved-tr delete" type="button" value="delete"> <i class="fa fa-minus"></i></button><select class="form-control without-invoice common_select" id="currency-id{{signatoryuser.currency.id}}" name="new_currency${newtrcount}" class="signatory-user-id "><option value="">--- Select Currency ----</option>{% for countries in currency %}<option data-id="{{currency.id}}" value="{{countries.id}}">{{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}})</option>{% endfor %}</select></div></td><td class="from-invoice"><input type="number" readonly class="min_amount form-control disable readonly_cls" name="new_min_amount${newtrcount}" value=""></td><td class="To-Invoice"><input readonly class="max_amount form-control readonly_cls disable" type="number" name="new_max_amount${newtrcount}" value=""></td><td class="small-td"><input type="number" class="no_of_users form-control" name="new_no_of_users" value="1" readonly> </td><td class="user-list"><div class="row" id="${newtrcount}"><div class="col-9"><select class="form-control common_select taxtypecls disable project_value signatory-user" name="new_newuser${newtrcount}"><option value="">--- Select User ----</option>{% for userlist in multiuser %}<option value="{{userlist.user.id}}">{{userlist.user.name}} {{userlist.user.lastname}}&nbsp;-- {{userlist.user.designation_role}} &nbsp; {% if userlist.user.roles.id == 2 %}-- Administration{% else %}{% if userlist.user.user_department_id is not None %}-- {{userlist.user.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>{% endfor %}</select></div><div class="col-2 user-list-add-btn"><button class='ml-0 mr-0 btn btn-clr add-btn pha-sebtn addnewuser desc-count' data-id="${newtrcount}" type='button' value='Add'> <i class="fa fa-plus"></i> </button></div><div class="col-1"></div></div></td></tr>`
+    // append the form
+    let countdown=0
+    $('.common_select').not('[readonly]').each(function() {
+      if ($(this).val()=='') {
+        $(this).addClass('con_error')
+        countdown++
+      }
+    });
+    $('.common_cls').not('[readonly]').each(function() {
+      if ($(this).val()=='') {
+        $(this).addClass('con_error')
+        countdown++
+      }
+    });
+    if(countdown==0){
+      $('#master_project_list tbody').append(form);
+      console.log('countdown',countdown)
+    }
+    newtrcount++;
+    //ids ++;
+})
+
+$(document).on('click','.add-with-invoice',function(e){
+  e.preventDefault();
+  $('html, body').animate({scrollTop:$(document).height()})
+  let form = `<tr><input type="hidden" name="newtr" value="new"><input type="hidden" name="new_invoice_type${newtrcount}" value="1"><td> <div class='align_items'><button id='add' class='btn btn-clr add-btn pha-sebtn add' type='button' value='Add'> <i class="fa fa-plus"></i> </button> <button id="delete" class="btn btn-clr delete-btn delete-usaved-tr delete" type="button" value="delete"> <i class="fa fa-minus"></i> </button><select class="form-control currency common_select disable" id="currency-id" name="new_currency${newtrcount}" class="signatory-user-id"><option value="">--- Select Currency ----</option>{% for countries in currency %}<option data-id="{{currency.id}}" value="{{countries.id}}">{{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}})</option>{% endfor %}</select></div></td><td><input type="number" class="min_amount common_cls form-control disable" oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))" name="new_min_amount${newtrcount}" value=""></td><td><input class="max_amount form-control common_cls disable" type="number" oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))" name="new_max_amount${newtrcount}" value=""></td><td><input type="number" class="no_of_users form-control" name="new_no_of_users" value="1" readonly> </td><td class="user-list"><div class="row" id="${newtrcount}"><div class="col-9"><select class="form-control common_select taxtypecls disable project_value signatory-user" name="new_newuser${newtrcount}"><option value="">--- Select User ----</option>{% for userlist in multiuser %}<option value="{{userlist.user.id}}">{{userlist.user.name}} {{userlist.user.lastname}}&nbsp;-- {{userlist.user.designation_role}} &nbsp; {% if userlist.user.roles.id == 2 %}-- Administration{% else %}{% if userlist.user.user_department_id is not None %}-- {{userlist.user.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>{% endfor %}</select></div><div class="col-2"><button class='ml-0 btn btn-clr add-btn pha-sebtn addnewuser' data-id="${newtrcount}" type='button' value='Add'> <i class="fa fa-plus"></i> </button></div><div class="col-1"></div></div></td></tr>`
+  let countdown=0
+  $('.common_cls').not('[readonly]').each(function() {
+    if ($(this).val()=='') {
+      $(this).addClass('con_error')
+      countdown++
+    }
+  });
+  $('.common_select').not('[readonly]').each(function() {
+    if ($(this).val()=='') {
+      $(this).addClass('con_error')
+      countdown++
+    }
+  });
+  if(countdown==0){
+    $('#master_project_list tbody').append(form);
+    console.log('countdown',countdown)
+  }
+  newtrcount++;
+});
+
+
+
+$(document).on('change','#project_manager',function(){
+  var selectedTexts = [];
+  var html='<option>--Select--</option>'
+  $('#project_manager option:selected').each(function() {
+      selectedTexts.push($(this).text());
+      let values=$(this).val()
+      html+='<option value="'+values+'">'
+      html+=''+$(this).text()+''
+      html+='</option>'
+      $('.opt').remove('')
+  });
+  $('.project_value').html(html)
+})
+
+
+$(document).on('click','.editproject',function(){
+  selectedTexts=[];
+  let pk=$('#userdata').attr('data-id')
+  console.log('pk',pk)
+  $('#project_manager option:selected').each(function() {
+    selectedTexts.push($(this).val());
+});
+$.ajax({
+  url: '/projects/usercheck/'+pk+'',
+  type: "POST",
+  headers: { "X-CSRFToken": csrf_token},
+  async: false,
+  data: {
+    'pk': pk,
+    'users_in':selectedTexts,
+  },
+  success: function (data) {
+  }
+})
+})
+
+
+$(document).on('change','.settings_sign',function(){
+  let current_val=$(this).val()
+  let company_sign_count='{{signatory_count2}}' 
+  if (current_val == 1){
+    if (company_sign_count == 0){
+      Swal.fire('Company Level Signatories Settings not updated')
+      $('.project_sign').hide();
+      const fixed_val=$('.hidden_val').val()
+      $('#sign_settings').val(fixed_val)
+      if(fixed_val==2){
+        $('.project_sign').hide();
+        if (signatory_count == 0){
+          swal.fire('Add Signatory for this Project')
+          $(this).val('')
+        }
+        else{
+          $('.Default_sign').show();
+        }
+       
+    }
+    if(fixed_val==1){
+        $('.Default_sign').hide();
+        $('.project_sign').show();
+    }
+    if(fixed_val == ''){
+      $('.Default_sign').hide();
+      $('.project_sign').hide();
+  }
+      
+    }
+    else{
+        
+      Swal.fire({
+        text: 'Are You sure want to change signatory type?',
+        showDenyButton: true,
+        confirmButtonText: 'Yes',
+        denyButtonText: 'No',
+        allowOutsideClick:false,
+        confirmButtonColor: '#AF2B50',
+        denyButtonColor:'#AF2B50',
+        customClass: {
+          actions: 'my-actions',
+          confirmButton: 'order-2',
+          denyButton: 'order-3',
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          let changed_val=$(this).val()
+          let pk=$('.edit-user').attr('data-id')
+          console.log('pk',pk)
+          $.ajax({
+            type: "POST",
+            headers: { "X-CSRFToken": "{{ csrf_token }}"},
+            url: "{% url 'projects:validatesignatorysettings' pk %}",
+            data: {'changed_val':changed_val,'pk':pk},
+            success: function(data){
+                window.location.reload();    
+                const fixed_val=$('.hidden_val').val()
+                $('#sign_settings').val(fixed_val)
+                if(fixed_val==2){
+                    $('.project_sign').hide();
+                    $('.Default_sign').show();
+                }
+                if(fixed_val==1){
+                  if (signatory_count == 0){
+                    swal.fire('Add Signatory for this Project')
+                    $(this).val('')
+                  }
+                  else{
+                    $('.project_sign').show();
+                    $('.Default_sign').hide();
+                  }
+                }
+                if(fixed_val == ''){
+                  $('.Default_sign').hide();
+                  $('.project_sign').hide();
+              }                
+            }
+  
+  
+        })
+        
+        } else if (result.isDenied) {
+          const fixed_val=$('.hidden_val').val()
+          $('#sign_settings').val(fixed_val)
+          if(fixed_val==2){
+              $('.project_sign').hide();
+              $('.Default_sign').show();
+          }
+          if(fixed_val==1){
+              $('.Default_sign').hide();
+              $('.project_sign').show();
+          }
+          if(fixed_val == ''){
+            $('.Default_sign').hide();
+            $('.project_sign').hide();
+        }
+        }
+      })
+  
+  
+  
+    var value_tye=$(this).val()
+    if(value_tye=='1'){
+        $('.project_sign').removeAttr('style')
+        $('.Default_sign').addClass('style').css('display', 'none');
+        }
+    else{
+        $('.project_sign').addClass('style').css('display', 'none');
+    }
+    if(value_tye=='2'){
+        $('.Default_sign').removeAttr('style')
+    }
+    else{
+        $('.Default_sign').addClass('style').css('display', 'none');
+    }
+    }
+  }
+  else{
+  Swal.fire({
+      text: 'Are You sure want to change signatory type?',
+      showDenyButton: true,
+      confirmButtonText: 'Yes',
+      denyButtonText: 'No',
+      allowOutsideClick:false,
+      confirmButtonColor: '#AF2B50',
+      denyButtonColor:'#AF2B50',
+      customClass: {
+        actions: 'my-actions',
+        confirmButton: 'order-2',
+        denyButton: 'order-3',
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        let changed_val=$(this).val()
+        let pk=$('.edit-user').attr('data-id')
+        console.log('pk',pk)
+        $.ajax({
+          type: "POST",
+          headers: { "X-CSRFToken": "{{ csrf_token }}"},
+          url: "{% url 'projects:validatesignatorysettings' pk %}",
+          data: {'changed_val':changed_val,'pk':pk},
+          success: function(data){
+              window.location.reload();    
+              const fixed_val=$('.hidden_val').val()
+              $('#sign_settings').val(fixed_val)
+              if(fixed_val==2){
+                  $('.project_sign').hide();
+                  $('.Default_sign').show();
+              }
+              if(fixed_val==1){
+                  $('.Default_sign').hide();
+                  $('.project_sign').show();
+              }
+              if(fixed_val == ''){
+                $('.Default_sign').hide();
+                $('.project_sign').hide();
+            }                
+          }
+
+
+      })
+      
+      } else if (result.isDenied) {
+        const fixed_val=$('.hidden_val').val()
+        $('#sign_settings').val(fixed_val)
+        if(fixed_val==2){
+            $('.project_sign').hide();
+            $('.Default_sign').show();
+        }
+        if(fixed_val==1){
+            $('.Default_sign').hide();
+            $('.project_sign').show();
+        }
+        if(fixed_val == ''){
+          $('.Default_sign').hide();
+          $('.project_sign').hide();
+      }
+      }
+    })
+
+
+
+  var value_tye=$(this).val()
+  if(value_tye=='1'){
+      $('.project_sign').removeAttr('style')
+      $('.Default_sign').addClass('style').css('display', 'none');
+      }
+  else{
+      $('.project_sign').addClass('style').css('display', 'none');
+  }
+  if(value_tye=='2'){
+      $('.Default_sign').removeAttr('style')
+  }
+  else{
+      $('.Default_sign').addClass('style').css('display', 'none');
+  }
+}
+})
+
+
+$(document).on('click','.adduser,.addnewuser',function(e){
+  e.preventDefault();
+  let id = $(this).data('id');  
+  console.log('new user id',id)
+  // id is not defined
+  if (id == undefined) {
+    id = 0
+  }
+  
+
+  // append the select tag
+  $(this).closest('tr').find('.user-list').append(`<div class="row"><div class="col-9"><select class="form-control disable newuser signatory-user common_select" name="newuser${id}"><option value="">--- Select User ----</option>{% for userlist in multiuser %}<option value="{{userlist.user.id}}">{{userlist.user.name}} {{userlist.user.lastname}}&nbsp;-- {{userlist.user.designation_role}} &nbsp; {% if userlist.user.roles.id == 2 %}-- Administration{% else %}{% if userlist.user.user_department_id is not None %}-- {{userlist.user.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>{% endfor %}</select></div><div class="col-2"><button  class="btn btn-clr delete-btn delete-unsaved-user desc-count" data-id="{{signatoryuser.id}}" type="button" value="delete"> <i class="fa fa-minus"></i> </button></div><div class="col-1"></div>`)
+  let get_noof_user = $(this).closest('tr').find('.no_of_users').val()
+  let set_no_of_user = $(this).closest('tr').find('.no_of_users').val(parseInt(get_noof_user)+1)
+})
+
+$(document).on('click','.add',function(e){
+  e.preventDefault();
+    const add_val=$(this)
+    let id = $(this).data('id');
+    // id is not defined
+    if (id == undefined) {
+      id = 0
+    }
+
+    // closest tr find currency id
+    let currency_id = $(this).closest('tr').find('.currency').val();
+    let min_id=$(this).closest('tr').find('.min_amountn,.min_amount').val();
+    let mini=$(this).closest('tr').find('.min_amountn,.min_amount')
+    let max_id = $(this).closest('tr').find('.max_amountn,.max_amount').val()
+    let maxi = $(this).closest('tr').find('.max_amountn,.max_amount')
+    // jquery each function
+    let max_amount_array = [0];
+    
+    $('.currency option[value="' + currency_id + '"]').filter('option:selected').each(function(index,value){
+      if($(this).val() == currency_id){
+        // get max amount
+        max = $(this).closest('tr').find('.max_amountn,.max_amount').val()
+        let parsedMax = parseInt(max.replace(/,/g, ''));
+        if (!isNaN(parsedMax)) {
+          max_amount_array.push(parsedMax);
+        }
+      }
+    })
+
+    if(currency_id==''){
+      $(this).closest('tr').find('.currency').addClass('con_error')
+    }
+  if(!mini.prop('readonly')){
+    if(min_id==''){
+      $(this).closest('tr').find('.min_amountn,.min_amount').addClass('con_error')
+    }
+  }
+  if(!maxi.prop('readonly')){
+    if(max_id==''){
+      $(this).closest('tr').find('.max_amountn,.max_amount').addClass('con_error')
+    }
+  }
+   
+    
+    // get array max amount
+  let maxs = max_amount_array.reduce((a, b) => Math.max(a, b));
+  console.log({'max':maxs})
+  let form=`<tr><input type="hidden" name="newtr" value="new"><input type="hidden" name="new_invoice_type${newtrcount}" value="1"><td class="add-sign"> <div class='align_items'><button id='add' onclick="scroll_function()" class='btn btn-clr add-btn pha-sebtn add' type='button' value='Add'> <i class="fa fa-plus"></i> </button> <button id="delete" class="btn btn-clr delete-btn delete-usaved-tr delete" type="button" value="delete"> <i class="fa fa-minus"></i> </button><select class="form-control common_select currency disable" id="currency-id{{signatoryuser.currency.id}}" name="new_currency${newtrcount}" class="signatory-user-id"><option value="">--- Select Currency ----</option>{% for countries in currency %}<option data-id="{{currency.id}}" value="{{countries.id}}">{{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}})</option>{% endfor %}</select></div></td><td class="from-invoice"><input type="number" class="min_amount form-control common_cls disable" id='mini_id' oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))" name="new_min_amount${newtrcount}" value="${maxs+1}"></td><td class="To-Invoice"><input class="max_amount form-control common_cls disable" type="number" id='maxi_id' oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))" name="new_max_amount${newtrcount}" value=""></td><td class="small-td"><input type="number" class="no_of_users form-control" name="new_no_of_users" value="1" readonly> </td><td class="user-list"><div class="row" id="${newtrcount}"><div class="col-9"><select class="form-control common_select taxtypecls common_select disable project_value signatory-user" name="new_newuser${newtrcount}"><option value="">--- Select User ----</option>{% for userlist in multiuser %}<option value="{{userlist.user.id}}">{{userlist.user.name}} {{userlist.user.lastname}}&nbsp;-- {{userlist.user.designation_role}} &nbsp; {% if userlist.user.roles.id == 2 %}-- Administration{% else %}{% if userlist.user.user_department_id is not None %}-- {{userlist.user.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>{% endfor %}</select></div><div class="col-2 user-list-add-btn"><button class='btn btn-clr add-btn pha-sebtn addnewuser' data-id="${newtrcount}" type='button' value='Add'> <i class="fa fa-plus"></i> </button></div><div class="col-1"></div></div></td></tr>`
+  let countdown=0
+  $('.common_cls').not('[readonly]').each(function() {
+  if ($(this).val()=='') {
+      $(this).addClass('con_error')
+      countdown++
+  }
+  });
+  $('.common_select').not('[readonly]').each(function() {
+  if ($(this).val()=='') {
+      $(this).addClass('con_error')
+      countdown++
+  }
+  });
+
+  if(currency_id!='' && countdown==0){
+  $(this).closest('tbody').append(form).find(`tr:last .currency option[value=${currency_id}]`).prop('selected', true)
+  }
+  $('html, body').animate({scrollTop:$(document).height()})      
+  newtrcount++;
+})
+
+
+
+</script>
+
+{% endblock %}

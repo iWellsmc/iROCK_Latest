@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/accountpayable.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/signatory_user.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/calculator.css' %}"> 
+
+<style>
+    
+
+    .table {
+      border: none; /* Remove border */
+    }
+
+    .table th,
+    .table td {
+      border: none !important; /* Remove border from table cells */
+    }
+</style>
+
+
+<section>
+    <div class="row">
+        <div class="col-lg-6 col-md-3">
+        </div>
+    <div class="col-lg-6 col-md-9 text-end">
+    <button type="button" class="btn btn-clr"><a href="{% url 'invoice:invoiceview' pk %}">Back</a></button>
+</div> 
+  {% comment %} <div class="from-head">Invoice Details</div>  
+  
+    <div class="row ">
+        <div class="invoice_split mb-4 cursor-pointer">
+          <table class="table invoice_split_details" >
+            <thead>
+              <tr class="heading-new">
+                <th class="text-al_cen text-wrap">VIN</th>
+                <th class="text-al_cen text-wrap">Vendor Name</th>
+                <th class="text-al_cen text-wrap">Service Name</th>
+                <th class="text-al_cen text-wrap">Invoice number </th>
+                <th class="text-al_cen text-wrap">Submit Date</th>
+                <th class="text-al_cen text-wrap">Aproval Status </th>
+                <th class="text-al_cen text-wrap">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{get_invoice.vendor.vin}}</td>
+                    <td>{{get_invoice.vendor.vendor_name}}</td>
+                    <td>{{get_invoice.name_service }}</td>
+                    <td>
+                        {% for invoice in invoice_details %}
+                        <div>{{invoice.invoice_number}}</div>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for invoice in invoice_details %}
+                        <div>{{invoice.invoice_submission_date|confulldate:invoice.invoice.company.id|default_if_none:"---"}}</div>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for invoice in invoice_details %}
+                        <div>{% if invoice.approval_status == 6 and get_invoice.invoice_status == 6 %} Disputed {% elif invoice.approval_status == 1 and get_invoice.invoice_status == 2 and get_invoice.approval_status == 0 %} Awaiting Approval {% elif invoice.approval_status == 1 and get_invoice.invoice_status == 2 and get_invoice.approval_status == 1 %} Approved{% elif invoice.approval_status == 1 and get_invoice.invoice_status == 1 %} Not Yet Submitted {% elif invoice.approval_status == 4 and get_invoice.invoice_status == 4 %} Returned {% elif invoice.approval_status == 5 and get_invoice.invoice_status == 5 %} Rejected {% else %} Approved {% endif %}</div>
+                        {% endfor %}
+                    </td>
+                    <td>
+                            
+                      <a class="btn px-1" href="/invoice/invoiceview/{{pk}}"><i class="fa fa-eye" title="View"></i></a>
+
+                      {% checkpermission_invoiceoverride get_invoice request.user.id "1" as haspermission_invoiceoverride %}
+                            {% if haspermission_invoiceoverride > 0 %}   
+                                <a class="btn px-1 inv_app_cls assign-user all-icon-same-clr" href="{% url 'invoice:invoiceoverrideusers' pk %}" data_id="{{pk}}">
+                                   
+                                    <img src="{% static 'images/over-ride-user.png' %}" title="Override Users"/>
+                                </a>    
+                            {% else %}
+                                {% checkpermission_invoicerecipt get_invoice request.user.id "1" as haspermission_invoicerecipt %}
+                                {% if haspermission_invoicerecipt > 0 %}
+                                    <a class="btn px-1 inv_app_cls check_sign all-icon-same-clr" href="{% url 'invoice:checklist' pk %}" data_id="{{pk}}">
+                                        <i class="fa-solid fa-list-check" title='Invoice Receipt'></i>
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+
+                            {% checkpermission_invoiceoverride get_invoice request.user.id "2" as haspermission_invoiceoverride %}
+                            {% if haspermission_invoiceoverride > 0 %}   
+                                <a class="btn px-1 inv_app_cls assign-user all-icon-same-clr" href="{% url 'invoice:invoiceoverrideusers' pk %}" data_id="{{pk}}">
+                                  
+                                    <img src="{% static 'images/over-ride-user.png' %}" title="Override Users"/>
+                                </a>    
+                            {% else %}
+                                {% checkpermission_invoicerecipt get_invoice request.user.id "2" as haspermission_invoicerecipt %}
+                                {% if haspermission_invoicerecipt > 0 %}   
+                                    <a class="btn px-1 inv_app_cls check_sign all-icon-same-clr" href="{% url 'invoice:invoiceapproval' pk %}" data_id="{{pk}}">
+                                        <i class='fa-solid fa-file-invoice' title='Invoice Approval'></i>
+                                    </a>    
+                                {% endif %}
+                            {% endif %}
+
+                            {% checkpermission_invoiceoverride get_invoice request.user.id "3" as haspermission_invoiceoverride %}
+                            {% if haspermission_invoiceoverride > 0 %}   
+                                <a class="btn px-1 inv_app_cls assign-user all-icon-same-clr" href="{% url 'invoice:invoiceoverrideusers' pk %}" data_id="{{pk}}">
+                                  
+                                    <img src="{% static 'images/over-ride-user.png' %}" title="Override Users"/>
+                                </a>    
+                            {% else %}
+                                {% checkpermission_invoicerecipt get_invoice request.user.id "3" as haspermission_invoicerecipt %}
+                                {% if haspermission_invoicerecipt > 0 %}   
+
+                             
+                            
+                                    <a class="btn px-1 inv_app_cls check_sign all-icon-same-clr" href="{% url 'invoice:exchangerate' pk %}" data_id="{{pk}}">
+                                        <i class="fa-brands fa-stack-exchange" title='Tax Confirmation'></i>
+                                    </a>  
+                                {% endif %}
+                            {% endif %}
+
+
+                            {% checkpermission_invoiceoverride get_invoice request.user.id "4" as haspermission_invoiceoverride %}
+                            {% if haspermission_invoiceoverride > 0 %}   
+                                <a class="btn px-1 inv_app_cls assign-user all-icon-same-clr" href="{% url 'invoice:invoiceoverrideusers' pk %}" data_id="{{pk}}">
+                                  
+                                    <img src="{% static 'images/over-ride-user.png' %}" title="Override Users"/>
+                                </a>    
+                            {% else %}
+                                {% checkpermission_invoicerecipt get_invoice request.user.id "4" as haspermission_invoicerecipt %}
+                                {% if haspermission_invoicerecipt > 0 %}       
+                                    <a class="btn px-1 inv_app_cls check_sign all-icon-same-clr" href="{% url 'invoice:generatepayment' pk %}" data_id="{{pk}}">
+                                        <i class="fa-brands fa-creative-commons-share" title='Payment Generation'></i>
+                                    </a>   
+                                {% endif %}
+                            {% endif %}
+                            <!-- <p>{{get_credit_note}}</p> -->
+                            {% if get_credit_note > 0 %}
+                            
+                            <!-- Display the count of credit notes -->
+                            <a class="btn px-1 waves-effect waves-float waves-light" href="{% url 'invoice:viewcreditnotes' pk %}" data_id="{{ data.id }}" title="View Credit Notes">
+                                <div class="credit_note">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" style="margin-top: -6px;" viewBox="0 0 14 14">
+                                        <path fill="none" stroke="#95183a" stroke-linecap="round" stroke-linejoin="round" d="M8 13.5H1.5a1 1 0 0 1-1-1v-11a1 1 0 0 1 1-1H9m1.5 3l1.5-3l1.5 3V12a1.5 1.5 0 0 1-3 0Zm0 6h3m-10-9v13M6 4h2"/>
+                                    </svg>
+                                </div>
+                            </a>
+                        {% endif %}
+                        
+
+
+
+
+                    </td>
+            </tr>
+            </tbody>
+          </table>
+        </div> 
+    </div> {% endcomment %}
+
+    {% if module_count > 0%}
+    <h4 class="head-inv-pre mid mt-5">Payment Details</h4>
+    <input type="hidden" id="user_sign" value="{{sign_data}}">
+    <div class="row ">
+        <div class="invoice_split mb-4 cursor-pointer">
+        {% for module in module_value %}    
+        <div class="head-inv-pre mt-5">Payment {% if module_count > 1%} - {{forloop.counter}} {% endif %}</div>  
+        <table class="table partially_paid">
+            <thead>
+              <tr class="heading-new">
+                <th class="text-al_cen text-wrap">Payment Percentage </th>
+                <th class="text-al_cen text-wrap">Invoice number </th>
+                <th class="text-al_cen text-wrap">Payment Status</th>
+                <th class="text-al_cen text-wrap">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+                <input type="hidden" class="payment_term" value="{{module}}" name="payment_term">
+                <tr>
+                  <td>
+                    {% for invoice in invoice_details %}
+                    {% find_payment_percentage module  invoice.id as payment_percentage %}
+                    {% if payment_percentage.payment_percentage != 0 and payment_percentage.payment_percentage != None %}
+                    <div>{{payment_percentage.payment_percentage}} %</div>
+                    {% endif %}
+                    {% endfor %}
+                </td>
+                  <td>
+                    {% for invoice in invoice_details %}
+                    {% find_payment_percentage module  invoice.id as payment_percentage %}
+                    {% if payment_percentage.payment_percentage != 0 and payment_percentage.payment_percentage != None %}
+                    <div>{{invoice.invoice_number}}</div>
+                    {% endif %}
+
+                    {% endfor %}
+                  </td>  
+
+
+                  
+                  <td>
+                    {% for invoice in invoice_details %}
+                    {% find_payment_percentage module  invoice.id as payment_percentage %}
+                    {% if payment_percentage.payment_percentage != 0 and payment_percentage.payment_percentage != None %}
+                    {% if payment_percentage.payment_status == 2 %}
+                    <input type="hidden" value="{{payment_percentage.id}}" invoice_cost="{{payment_percentage.invoicecost.id}}" data_name="{{payment_percentage.invoicecost.invoice_number}}" name="file_upload" class="file_upload" data_id="{{payment_percentage.payment_percentage}}">
+                    {% endif %}
+                    <!-- <div>{% if payment_percentage.payment_status == 1 %}Unpaid{% elif payment_percentage.payment_status == 2 %} Confirmed for Payment{% else %}  {% payment_generate_split_percentage payment_percentage.invoicecost payment_percentage.payment_count as partial %} {% if partial == 100 %} Paid {% else %} Partially paid {% endif %} {% endif %}</div> -->
+                    <div>
+                        {% if payment_percentage.payment_status == 1 %}
+                            Unpaid
+                        {% elif payment_percentage.payment_status == 2 %}
+                            {% if payment_percentage.new_payment_status == 1 %}
+                                Confirmed for Payment
+                            {% else %} 
+                                {% payment_generate_split_percentage payment_percentage.invoicecost payment_percentage.payment_count as partial %} {% if partial == 100 %} Paid {% else %} Paid {% endif %}
+                            {% endif %}
+                        
+                        {% else %} 
+                            {% payment_generate_split_percentage payment_percentage.invoicecost payment_percentage.payment_count as partial %} {% if partial == 100 %} Paid {% else %} Paid {% endif %}
+                        {% endif %}</div>
+                    {% endif %}
+                    {% endfor %}
+                  </td>
+                  <td>
+                    <a class="btn px-1" href="/invoice/paymentinstructionsview/{{pk}}/{{module}}/"><i class="fa fa-eye" title="View"></i></a>
+                    <!-- {% checkapprovalmodule_flow get_invoice request.user.id "5" module as payment_approval %}
+                    {% if payment_approval %}
+                    <a class="btn px-1 inv_app_cls check_sign all-icon-same-clr" href="/invoice/signatory/{{pk}}/{{module}}" data_id="{{pk}}"><i class="fa-solid fa-file-signature" title="Payment Approval"></i></a>
+                    {% endif %}
+                    {% checkapprovalmodule_flow get_invoice request.user.id "6" module as payment_approval %}
+                    {% if payment_approval %}
+                    <a class="btn px-1 inv_app_cls check_sign all-icon-same-clr" href="/invoice/accountpayable/{{pk}}/{{module}}" data_id="{{pk}}" title="Payment Confirmation"><svg xmlns="http://www.w3.org/2000/svg" width="1.4em" height="1.4em" style="margin-top: -6px;" viewBox="0 0 384 512"><path fill="#95183a" d="M64 0C28.7 0 0 28.7 0 64v384c0 35.3 28.7 64 64 64h256c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zm192 0v128h128L256 0zM64 80c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16s-7.2 16-16 16H80c-8.8 0-16-7.2-16-16zm0 64c0-8.8 7.2-16 16-16h64c8.8 0 16 7.2 16 16s-7.2 16-16 16H80c-8.8 0-16-7.2-16-16zm128 72c8.8 0 16 7.2 16 16v17.3c8.5 1.2 16.7 3.1 24.1 5.1c8.5 2.3 13.6 11 11.3 19.6s-11 13.6-19.6 11.3c-11.1-3-22-5.2-32.1-5.3c-8.4-.1-17.4 1.8-23.6 5.5c-5.7 3.4-8.1 7.3-8.1 12.8c0 3.7 1.3 6.5 7.3 10.1c6.9 4.1 16.6 7.1 29.2 10.9l.5.1c11.3 3.4 25.3 7.6 36.3 14.6c12.1 7.6 22.4 19.7 22.7 38.2c.3 19.3-9.6 33.3-22.9 41.6c-7.7 4.8-16.4 7.6-25.1 9.1V440c0 8.8-7.2 16-16 16s-16-7.2-16-16v-17.8c-11.2-2.1-21.7-5.7-30.9-8.9c-2.1-.7-4.2-1.4-6.2-2.1c-8.4-2.8-12.9-11.9-10.1-20.2s11.9-12.9 20.2-10.1c2.5.8 4.8 1.6 7.1 2.4c13.6 4.6 24.6 8.4 36.3 8.7c9.1.3 17.9-1.7 23.7-5.3c5.1-3.2 7.9-7.3 7.8-14c-.1-4.6-1.8-7.8-7.7-11.6c-6.8-4.3-16.5-7.4-29-11.2l-1.6-.5c-11-3.3-24.3-7.3-34.8-13.7c-12-7.2-22.6-18.9-22.7-37.3c-.1-19.4 10.8-32.8 23.8-40.5c7.5-4.4 15.8-7.2 24.1-8.7V232c0-8.8 7.2-16 16-16z"/></svg></a>
+                    {% endif %}
+                    {% checkfor_invoicerecipt_upload get_invoice request.user.id "7" module as payment_approval %} -->
+                    <!-- {% if payment_approval %}
+                    <a class="btn px-1 check_sign inv_app_cls file_uploader upload{{pk}}" class="pay_rec_cls " pay_id="{{pk}}"  data-toggle="modal" id="file_uploading" data-target="#exampleModalCenter" data_id="{{pk}}"><i class="fa-solid fa-receipt" style="color: #95183a; font-size: 17px;" title="Payment Receipt Confirmation"></i></a>
+
+                    {% comment %} <a class="btn px-1 inv_app_cls check_sign all-icon-same-clr" href="/invoice/signatory/{{pk}}/{{module}}" data_id="{{pk}}"><i class="fa-solid fa-file-signature" title="Payment Approval"></i></a> {% endcomment %}
+                    {% endif %} -->
+                    <!-- {% if request.user.bankuserstatus == 1 %}
+                    {% checkapprovalmodule_flow get_invoice request.user.id None module as payment_approval %}
+                    {% if payment_approval %}
+                    <a class="btn px-1 check_sign all-icon-same-clr" href="/invoice/bankuserview/{{pk}}/{{module}}" data_id="{{pk}}"><button type="button" class="btn btn-clr invoice-pay-btn">Invoice for Payment</button></a>
+                    {% endif %}
+                    {% else %}
+                    {% checkbal_for_balance_invoice get_invoice request module as payment_approval %}
+                    {% if payment_approval > 0 %}
+                    <a class="btn px-1 check_sign all-icon-same-clr" href="/invoice/bankuserview/{{pk}}/{{module}}" data_id="{{pk}}"><button type="button" class="btn btn-clr invoice-pay-btn">Invoice for Payment</button></a>
+                    {% endif %}
+                    {% endif %} -->
+                  </td>
+                </tr>
+                {% comment %} {% endfor %} {% endcomment %}
+            </tbody>
+        </table>
+        {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+
+    <form method="POST" id="queryform" enctype="multipart/form-data">
+        {% csrf_token %}
+    <div class="my-modal">
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content ">
+                <div class="modal-header comment-head">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Payment Receipt Upload</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                    <div class="modal-body">
+                        <table class="upload-choose-file">
+                            <tbody class="val_details">
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer comment-foot">
+                    <button class="btn btn-secondary submit_cls">Submit</button>
+                    </div>
+            </div>
+            </div>
+        </div>  
+    </div>
+    </form>
+
+      
+     
+  
+  
+  
+  
+  
+   </section>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    var pk="{{pk}}"
+</script>
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script type="text/javascript" src="{% static 'js/invoice/companyinvoicelist.js' %}"></script>
+{% endblock %}

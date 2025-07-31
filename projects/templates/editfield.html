@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_tags %}
+{% block content %}
+<h4 class="card-title from-head">Edit Field</h4>
+<form method="POST" class="form-txt" id="edit-field">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-3 ">
+            <h3 class="head-master">Country</h3>
+            <div class="project_country txt-name">
+                <p>{{project.country.name}}</p>
+            </div>
+            
+        </div>
+        <div class="col-3 ">
+            <h3 class="head-master">Project Name</h3>
+            <div class="project_name txt-name">
+                <input type="hidden" id="project_id" name="project_id" value={{project.id}}>
+                <p>{{project.name}}</p>
+            </div>
+        </div>
+        <div class="col-6">                
+            <div class="container-fluid">
+                
+                {% for block in blocks %}
+                {% if block.status == 1 %}
+                {% if forloop.counter == 1 %}
+                <h3 class="head">Block Name</h3>
+                {% endif %}
+                <div class="row">
+                    <div class='col-6'>
+                        
+                        <input type="checkbox" name="block_name_check" {% if block.status == 1%} checked="checked" {% endif%} data-id={{block.id}}  value="{{block.block_name}}" >&emsp;<label>{{block.block_name}}</label><br>
+                    </div>
+                    <div class='col-6'>
+                        <table id ="table_field-{{block.id}}" class="blk-col" >
+                        <tbody>
+                        <input type="hidden" name='block_hdid' value="{{block.id}}" >  
+                        {% for field in block.id|get_field:"field" %}
+                            <tr>
+                                <input type="hidden" name="field_hd{{block.id}}" value="{{field.id}}" >
+                                <td><input type="text" name="field_name{{block.id}}" class="form-control" value="{{field.field_name}}"></td>
+                                {% comment %} {% if forloop.counter0 == 0 %} {% endcomment %}
+                                <td><button id="field-add-row" class="btn btn-clr add-btn" type="button" data-id="{{block.id}}" value="Add"><i class="fa fa-plus"></i></button></td>
+                                {% comment %} {% else %} {% endcomment %}
+                                <td><button id="delete-row" class="btn-clr field-delete-row btn btn-primary" type="button" value="delete"><i class="fa fa-minus"></i></button></td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        </table>
+                    </div> 
+                
+                </div>
+                {% else %}
+                
+                <div class="row">
+                    <div class='col-6'>
+                        <input type="hidden" name='block_hdid' value="{{block.id}}" >  
+                        <input type="checkbox" name="block_name_check" data-id={{block.id}} value="{{block.block_name}}" >&emsp;<label>{{block.block_name}}</label><br>
+                    </div>
+                    <div class='col-6'>
+                    </div> 
+                
+                </div>
+                {% endif %}
+                {% endfor %}
+                
+
+                    {% comment %} <div class="col-md-6">
+                        <h3 class="head-master">Block Name</h3>
+                        {% for block in blocks %}
+                            <input type="checkbox" name="block_name_check" {% if block.status == 1%} checked="checked" {% endif%} data-id={{block.id}}  value="{{block.block_name}}" >&emsp;<label>{{block.block_name}}</label><br>
+                        {% endfor %}
+                    
+                    <div class="col-md-6">
+                        <h3 class="head-master">Field Name</h3>
+                        {% for block in blocks %}
+                   
+                            {% if block.status == 1 %}
+                            <table>
+                                <tbody id ="table-'+val+" class="blk-col">
+                                {% for field in fields %}
+                                    {% if block.id == field.block_id %}
+                                        <tr>
+                                        <td id="fieldrow0"><input type="text" name="field_name{{field.id}}" class="form-control" placeholder="Field Name" value="{{field.field_name}}"></td>
+                                        <td><button id="field-add-row" class="btn btn-clr add-btn" type="button" data-id='{{field.id}}' value="Add"><i class="fa fa-plus"></i></button></td>    
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                            </table>
+                            {% endif %}
+                        {% endfor %} {% endcomment %}
+                </div>                 
+            </div>
+            <div class= "blockname_check txt-name" ></div>
+            
+        </div>
+        <div class="text-center">
+            <button type="button" class="btn btn-clr save-draft text-center submit-cls" project_id="{{project.id}}"  data-id="3">Save</button>
+            <button type="button" class="btn btn-clr save-draft text-center back-cls" data-id="3">Back</button>
+        </div>
+    </div>
+</form>
+
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/projects/editmasterproject.js' %}"></script>
+{% endblock %}

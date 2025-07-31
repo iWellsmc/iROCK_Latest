@@ -1,0 +1,32 @@
+Dear {{recipientuser.name|default_if_none:"---"}} {{recipientuser.lastname|default_if_none:"---"}},<br>
+Please note that payment has been approved for invoice-{{all_invoice}} for Vendor-{{vendor.vendor_name}} for services-{{invoice_detail.name_service}}<br><br>
+The above invoice has been reviewed and approved by all the assigned personnel:<br>
+{% if approved_users_count > 1 %}
+{% for users in approved_users %}
+{% if forloop.last %}
+and 
+{{users.name}} {{users.lastname|default_if_none:"---"}}.<br>
+{% else %}
+{{users.name}} {{users.lastname|default_if_none:"---"}},<br>
+{% endif %}
+{% endfor %}<br>
+{% else %}
+{% for users in approved_users %}
+{{users.name}} {{users.lastname|default_if_none:"---"}}.<br>
+{% endfor %}<br>
+{% endif %}
+Please proceed to process the invoice to be sent for payment authorization as assigned.<br><br>
+
+Regards,<br>
+The Invoice Payment Process System.<br>
+{{request.company.company_name|default_if_none:"---"}}<br>
+L:{% if request.company.phone_countrycode %}  {{request.company.phone_countrycode|default_if_none:"---"}}-{{request.company.phonenumber|default_if_none:"---"}} {% endif %} {% if request.company.mobile_countrycode %}| M:{{request.company.mobile_countrycode|default_if_none:"---"}}-{{request.company.mobile|default_if_none:"---"}} {% endif %}<br>
+E: {% if request.company.email %}{{request.company.email|default_if_none:"---"}} {% endif %} {% if request.company.website %}| W:{{request.company.website|default_if_none:"---"}} {% endif %}<br>
+{% if request.company.address %}
+{{request.company.address|default_if_none:"---"|safe}}<br>
+{% endif %}
+{% if image == '' %}
+<img  src="{{url}}/static/images/icons/Character%20icon.svg" width="100" height="150" alt="Image" title="Image" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 100%;max-width: 100px; height:100px; padding: 12px 0px;"/>
+{% else %}
+<img  src="{{url}}{{image}}" width="100" height="150" alt="Image" title="Image" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 100%;max-width: 100px; height:100px; padding: 12px 0px;"/>
+{% endif %}

@@ -1,0 +1,473 @@
+{% load custom_tags %}
+{% load static %}
+
+
+<!-- <div>
+  {{request.GET.sortname}}
+  {{request.GET.sortvendorname}}
+
+  {{request.GET.vendor}} -->
+
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/vendormaster.css' %}">
+
+  <section id="data-list-view" class="data-list-view-header">
+  <input type="hidden" class="entries" value="{{pageper_data}}">
+    <h3 class="from-head">Vendor Master</h3>
+    <form method="POST" class="bot-sp-sea" id="vendor_master" enctype="multipart/form-data">
+      {% csrf_token %}
+      
+    <!-- </form> -->
+            
+    <div class="row">
+        <div class="col-9 col-md-6">
+              <div class="upload-btn-wrapper ">
+              {% if request.user.roles_id == 3 %}
+                  {%if rights.create == '1' %}
+                  <a data-toggle="modal" href="#myvendorModal" class="btn btn-clr btn-master">Import Vendor</a>
+                  <div class="modal" id="myvendorModal">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                              <h4 class="modal-title">
+                              Import or Download Excel Template
+                              </h4>    
+                              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            </div>
+                            
+                            <div class="container">
+                            </div>
+                            <div class="modal-body">
+                              <button type="submit" class="btn btn-clr btn-master"><a href="{% url 'projects:createvendorexcelsheet' %}">Download Excel Template</a></button>
+                              {% comment %} <a data-toggle="modal" href="#myModal2" class="btn btn-clr btn-master">Import</a> {% endcomment %}
+                              <input type="file" name="vendorfile" class="filesize" id="vendorfileid"/> <span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="submit" data-toggle="modal" href="#myModal3" class="btn btn-clr btn-master con_file_id" id="submitbtn">Upload</button>
+                              <!-- <a data-toggle="modal" href="#myModal3" class="btn btn-clr btn-master con_file_id">Upload</a> -->
+                              <!-- <a href="#" data-dismiss="modal" class="btn btn-clr btn-master">Close</a> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div id="loader" class="lds-dual-ring hidden overlay">
+                      <h5 class="head_cls">Please Wait...</h5>
+                    </div>
+                  </div>
+
+                {% endif%}
+              {% else %}
+
+                <a data-toggle="modal" href="#myvendorModal" class="btn btn-clr btn-master">Import Vendor</a>
+                <div class="modal" id="myvendorModal">
+                  <div class="modal-dialog modal-lg">
+                      <div class="modal-content back-clr-full">
+                          <div class="modal-header">
+                            <h4 class="modal-title">
+                            Import or Download Excel Template
+                            </h4>    
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                          </div>
+                          
+                          <div class="container">
+                          </div>
+                          <div class="modal-body">
+                            <button type="submit" class="btn btn-clr btn-master validation"><a href="{% url 'projects:createvendorexcelsheet' %}">Download Excel Template</a></button>
+                            {% comment %} <a data-toggle="modal" href="#myModal2" class="btn btn-clr btn-master">Import</a> {% endcomment %}
+                            <input type="file" name="vendorfile" class="filesize" id="vendorfileid" /> <span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="submit" data-toggle="modal" href="#myModal3" class="btn btn-clr btn-master con_file_id" id="submitbtn">Upload</button>
+                            <!-- <a data-toggle="modal" href="#myModal3" class="btn btn-clr btn-master con_file_id">Upload</a> -->
+                            <!-- <a href="#" data-dismiss="modal" class="btn btn-clr btn-master">Close</a> -->
+                          </div>
+                      </div>
+                  </div>
+                  <div id="loader" class="lds-dual-ring hidden overlay">
+                    <h5 class="head_cls">Please Wait...</h5>
+                  </div>
+                </div>
+
+              {% endif %}
+              </div>
+            </div>
+        <div class="col-3 col-md-6 text-end">
+          {% if request.user.roles_id == 3 %}
+            {%if rights.create == '1' %} 
+              <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'projects:createvendormaster' %}">Add Vendor</a></button>
+            {% endif %}
+              {% if rights.view == '1' %}
+              <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'projects:vendormasterpdf' %}" target="_blank" >Generate Report</a></button>
+            {% endif %}
+          {% else%}
+            <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'projects:createvendormaster' %}">Add Vendor</a></button>
+            <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'projects:vendormasterpdf' %}" target="_blank">Generate Report</a></button>
+          {% endif %}
+        </div>
+    </div>
+
+    <div class="row my-4">
+      <div class="col-9"> 
+        <div class="card all-noti-box">
+          <div class="show-noti p-0">
+              <label class="mb-0">Show 
+                <select id="datafilters" class="changevalue select-style">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select> entries</label>
+          </div>
+        </div>
+      </div>
+      <div class="col-3 text-end">
+          <input type="text" id="myInput" class="search-f-inf" name="searchvendor" placeholder="Search for Vendor Name" value="{{query}}">
+          <!-- <button type="button" class="v_search"><i class="fas fa-search sea-rch-clr"></i></button> -->
+      </div>
+    </div>
+    
+  </form>
+  <div class="row">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li  {% if message.tags %} class="{{ message.tags }} msg-cls"{% endif %} style="display:none;"> {{ message }} </li>
+        {% endfor %}
+    </ul>
+  {% endif %}
+  </div>
+    
+      <div class="vends-invite-lists table-responsive text-nowrap">
+       
+        <table  id="vendor-sort" class="table settings-data-list-view data-list-view vin-no ascen-descen-class irock-table prj-back_clr table-wid new-vendor-table"> <!-- Class removed -> project_master vend-thead vend-tt vend-border -->
+            <thead>
+                <tr>
+                    <th class="vendormas-sn">S/N</th> 
+                    <th class="vendormas-vin">VIN
+                      <button type="button" class="sort up-arr sort line-hight-zero" name="asc">
+                        <svg width="14" height="7" viewBox="0 0 14 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M7 0L13.0622 6.75H0.937822L7 0Z" fill="#A11D40"/>
+                          </svg>
+                       <!-- <i class="fa fa-sort-asc" aria-hidden="true"></i> -->
+                    </button>
+
+                      <button type="button" class="sort down-arr sort line-hight-zero active-descending" name="dec">
+                        <svg width="14" height="7" viewBox="0 0 14 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M7 7L13.0622 0.25H0.937822L7 7Z" fill="#A11D40"/>
+                          </svg>
+                        <!-- <i class="fa fa-sort-desc" aria-hidden="true"></i> -->
+                      </button></th>
+                        
+                        
+                    <th class="vendormas-name">Vendor Name  
+                      
+                      <button type="button" class="sortname up-arr sortname line-hight-zero" name="asc">
+                        <img aria-hidden="true" src="/static/images/svg/up.svg">
+                        <!-- <i class="fa fa-sort-asc" aria-hidden="true"></i> -->
+                    </button>
+
+                    <button type="button" class="sortname down-arr sortname line-hight-zero line-hight-zero-change" name="dec">
+                      <img aria-hidden="true" src="/static/images/svg/Down.svg">
+                      <!-- <i class="fa fa-sort-desc" aria-hidden="true"></i> -->
+                      </button></th>
+
+
+                    <th class="vendormas-contact">Contact Person</th>
+                    <th class="vendormas-email">Email Address</th>
+                    <th class="vendormas-status">Status</th>
+                    <th class="vendormas-action">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="table-list wid-size-vend" id="myTable">
+                {% if vendor_master_count > 0 %}
+                  {% for vendor in vendors %}
+                  <tr>
+                  
+                  <td class="sno-center">{{vendors.start_index|add:forloop.counter0 }}</td>
+                  <td class="vin-center">{{vendor.vin}}</td>
+                  <td class="vendor-master-vname ">{{vendor.vendor_name}}</td>
+                  <td id="td-left">{{vendor.contactpersonname}} {{vendor.contactpersonlastname}}</td>
+                  <td id="td-left">{{vendor.contactpersonemail}}</td>
+                  <td id="td-left">
+                    {% checkcontracts_vendor vendor.id as vendorcontractcount %}
+
+                  {% if vendorcontractcount > 0 %}
+                  
+                    <div class="badge badge-success">
+                      Contracts Added
+                    </div>
+                  {% else%}
+                      <div class="badge badge-warning">
+                        No Contracts Added
+                      </div>
+                    
+                  {% endif %}
+                  {% if vendor.approver_status == 0 %}
+                    <div class="badge badge-danger">
+                      Vendor details not updated
+                    </div>
+                  {% else %}
+                    <div class="badge badge-primary">
+                      Vendor details updated
+                    </div>
+                  {% endif %}
+
+                  <!-- {% if vendor.active_status == 1 %}
+                  
+                  <div class="badge badge-success">
+                    Active
+                  </div>
+                {% else%}
+                    <div class="badge badge-warning">
+                      Inactive
+                    </div> -->
+                  
+                <!-- {% endif %} -->
+
+                  </td>
+                  <td class="same-line-icons-vend">
+                    {% if request.user.roles_id == 3 %}
+                      {%if rights.view == '1' %} 
+                          <a class="btn p-0 showtoggle" data-toggle="collapse" href="#collapseExample{{vendor.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                          <span class="action-edit align-icons">
+                            <i class="fa fa-eye eyebutton" title="View" ></i>
+                          </span>
+                        </a>
+                      {% endif %}
+                    {% else%}
+                      <a class="btn p-0 showtoggle" data-toggle="collapse" href="#collapseExample{{vendor.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                        <span class="action-edit align-icons">
+                          <i class="fa fa-eye eyebutton" title="View" ></i>
+                        </span>
+                      </a>
+                    {% endif %}
+
+                    {% if request.user.roles_id == 3 %}
+                      {%if rights.edit == '1' %} 
+                      <a href="{% url 'projects:editvendormaster' pk=vendor.id %}" >
+                        <span class="action-edit align-icons"><i class="fa fa-pencil" title="Edit" ></i></span>
+                      </a>
+                      {% endif %}
+                    {% else %}
+                    <a href="{% url 'projects:editvendormaster' pk=vendor.id %}" >
+                      <span class="action-edit align-icons"><i class="fa fa-pencil" title="Edit" ></i></span>
+                    </a>
+                    {% endif %}
+                    {% if vendorcontractcount == 0 %}  
+                    {% if request.user.roles_id == 3 %}
+                    {%if rights.delete == '1' %} 
+                      <a class="vendormaster_delete" data-id="{{vendor.id}}" vendor_name="{{vendor.vendor_name}}">
+                        <span class="action-delete align-icons"><id class="fa fa-trash-o" title="Delete"  ></i></span>
+                      </a>
+                      {% endif %}
+                    {% else %}
+                      <a class="vendormaster_delete" data-id="{{vendor.id}}" vendor_name="{{vendor.vendor_name}}">
+                        <span class="action-delete align-icons"><id class="fa fa-trash-o" title="Delete" ></i></span>
+                      </a>
+                    {% endif %}
+                    {% if vendor.approver_status == 0 %}
+                      {% if request.user.roles_id == 3 %}
+                      {%if rights.edit == 1 or  rights.create == '1' %} 
+                      <a class="" >
+                        <span title = "Email Login Details" data-id="{{vendor.id}}" class="ale rt-cls action-delete align-icons"><id class="fa fa-paper-plane" id="postform" title="Email Login Details" ></i></span>
+                      </a>
+                      {%endif%}
+                      {%else%}
+                      <a class="" >
+                        <span title = "Email Login Details" data-id="{{vendor.id}}" class="ale rt-cls action-delete align-icons"><id class="fa fa-paper-plane" id="postform" title="Email Login Details" ></i></span>
+                      </a>
+                      {%endif%}
+                    {% endif %}
+                    {% endif %}
+
+                    {% if request.user.roles_id == 3 %}
+                      {%if rights.edit == 1 or  rights.create == '1' %} 
+                    <label class="switch">
+                      <input type="checkbox" class="inpt" {% if vendor.active_status == 1 %} checked  {% endif %}>
+                      <span class="slider round" data_id="{{vendor.id}}" id="input1" title='{% if vendor.active_status == 1 %}Active{% else %}Inactive{% endif %}'></span>
+                    </label>
+                    {%endif%}
+                    {%else%}
+                    <label class="switch">
+                      <input type="checkbox" class="inpt" {% if vendor.active_status == 1 %} checked  {% endif %}>
+                      <span class="slider round" data_id="{{vendor.id}}" id="input1" title='{% if vendor.active_status == 1 %}Active{% else %}Inactive{% endif %}'></span>
+                    </label>
+                    {%endif%}
+
+                  </td>
+                  </tr>
+                  <tr>
+                    <td colspan="12" class="p-0">
+                      <div class="collapse" id="collapseExample{{vendor.id}}">
+                        <div class="card card-body shadow-none master-crd m-0">
+                            <ul id="myTabs" class="nav nav-pills nav-justified new-tab" role="tablist" data-tabs="tabs">
+                              <li class="active"><a class="prjlist-menu" href="#vendorlist{{vendor.id}}" data-toggle="tab">Vendor Overview</a></li>
+                            </ul>
+                          
+                            <div class="tab-content"> 
+                              <div role="tabpanel" class="tab-pane active" id="vendorlist{{vendor.id}}">
+                                <div class="row">
+                                  <div class="col-6">
+                                    <br>
+                                    <h4 class="from-head">Vendor Company Information</h4>
+                                    <table class="prt-viewlist mid-view-tbl head-vend-mas">
+                                      <tr><th>Vendor Name:</th><td>{{vendor.vendor_name|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Country Of Incorporation:</th><td>{{vendor.country_of_incorporation.nicename|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Register Number in the Country of Incorporation:</th><td>{{vendor.RegisterNumber|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Vendor Company Website:</th><td>{{vendor.website|yesno:"---"|default:"---"}}</td></tr>
+                                    </table>
+                                  </div>
+                                  <div class="col-6">
+                                    <br>
+                                    <h4 class="from-head">Vendor Company Address</h4>
+                                    <table class="prt-viewlist mid-view-tbl head-vend-mas">
+                                      <tr><th>Country Of Operation:</th><td>{{vendor.country_of_operation.name|yesno:"---"|default:"---" }}</td></tr>
+                                      <tr><th>State in the Country of Operation:</th><td>{{vendor.state.name|yesno:"---"|default:"---" }}</td></tr>
+                                      {% comment %} <tr><th>Vendor Company Official Address:</th><td>{{vendor.Address|yesno:"---"|default:"---" }}</td></tr> {% endcomment %}
+                                      <tr><th>Vendor Company Official Address:</th><td>
+                                        <p class="vendoraddress">
+                                            {{ vendor.Address|default_if_none:''|safe }}
+                                        </p>
+                                    </td></tr>
+                                  </table>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-12">
+                                    <table class="samll-tbl head-vend-mas vendor-tax-details">
+                                      <br>
+                                      <h4 class="from-head">Vendor Tax Details</h4>
+                                      <tr><th>Tax Name</th><th>Tax Number</th></tr>
+                                      {% for taxes in vendor.id|vendortaxdetails:"owntax" %}
+                                        <tr><td id="td-left">{{taxes.Tax_Name}}</td><td>{{taxes.Tax_Number}}</td></tr>
+                                      {% empty %}
+                                        <tr><td id="td-center">---</td><td>---</td></tr>
+                                      {% endfor %}
+
+                                      
+                                  </table>
+                                  </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                  <div class="col-6">
+                                    
+                                    <h4 class="from-head">Primary Contact Details</h4>
+                                    <table class="prt-viewlist mid-view-tbl head-vend-mas">
+                                      <tr><th>Primary Person Name:</th><td>{{vendor.contact_primary_title|yesno:"---"|default:"---"}}{% if vendor.contact_primary_title %}.{% endif %}{{vendor.contact_primary_first_name|default_if_none:"---"}} {{vendor.contact_primary_middle_name|default_if_none:"---"}} {{vendor.contact_primary_last_name|default_if_none:"---"}}</td></tr>
+                                      <tr><th>Designation:</th><td>{{vendor.primary_designation|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Email Address:</th><td>{{vendor.official_primary_email|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Country Code:</th><td>{{vendor.contact_primary_phone_code|convertnum}}</td></tr>
+                                      <tr><th>Area Code:</th><td>{{vendor.contact_primary_area_code|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Phone Number(Land Line):</th><td>{{vendor.contact_primary_phone|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Country Code:</th><td>{{vendor.contact_primary_mobile_code|convertnum}}</td></tr>
+                                      <tr><th>Phone Number(Mobile No.):</th><td>{{vendor.contact_primary_mobile|yesno:"---"|default:"---"}}</td></tr>
+                                    </table>
+                                  </div>
+                                  <div class="col-6">
+                                    <h4 class="from-head" >Secondary Contact Details</h4>
+                                    <table class="prt-viewlist mid-view-tbl head-vend-mas">
+                                      <tr><th>Secondary Person Name:</th><td>{{vendor.contact_secondary_title|yesno:"---"|default:"---"}}{% if vendor.contact_secondary_title %}.{% endif %}{{vendor.contact_secondary_first_name|default_if_none:"---"}} {{vendor.contact_secondary_middle_name|default_if_none:"---"}} {{vendor.contact_secondary_last_name|default_if_none:"---"}}</td></tr>
+                                      <tr><th>Designation:</th><td>{{vendor.secondary_designation|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Email Address:</th><td>{{vendor.official_secondary_email|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Country Code:</th><td>{{vendor.contact_secondary_phone_code|convertnum}}</td></tr>
+                                      <tr><th>Area Code:</th><td>{{vendor.contact_secondary_area_code|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Phone Number(Land Line):</th><td>{{vendor.contact_secondary_phone|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Country Code:</th><td>{{vendor.contact_secondary_mobile_code|convertnum}}</td></tr>
+                                      <tr><th>Phone Number(Mobile No.):</th><td>{{vendor.contact_secondary_mobile|yesno:"---"|default:"---"}}</td></tr>
+                                    </table>
+                                  </div>
+                                </div>
+                                <!--  -->
+                              </div>
+                               
+                            </div>
+                            
+                            
+                            <div class="row">
+                             
+                  {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="7" class="cls-nil" id="td-center">
+                      ---
+                    </td>
+                  </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        </div>
+    
+
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center">
+      {% if vendors.has_previous %}
+       <li class="page-item">
+          <a class="btn-clr page-link" href="{{request.META.HTTP_REFERER }}">Previous</a>
+        </li>
+      {% else %}
+          <li class="page-item disabled">
+          <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Previous</a>
+        </li>
+      {% endif %}
+
+      {% if vendors.number|add:'-4' > 1 %}
+          <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ vendors.number|add:'-5' }}">&hellip;</a></li>
+      {% endif %}
+
+      {% for i in vendors.paginator.page_range %}
+          {% if vendors.number == i %}
+              <li class="page-item pg-count active" aria-current="page">
+            <span class="btn-clr page-link pg-circle">
+              {{ i }}
+              <span class="sr-only">(current)</span>
+            </span>
+          </li>
+          {% elif i > vendors.number|add:'-5' and i < vendors.number|add:'5' %}
+            {% if request.GET.vendor %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&page={{ i }}">{{ i }}</a></li>
+            {% elif request.GET.vendor and request.GET.sortname %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+            {% elif request.GET.vendor and request.GET.sortvendorname %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+            {% elif request.GET.sortname %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+            {% elif request.GET.sortvendorname %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+            {% else %}
+               <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+          {% endif %}
+      {% endfor %}
+
+      {% if vendors.paginator.num_pages > vendors.number|add:'4' %}
+         <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ vendors.number|add:'5' }}">&hellip;</a></li>
+      {% endif %}
+
+      {% if vendors.has_next %}
+          <li class="page-item">
+          <a class="btn-clr page-link " href="?page={{ vendors.next_page_number }}">Next</a>
+        </li>
+      {% else %}
+
+          <li class="page-item disabled">
+          <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Next</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+
+</div> 
+</section>  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="{% static 'js/projects/search_vendormaster.js' %}"></script>
+<script>
+   $(document).ready(function() {
+     $(".showtoggle").on('click', function() {
+ 
+ let nxttr = $(this).closest('tr').next('tr');
+ console.log(nxttr)
+ $(this).closest('table tbody').find('.collapse').not(nxttr.find('.collapse')).removeClass('show');
+});
+
+});
+
+</script>

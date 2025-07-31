@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/reports/listinvoicereport.css' %}">
+<h3 class="from-head">Reports</h3>
+    
+<div class="container">
+    <div class="row">
+    <div class="col-6">
+        <table class="table table-bordered reports-chk-box">
+            Invoice Summary Reports
+           <tbody>
+               <tr>
+                 <td><input class="chk-report-box star " type="checkbox" name="invoice_register" {%for i in starredreports%}{%if i.reportname == 'invoice_register' and i.starred == True %}Checked{%endif%}{%endfor%}> <span></span></td>
+                 <td class="add_btn"><a href="{% url 'invoice:invoicecompletereport' reportname='invoice_register'%}">Invoice Register</a></td>
+               </tr>
+               <tr>
+                 <td><input class="chk-report-box star " type="checkbox" name="approval_status" {%for i in starredreports%}{%if i.reportname == 'approval_status' and i.starred == True %}Checked{%endif%}{%endfor%}> <span></span></td>
+                 <td class="add_btn"><a href="{% url 'invoice:invoicecompletereport' reportname='approval_status'%}">Invoice	Register	view	by	Approval	Status</a></td>
+               </tr>
+              <tr>
+                <td ><input class="chk-report-box star " type="checkbox" name="submission_count"{%for i in starredreports%}{%if i.reportname == 'submission_count' and i.starred == True %}Checked{%endif%}{%endfor%}> <span></span></td>
+                <td class="add_btn"><a href="{% url 'invoice:invoicecompletereport' reportname='submission_count'%}">Invoice	Submission	Count</a>
+               </td>
+              </tr>
+              <tr>
+                <td><input class="chk-report-box star " type="checkbox" name="vendors_ranking"{%for i in starredreports%}{%if i.reportname == 'vendors_ranking' and i.starred == True %}Checked{%endif%}{%endfor%}> <span></span></td>
+                <td class="add_btn"><a href="{% url 'invoice:invoicecompletereport' reportname='vendors_ranking'%}">Ranking Vendors</a>
+               </td>
+              </tr>
+            </tbody>
+           </table>
+    </div> 
+    <div class="col-6">
+        <table class="table table-bordered reports-chk-box">
+            Invoice Payable Reports
+           <tbody>
+               <tr>
+                 <td><input class="chk-report-box star " type="checkbox" name="payment_status" {%for i in starredreports%}{%if i.reportname == 'payment_status' and i.starred == True %}Checked{%endif%}{%endfor%}><span></span></td>
+                 <td class="add_btn"><a href="{% url 'invoice:invoicecompletereport' reportname='payment_status'%}">Invoice	Payable	Report.</a>
+                </td>
+               </tr>
+               <tr>
+                 <td><input class="chk-report-box star " type="checkbox" name="partially_paid" {%for i in starredreports%}{%if i.reportname == 'partially_paid' and i.starred == True %}Checked{%endif%}{%endfor%}><span></span></td>
+                 <td class="add_btn"><a href="{% url 'invoice:invoicecompletereport' reportname='partially_paid'%}">Partially	Paid	Invoices	Summary	Sheet</a>
+                </td>
+               </tr>
+                <tr>
+                <td><input class="chk-report-box star " type="checkbox" name="payment_account"{%for i in starredreports%}{%if i.reportname == 'payment_account' and i.starred == True %}Checked{%endif%}{%endfor%}><span></span></td>
+                <td class="add_btn"><a href="{% url 'invoice:add_paymentonaccount'%}">Payment	on	Account</a>
+               </td>
+              </tr> 
+           </tbody>
+           </table>
+    </div>  
+
+    
+</div>
+<div class="row">
+    <div class="col-6">
+        <table class="table table-bordered reports-chk-box">
+            Invoice Ageing Reports
+           <tbody>
+               <tr>
+                 <td><input class="chk-report-box star " type="checkbox" name="ageing_report" {%for i in starredreports%}{%if i.reportname == 'ageing_report' and i.starred == True %}Checked{%endif%}{%endfor%}><span></span></td>
+                 <td class="add_btn"><a href="{% url 'invoice:invoicecompletereport' reportname='ageing_report'%}" {%for i in starredreports%}{%if i.reportname == 'ageing_report' and i.starred == True %}Checked{%endif%}{%endfor%}>Invoice	Ageing	Report</a>
+                </td>
+               </tr>
+           </tbody>
+           </table>
+    </div> 
+    <div class="col-6">
+        <table class="table table-bordered reports-chk-box">
+            Invoice Analysis Reports
+           <tbody>
+               <tr>
+                 <td><input class="chk-report-box star " type="checkbox" name="paidinvoice_paymentdays"{%for i in starredreports%}{%if i.reportname == 'paidinvoice_paymentdays' and i.starred == True %}Checked{%endif%}{%endfor%}><span></span></td>
+                 <td class="add_btn"><a href="{% url 'invoice:invoicecompletereport' reportname='paidinvoice_paymentdays'%}">Paid	Invoices	Vs	Days	for	Payment	
+                    (with	invoice	count)</a>
+                </td>
+               </tr>
+               <tr>
+                 <td class="add_btn"><input class="chk-report-box star " type="checkbox" name="unpaidinvoice_overdue"{%for i in starredreports%}{%if i.reportname == 'unpaidinvoice_overdue' and i.starred == True %}Checked{%endif%}{%endfor%}><span></span></td>
+                 <td class="add_btn"><a href="{% url 'invoice:invoicecompletereport' reportname='unpaidinvoice_overdue'%}">Unpaid	invoices	Vs	No	of	Days	
+                    Overdue	(with	Invoice	count)</a>
+                </td>
+               </tr>
+               <tr>
+                 <td><input class="chk-report-box star " type="checkbox" name="exception_report"{%for i in starredreports%}{%if i.reportname == 'exception_report' and i.starred == True %}Checked{%endif%}{%endfor%}><span></span></td>
+                 <td class="add_btn"><a href="{% url 'invoice:invoicecompletereport' reportname='exception_report'%}">Invoice	Exception	Report</a>
+                </td>
+               </tr>
+           </tbody>
+           </table>
+    </div>  
+</div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+var csrf_token='{{csrf_token}}'
+var currency_count ='{{currency_count}}'
+</script>
+
+<script>
+  var generalSettingUrl = "{% url 'custom_auth:generalsetting' companyid=request.user.company.id %}";
+</script>
+
+<script src="{% static 'js/invoice/listinvoicereport.js' %}"></script>
+{% endblock %}

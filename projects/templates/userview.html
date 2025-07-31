@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/user_Management/users.css' %}">
+<div>
+    <div class="row">
+        <div class="col-12 text-end">
+            <a class="btn btn-clr" href="{% url 'projects:userlist' %}">Back</a>
+        </div>
+    </div>
+    <h4 class="from-head">User Details</h4>
+    <div class="row">
+        <div class="col-12">
+            {% comment %} <button type="button" class="btn btn-clr"><a href="{% url 'projects:userrights' pk=user.id %}">Add General Rights</a></button>
+            <button type="button" class="btn btn-clr"><a href="{% url 'projects:userprojectrights' pk=user.id %}">Add Project Specific Rights</a></button> {% endcomment %}
+        </div>
+        <!-- <div class="col-3">
+            <button type="button" class="btn btn-clr btn-master"><a href="{% url 'projects:userlist' %}">Back</a></button>
+        </div> -->
+        <div class="col-3 pb-3">
+            <!-- <a class="btn btn-clr btn-master" href="{% url 'projects:userlist' %}">Back</a> -->
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 user-viem-boxs">
+    <table class="user-detail-page irock-table"> 
+        <tbody>
+            <tr>
+                <th>First Name</th><td>{{user.name}}</td>
+            </tr>
+            <tr>
+                <th>Last Name</th><td>{{user.lastname}}</td>
+            </tr>
+            <tr>
+                <th>Designation</th><td>{{user.designation_role|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+                <th>Department</th><td>{{user.user_department|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+                <th>Group</th><td>{{user.user_group|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+                <th>Email</th><td>{{user.email}}</td>
+            </tr>
+            <tr>
+                <th>Official Phone Number (Land Line)</th><td>{{user.phone_countrycode|convertnum}}-{{user.areacode|default_if_none:"---"}}-{{user.phone|default_if_none:"---"}}-{{user.phone_number_extenstion|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+                <th>Official Phone Number (Mobile Line)</th><td>{{user.mobile_countrycode|convertnum}}-{{user.mobile|default_if_none:"---"}}</td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+    </div>
+</div>
+
+{%endblock%}

@@ -1,0 +1,171 @@
+{% load static %}
+<html>
+<body>
+Dear XXXX,<br>
+Please note that invoice “001” for Vendor “YYYY” for services <Name of Service**> has been reviewed by <br>
+**FPOC and passed for your approval. <br>
+Please review and approve the invoice as assigned. <br>
+Note: ** - Actual full name of FPOC, Vendor and Name of Service automatically picked up by the software.<br>
+Regards,<br>
+The Invoice Approval Process System<br>
+</body>
+</html>
+
+<!DOCTYPE HTML
+PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office">
+{% load static %}
+
+<head>
+<!--[if gte mso 9]>
+<xml>
+<o:OfficeDocumentSettings>
+  <o:AllowPNG/>
+  <o:PixelsPerInch>96</o:PixelsPerInch>
+</o:OfficeDocumentSettings>
+</xml>
+<![endif]-->
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="x-apple-disable-message-reformatting">
+<!--[if !mso]><!-->
+<meta http-equiv="X-UA-Compatible" content="IE=edge"><!--<![endif]-->
+<title></title>
+
+<!-- <style type="text/css">
+     table, td { color: #000000; } a { color: #0000ee; text-decoration: underline; }
+@media only screen and (min-width: 520px) {
+.u-row {
+  width: 500px !important;
+}
+
+.u-row .u-col {
+  vertical-align: top;
+}
+
+.u-row .u-col-50 {
+  width: 250px !important;
+}
+
+.u-row .u-col-100 {
+  width: 500px !important;
+}
+
+}
+
+@media (max-width: 520px) {
+.u-row-container {
+  max-width: 100% !important;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
+.u-row .u-col {
+  min-width: 320px !important;
+  max-width: 100% !important;
+  display: block !important;
+}
+.u-row {
+  width: calc(100% - 40px) !important;
+}
+.u-col {
+  width: 100% !important;
+}
+.u-col > div {
+  margin: 0 auto;
+}
+}
+body {
+margin: 0;
+padding: 0;
+}
+
+table,
+tr,
+td {
+vertical-align: top;
+border-collapse: collapse;
+}
+
+p {
+margin: 0;
+}
+
+.ie-container table,
+.mso-container table {
+table-layout: fixed;
+}
+
+* {
+line-height: inherit;
+}
+
+a[x-apple-data-detectors='true'] {
+color: inherit !important;
+text-decoration: none !important;
+} 
+
+</style> -->
+<style>
+    *{
+    font-family:arial,helvetica,sans-serif;
+  }
+</style>
+
+
+</head>         
+
+<body class="clean-body" style="margin: 0;padding: 0;-webkit-text-size-adjust: 100%;color: #000000">
+
+<table style="font-family:arial,helvetica,sans-serif;max-width:800px;" role="presentation" cellpadding="0" cellspacing="0"
+  width="100%" border="0">
+  <tbody>
+    <tr>
+      <td style="overflow-wrap:break-word;word-break:break-word;font-family:arial,helvetica,sans-serif;" align="left">
+
+
+        <table style="font-family:arial,helvetica,sans-serif;">
+          <tbody>
+            <tr>
+              <td style="font-size: 15px;line-height: 25px;">Dear {{user.name|default_if_none:"---"}},</td>
+            </tr>
+            <tr>
+              <td style="font-size: 15px;line-height: 25px !important;">Please note that the payment instruction sent by you has been received by the {{bank_name}} on {{date_today}}.<br>
+The verification Code for payment is {{code}}</td>
+            </tr>
+            <tr>
+              <td style="font-size: 15px;line-height: 25px !important;">please proceed to confirm payment to the bank via the details outlined above.
+            </td>
+            </tr>
+ 
+            
+<tr>
+                <td style="font-size: 15px; padding-top: 20px; padding-bottom: 20px;">Regards,</td>
+              </tr>
+<tr>
+                <td style="font-size: 15px; line-height: 25px;">The Invoice Payment Process System.</td>
+              </tr>
+<tr>
+                <td style="font-size: 15px; line-height: 25px;">{{companyname}},</td>
+              </tr>
+
+            <tr>
+              <td>
+    {% if image == '' %}
+<img  src="{{url}}/static/images/icons/Character%20icon.svg" width="100" height="150" alt="Image" title="Image" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 100%;max-width: 100px; height:100px; padding: 12px 0px;"/>
+{% else %}
+<img  src="{{url}}{{image}}" width="100" height="150" alt="Image" title="Image" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 100%;max-width: 100px; height:100px; padding: 12px 0px;"/>
+{% endif %}
+           </td>
+           </tr>
+
+          </tbody>
+        </table>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+
+</html>

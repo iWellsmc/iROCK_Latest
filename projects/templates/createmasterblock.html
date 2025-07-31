@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+<section>
+    <h3 class="from-head">Create Block</h3>
+    <form method="POST" class="form-txt" id="create-masterblock">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-4">
+                <label class="txt-name">Country</label>
+                <p class="txt-detail">{{project_details.country.nicename}}</p>
+            </div>
+            <div class="col-4">
+                <label class="txt-name">Project Name</label>
+                <p class="txt-detail">{{project_details.name}}</p>
+            </div>
+            <div class="col-4">
+                <label class="txt-name">Block Name</label>
+                <table>
+                    <tbody id="block_table">
+                        <tr>
+                            <td>
+                                <input list="browsers" type="text" name="block_name" class="form-control block-cls" id="block_id" autocomplete="off">
+                                <datalist id="browsers"><option value="Not Applicable"></datalist>
+                            </td>
+                            <td>
+                                <button id="block-add-row" class="btn btn-clr  waves-effect waves-float waves-light max-min" type="button" value="Add"><i class="fa fa-plus"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="text-center spacing-button">
+            <button type="button" class="btn btn-clr text-center draft-cls" data-id="2">Save as Draft</button>
+            <button type="button" class="btn btn-clr text-center back-cls" data-id="2">Back</button>
+            <button type="button" class="btn btn-clr text-center submit-cls" data-id="2">Create</button>
+        </div>
+    
+    </form>
+
+</section>
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+var is_filled=true; 
+var lenfilled=true;
+var id=$(this).closest('tr').index()
+$(document).on("click","#block-add-row", function(){
+    console.log(is_filled)
+    if (is_filled==true && lenfilled==true){
+    var new_row='<tr><td><input list="browsers" autocomplete="off" name="block_name" type="text" class="form-control block-cls"><datalist id="browsers"><option value="Not Applicable"></datalist><span id="block'+id+'"></span></td><td><button id="block-delete-row" class="btn-clr block-delete-row btn max-min" type="button" value="delete"><i class="fa fa-minus"></i></button></td>'
+    $("#block_table").append(new_row);
+    }
+    else{
+    }
+
+})
+$(document).on("click", "#block-delete-row", function () {
+    block_val=$(this).closest('td').prev('td').find('.block-cls').val()
+    if (block_val == ''){
+        $(this).closest('tr').remove()
+        is_filled = true
+    }
+    else{
+        if (is_filled==true && lenfilled==true){
+        var id=$(this).closest('tr').index()
+        $('#block'+id+'').remove()
+        $(this).closest('tr').remove()
+        }
+        else{
+        }
+    }
+})
+
+$('.back-cls').click(function(){
+    var project_id="{{project_details.id}}"
+    var current_url=$(location).attr("href")
+    var replace_url=current_url.replace("createmasterblock/"+project_id+"","createdmasterproject/"+project_id+"")
+    window.location.href = replace_url;
+})
+  
+$(document).on("keyup",".block-cls",function(){
+    var x=$(this).val().toLowerCase();
+    $('.spancls').remove()
+    // console.log("X",x)
+    var spanid=$(this).closest('tr').index()
+    if (x.length <= 14){
+        lenfilled = true;
+        $('#maxblock'+spanid+'').remove()
+    }
+    else {
+        lenfilled = false;
+        $('#maxblock'+spanid+'').remove()
+        $(this).closest('tr').after('<span class="waring-err spancls" id=maxblock'+spanid+'>Maximum 14 Characters only</span>')
+    }
+    var z=0;
+    $("input").each(function(){
+        if (x != 'not applicable'){
+            if (x !='' && y !=''){
+            var y=$(this).val().toLowerCase();
+            if(x==y){
+                console.log("true")
+                z=z+1;
+            }
+        }
+
+    }
+    });
+    console.log()
+    if(z>1){
+        var spanid=$(this).closest('tr').index()
+        $(this).addClass("error")
+        is_filled = false;
+        console.log(is_filled)
+        $(this).closest('tr').after('<span class="waring-err spancls" id=blocks'+spanid+'>Block name already exists</span>')
+    }
+    else{
+        $(this).removeClass("error")
+        is_filled = true;
+        $('#blocks'+spanid+'').remove()
+    }
+})
+
+
+$(".draft-cls").click(function(){
+
+    var project_id="{{project_details.id}}"
+    var data_id=$(this).attr('data-id');
+    var form=$("#create-masterblock");
+    $('.block-cls').each(function(){
+        if ($(this).val()=='') {
+            is_filled = false;
+           Swal.fire({
+              icon: 'error',
+              title: 'Error...',
+              text: 'The block is required',
+              })
+       }
+    })
+    if (is_filled==false || lenfilled == false){
+        console.log('empty')
+    }
+    else{
+        $(this).prop('disabled', true);
+        $.ajax({
+          type:"POST",
+          container:"#create-masterblock",
+          url:'/projects/createmasterblock/'+project_id,
+          data:form.serialize(),
+          success: function(data){
+            var url = "{% url 'projects:listmaster'%}";
+            document.location.href = url;
+
+          }
+        })
+    }
+})
+
+
+
+$(".submit-cls").click(function(){
+    var project_id="{{project_details.id}}"
+    var data_id=$(this).attr('data-id');
+    var form=$("#create-masterblock");
+    $('.block-cls').each(function(){
+        if ($(this).val()=='') {
+            is_filled = false;
+           Swal.fire({
+              icon: 'error',
+              title: 'Error...',
+              text: 'The field is required',
+              })
+       }
+    })
+    if (is_filled==false || lenfilled == false){
+        console.log('empty')
+    }
+    else{
+        $(this).prop('disabled', true);
+        $.ajax({
+          type:"POST",
+          container:"#create-masterblock",
+          url:'/projects/createmasterblock/'+project_id,
+          data:form.serialize(),
+          success: function(data){
+            console.log(data)
+            if (data_id == "2" ){
+                Swal.fire({
+                    text: 'Do you want to add  Field(s) to this project?',
+                    showDenyButton: true,
+                    confirmButtonText: 'Yes',
+                    allowOutsideClick:false,
+                    denyButtonText: 'No',
+                    confirmButtonColor: '#AF2B50',
+                    denyButtonColor:'#AF2B50',
+                    customClass: {
+                      actions: 'my-actions',
+                      confirmButton: 'order-2',
+                      denyButton: 'order-3',
+                    }
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                        var url = "{% url 'projects:createmasterfield' 123 %}";
+                        document.location.href = url.replace('123', project_id);
+                    } else if (result.isDenied) {
+                      var current_url=$(location).attr("href")
+                      var replace_url=current_url.replace("createmasterblock/"+project_id+"","listmaster")
+                      window.location.href = replace_url;
+                    }
+                  })
+            }
+          }
+        })
+    }
+})
+</script>
+{% endblock %}

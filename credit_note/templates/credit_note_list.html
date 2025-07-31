@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load credit_custom_tags %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/creditnote.css' %}">
+
+    <div>
+        <h3 class="from-head">Credit Note Submitted to Date</h3>
+
+        <div class="row">
+            <div class="col-lg-9 col-md-8">
+            </div>
+            <div class="col-lg-3 col-md-4 text-end">
+                {% if vendorid.active_status == 1 %}
+                {% if vendor_status == True %}
+                <button type="button" class="btn btn-clr"><a href="{% url 'credit:create_credit_note' %}">Submit Credit Note</a></button>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="table-responsive text-nowrap cred-table_wid">
+        <table class="table prj-back_clr settings-data-list-view data-list-view invoicelist tot-in irock-table" id="master_project_list">
+            <thead >
+                <tr >
+                    <th>S/N</th> 
+                    <th class="">Credit Note No.</th>     
+                    <th>Date</th>
+                    <th>Ref.Invoice</th>
+                    <th>Approval Status</th>
+                    <th>Approval/Disputed Date</th>
+                    <th>Status</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="table-list">
+                <!-- {% if credit_note_count == 0 %}
+                <tr>
+                    <td colspan="9" class="cls-nil">
+                      ---
+                    </td>
+                  </tr>   
+                  {%else%}
+                {% for credit in credit_note %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        
+                            <td>
+                                {% for credit_invoice in credit.id|get_credit_invoices %}
+                                    <div>{{credit_invoice.credit_note_no}}</div>
+                                {% endfor %}
+                            </td>
+                            <td class="text-center">
+                                {% for credit_invoice in credit.id|get_credit_invoices %}
+                                    <div>{{credit_invoice.date|convert_credit_date:credit_invoice.credit.company.id}}</div>
+                                {% endfor %}
+                            </td>
+                            <td >
+                                {% for credit_invoice in credit.id|get_credit_invoices %}
+                                    <div>
+                                        {% for invoice in credit_invoice.credit.id|credit_contract_invoices:"inv" %}
+                                                {{invoice}}{% if not forloop.last %},{% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                            </td>
+                            <td class="ref_left">
+                                {% for credit_invoice in credit.id|get_credit_invoices %}
+                                    <div>
+                                        {% if credit_invoice.credit.approval_status == 1 %}
+                                            Pending
+                                        {% elif credit_invoice.credit.approval_status == 2 %}
+                                            Rejected
+                                        {% elif credit_invoice.credit.approval_status == 3 %}
+                                            Returned
+                                        {% elif credit_invoice.credit.approval_status == 6 %}
+                                            Disputed
+                                        {% else %}
+                                            Approved
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </td>
+                            <td class="text-center">
+                                {% for credit_invoice in credit.id|get_credit_invoices %}
+                                    <div>{{credit_invoice.credit.approval_date|convert_credit_date:credit_invoice.credit.company.id}}</div>
+                                {% endfor %}
+                            </td>
+                            <td class="ref_left">
+                                {% if credit.credit_status == 1 %}
+                                    Draft
+                                {% else %}
+                                    Submitted
+                                {% endif %}
+                            </td>
+                        <td>
+                            <a class="btn px-1" href="{% url 'credit:credit_view' pk=credit.id %}">
+                                <i class="fa fa-eye" title="View"></i>
+                            </a>
+                            {% if vendorid.active_status == 1 %}
+                            {% if vendor_status == True %}
+                            {% if credit.credit_status == 1 %}
+                                <a class="btn px-1" href="{% url 'credit:edit_credit_note' pk=credit.id %}">  
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                            {% endif %}
+                            {% endif %}
+                            {% if credit.approval_status == 3%}
+                            {% get_returned_invoice_count ''  credit.id as inv_count %}
+                            {% if inv_count == 0 %}
+                                <a href="{% url 'credit:creditqueryhistory' pk=credit.id %}" class="btn his-oty px-1"><i class="fa fa-history" title="History" aria-hidden="true"></i></a>
+                            {% endif %}
+                            {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %} -->
+
+
+                    <!-- using jqury ajax getallcreaditnotes.js -->
+            </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/credit_note/getallcreaditnotes.js' %}"></script>
+<script>
+</script>
+{% endblock %}

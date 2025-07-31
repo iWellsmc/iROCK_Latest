@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_tags %}
+{% block content %}
+<h4 class="card-title from-head">Edit Cluster</h4>
+<form method="POST" class="form-txt" id="edit-cluster">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col">
+            <h3 class="head-master">Country</h3>
+            <div class="project_country txt-name">
+                <p>{{project.country.name}}</p>
+            </div>
+        </div>
+        <div class="col">
+            <h3 class="head-master">Project Name</h3>
+            <div class="project_name txt-name">
+                <input type="hidden" id="project_id" name="project_id" value={{project.id}}>
+                <p>{{project.name}}</p>
+            </div>
+        </div>
+        <div class="col"><h3 class="head-master">Block Name</h3>
+            <div class="show-checked-block txt-name" >
+                {% for block in blocks %}
+                    {% if block.status == 1 %}
+                    <p>{{block.block_name}}</p><br>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="container-fluid">
+            <h3 class="head">Field Name</h3>
+                {% for field in fields %}
+                <div class="row">
+                    <div class='col-6'>
+                        
+                        <input type="checkbox" name="field_checkbox" p_id={{field.id}} class="fieldsubtype-class" {% if field.status == 1%} checked="checked" {% endif %} value="{{field.field_name}}">&emsp;<label>{{field.field_name}}</label><br>
+                    </div>
+                    <div class='col-6'>
+                        <div id="fieldsub_id{{field.id}}"><h5>{{field.field_name}}</h5>
+                        {% for cluster in field.id|get_clusters:"cluster" %}
+                        <input type="checkbox" name="clustersubtype_{{field.id}}" id="field_subtype_id1"  data-id="'+data_id+'" data-name="well_pad" class="field-class" value="well_pad" {% if field.id|checkstatuscluster:"well_pad" == 1 %} checked='checked' {% endif %}>&emsp;<label>Well Pad</label><br>
+                        {% if field.id|checkstatuscluster:"well_pad" == 1 %} 
+                        <div>
+                            <table id="table_fieldsub-{{field.id}}">
+                                <tbody>
+                                    {% for clutsersub in cluster.id|getclustersub:"clusterssub" %}
+                                        <tr>
+                                            <td><input type="text" name="wellpad-{{field.id}}" class="form-control" value="{{clutsersub}}"></td>
+                                            <td><button id="cluster-add-row" class="btn btn-clr add-btn" type="button" data-id='+val+' value="Add"><i class="fa fa-plus"></i></button></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                        <input type="checkbox" name="clustersubtype_{{field.id}}" id="field_subtype_id2"  data-id="'+data_id+'" class="field-class" data-name="well_platform" value="well_platform" {% if field.id|checkstatuscluster:"well_platform" == 1 %} checked='checked' {% endif %}>&emsp;<label>Well Platform</label><br>
+                        {% if field.id|checkstatuscluster:"well_platform" == 1 %}
+                        <div>
+                            <table id="table_fieldsub-{{field.id}}">
+                                <tbody>
+                                    {% for clutsersub in cluster.id|getclustersub:"clusterssub" %}
+                                        <tr>
+                                            <td><input type="text" name="well_platform-{{field.id}}" class="form-control" value="{{clutsersub}}"></td>
+                                            <td><button id="cluster-add-row" class="btn btn-clr add-btn" type="button" data-id='+val+' value="Add"><i class="fa fa-plus"></i></button></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                        <input type="checkbox" name="clustersubtype_{{field.id}}" id="field_subtype_id3" data-id="'+data_id+'" class="field-class" data-name="subsea_clusters" value="subsea_clusters" {% if field.id|checkstatuscluster:"subsea_clusters" == 1 %} checked='checked' {% endif %}>&emsp;<label>Subsea Clusters</label><br>
+                        {% if field.id|checkstatuscluster:"subsea_clusters" == 1 %} 
+                        <div>
+                            <table id="table_fieldsub-{{field.id}}">
+                                <tbody>
+                                    {% for clutsersub in cluster.id|getclustersub:"clusterssub" %}
+                                        <tr>
+                                            <td><input type="text" name="subsea_clusters-{{field.id}}" class="form-control" value="{{clutsersub}}"></td>
+                                            <td><button id="cluster-add-row" class="btn btn-clr add-btn" type="button" data-id='+val+' value="Add"><i class="fa fa-plus"></i></button></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="text-center">
+        <button type="button" class="btn btn-clr save-draft text-center submit-cls" project_id="{{project.id}}" data-id="4">Save</button>
+        <button type="button" class="btn btn-clr save-draft text-center back-cls" data-id="4">Back</button>
+    </div>
+</div>
+</form>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/projects/editmasterproject.js' %}"></script>
+{% endblock %}

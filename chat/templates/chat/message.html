@@ -1,0 +1,524 @@
+
+<!DOCTYPE html>
+<html>
+<title></title><head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script></head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<body>
+
+<!-- Sidebar -->
+<div class="w3-sidebar w3-light-grey w3-bar-block chat-sidebar">
+  <div class="w3-bar-item user-list-nme"><div class="head-us-li"><span class="u-ser-hov"><i class="fa fa-user user-chat-list"></i> User list</span></div><div><button type="button" class="btn btn-add-group" data-toggle="modal" data-target="#myModal"><span class="add-pluss"><i class="fa fa-plus-circle add-plus-gr"></i>Add Group</span></button></div></div>
+  <!-- <div><button type="button" name="addgroup" id="add-group">Add Group</button></div> -->
+
+
+  <input type="hidden" class="senderid" id="senderid" value="{{current_user}}">
+   
+<ul class="menu-list chat-side-li">
+  <li>
+    <a href="#">Direct Message</a>
+    
+    <ul class="sub-chat">
+      <li>{%for i in userlist%}
+          <button type="button" class="room-creat w3-bar-item w3-button name-chat-list" value="{{i.id}}" class="w3-bar-item w3-button chatsend ">{{i.name}}</button>
+        
+          <input type="hidden" class="receiverid" id="receiverid" value="{{i.id}}">
+          
+          
+        {%endfor%}
+        </li>
+      
+    </ul>
+  </li>
+  <li>
+    <a href="#">Group Message</a>
+    
+    <ul class="sub-chat">
+      <li>{%for i in groupname%}
+          
+                
+        <button type="button" class="redirectroom w3-bar-item w3-button name-chat-list" value="{{i.groupid}}" class="w3-bar-item w3-button chatsend">{{i.groupname}}</button>
+      
+
+      {%endfor%}
+      </li>
+      
+    </ul>
+  </li>
+
+  </ul>
+
+
+
+
+
+
+  <!-- {%for i in userlist%} -->
+
+<!-- {%for j in current_company%} -->
+  <!-- <a href="http://127.0.0.1:8000/chat/{{i.id}}" class="w3-bar-item w3-button chatsend"  id="room-creat">{{i.name}}</a> -->
+  <!-- <button type="button" class="room-creat w3-bar-item w3-button" value="{{i.id}}" class="w3-bar-item w3-button chatsend">{{i.name}}</button> -->
+
+  <!-- <input type="hidden" class="receiverid" id="receiverid" value="{{i.id}}"> -->
+  <!-- {%endfor%} -->
+  
+<!-- {%endfor%} -->
+
+ 
+</div>
+
+<!-- Page Content -->
+
+
+<div class="w3-container w3-teal irock-chat">
+  <h1 class="iro-chat-hed"><a href="{{lasturl}}" class="bck-chat-close"><i class="fa fa-close"></i></a><a href="{{request.META.HTTP_REFERER|escape}}" class="bck-chat"><i class="fa fa-arrow-left"></i></a>iROCK Chat</h1> 
+  
+  
+  <!-- <ul id="nav">
+    <li><a href="#">Group Message</a>
+
+    <ul>
+      <li>{%for i in groupname%}
+
+      
+          <button type="button" class="redirectroom w3-bar-item w3-button" value="{{i.groupid}}" class="w3-bar-item w3-button chatsend">{{i.groupname}}</button>
+        
+
+        {%endfor%}
+        </li>
+        
+        </ul>
+        </li>
+</ul>
+ -->
+
+
+
+
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title title-pop-chat">Create your Group</h4>
+      </div>
+      <div class="modal-body">
+        <!-- <p>Some text in the modal.</p> -->
+
+        <!-- //form for creating group -->
+        <form>
+          <div class="form-group">
+            <label class="lab-tilt-chat" for="exampleInputEmail1">Group Name</label>
+            <input type="text" name="groupname" class="form-control gn-input" id="groupname" aria-describedby="emailHelp" placeholder="Enter GroupName">
+            
+          </div>
+          <div class="form-group">
+            <label class="lab-tilt-chat" for="exampleInputPassword1">Select Group Members</label>
+            
+            <select name="groupmembers" id="groupmembers" placeholder="Select Users" class="form-control select2 gn-input" multiple >
+              <!-- <option value="">Select</option> -->
+              {%for groupmembers in userlist%}
+                <option value="{{groupmembers.id}}">{{groupmembers.name}} {{groupmembers.designation_role}}</option>
+         
+                {%endfor%}
+              </select>
+
+          </div>
+          <div class="form-check">
+
+          </div>
+          <button type="submit" class="btn btn-add-group">Create Group</button>
+        </form>
+
+
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-add-group btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+      
+      
+</body>
+</html>
+
+<style>
+
+a.bck-chat i:hover {
+    color: #00ad8d;
+    transform: scale(1.5);
+    transition: 0.5s;
+}
+
+a.bck-chat i {
+    font-size: 22px;
+    padding: 0px 20px;
+}
+
+a.bck-chat-close i:hover {
+    color: #00ad8d !important;
+    transform: scale(1.5) !important;
+    transition: 0.5s !important;
+}
+
+a.bck-chat-close i {
+    font-size: 22px !important;
+    padding: 0px 20px !important;
+    margin-right:0px !important;
+    float: right !important;
+}
+
+        .chat-sidebar {
+    width: 100% !important;
+    max-width: 300px !important;
+}
+
+.iro-chat-hed {
+    font-size: 25px;
+}
+
+
+.irock-chat {
+  padding: 16px 10px;
+    margin-left: 300px;
+    background-image: linear-gradient( 182deg ,#8b1434 , #ce2e58) !important;
+}
+
+.user-list-nme {
+    display: flex !important;
+    margin: 5px 0px;
+    padding: 19px 10px !important;
+    border-bottom: 1px solid #a81f43 !important;
+}
+
+.head-us-li {
+    color: #96183a;
+    font-size: 20px;
+    margin: 2px 15px;
+    font-weight: 500;
+}
+
+
+.menu-label {
+  color: #222;
+}
+.menu-list .menu-label {
+  padding-left: 1em;
+}
+.menu-list > li, .menu-list > li a, .menu-list > li .menu-label, .menu-list > li ul {
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(1, 0, 1, 0);
+  transition-property: margin, max-height, opacity, background-color, color;
+}
+.menu-list > li, .menu-list > li.is-active .menu-label, .menu-list > li.is-active ul {
+  height: auto;
+  max-height: 500px;
+  opacity: 1;
+}
+.menu-list > li.is-invisible, .menu-list > li .menu-label, .menu-list > li ul {
+  height: auto;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+.menu-list > li:not(.is-active) .menu-label,
+.menu-list > li:not(.is-active) ul {
+  margin: 0;
+}
+.menu-list > li.is-hidden2, .menu-list > li.is-hidden2 a, .menu-list > li.is-hidden2 .menu-label, .menu-list > li.is-hidden2 ul {
+  transition-timing-function: cubic-bezier(0, 1, 0, 1);
+}
+
+.btn-add-group {
+    background: #00ad8d;
+    color: #fff !important;
+}
+
+.btn.btn-add-group:hover {
+    color: #fff;
+}
+
+.btn-add-group:focus {
+    outline: none !important;
+}
+
+.chat-side-li li {
+    list-style: none !important;
+     background: #a92044; 
+    color: #fff;
+    padding: 10px 10px;
+    margin: 10px 10px;
+     border-radius: 5px;
+    /* width: 100%;
+    max-width: 180px;  */
+}
+
+.chat-side-li li a:hover {
+    text-decoration: none !important;
+    color: #fff;
+}
+
+.chat-side-li li a:focus {
+    text-decoration: none !important;
+    color: #fff;
+}
+
+.chat-side-li {
+    padding: 20px 25px;
+}
+
+ul.sub-chat li {
+    margin: 0px !important;
+}
+
+ul.sub-chat {
+    padding: 0px !important;
+}
+
+.name-chat-list:hover {
+    background: #00ad8d !important;
+    border-radius: 10px;
+}
+
+.sub-chat {
+    overflow-y: auto !important;
+    height: 460px !important;
+}
+
+.sub-chat::-webkit-scrollbar {
+    width: 5px;
+    height:10px;
+  } 
+  
+  /* Track */
+  .sub-chat::-webkit-scrollbar-track {
+    /* background: #f1f1f1;  */
+    background: #991a3c;
+  }
+   
+  /* Handle */
+  .sub-chat::-webkit-scrollbar-thumb {
+     background: #cdcdcd;  
+    
+  }
+  
+  /* Handle on hover */
+  .sub-chat::-webkit-scrollbar-thumb:hover {
+     /* background: #cdcdcd;   */
+     background:#017474;
+  }
+
+  a.is-active {
+    color: #fff !important;
+    font-size: 16px;
+    font-weight: 500;
+    /* background: #00ad8dcc; */
+    padding: 10px 10px;
+    border-left: 4px solid #00ad8d;
+    
+}
+
+.title-pop-chat {
+    color: #810022;
+    font-weight: 400;
+    font-size: 20px;
+}
+
+.title-pop-chat:hover {
+    color: #007661;
+    font-weight: 400;
+    font-size: 20px;
+}
+
+
+
+.lab-tilt-chat {
+    color: #008062;
+    font-weight: 500 !important;
+    font-size: 16px;
+}
+
+.btn-add-group:hover {
+    background: #aa2044;
+}
+
+.full-width-sel .select2-container{
+  display: block !important;
+}
+
+.pop-up-boxbor {
+    box-shadow: 0px 0px 5px #5a3c3c;
+}
+
+span.select2.select2-container.select2-container--default {
+    width: 100% !important;
+}
+
+span.select2.select2-container.select2-container--default.select2-container--focus {
+    width: 100% !important;
+    border-color:#8b1434 !important;
+}
+
+.gn-input:focus {
+    border-color: #4e0e1f;
+    box-shadow: none;
+}
+
+i.fa.fa-plus-circle.add-plus-gr {
+    font-size: 18px;
+    padding: 0px 5px;
+}
+
+i.user-chat-list {
+    font-size: 22px;
+    padding: 5px 5px;
+}
+
+
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #8f0000;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+    color: #fff;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: #fff;
+}
+
+.u-ser-hov:hover {
+    color: #00ad8d;
+}
+ 
+</style>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>  -->
+
+<script>
+
+
+$(document).on('click','.redirectroom',function(){
+  var val=$(this).attr('value')
+  var current_url=$(location).attr("href")
+  replace_url=current_url.replace('message',val)
+  window.location.href = replace_url
+})
+
+$('#groupmembers').select2({
+        // maximumSelectionLength: 4
+     });
+
+$('.room-creat').click(function(e){
+              var sender_id =$('#senderid').attr('value')
+              var receiver_id =$(this).attr('value')
+              var groupname=$('#groupname').val()
+             
+              var groupmembers=$('.room-groupmembers').select2().val()
+
+  console.log(groupmembers)
+
+    if(groupname=='')
+    {
+      // alert('normal')
+      $.ajax({
+              
+              url: "/chat/createroom",
+              type: 'GET',
+              data:{'sender_id':sender_id,'receiver_id':receiver_id},
+              success: function (response) {
+                console.log(response)
+                var current_url=$(location).attr("href")
+                replace_url=current_url.replace('message',response.roomid)
+                console.log('mesgurl',replace_url)
+                window.location.href = replace_url
+              }
+
+            });
+    }
+    else{
+
+      var  myJSON = JSON.stringify(groupmembers);
+      $('#groupname').next('span').remove()
+
+      $.ajax({
+              
+              url: "/chat/createroom",
+              type: 'GET',
+              data:{'sender_id':sender_id,'receiver_id':myJSON,'groupname':groupname},
+              success: function (response) {
+                console.log(response)
+                if (response.roomid == 'exists'){
+                  $('#groupname').after('<span class="waring-err" style="color: red;">Group Name already exists</span>')
+                }
+                else{
+                var current_url=$(location).attr("href")
+                replace_url=current_url.replace('message',response.roomid)
+           
+                window.location.href = replace_url
+                }
+
+              }
+
+            });
+
+
+
+    }
+             
+
+
+
+
+            });
+              
+            // {'sender':sender_id,'receiver':receiver_id},  
+
+$(document).on('keyup','#groupname',function(){
+  $(this).next('span').remove()
+})
+
+</script>
+ 
+<!--sidebar-->
+<script>
+  const links = document.querySelectorAll(".menu-list > li > a");
+for (const link of links) {
+  link.addEventListener(
+  "click",
+  e => {
+    const curr = e.srcElement;
+    [...links].forEach(link => {
+      if (link !== curr) {
+        link.classList.remove("is-active");
+        link.parentNode.classList[
+        curr.classList.contains("is-active") ? "remove" : "add"](
+        "is-invisible");
+      }
+    });
+    curr.parentNode.classList.remove("is-invisible");
+    curr.parentNode.classList.toggle("is-active");
+    curr.classList.toggle("is-active");
+  },
+  false);
+ 
+}
+</script>
+
+

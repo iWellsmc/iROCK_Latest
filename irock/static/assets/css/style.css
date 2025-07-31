@@ -1,0 +1,502 @@
+/*================================================================================
+	Item Name: Vuexy - Vuejs, HTML & Laravel Admin Dashboard Template
+	Version: 2.0
+	Author: PIXINVENT
+	Author URL: http://www.themeforest.net/user/pixinvent
+================================================================================
+
+NOTE:
+------
+PLACE HERE YOUR OWN SCSS CODES AND IF NEEDED, OVERRIDE THE STYLES FROM THE OTHER STYLESHEETS.
+WE WILL RELEASE FUTURE UPDATES SO IN ORDER TO NOT OVERWRITE YOUR STYLES IT'S BETTER LIKE THIS.  */
+
+/*27/10/2021*/
+.content-body {
+
+    /* margin:30px !important; */
+    /* margin-top: 30px !important;
+    margin-right:30px !important; */
+    /* border-radius:15px; */
+    /* padding:35px; */
+    /* box-shadow: 0px 0px 20px grey; */
+}
+
+.main-header {
+    margin: 0px auto !important;
+    height:100%;
+    max-height:50px;
+}
+
+.lg-office {
+    padding: 0px !important;
+}
+
+img.login-img {
+    width: 100% !important;
+	height: 100vh;
+}
+
+.lg-field {
+    padding: 0px !important;
+}
+
+.lg-card {
+    height: 100vh;
+	background: #AF2B50;
+    padding: 0px !important;
+    margin: 0px !important;
+}
+
+.lg-name {
+    color: #fff !important;
+	padding-bottom: 7px;
+    font-size:16px ;
+}
+
+.lg-sign {
+    width: 50%;
+    background: white !important;
+    color: #AF2B50 !important;
+	font-size: 16px !important;
+    font-weight: 800 !important;
+	padding: 20px 20px;
+	border: #fff !important;
+	margin-top: 15px !important;
+}
+
+.lg-sign:hover{
+background-color: #fff !important;
+color:#AF2B50 !important;
+box-shadow: none !important;
+}
+
+.lg-sign:hover:active{
+	background-color:#fff !important ;
+}
+
+.card.lg-card {
+    position: relative;
+}
+
+
+.form-card{
+	position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+}
+
+.lg-head {
+    color: #fff;
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.form-card {
+    padding: 40px 40px;
+}
+
+img.lg-mainlogo {
+    width: 100% !important;
+    max-width: 200px;
+}
+
+.lg-logo {
+    position: relative;
+}
+
+img.lg-mainlogo {
+    position: absolute;
+    left: 30px;
+    top: 0px;
+	margin:0px auto !important;
+}
+
+form.reg-form .form-control {
+    height: 40px !important;
+    margin-bottom: 15px !important;
+	border: 1px solid #989898;
+}
+.reg-head {color: #AF2B50; font-weight: 600; padding:20px 0px 0px 0px;}
+.reg-subhead {
+    font-size: 14px;
+}
+.reg-card {
+	padding: 0em 3em !important;
+}
+.reg-form label { color: #000;     font-size: 16px;
+    font-weight: 500; margin-bottom: 8px; }
+.m-0 { margin:0; }
+
+.top-spacing {
+    padding-top: 20px !important;
+}
+
+.btn-color {
+    color: #AF2B50 !important;
+    border-color: #AF2B50 !important;
+    margin: 0px 4px;
+}
+
+.btn-color:focus{
+	background-color:#AF2B50 !important ;
+	color:#fff !important;
+}
+
+.btn-color:active{
+	background-color:#AF2B50 !important ;
+	color:#fff !important;
+}
+
+.reg-box {
+    border-radius:25px !important;
+}
+
+form.reg-form .form-control:focus{
+    border-color: #95183a !important;
+}
+
+.reg-form .form-control{
+    color: #000;
+    font-weight: 600;
+    font-size: 16px;
+    /* padding: 15px 10px; */
+    margin: 0px 0px 10px 0px;
+}
+
+/*28-10-21*/
+@media (max-width: 1850px){
+    .reg-box {
+        margin: 30px 20px!important;
+    }
+}
+
+button.btn.float-right.btn-inline.lg-sign.waves-effect.waves-float.waves-light {
+    margin-right: 15px;
+}
+
+.lg-logup {
+    display: flex;
+}
+
+.btn-spacing {
+    padding-top: 25px !important;
+}
+
+.from-head {
+    color: #AF2B50;
+    font-weight: 600;
+    font-size:30px;
+    text-align: center;
+    margin: 30px 0px;
+    /* margin-top:4px !important; */
+    /* padding: 20px 0px 0px 0px;
+    color: black;
+    font-size: 30px;
+    font-weight: 500; */
+    /* text-shadow: 0px 0px 8px #959595e8; */
+}
+
+.from-head-tax {
+    color: #008b8b;
+    font-weight: 600;
+    font-size:30px;
+    text-align: center;
+    margin: 30px 0px;
+}
+.btn-clr {
+       /* margin-top:20px;  */
+      /* margin-bottom:20px; */
+    position: relative;
+}
+
+.not-fi{
+    position: absolute !important;
+    left: -15px !important;
+    top: 0px !important;
+    max-width: 20px;
+    background: #a10000 !important;
+    
+}
+
+
+
+@media (max-width: 1600px){
+.table-bck {
+    overflow-y: scroll !important;
+}
+}
+
+ul.main-head1 li {
+    padding: 5px;
+}
+
+.card1 {
+    padding: 30px;
+}
+
+h5.u-name {
+    float: right;
+    font-weight: bold;
+    text-transform: capitalize;
+    color: #000;
+}
+
+p.client-ad {
+    float: right;
+    color: #000;
+    font-weight: 500;
+}
+
+img.i-cons {
+    padding-right: 15px;
+    padding-top: 10px;
+}
+
+span.number {
+    font-size: 16px !important;
+}
+
+.development-type li{
+    list-style-type: none ! important;
+    color: black;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.discipline-subtype li{
+    list-style-type: none ! important;
+    color: black;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.form-txt2{
+    color:black;
+    font-size: 16px !important;
+    font-weight: 600;
+}
+
+/*10-11-2021*/
+.crt-table {
+    /* overflow-y: scroll; */
+    overflow-x:hidden;
+    overflow-y:auto;
+    /* height:500vh !important; */
+}
+
+.crt-table1 {
+    /* overflow-y: scroll; */
+    overflow-x:hidden;
+    overflow-y:auto;
+    /* height:500vh !important; */
+}
+
+p.info {
+    color: #fff !important;
+    font-size: 16px;
+}
+
+div#company_list_length {
+    color: #951739;
+    font-weight: 600;
+    padding-bottom: 20px !important;
+}
+
+div#company_list_filter {
+    color: #941839;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+div#company_list_info {
+    padding-top: 20 px !important;
+    color: #96183a;
+    font-weight: 600;
+}
+
+div#company_list_paginate a {
+    margin-top: 10px !important;
+    color: #96183a !important;
+    font-weight: 600 !important;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid #96183a !important;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid #96183a !important;
+}
+
+
+/*13-11-2021*/
+.btn-clr a:hover {
+    color: #fff !important;
+    text-decoration: solid;
+}
+
+.cd-head {
+    border-bottom: none !important;
+}
+
+.close {
+    float: left !important;
+}
+
+li.nav-item.mnu-item2 a:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+table.prt-viewlist th {
+    text-align: left !important;
+}
+
+table.prt-viewlist {
+    box-shadow: 0px 0px 5px;
+    border-radius: 15px;
+}
+
+table.prt-viewlist td {
+    color: #000;
+    font-weight: 600;
+}
+
+.sign-eye-icon {
+    position: relative;
+}
+
+.eye-iicon {
+    position: absolute;
+    content: "";
+    right: 20px;
+    top: 50px;
+    color: #af2b50;
+}
+
+.eye-iicon2 {
+    position: absolute;
+    content: "";
+    right: 20px;
+    top: 50px;
+    color: #af2b50;
+}
+
+.input-dis {
+    margin-bottom: 20px;
+}
+
+/*3-10-2022*/
+.waring-err {
+    color: red;
+    font-size: 15px;
+    font-weight: 400;
+}
+
+.well-cls.error {
+    margin: 0px;
+}
+
+.well-class.error {
+    margin-bottom: 0px;
+}
+
+.cluster-cls.error{
+    margin-bottom: 0px !important;
+}
+
+.cluster-class.error {
+    margin-bottom: 0px !important;
+}
+
+td.same-line {
+    display: flex;
+    vertical-align: baseline;
+}
+
+ .prj-creation:focus {
+    margin-left: 8px;
+} 
+
+.invoicepercls {
+    width: 50% !important;
+}
+
+
+/* bar chart css starts here*/
+.highcharts-figure,
+.highcharts-data-table table {
+  min-width: 310px;
+  max-width: 800px;
+  margin: 1em auto;
+}
+
+#container {
+  height: 400px;
+}
+
+.highcharts-data-table table {
+  font-family: Verdana, sans-serif;
+  border-collapse: collapse;
+  border: 1px solid #ebebeb;
+  margin: 10px auto;
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+}
+
+.highcharts-data-table caption {
+  padding: 1em 0;
+  font-size: 1.2em;
+  color: #555;
+}
+
+.highcharts-data-table th {
+  font-weight: 600;
+  padding: 0.5em;
+}
+
+.highcharts-data-table td,
+.highcharts-data-table th,
+.highcharts-data-table caption {
+  padding: 0.5em;
+}
+
+.highcharts-data-table thead tr,
+.highcharts-data-table tr:nth-child(even) {
+  background: #f8f8f8;
+}
+
+.highcharts-data-table tr:hover {
+  background: #f1f7ff;
+}
+
+/* bar chart css ends here*/
+
+.invoice-info {
+    width:100%; margin: 0 auto; border: 1px solid #c7c7c7;
+}
+.invoice-info th, .invoice-info td { 
+    border-bottom: 1px dashed #c7c7c7 !important;
+    padding: 8px;
+}
+.invoice-info th {
+    width: 50%;
+    border-right: 1px dashed #c7c7c7 !important;
+}
+.invoice-info a, .invoice-info a:hover, .inv-pretbl a, .inv-pretbl a:hover { color: #96183a; }
+.vend-dashboard h3 { font-size: 25px; text-decoration:underline; }
+.vend-dashboard ul { padding: 0; margin-top:20px; }
+.vend-dashboard ul li { list-style-type: none; font-size: 20px; }
+.vend-dashboard ul li span { padding-left: 10px; }
+
+/* Tax/Levy Selection */
+.texx-rgh {
+    text-align: right;
+}
+
+.wid-percen {
+    width: 150px;
+}

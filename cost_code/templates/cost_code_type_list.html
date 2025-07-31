@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% load cost_code_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/cost_code/cost_code_type_list.css' %}">
+<section id="data-list-view" class="data-list-view-header">
+  <div>
+    <input class="listid" value="{{get_id}}" type="hidden">
+    <h3 class="from-head">Level {% get_level_name pk request %} - {{level.level_type.level_name}}</h3>
+    <!-- <br><br> -->
+    <div class="row my-4 justify-content-center">
+      <div class="row mb-4">
+        <div class="col-8 pl-0">
+          {% if request.user.roles_id == 3 %}
+          {% if rights.create == '1'%}
+          <!-- <button type="button" class="btn btn-clr im-port-cont waves-effect waves-float waves-light" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                  Import
+                </button> -->
+          {% endif %}
+          {% else %}
+          <!-- <button type="button" class="btn btn-clr im-port-cont waves-effect waves-float waves-light" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                  Import
+                </button> -->
+          {% endif %}
+
+          <!-- Modal -->
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <form method="POST" enctype="multipart/form-data" id="import_costcode_component">
+              {% csrf_token %}
+
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Import</h5>
+                    <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <input type="hidden" name="cost_code_id" value="{{level.level_type.id}}">
+                    <input type="file" name="import_file" class="filesize"
+                      accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" id="import_file" /><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                    <h6 id="file-error" class="choose-file-error"></h6>
+                  </div>
+                  <div class="modal-footer">
+                    <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+                    <button type="submit"
+                      class="btn btn-clr final-cls waves-effect waves-float waves-light">Submit</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <!-- <div class="col-4 text-end pr-0">
+        {% if request.user.roles_id == 3 %}
+                {% if rights.create == '1' %} 
+                 <button type="button" class="btn btn-clr btn-master mr-0"><a href="{% url 'cost_code:createcostcodetype' level_id=pk %}">Add</a></button>
+                 {%endif%}
+          {%else%}
+          <button type="button" class="btn btn-clr btn-master mr-0"><a href="{% url 'cost_code:createcostcodetype' level_id=pk %}">Add</a></button>
+          {%endif%}
+          {% if request.user.roles_id == 3 %}
+          {% if rights.create == '1'%} 
+          <button type="button" class="btn btn-clr btn-master"><a href="{% url 'cost_code:costcodetypedownloadtemplate' pk=pk %}">Download Template</a></button>
+          {% endif %}
+          {% else %}
+          <button type="button" class="btn btn-clr btn-master"><a href="{% url 'cost_code:costcodetypedownloadtemplate' pk=pk %}">Download Template</a></button>
+          {% endif %}
+      </div> -->
+
+      </div>
+
+
+      <div class="table-responsive text-nowrap inv-table_wid">
+        <table class="table irock-table import-table" id="costcodetype_list">
+          <!-- class removed -> prj-back_clr settings-data-list-view data-list-view invoicelist tot-in  -->
+          <thead>
+            <tr>
+              <th>S/N</th>
+              <th>Component Name <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>
+              <!-- <th>Cost Code</th>
+                    <th id="actions_th">Actions</th> -->
+            </tr>
+          </thead>
+          <tbody class="table-list">
+            <!-- {% for cost_code_type in process_list %}
+               <tr>
+                    <td>{{process_list.start_index|add:forloop.counter0 }}</td>
+                    <td>{{cost_code_type.component_name}}</td>
+                    <td>{{cost_code_type.component_cost_code}}</td>
+                    {% checkcostcodetypeexists cost_code_type.id company cost_code_type.component_name  as checktype %}
+                    <td class='check_type'>
+                      {% if checktype == 0 %}
+                      {% if request.user.roles_id == 3 %}
+                          {% if rights.edit == '1' %} 
+                          <a class="btn py-0 px-2" href="{% url 'cost_code:costcodetypeedit' pk=cost_code_type.id %}">    
+                            <i class="fa fa-edit" title="Edit"></i>
+                        </a>
+                          {%endif%}
+                          {% if rights.delete == '1' %} 
+                          <a class="btn py-0 px-2 delete" href="#" data_id="{{cost_code_type.id}}">
+                            <i class="fa fa-trash-o" title="Delete"></i>
+                        </a>
+                          {%endif%}
+                      {%else%}
+                        <a class="btn py-0 px-2" href="{% url 'cost_code:costcodetypeedit' pk=cost_code_type.id %}">    
+                          <i class="fa fa-edit" title="Edit"></i>
+                          <a class="btn py-0 px-2 delete" href="#" data_id="{{cost_code_type.id}}">
+                            <i class="fa fa-trash-o" title="Delete"></i>
+                        </a>
+                      </a>
+                {%endif%}
+                       
+                       
+                       
+                        {% endif %}
+                      {%if nxtcomponentexit == False %}
+                      {% if request.user.roles_id == 3 %}
+                        {% if rights.create == '1' %} 
+                        <a class="text-decoration-none" href="{% url 'cost_code:createcostcoderangetype' level_id=pk id=cost_code_type.id %}" >
+                          <span class="action-add"><i class="fa fa-add" title="Add" style="font-size:15px; color:#95183a;"></i></span>
+                        </a> 
+                        {%endif%}
+                    {%else%}
+                    <a class="text-decoration-none" href="{% url 'cost_code:createcostcoderangetype' level_id=pk id=cost_code_type.id %}" >
+                      <span class="action-add"><i class="fa fa-add" title="Add" style="font-size:15px; color:#95183a;"></i></span>
+                    </a> 
+                  {%endif%}
+                     
+                     {%endif%}
+                     
+                    </td>   
+                    </tr>
+               {% empty %}
+               <tr>
+                 <td colspan="9" id="empty_class">---</td>
+               </tr>
+               {% endfor %} -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script type="text/javascript" src="{% static 'js/projects/userslist.js' %}"></script>
+<script>
+  var scheme = '{{scheme}}'
+  var gethost = '{{gethost}}'
+  var csrf_token = '{{csrf_token}}'
+  var costcode_master_id = '{{get_id}}'
+
+</script>
+<script src="{% static 'js/cost_code/import_cost_component.js' %}"></script>
+{% endblock %}

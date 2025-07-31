@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/vendorcontract.css' %}">
+<div class="etst-000">
+    <form method="POST" id="cost_type_form">
+    {% csrf_token %}
+    <div>
+
+        <div id="loader" class="lds-dual-ring hidden overlay">
+            <h5 class="head_cls">Please Wait...</h5>
+          </div>
+        <div class="upload-btn-wrapper ">
+            <!-- <input type="hidden" name="count_hdn" value="{{countlist}}"> -->
+
+            <button type="submit" class="btn btn-clr imp-btn-space submit_cls">Save</button>
+            <button type="button" class="btn btn-clr imp-btn-space mr-0"><a href="{% url 'cost_code:costcodetypelist' pk=cost_code_id %}">Back</a></button>
+          </div>
+    </div>
+        <div class="row">
+            <h4 class="from-head">Upload File</h4>
+            <div class="note-upload">
+    
+    <h6 class=""><img src="/static/images/icons8-note-20.png" alt=""> <span class="note-color">Note* :</span> Sequence gap between each cost line item for {{get_types.level_type_name}} = {{level.sequence_gap}}<br> <span class="second-text">This can be modified as required.</span></h6>
+            </div>
+            <!-- <div class="row">
+                <div class="col-12">
+                    <p class="vend-imp-clr" id="errornameid">Error Rows</p>
+                    <p class="error-red-clr" id="errorlistid">{{error_list}}</p>
+                </div>
+                <div class="col-4 search-bot-space">
+                    <label class="vend-imp-clr">Search Serial No:</label>
+                    <div class="row">
+                        <div class="col-8">
+                            <input type="text" name="search" id="searchid" value="" placeholder="Search Serial No" class="form-control search-box-err">
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="getrow btn btn-clr">Search</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-8"></div>
+            </div> -->
+         <div class="up-load-file table-responsive text-nowrap irock-table">
+            <table class="table usr-ryts upload-table" id="id_create_cost_tbl" data-id="{{get_types.id}}">
+                <thead>
+                    <tr> 
+                        <th>S/N</th>
+                        <th>Component Name</th>
+                        <th>Cost Code</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in datas %}
+                    <tr> 
+                        <td class="s_no">{{forloop.counter}}</td> 
+                        
+                        <td> 
+                            <input type="hidden" value="{{data}}" name="hidden_type" class="hidden_type">
+                            <input type="text" name="component_name" class="form-control comp_cls common_cls" autocomplete="off" value="{{data}}">
+                        </td>
+
+                        <td>
+                            <input type="hidden" value="{% if forloop.counter == 1 %}{% if set_val != None %}{{set_val}}{% else %}{{level.start_with}}{% endif %}{% endif %}" name="hidden_component_val" class="hidden_component_val">
+                            <input type="text" name="component_cost_code" class="form-control comp_code_cls common_cls" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" autocomplete="off" maxlength="{{level.no_digits}}" data_id="{{level.sequence_gap}}" value="{% if forloop.counter == 1 %}{% if set_val != None %}{{set_val}}{% else %}{{level.start_with}}{% endif %}{% endif %}">
+                        </td>
+                        <td class="text-center">
+                            <button id="add-row" class="btn btn-clr add-cls waves-effect waves-float waves-light" type="button" max_data="{{level.no_digits}}"><i class="fa fa-plus"></i></button>
+                            <button id="delete-row" class="btn btn-clr minus-cls waves-effect waves-float waves-light" type="button" data_id="{{level.sequence_gap}}" max_data="{{level.no_digits}}"><i class="fa fa-minus"></i></button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+            </div>
+        </div>
+
+</form>
+</div>
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+    var startwith = '{{get_types.start_with}}'
+    var max_digit=`{{level.no_digits}}`
+    var sequence_gap =`{{level.sequence_gap}}`
+</script>
+<script src="{% static 'js/cost_code/import_cost_component.js' %}"></script>
+<script>
+
+// $('.getrow').click(function(){
+//     var row = $('tr');
+//     var table = $('table');
+//     var value=$(this).parents('div').find('div:first').find('#searchid').val();
+//     console.log(value)
+//     var w = $(window);
+    
+//     $('table > tbody  > tr').each(function(index, tr) { 
+//         $(this).find('td:eq(0)').removeClass('coloractive')
+//     })
+//     var row = table.find('tr')
+//     .removeClass('active')
+//     .eq( +value )
+//     .addClass('active');
+    
+//     if (row.length){
+//         table.find('tr').removeClass('coloractive').eq(+value).find('td:first').addClass('coloractive');
+//         w.scrollTop( row.offset().top - (w.height()/2) );
+//     }
+// });
+
+
+// var count_val=$('input[name=count_hdn]').val();
+// console.log(count_val)
+// var s_num=[]
+
+// $('table > tbody  > tr').each(function(index, tr) { 
+//     var v_name=$(this).find('td:eq(1)').find('.vendornamecls').val()
+//     var v_name_span=$(this).find('td:eq(1)').find('span').text()
+//     var title=$(this).find('td:eq(2)').find('.titlecls').val()
+//     var name=$(this).find('td:eq(3)').find('.pnamecls').val()
+//     var lname=$(this).find('td:eq(4)').find('.lnamecls').val()
+//     var email=$(this).find('td:eq(5)').find('.emailcls').val()
+//     var email_span=$(this).find('td:eq(5)').find('span').text()
+
+//     if (v_name == '' || v_name_span.length > 1 || title == '' || name == '' || lname == '' || email == '' || email_span.length > 1){
+//         s_num.push($(this).closest('tr').children('td:first').text())
+//     }
+//     var vendor_duplicate=0
+//     //var emailduplicate=0
+//     $('input.vendornamecls').each(function() {
+//         var value=$(this).val()
+//         if (value == v_name){
+//            vendor_duplicate+=1
+           
+//         }
+//     });
+//     if (vendor_duplicate >1){
+//         $(this).find('td:eq(1)').find('span').text('Vendor Name Duplicate')
+//         s_num.push($(this).closest('tr').children('td:first').text())
+//     }
+//  });
+
+
+</script>
+{% endblock%}

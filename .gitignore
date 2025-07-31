@@ -1,0 +1,12 @@
+*.DS_Store
+**/__pycache__
+**/.DS_Store
+*.idea
+*venv
+*media
+**/migrations
+*env
+*venv
+manage.py
+/irock/pro.py
+/irock/dev.py

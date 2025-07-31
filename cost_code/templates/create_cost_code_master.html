@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/cost_code/create_cost_code_master.css' %}">
+
+<div class="row">
+  <div class="col-12 text-end">
+      <button type="button" class="btn btn-clr"><a href="{% url 'cost_code:costcodemasterlist' %}">Back</a></button>
+  </div>
+</div>
+
+<div>
+    <h3 class="from-head">Cost Code Master</h3>
+
+    
+    <form method="POST" id="createcostcode_master">
+        {% csrf_token %}
+    <div class="row mb-3">
+        <div class="col-5">
+            <table>
+                <tr class="cost-code-format">
+                    <td><label>Cost Code Style</label></td>
+                    <td>:</td>
+                    <td><select name="cost_code_format" class="form-control" id="costcodeformat">
+                        <option value="">--Select--</option>
+                        {% for format in code_format %}
+                            <option value="{{format}}">{{format}}</option>
+                        {% endfor %}
+                </select>
+            </td>
+                </tr>
+            </table>
+
+            <!-- <label>Cost Code Format :</label>
+            <select name="cost_code_format" class="form-control" id="costcodeformat">
+                    <option value="">--Select--</option>
+                    {% for format in code_format %}
+                        <option value="{{format}}">{{format}}</option>
+                    {% endfor %}
+            </select> -->
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-5" >
+            <table>
+                <tr class="cost-code-format">
+                    <td><label>Input Type</label></td>
+                    <td>:</td>
+                    <td><input type="text" name="input_type" class="form-control type_cls" readonly value="Numeric" ></td>
+                </tr>
+            </table>
+            <!-- <label>Input Type :</label>
+            <input type="text" name="input_type" class="form-control type_cls" readonly value="Numeric" > -->
+        </div>
+    </div>
+    <div class="row">
+       <div class="col-12">
+        <table id="id_create_cost_tbl" class="cost-code-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Level Type</th>
+                    <th>No of Digits</th>
+                    <th>Start with</th>
+                    <th>Sequence Gap <i class="fa fa-info-circle" title="No. of items that can be added in between each cost line item for code generation"></i></th>
+                </tr>
+
+            </thead>
+            <tbody>
+                <tr class="main_tr">
+                    <td><label class="lev_nm_cls">Level 1</label></td>
+                    <td>
+                        <input value="Development Type" class="form-control level_cls " name="level_cls" readonly>
+                        <select name="level_type" class="form-control level_cls" style="display: none;">
+                            <option value="1" selected>Development Type</option>
+                        </select>
+                        <input type="text" name="new_level" class="form-control new_level_cls" style="display:none" placeholder="Please Enter New levels">
+                        <input type="hidden" name="leveltype" class="leveltype">
+
+                    </td>
+                    <td>
+                        <input type="text" name="num_digits" maxlength=2 class="form-control digit_cls tdvalue-center" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');" autocomplete="off" value="2">
+                    </td>
+                    
+                    <td>
+                        <input type="text" name="start_with" class="form-control type_based_cls tdvalue-center" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');" autocomplete="off" maxlength=2>
+                    </td>
+                    <td>
+                        <input type="text" name="Sequence_gap" class="form-control seq_cls tdvalue-center" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');" autocomplete="off" maxlength='3'>
+
+                    </td>
+                    <td>
+    
+                        <select name="input_type" class="form-control type_cls" style="display: none;">
+                            <option value="Numeric">Numeric</option>
+                        </select>
+                    </td>
+                    <td class="tdvalue-center">
+                        
+                        <a class="btn p-0" data-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample">
+                            <span class="action-edit align-icons">
+                                <!-- <i class="fa fa-eye eyebutton" title="View" style="font-size:17px; color:#95183a;"></i> -->
+                                <button class="comp-btn level_1" title="View">Component L1 <i class="fa-solid fa-chevron-down pl-1" id="bac-eye"></i> </button>
+                            </span>
+                        </a>
+                       
+                    </td>
+                    <div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter1" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+                          <div class="modal-content" data-backdrop="static">
+                            
+                            <div class="modal-header comment-head">
+                              <h5 class="modal-title" id="exampleModalCenterTitle">Development Type</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body calc-body">
+                                {% for discipline in alldiscipline%}
+                                {% for development in alldevelopment%}
+                                    <input value="{{discipline.name}}({{development.development_type}})" >
+                                {% endfor %}
+                            {% endfor %}
+                            </div>
+                           
+                    
+                            <div class="modal-footer comment-foot">
+                             
+                            </div>
+                            </div>
+                        </div>
+                      </div>
+
+                      <div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter2" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+                          <div class="modal-content" data-backdrop="static">
+                            
+                            <div class="modal-header comment-head">
+                              <h5 class="modal-title" id="exampleModalCenterTitle">Discipline</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body calc-body">
+                               {%for disciplinesubtype in discipline_subtype%}
+                               <input value="{{disciplinesubtype}}" >
+                              {%endfor%}
+                            </div>
+                           
+                            <div class="modal-footer comment-foot">
+                            
+                            </div>
+                            </div>
+                        </div>
+                      </div>
+                </tr>
+                <tr class='dev_type'>
+                  <td colspan="12" class="p-0">
+                    <div class="collapse coll_1" id="collapseExample1">
+                      <div class="card card-body shadow-none master-crd pad-adj">
+                            <div role="tabpanel" class="tab-pane active space" id="roles{{obj.id}}">
+                              <div class="row">
+                                <div class="col-12">
+                                  <h4 class="proj-hd">Development Type</h4>
+                                </div>
+                              </div>
+                              <div class="row" id="name">
+                                <div class="col-12">
+                                  {% for discipline in alldiscipline%}
+                                  {% for development in alldevelopment%}
+                                  <div class="row">
+                                    <div class="col-12">
+                                      <li class="role-cls" process_id="{{flow.process.id}}" pk="{{obj.id}}">{{discipline.name}}({{development.development_type}})</li>
+                                    </div>
+                                  </div>
+                                  {% endfor %}
+                                  {% endfor %}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                      </div>
+                    </div> 
+                    
+                    {% comment %} <div class="collapse" id="collapseExample2">
+                      <div class="card card-body shadow-none master-crd pad-adj">
+                            <div role="tabpanel" class="tab-pane active space" id="roles{{obj.id}}">
+                              <div class="row">
+                                <div class="col-12">
+                                  <h4 class="proj-hd">Discipline Type</h4>
+                                </div>
+                              </div>
+                              <div class="row" id="name">
+                                <div class="col-12">
+                                  {%for disciplinesubtype in discipline_subtype%}
+                                  <div class="row">
+                                    <div class="col-12">
+                                      <li class="role-cls" process_id="{{flow.process.id}}" pk="{{obj.id}}">{{disciplinesubtype}}</li>
+                                    </div>
+                                  </div>
+                                  {% endfor %}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                      </div>
+                    </div> {% endcomment %}
+                  </td>
+              </tr>
+
+            </tbody>
+        </table>
+       </div>
+        <div class="row">
+            <div class="col-1 one-wid"></div>
+            <div class="col-11 pl-0">            
+                <button id="add" type="button" class="add-nxt-btn">Add Next Level</button>
+            </div>
+        </div>
+    </div>
+
+        <div class="text-center btn-cls">
+            <button type="submit" class="btn btn-clr text-left final-cls waves-effect waves-float waves-light">Submit</button>
+        </div>
+    </form>
+</div>
+        
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+  let subtype='{{subtype}}'
+</script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> 
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" ></script>
+<script src="{% static 'js/cost_code/create_cost_code.js' %}"></script>
+{% endblock %}

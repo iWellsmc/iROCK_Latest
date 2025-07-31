@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/cost_code/costcode_master.css' %}">
+
+
+<div>
+    <h3 class="from-head">Cost Code Master</h3>
+    <div class="row">
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+            {% if request.user.roles_id == 3 %}
+                
+                    {% if cost_code_len == 0 %}
+                    {% if rights.create == '1' %} 
+                        <button type="button" class="btn btn-clr btn-master"><a href="{% url 'cost_code:createcostcode' %}">Add</a></button>
+                    {% endif %}
+                    {% else %}
+                        {% if cost_code_len > 0 or length == 0 %}
+                        {% if rights.edit == '1' %}
+                        <button type="button" class="btn btn-clr btn-master mr-0"><a href="{% url 'cost_code:editcostcodemaster' %}">Edit</a></button>
+                        {% endif %}
+                        {% endif %}
+                    {% endif %}
+            {%else%}
+                {% if cost_code_len == 0 %}
+                <button type="button" class="btn btn-clr btn-master"><a href="{% url 'cost_code:createcostcode' %}">Add</a></button>
+                {% else %}
+                    {% if cost_code_len > 0 or length == 0 %}
+                    <button type="button" class="btn btn-clr btn-master mr-0"><a href="{% url 'cost_code:editcostcodemaster' %}">Edit</a></button>
+                    {% endif %}
+                {%endif%}
+            
+            {%endif%}
+
+        </div>
+    </div>
+    <!-- {% for cost_code in cost_code_list %}
+        {%if forloop.first%}
+            <h5>Cost Code Format  : {{cost_code.cost_code_format}}</h5>
+            <h5>Input Type : Numeric</h5>
+        {%endif%}
+        {%empty%}
+        <h5>Cost Code Format  :</h5>
+        <h5>Input Type : Numeric</h5>
+    {%endfor%} -->
+
+    {% for cost_code in cost_code_list %}
+        {%if forloop.first%}
+            <!-- <h5>Cost Code Format  : {{cost_code.cost_code_format}}</h5> -->
+            <table>
+                <tr class="cost-code-format">
+                    <td class="pl-0">Cost Code Style</td>
+                    <td>:</td>
+                    <td>{{cost_code.cost_code_format|default_if_none:"---"}}</td>
+                </tr>
+            </table>
+            <!-- <h5>Input Type : Numeric</h5> -->
+            <table>
+                <tr class="cost-code-format">
+                    <td class="pl-0">Input Type </td>
+                    <td>:</td>
+                    <td>Numeric</td>
+                </tr>
+            </table>
+        {%endif%}
+        {%empty%}
+        <table>
+            <tr class="cost-code-format">
+                <td>Cost Code Style</td>
+                <td>:</td>
+                <td>---</td>
+            </tr>
+        </table>
+        <!-- <h5>Cost Code Format  :</h5> -->
+        <!-- <h5>Input Type : Numeric</h5> -->
+        <table>
+            <tr class="cost-code-format">
+                <td>Input Type</td>
+                <td>:</td>
+                <td>Numeric</td>
+            </tr>
+        </table>
+    {%endfor%}
+    <div class="table-responsive text-nowrap inv-table_wid">
+        <table class="table prj-back_clr settings-data-list-view data-list-view invoicelist tot-in irock-table" id="master_project_list">
+            <thead >
+                <tr >
+                    <th>S/N</th> 
+                    <th class="">Levels <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>     
+                    <th id="text-initial">No. of Digits <button class="filter-btn" data-filter="last-name"> <i class="fas fa-sort"></i></button></th>
+                    <th>Start With <button class="filter-btn" data-filter="designation"> <i class="fas fa-sort"></i></button></th>
+                    <th>Sequence Gap <i class="fa fa-info-circle" title="No. of items that can be added in between each cost line item for code generation"></i> <button class="filter-btn" data-filter="dept"> <i class="fas fa-sort"></i></button></th>
+                    <!-- i-con-clr -->
+                </tr>
+            </thead>
+            <tbody class="table-list">
+                {% for cost_code in cost_code_list %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{cost_code.level_type.level_name}}</td>
+                        <td>{{cost_code.no_digits}}</td>
+                        <td id="cc-center">{{cost_code.start_with}}</td>
+                        <td>{{cost_code.sequence_gap}}</td>
+                    </tr>
+                     {% empty %}
+                  <tr>
+                    <td colspan="9" id="empty_class">---</td>
+                  </tr>
+                 {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script type="text/javascript" src="{% static 'js/projects/userslist.js' %}"></script>
+{% endblock %}

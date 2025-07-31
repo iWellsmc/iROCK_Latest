@@ -1,0 +1,132 @@
+.cost-code-format {
+    display: flex;
+    align-items: center;
+}
+
+.cost-code-format label {
+    width: 150px !important;
+    margin-bottom: 0;
+    color: #000;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.cost-code-format td {
+    padding: 0px 5px;
+}
+
+.cost-code-format td:nth-child(2) {
+    color: #000;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.cost-code-format td:nth-child(3) {
+    width: 250px;
+}
+
+.form-control.level_cls[readonly] {
+    pointer-events: none;
+}
+
+.form-control.type_cls[readonly] {
+    pointer-events: none;
+}
+
+.cost-code-table {
+    width: 100%;
+}
+
+.lev_nm_cls {
+    color: #000;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 0px;
+}
+
+.cost-code-table th {
+    color: #017474;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    width: 19%;
+}
+
+.cost-code-table th:first-child {
+    width: 5%;
+}
+
+.cost-code-table select {
+    width: 90%;
+    margin: 8px auto;
+}
+
+.cost-code-table input {
+    width: 90%;
+    margin: 8px auto;
+}
+
+.cost-code-table button {
+    width: 200px;
+}
+
+.one-wid {
+    padding: 0px;
+    width: 7%;
+}
+
+.add-nxt-btn {
+    color: #fff;
+    background-color: #BD2753;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+li.role-cls {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 5px auto !important;
+}
+
+::marker {
+    color: #9a1a3c;
+}
+
+.space {
+    height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.comp-btn {
+    border: none;
+    border-radius: 7px;
+    background-color: #bd2753;
+    color: #fff;
+    padding: 6px 6px;
+}
+
+#bac-eye {
+    background-color: #bd2753 !important;
+    color: #fff !important;
+}
+
+.tdvalue-center {
+    text-align: var(--centertext-align);
+}
+
+.td-left {
+    text-align: var(--lefttext-align);
+}
+
+
+
+
+/*************** Edit cost code master media query ***************/
+@media (min-width: 768px) and (max-width: 1250px) {
+    .cost-code-table {
+        width: 80em;
+    }
+}

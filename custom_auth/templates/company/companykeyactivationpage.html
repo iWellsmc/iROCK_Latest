@@ -1,0 +1,282 @@
+{% load static %}
+<!-- 
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+  <div class="row same-coline">
+    <div class="col-2 col-wid1"></div>
+    <div class="col-8 col-wid2">
+      <div class="key-form-mid">
+        <div class="key-act-log">
+        <img class="key-logo" src="/static/images/logo/irock.png" alt="irock-logo" style="">
+        </div>
+<form method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="seckey"class="key-acthed">Enter your company License Key Here<span class="star-clr">*</span></label>
+      <input type="text" name="sec_key" class="form-control key-inp" id="seckey" aria-describedby="seckey" placeholder="Enter Your Software Activation Key">
+    
+    <button type="submit" class="btn  active-keybtn">Activate Now</button>
+    </div>
+  </form> -->
+ 
+
+ <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://jqueryvalidation.org/files/dist/jquery.validate.min.js"></script>
+<script src="https://jqueryvalidation.org/files/dist/additional-methods.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="shortcut icon" type="image/x-icon" href="{% static 'images/logo/irock.png' %}">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
+  <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> -->
+<div class="row same-coline">
+  <div class="col-2 col-wid1"></div>
+  <div class="col-8 col-wid2">
+    <div class="key-form-mid">
+      <div class="key-act-log">
+        <img class="key-logo" src="/static/images/logo/irock.png" alt="irock-logo" style="">
+        </div>
+<form action="" id="keyactivation" method="post" >
+    {% csrf_token %}
+    <div class="form-group">
+      <label class="key-acthed" for="seckey">Enter Company License Key<span class="star-clr">*</span></label>
+      <input type="seckey" name="sec_key" class="form-control key-inp" id="seckey" aria-describedby="seckey">
+      <input type="hidden" value="" id="messages">
+    <div><button type="submit" class="btn active-keybtn" id="submit" >Activate Now</button></div>
+  </form>
+  </div>
+  </div>
+  </div>
+  <div class="col-4 col-wid3"></div>
+  
+ 
+ <style>
+   .same-coline {
+    display: flex;
+}
+
+.col-wid1 {
+    width: 33%;
+}
+
+.col-wid2 {
+    width: 33%;
+}
+
+.col-wid3 {
+    width: 33%;
+}
+
+.key-acthed {
+    color: #00958e;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+
+.active-keybtn {
+    background: #910007;
+    color: #fff;
+    margin-top: 10px;
+}
+
+.active-keybtn:hover{
+  color:#fff;
+}
+
+.key-form-mid {
+    position: absolute;
+    right: 33%;
+    bottom: 35%;
+    /* border: 1px solid #efefef; */
+    padding: 20px 20px;
+    width: 100%;
+    max-width: 560px;
+    box-shadow: 0px 0px 4px;
+}
+
+.key-inp {
+    margin-bottom: 10px;
+}
+
+.key-inp:focus{
+    border-color:#910007 !important;
+    box-shadow: 0px 0px 2px #910007 !important;
+}
+
+.active-keybtn:focus-visible{
+  outline:none !important;
+}
+
+.active-keybtn:focus {
+    outline:none !important;
+    color:#fff;
+    border: 1px solid #910007;
+    box-shadow: 0px 0px 2px #910007;
+}
+
+span.star-clr {
+    color: #97193a;
+    font-weight: bolder;
+}
+
+#errorkey
+{
+
+  color: #97193a;
+    font-weight: bolder;
+}
+img.key-logo {
+    width: 100%;
+    max-width: 210px;
+    height: auto;
+    margin: 0px 0px 10px 0px;
+    
+}
+
+.key-act-log {
+    width: 100%;
+    text-align: center;
+}
+
+button.btn.active-keybtn:hover {
+    background: #00958e;
+}
+ </style>
+  <script>
+
+
+    $(document).on('change','#seckey', function() {
+            var val=$(this).val();
+            console.log(val)
+            
+            $.ajax({
+                type: "GET",
+                url:"/seckeychecking/",
+                data:{'value':val} ,
+                cache: false,
+                success: function(data)
+                { 
+                  console.log(data.data);
+               
+                    if (data.data == 'false'){
+                        swal.fire('Enter valid key')
+        
+                        
+                        $('#submit').attr('disabled', 'disabled');
+                        
+                    }
+                    else{
+                      
+                   
+                        $('#submit').attr('disabled', false);
+                    }
+                }
+            })
+        });
+    
+
+   
+    //     $("#keyactivation").validate({
+    //     rules: {
+    //       sec_key: {
+    //         required: true,
+         
+    //         },
+            
+    //     },
+    //     messages: {
+    //       sec_key:{
+    //             required:"Enter the license Key",
+              
+    //         },
+            
+    //         errorElement : 'span',
+    //         },
+    //     submitHandler: function(form) {
+     
+    //         form.submit();
+          
+
+
+    //     }
+    // });
+        
+
+
+      $(document).on('click','#submit', function(e) {
+
+$('#errorkey').remove()
+      var key=$("#seckey").val()
+      if(key=='')
+      {
+
+        $('#submit').attr('disabled', 'disabled');
+        // $('#keyactivation').html(<span id='errorkey'>Enter License Key</span>);
+        $('#seckey').after('<span id="errorkey" class="errorkey" >Enter License Key</span>')
+      }
+      else{
+                      
+                   $('#errorkey').remove()
+                      $('#submit').attr('disabled', false);
+                  }
+                  // e.preventDefault(); 
+    });
+
+
+    $(document).on('keyup','#seckey', function(e) {
+      $('#errorkey').remove()
+      var  val=$(this).val()
+      if(val=='')
+      {
+
+        $('#seckey').after('<span id="errorkey" class="errorkey" >Enter License Key</span>')
+      }
+      else{
+        $('#errorkey').remove()
+      }
+      
+
+ 
+
+    });
+
+    $( document ).ready(function() {
+      "{% if messages %}"
+          "{% for message in messages %}"
+              $('#messages').val("{{message}}")
+          "{% endfor %}"
+      "{% else %}"
+      $('#messages').val("nomessage")
+      "{% endif %}"
+      $('#submitbtn').prop('disabled', true);
+      var notyf = new Notyf({
+          duration: 2000,
+          position: {
+            x: 'right',
+            y: 'top',
+          },
+          types: [
+            {
+              type: 'success',
+              background: '#D3D3D',
+              icon: {
+                className: 'fa fa-check-circle',
+                tagName: 'i',
+                color: '#000',
+              },
+            },
+          ]
+        });
+      var msg=$('#messages').val();
+      if (msg!='nomessage' && msg!=""){
+        notyf.open({
+        type: 'success',
+        message: msg,
+      }); 
+      }
+    })
+      </script>
+    

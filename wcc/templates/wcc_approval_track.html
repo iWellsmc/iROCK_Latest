@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+<!-- {% load custom_tags %} -->
+{% load wcc_custom_tags %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/wcc/wcctrack.css' %}"> 
+
+<style>
+    .tracking-item {
+        padding-bottom: 15px !important;
+    }
+    
+    /* .vendor_name {
+        bottom: 15px !important;
+    } */
+</style>
+
+<div class="row">
+    <div class="col-12 text-end">
+        {% comment %} <button class="btn btn-clr waves-effect waves-float waves-light" onclick="history.back()">Back
+            <!-- <a href="{% url 'wcc:wccapprovalview' pk=pk%}">Back</a> -->
+        </button> {% endcomment %}
+    </div>
+</div>
+
+<h3 class="from-head">WCC Approval Track</h3>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-12 col-lg-12">
+            <div id="tracking">
+                <div class="tracking-list">
+                    {% if wcc_data.wcc_status == 0 %}
+                        {% for station in station_list%}
+                        {% trackstation pk station as station_users %}
+                            {% if station_users|length > 0 %}
+                                <div class="tracking-item">
+                                    <div class="tracking-icon status-intransit">
+                                        <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                            <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                        </svg>
+                                    </div>
+                                    <!-- <div class="main_station_cls track-font-sze">Station : {{forloop.counter}}</div> -->
+                                    {% for station_user in station_users %}
+                                    <div class="tracking-content">{{station_user.user.name}} {{station_user.user.lastname}}<span>{{station_user.user.designation_role}}</span>
+                                    <span>Date : {{station_user.wcc_approval_submit_date|date:"d-M-Y"}}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}     
+                                <div class="tracking-item-pending">
+                                    <div class="tracking-icon status-intransit">    
+                                        <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                            <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                        </svg>
+                                    </div>
+                                    <!-- <div class="main_station_cls station-color track-font-sze">Station : {{forloop.counter}}</div> -->
+                                    {% unapprovedtrackstation pk station as station_users %}
+                                        {% for station_user in station_users %}
+                                            {% if station_user.invoice_override == 0 %}
+                                                <div class="tracking-content">{{station_user.user.name}} {{station_user.user.lastname}}<span>{{station_user.user.designation_role}}</span></div>
+                                            {% endif %}
+                                        {% endfor %}
+                                </div>
+                            {% endif %}
+                            {% endfor %}
+                            {% for pending_station in pending_station_data %}
+                                <div class="tracking-item-pending">
+                                    <div class="tracking-icon status-intransit">    
+                                        <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                            <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                        </svg>
+                                    </div>
+                                    <!-- <div class="main_station_cls station-color track-font-sze">Station : {{forloop.counter}}</div> -->
+                                    {% get_station_users pending_station.id True as station_users %}
+                                        {% for station_user in station_users %}
+                                                <div class="tracking-content">{{station_user.user.name}} {{station_user.user.lastname}}<span>{{station_user.user.designation_role}}</span></div>
+                                        {% endfor %}
+                                </div>
+                            {% endfor %}
+                            {% if total_approval == 1 %}
+                            <div class="tracking-item">
+                                <div class="tracking-icon status-intransit">
+                                    <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                        <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="tracking-item-pending">
+                                <div class="tracking-icon status-intransit">    
+                                    <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                        <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            {% endif %}
+                    {% else %}
+                        {% for user in approved_users %}
+                            <div class="tracking-item">
+                                <div class="tracking-icon status-intransit">
+                                    <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                        <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                    </svg>
+                                </div>
+                                <!-- <div class="main_station_cls track-font-sze">Station : {{forloop.counter}}</div> -->
+                                <div class="tracking-content">{{user.user.name}} {{user.user.lastname}}<span>{{user.user.designation_role}}</span>
+                                <span>Date : {{user.wcc_approval_submit_date|date:"d-M-Y"}} -
+                                (
+                                        {% if user.approval_status == 2 %}
+                                        Approved
+                                        {% elif user.approval_status == 3 %}
+                                        Returned
+                                        {% elif user.approval_status == 0 %}
+                                        Rejected
+                                        {% endif %}
+                                    )</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <div class="tracking-item">
+                            <div class="tracking-icon status-intransit">
+                                <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                    <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="vendor_name">
+                        {% if wcc_data.wcc_status == 0 %}
+                            {% if wcc_number %}
+                            WCC Approval for WCC No: {{wcc_number}} in Progress
+                            {% endif %}
+                        {% else %}
+                            WCC
+                            {% if wcc_data.wcc_status == 2 %}
+                                Returned
+                            {% elif wcc_data.wcc_status == 3 %}
+                                Rejected
+                            {% else %}
+                                Approved
+                            {% endif %}
+                            and Sent to {{ contract_data.contractvendor.vendor_name }}
+                        {% endif %}
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        
+{% endblock %}
+
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/wcc/wccapporvaltrack.js' %}"></script>
+{% endblock %}

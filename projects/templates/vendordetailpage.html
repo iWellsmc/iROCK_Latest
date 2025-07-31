@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/vendorinfo.css' %}">
+
+<h3 class="from-head">Vendor Details</h3>
+
+
+<div class="row">
+
+    <div class="vends-invite-lists vend-detail table-responsive text-nowrap">
+      <table class="table prj-back_clr settings-data-list-view data-list-view project_master vend-thead vend-tt vend-border all-tbl-hd contr-nmm irock-table">
+          <thead >
+              <tr >
+                  <th>VIN</th>     
+                  <th>Vendor Name</th>
+                  <th>Contact Person</th>
+                  <th>Email Address</th>
+                  {% comment %} <th>Contract Status</th> {% endcomment %}
+                  <th>Actions</th>
+              </tr>
+          </thead>
+          <tbody class="table-list wid-size-vend" id="myTable">
+                <tr>
+                <input type="hidden" id="basicdetailstatus" value="{{request.user.userfirsttimelogin}}">
+                <td class="vin_center">{{vendor.vin}}</td>
+                <td>{{vendor.vendor_name}}</td>
+                <td class="vin_left">{{vendor.contactpersonname}} {{vendor.contactpersonlastname}}</td>
+                <td>{{vendor.contactpersonemail}}</td>
+                {% comment %} {% checkcontracts_vendor vendor.id as vendorcontractcount %}
+                {% if vendorcontractcount > 0 %}
+                <td>
+                  <div class="badge badge-success">
+                    Contracts Added
+                  </div>
+                </td>
+                {% else%}
+                  <td>
+                    <div class="badge badge-warning">
+                      No Contracts Added
+                    </div>
+                  </td>
+                {% endif %} {% endcomment %}
+                <td class="vend-text-cen">
+                  <a class="btn p-0" data-toggle="collapse" href="#collapseExample{{vendor.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  <span class="action-edit align-icons">
+                    <i class="fa fa-eye" title="View" ></i>
+                  </span>
+                </a>
+                {% if request.user.contactpersonstatus == 1 %}
+                  <a href="{% url 'projects:editinsidevendorbasicinfo' pk=vendor.id %}" >
+                    <span class="action-edit align-icons"><i class="fa fa-pencil"></i></span>
+                  </a>
+                {% endif %}
+                </td>
+                </tr>
+
+                <tr>
+              <td colspan="12" class="p-0">
+                <div class="collapse" id="collapseExample{{vendor.id}}">
+                  <div class="card card-body shadow-none master-crd mb-0">
+                      <ul id="myTabs" class="nav nav-pills nav-justified new-tab" role="tablist" data-tabs="tabs">
+                        <li class="active"></li>
+                      </ul>
+                    
+                      <div class="tab-content"> 
+                        <div role="tabpanel" class="tab-pane active" id="vendorlist{{vendor.id}}">
+                          <div class="row">
+                            <div class="col-6">
+                              <br>
+                              <h4 class="from-head">Vendor Company Information</h4>
+                              <table class="prt-viewlist mid-view-tbl head-vend-mas">
+                                <tr><th>Vendor Name :</th><td>{{vendor.vendor_name|default:"---"}}</td></tr>
+                                <tr><th>Country Of Incorporation :</th><td>{{vendor.country_of_incorporation.nicename|default:"---"}}</td></tr>
+                                <tr><th>Registered Number in the Country of Incorporation :</th><td>{{vendor.RegisterNumber|default:"---"}}</td></tr>
+                                <tr><th>Vendor Company Website :</th><td>{{vendor.website|default:"---"}}</td></tr>
+                              </table>
+                            </div>
+                            <div class="col-6">
+                              <br>
+                              <h4 class="from-head">Vendor Company Address</h4>
+                              <table class="prt-viewlist mid-view-tbl head-vend-mas">
+                                <tr><th>Country Of Operation :</th><td>{{vendor.country_of_operation.name|default:"---"}}</td></tr>
+                                <tr><th>State in the Country of Operation :</th><td>{{vendor.state.name|default:"---"}}</td></tr>
+                                <tr><th>Vendor Company Official Address :</th><td>{{vendor.Address|safe|default:"---"}}</td></tr>
+                            </table>
+                            </div>
+                          </div>
+                          <div>
+                          <h4 class="from-head">Vendor Tax Details</h4>
+                          <div class="row">
+                            <table class="samll-tbl head-vend-mas">
+                              <br>
+                              
+                              <tr><th class="text-center">Tax Name</th> <th class="text-center">Tax Number</th></tr>
+                              {% for taxes in vendor.id|vendortaxdetails:"owntax" %}
+                                <tr><td class="vin_left">{{taxes.Tax_Name|default:"---"}}</td> <td class="vin_center">{{taxes.Tax_Number|default:"---"}}</td></tr>
+                              {% endfor %}
+                            </table>
+                          </div>
+                        </div>
+                          <!-- <br> -->
+                          {% comment %} <div class="row">
+                            <h4 class="from-head">Invoice Tax Details</h4>
+                           <div class="row">
+                            <div class="col-6 ">
+                              <h4 class="from-head">Inclusive</h4>
+                              <table class="samll-tbl head-vend-mas">
+                                <br>
+                                <tr><th class="text-center">Tax Name</th></tr>
+                                {% for taxes in vendor.id|vendortaxdetails:"Inclusive" %}
+                                  <tr><td>{{taxes.tax.Tax_Name|default:"---"}}</td></tr>
+                                {% endfor %}
+                              </table>
+                            </div>
+                            <div class="col-6 ">
+                              <h4 class="from-head">Exclusive</h4>
+                              <table class="samll-tbl head-vend-mas">
+                                <br>
+                                <tr><th class="text-center">Tax Name</th></tr>
+                                {% for taxes in vendor.id|vendortaxdetails:"Exclusive" %}
+                                  <tr><td>{{taxes.tax.Tax_Name|default:"---"}}</td></tr>
+                                {% endfor %}
+                              </table>
+                            </div>
+                          </div>
+                          </div> {% endcomment %}
+                          <br>
+                          <div class="row">
+                            <div class="col-12">
+                              <table class="samll-tbl head-vend-mas bank-inf bank-information-cls">
+                               
+                                <h4 class="from-head">Bank Information</h4>
+                                <tr><th class="text-center">Currency</th> 
+                                  <th class="text-center">Bank Name</th> 
+                                  <th class="text-center">Account Number</th>
+                                  <th class="text-center">Bank Details</th></tr>
+                                {% for taxes in vendor.id|vendorbankdetails:"bank" %}
+                                  <tr><td class="cur-symbol">
+                                    {{ taxes.bankcurrency.currency_symbol|default:"---" }}
+                                    {% if taxes.bankcurrency.currency_symbol and taxes.bankcurrency.currency_name %}
+                                        ({{ taxes.bankcurrency.currency_name|default:"---" }})
+                                    {% endif %}
+                                </td>
+                                 <td class="bank-nmme text-left">{{taxes.bankname|default:"---"}}</td> <td>{{taxes.accountnumber|default:"---"}}</td> {% if taxes.bankdetails|safe != ''  %}<td> {{taxes.bankdetails|safe}} </td> {% else %} <td>---</td> {% endif %}</tr>
+                                {% endfor %}
+                            </table>
+                            </div>
+                          </div>
+                        <br>
+                          <div class="row">
+                            <div class="col-6">
+                              
+                              <h4 class="from-head">Primary Contact Details</h4>
+                              <table class="prt-viewlist mid-view-tbl head-vend-mas">
+                                <tr><th>Primary Person Name :</th><td>{{vendor.contact_primary_title|yesno:"---"|default:"---"}} {% if vendor.contact_primary_title %}{% endif %}{{vendor.contact_primary_first_name|default_if_none:"---"}} {{vendor.contact_primary_middle_name|default_if_none:"---"}} {{vendor.contact_primary_last_name|default_if_none:"---"}}</td></tr>
+                                <tr><th>Designation :</th><td>{{vendor.primary_designation|yesno:"---"|default:"---"}}</td></tr>
+                                <tr><th>Email Address :</th><td>{{vendor.official_primary_email|yesno:"---"|default:"---"}}</td></tr>
+                                <tr><th>Country Code :</th><td>{{vendor.contact_primary_phone_code|convertnum|yesno:"---"|default:"---" }}</td></tr>
+                                <tr><th>Area Code :</th><td>{{vendor.contact_primary_area_code|yesno:"---"|default:"---"}}</td></tr>
+                                <tr><th>Phone Number(Land Line) :</th><td>{{vendor.contact_primary_phone|yesno:"---"|default:"---"}}</td></tr>
+                                <tr><th>Country Code :</th><td>{{vendor.contact_primary_mobile_code|convertnum|yesno:"---"|default:"---" }}</td></tr>
+                                <tr><th>Phone Number(Mobile No.) :</th><td>{{vendor.contact_primary_mobile|yesno:"---"|default:"---"}}</td></tr>
+                              </table>
+                            </div>
+                            <div class="col-6">
+                              <h4 class="from-head" >Secondary Contact Details</h4>
+                              <table class="prt-viewlist mid-view-tbl head-vend-mas">
+                                <tr><th>Secondary Person Name :</th><td>{{vendor.contact_secondary_title|yesno:"---"|default:"---"}} {% if vendor.contact_secondary_title %}{% endif %}{{vendor.contact_secondary_first_name|default_if_none:"---"}} {{vendor.contact_secondary_middle_name|default_if_none:"---"}} {{vendor.contact_secondary_last_name|default_if_none:"---"}}</td></tr>
+                                <tr><th>Designation :</th><td>{{vendor.secondary_designation|yesno:"---"|default:"---"}}</td></tr>
+                                <tr><th>Email Address :</th><td>{{vendor.official_secondary_email|yesno:"---"|default:"---"}}</td></tr>
+                                <tr><th>Country Code :</th><td>{{vendor.contact_secondary_phone_code|convertnum|yesno:"---"|default:"---" }}</td></tr>
+                                <tr><th>Area Code :</th><td>{{vendor.contact_secondary_area_code|yesno:"---"|default:"---"}}</td></tr>
+                                <tr><th>Phone Number(Land Line) :</th><td>{{vendor.contact_secondary_phone|yesno:"---"|default:"---"}}</td></tr>
+                                <tr><th>Country Code :</th><td>{{vendor.contact_secondary_mobile_code|convertnum|yesno:"---"|default:"---" }}</td></tr>
+                                <tr><th>Phone Number(Mobile No.) :</th><td>{{vendor.contact_secondary_mobile|yesno:"---"|default:"---"}}</td></tr>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+          </tbody>
+      </table>
+      </div>
+  </div>
+
+</div>    
+
+
+{%endblock%}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+  var vendorid='{{vendor.id}}'
+  $(document).ready(function(){
+    var val=$('#basicdetailstatus').val()
+    if ( val <= 1){
+      if('{{request.user.is_primary}}' == '0' && '{{request.user.is_secondary}}' == '0'){
+    swal.fire({
+      //title: "Warning!",
+      text: "Add Company Information",
+      type: "success"
+    }).then(function() {
+      var current_url=$(location).attr("href")
+      var replace_url=current_url.replace("vendordetailpage","editinsidevendorbasicinfo/"+vendorid)
+      window.location.href = replace_url;
+    }); 
+    }}
+  })
+</script>
+{% endblock %}

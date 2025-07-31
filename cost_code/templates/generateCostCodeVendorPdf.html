@@ -1,0 +1,126 @@
+{% load static %}
+{% block content %}
+{% load cost_code_tags %}
+{% load custom_tags %}
+<div>
+    <title>Cost Codes</title>
+  <header>
+    <div class="row d-flex align-items-center">
+      <div class="logo">
+                    
+      </div>
+      
+      <div class="company-details">
+          <h4 class="head-inv-pre-vend">{{request.company.company_name|safe}}</h4>
+          <p>{{request.company.address|safe}}</p>  
+      </div>
+  </div>
+  </header>
+
+  <footer style="width: 100%;">
+    <div style="border: 1px solid #e3e3e3; height: 0px; margin-bottom: 5px;"></div>
+</footer>
+
+    <!-- <h3 class="from-head">Cost Code to Vendor View</h3> -->
+    <!-- <div class="row">
+        <div class="Col-6">
+            <table class="vin-table">
+                <tr class="vin-no">
+                    <td><label style="font-weight:bold;">VIN</label></td>
+                    <td class="dot-colon">:</td>
+                    <td><span>{{vendor.vin}}</span></td>
+                </tr>
+
+                <tr class="ven-name">
+                    <td><label style="font-weight:bold;">Vendor Name</label></td>
+                    <td class="dot-colon">:</td>
+                    <td><span>{{vendor.vendor_name}}</span></td>
+                </tr>
+            </table>
+        </div>
+    </div> -->
+
+    {% for contract in  contracts_ids%}
+    {% if contract != None %}
+    <div class="row">
+        <div class="Col-6">
+            <table class="vin-table">
+                <tr class="ven-name">
+                    <td><label style="font-weight:bold;">Contract Details</label></td>
+                    <td class="dot-colon">:</td>
+                    <td>
+                        {% for contract_values in allcontract %}
+                        {% if contract_values.id|check_for_condition:contract %}
+                                <span >{{contract_values.contract_name}}-{{contract_values.field_type}}-{{contract_values.development_type}}-{{contract_values.disciplinename}}({{contract_values.reference_number}})</span>
+                        {% endif%}  
+                        {% endfor %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    {%getcostcode_contract_forreport request.company pk contract as allcostcode_vendor_contract %}
+    {% for allcostcode in  allcostcode_vendor_contract %}
+    <table class="vendorpdf-table">
+        <tbody>
+            {% for subcode in allcostcode %}
+            {% if forloop.counter == 1 %}
+            <tr>
+                <td colspan="2" class="td-ccvendor-green" style="text-align: center;">{{subcode.level1}}</td>
+                <td colspan="{{get_remaining_level_count}}" class="td-ccvendor-green" style="text-align: center;">{{subcode.level2}}</td>
+    
+            </tr>
+            <tr>
+                <th style="width: 5%;">S/N</th>
+                <!-- <th style="width: 5%;">VIN</th> 
+                <th style="width: 5%;">Vendor Name</th> -->
+                <th style="width: 15%;">Cost Code</th>     
+                <!-- <th style="width: 15%;">Category</th> -->
+                <th style="width: 80%;" colspan="{{get_remaining_level_count}}">Code Category Paths</th>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                
+
+                {% for level in subcode.remaining_levels %}
+                {% for key, value in level.items %}
+                    <th style="width: 25%;">
+                    <p class="s_no">{{key}}</p>
+                    </th>
+                {% endfor %}
+                {% endfor %}
+            </tr>
+            {% endif %}
+            
+            <tr>
+                <td style="text-align: center;">{{forloop.counter}}</td>
+                <!-- <td style="text-align: center;">{{subcode.vin}}</td>
+                <td>{{subcode.vendor_name}}</td> -->
+                <td style="text-align: center;">{{subcode.allcostcode}}</td>
+
+                {% for level in subcode.remaining_levels %}
+                    {% for key, value in level.items %}
+                        <td style="width: 10%;">
+                            <p class="s_no">{{value}}</p>
+                        </td>
+                    {% endfor %}
+            
+                {% endfor %}
+
+
+
+            </tr>
+            {% endfor %}
+        </tbody>
+
+
+    </table>
+{% endfor %}
+{%endif%}
+{% endfor %}
+ 
+</div>
+{% endblock %}
+

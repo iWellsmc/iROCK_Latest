@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+
+<div>
+    
+    <div class="row">
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+            <button type="button" class="btn btn-clr btn-master chck-tst"><a href="{% url 'projects:contractlist' %}">Back</a></button>
+        </div>
+    </div>
+
+
+    <h3 class="from-head">Selected Contracts</h3>
+    <form method="POST"  enctype="multipart/form-data">
+        {% csrf_token %}
+        <table id="checkcontracttable">
+            <thead>
+                <tr>
+                    <th>Contract Reference Number</th>
+                    <th>Reason</th>
+                    <th>Contract File</th>
+                    <th>Price Table File</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for checked in checkedvalues %}
+                <tr>
+                    <td>{{checked}}</td>
+                    <td>
+                        <textarea class="form-control"  name="reason{{checked}}" rows="3" cols="50"></textarea>
+                    </td>
+                    <td><input type="file" name="cfile{{checked}}" class="form-control filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></td>
+                    <td><input type="file" name="pfile{{checked}}" class="form-control filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="text-center spacing-button">
+            <button type="submit" class="btn btn-clr text-center submit-cls">Save</button>
+
+        </div>
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+{{block.super}}
+<script>
+{% comment %} 
+$(document).on('change','#type',function(){
+    var val=$(this).val()
+    var html=''
+    var thisvar=$(this)
+    if (val !=''){
+        $.ajax({
+            type:"GET",
+            url:'/projects/getcontracts',
+            data:{'type':val},
+            success: function(data){
+                console.log(data)
+                    html+='<option value="">--Select--</option>'
+                $.each(data.data,function(key,val){
+                    html+='<option value='+val+'>'+val+'</option>'
+                })
+                thisvar.closest('td').next('td').find('#refnum').html(html)
+            }
+        })
+    }
+})
+
+
+$(document).on('click','#add-row',function(){
+    totalrow= $('#checkcontracttable tbody tr').length
+    var html='<tr><td><select name="" id="type" class="form-control"><option value="">--Select--</option><option value="service">Service</option> <option value="supply">Supply</option><option value="service_supply">Service & Supply</option></select></td><td><select name="" id="refnum" class="form-control"><option value="" selected>--Select--</option></select></td><td><textarea class="form-control"id="" name="" rows="3" cols="50"></textarea></td><td><input type="file" name="" class="form-control filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></td><td><input type="file" name="" class="form-control filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></td><td><button id="add-row" class="btn btn-clr add-btn" type="button" value="Add"><i class="fa fa-plus"></i></button><button id="delete-row" class="btn btn-clr add-btn" type="button" value="minus"><i class="fa fa-minus"></i></button></td></tr>'
+    $("#checkcontracttable").append(html)
+})
+
+$(document).on('click','#delete-row',function(){
+    var rowCount = $('#checkcontracttable tbody tr').length;
+    if (rowCount > 1){
+        $(this).closest('tr').remove();
+    }
+    
+}) {% endcomment %}
+</script>
+{% endblock%}

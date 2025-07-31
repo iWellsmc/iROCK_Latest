@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+{% block content %}
+<head>
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendormanagement/vendormissed.css' %}">
+
+</head>
+<div>
+
+        <div class="row">
+            <div class="col-12 text-end">
+                <button type="button" class="btn btn-clr waves-effect waves-float waves-light">
+                    <a href="{% url 'invoice:listdisputeinvoices' %}">Back</a></button>
+            </div>
+        </div>
+    <h4 class="from-head">Returned Credit Note Query</h4>
+
+        <div class="qry-top-hd">
+
+
+            <div class="row align-items-baseline">
+                <div class="qur-titl col-lg-3 col-md-6">
+                    <h4>VIN :</h4> 
+                    <span>{{contact_person.vin}}</span>
+                </div>
+
+                <div class="qur-titl col-lg-3 col-md-6">
+                   <h4>Vendor Name : </h4>
+                   <p class="qur-rf-no">{{contact_person.vendor_name}}</p>
+                   </div>
+                   
+                <div class="qur-titl col-lg-3 col-md-6">
+                   <h4>Contract Ref No :</h4>
+                   <p class="qur-rf-no">{{ref_num.reference_number|default_if_none:"---"}}</p>
+                   </div>
+                <div class="qur-titl col-lg-3 col-md-6">
+                   <h4>Status :</h4>
+                   <span>{% if get_status.status == 0 %}Closed{% else %}Open{% endif %}</span>
+                </div>
+            </div>
+
+            </div>
+
+
+        <div class="row">
+          <h5>Reasons for Credit Note Return: </h5>
+          <div>
+            {% split_credit_newline checked_messages as checked %}
+            {% for check in checked %}
+              <p>{{check}}</p>
+            {% endfor %}
+          </div>
+                {% for query in querylists %}
+                <div class="col-12">
+                  
+                    <div class={% if request.user.roles.id == query.user.roles.id %}"send-in"{% else %}"rec-in"{% endif %}>
+                         {% if query.deniedreason != None and query.deniedreason != '' %}
+                                 <div class="{% if request.user.roles.id == query.user.roles.id %}right-cls{% else %}left-cls{% endif %} txt-clrr" dataid="{{query.user.roles.id}}">{{query.deniedreason|safe}}</div>
+                         {% endif %}
+                         {% if query.file != '' and query.file != None %}
+                                 <div class="{% if request.user.roles.id == query.user.roles.id %}right-cls{% else %}left-cls{% endif %} f-name" dataid="{{query.user.roles.id}}">File Name :<span class="nmc-nme"><a href="{{query.file.url}}" target="_blank">{{query.file.name}}</a></span></div>
+                         {% endif %}
+                          <div class={% if request.user.roles.id == query.user.roles.id %}"right-cls"{% else %}"left-cls"{% endif %}>{{query.id|get_file_name}}</div>
+
+                         {% get_files query.id request as query_files %}
+                         {% for file in query_files %}
+                         {% if file.file != '' and file.file != None %}
+                         <div class="{% if request.user.roles.id == query.user.roles.id %}right-cls{% else %}left-cls{% endif %} f-name" dataid="{{query.user.roles.id}}">File Name :<span class="nmc-nme"><a href="{{file.file.url}}" target="_blank">{{file.file.name}}</a></span></div>
+                         {% endif %}
+                         {% endfor %}
+
+                         
+                         {% if request.user.id != query.user.id %}
+                         <div class="{% if request.user.roles.id == query.user.roles.id %}right-cls{% else %}left-cls{% endif %}"><label class="name-style">By : {{query.user.name|default_if_none:''}} {{query.user.lastname|default_if_none:''}}</label></div>
+                         {% else %}
+                         <div class="right-cls"><label class="name-style">By : you</label></div>
+                         {% endif %}
+                         <div class={% if request.user.roles.id == query.user.roles.id %}"right-cls utctolocal send-date"{% else %}"left-cls utctolocal rec-date"{% endif %}>{{query.date}}</div>
+                     </div>
+
+                 </div>
+                {% endfor %}
+                
+                {% if query.status == 1 %}
+                <div class="text-center spacing-button d-flex justify-content-center">
+                {% if query.dispute_status != 2 %}
+                    <button type="button" class="btn btn-clr text-center mx-1" data-toggle="modal" data-target="#exampleModal">Reply</button>
+                {% else %}
+                {% if request.user.roles_id == 2 or request.user.roles_id == 3 %}
+                    {% get_dispute_committee_member request query as dispute_user %}
+                    {% if dispute_user > 0 %}
+                    <div class=""> 
+                        <button type="button" class="btn btn-clr text-center mx-1" data-toggle="modal" data-target="#exampleModal">Reply</button>
+                    </div>
+                    {% endif %} 
+                {% else %}
+                <div class=""> 
+                    <button type="button" class="btn btn-clr text-center mx-1" data-toggle="modal" data-target="#exampleModal">Reply</button>
+                </div>
+                {% endif %}
+                {% endif %}
+                {% if request.user.roles.id == 3 or request.user.roles.id == 2 %}
+                {% if query.dispute_status == 0 %}
+                <!-- {% if get_dispute_users == 0%}
+                 <div class=""> 
+                    <button type="button" class="btn btn-clr empty_user green mx-1" value="8">Move to Dispute</button>
+                  </div>
+                {% else %}
+                <div class=""> 
+                    <button type="button" class="btn btn-clr status_cls green mx-1" value="8" data-toggle="modal" data-target="#exampleModalCenter" >Move to Dispute</button>
+                  </div>
+                {% endif %} -->
+                {% endif %}
+                {% if query.dispute_status == 2 %}
+                {% get_dispute_committee_member request query as dispute_user %}
+                {% if dispute_user > 0 %}
+                  {% if settlement_count == 0 %}
+                  <div class=""> 
+                    <button type="button" class="btn btn-clr status_cls green mx-1" value="1" data-toggle="modal" data-target="#exampleModalCenter" >Approve</button>
+                  </div> 
+
+                  <div class=""> 
+                    <button type="button" class="btn btn-clr status_cls red mx-1" value="10" data-toggle="modal" data-target="#exampleModalCenter" >Settlement</button>
+                  </div>
+                  {% endif %} 
+                  {% endif %} 
+                {% elif query.dispute_status == 1  %}
+                {% query_closed_user 2 '' query.id as closed_user %}
+                    <div class=""> 
+                        <button type="button" class="btn btn-clr status_cls green mx-1 " value="1" data-toggle="modal" data-target="#exampleModalCenter" >Accept/Proceed Credit Note</button>
+                    </div>
+                    <!-- {% if closed_user.user.roles_id == 4 %}
+                    {% if get_dispute_users == 0%}
+                    <div class=""> 
+                       <button type="button" class="btn btn-clr empty_user green mx-1" value="8">Move to Dispute </button>
+                     </div>
+                   {% else %}
+                   <div class=""> 
+                       <button type="button" class="btn btn-clr status_cls green mx-1" value="8" data-toggle="modal" data-target="#exampleModalCenter" >Move to Dispute </button>
+                     </div>
+                   {% endif %}
+                    {% endif %} -->
+                {% elif query.dispute_status == 3 %}
+                {% if request.user.roles_id == 2 or request.user.roles_id == 3 %}
+                {% get_dispute_committee_member request query as dispute_user %}
+                {% if dispute_user > 0 %}
+                {% if settlement_count > 0 %}
+                <div class=""> 
+                    <button type="button" class="btn btn-clr status_cls green mx-1" value="1" data-toggle="modal" data-target="#exampleModalCenter" >Approve</button>
+                </div>
+                {% endif %}
+                {% endif %}
+                {% endif %}
+                {% endif %}
+                
+                {% endif %}
+                    {% if request.user.roles.id == 4 %}
+                    {% if settlement_count > 0 %}
+                    {% if  query.dispute_status == 2 %}
+                    <div class=""> 
+                        <button type="button" class="btn btn-clr status_cls green mx-1" value="A1" data-toggle="modal" data-target="#exampleModalCenter" >Accept & Resolve</button>
+                    </div>   
+                    <div class=""> 
+                        <button type="button" class="btn btn-clr status_cls green mx-1" value="A2" data-toggle="modal" data-target="#exampleModalCenter" >Contest Dispute</button>
+                    </div> 
+                    {% endif %}
+                    {% endif %}
+                    {% if query.dispute_status == 0 %}
+                        <button type="button" class="btn btn-clr text-center show_alert" >
+                          Accept Query                        </button>
+                    {% endif %}
+                    {% else %}
+                    {% if query.dispute_status == 0 %}
+                        {% comment %} <button type="button" class="btn btn-clr text-center show_alert" >
+                            Accept Query
+                        </button> {% endcomment %}
+                    {% endif %}
+                    {% endif %}
+                </div>
+                {% endif %}
+
+            <!-- Modal -->
+            <form id="queryform" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type='hidden' name='settlement_val' class='settlement_val'>
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Reason</h5>
+                        </div>
+                        <div class="modal-body">
+                            <label class="label-message">Message :</label>
+                            <textarea name="message" class="form-control msgcls" id="summernote" rows="3" cols="40"></textarea>
+                            <input type='hidden' name='document_type' class='document_type'>
+                            <input type='hidden' name='document_name' class='document_name'>
+                            {% if request.user.roles_id == 3 or request.user.roles_id == 2 %}
+                            <input type="file" name="file" class="filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                            {% endif %}
+                            {% if request.user.roles_id == 4%}
+                            {% if check_InvoiceExceptional > 0 %}
+                            <select name='files_upload' class='form-select files_upload'>
+                            <option value=''>--Select File--</option>
+                            <option value=1>Other Documents</option>
+                            </select>
+                            {% else %}
+                            <input type="file" name="file" class="filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                            {% endif %}
+                            {% endif %}
+                            <div class='upload_file_data'>
+                            </div>
+                            
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary btn-clr">Submit</button> <!-- querydenied, btn-primary -> class removed -->
+                        </div>
+                    </div>
+                    </div>
+
+                </div>
+
+
+                  <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header comment-head">
+                          <h5 class="modal-title" id="exampleModalCenterTitle">Comments</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body comment-body get_reason">
+                            <textarea name="main_comments" class="form-control">
+                            </textarea>
+                            <div class="excp_content">
+
+                            </div>
+                          </div>
+                        <div class="modal-footer comment-foot">
+                          <button type="button" class="btn btn-secondary" id="submit_id">Save</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+        </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script src="path/to/summernote.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+<script type="text/javascript" src="{% static 'js/credit_note/returnedqueryhandling.js' %}"></script>
+<script>
+    jQuery.noConflict();
+    $(document).on('click','.show_alert',function(){
+
+      Swal.fire({
+              text: 'Do you want to Accept the Query?',
+              showDenyButton: true,
+              confirmButtonColor: '#77d61f',
+              allowOutsideClick:false,
+              denyButtonColor:'#AF2B50',
+              confirmButtonText: 'Yes',
+              denyButtonText: 'No',
+              customClass: {
+                  actions: 'my-actions',
+                  confirmButton: 'order-2',
+                  denyButton: 'order-3',
+              }
+              }).then((result) => {
+              if (result.isConfirmed) {
+                  var url = "{% url 'credit:closecreditquery' pk %}";
+                  document.location.href = url;
+              }
+      })
+  });
+</script>
+
+{% endblock %}

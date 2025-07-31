@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load projectflowtags %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/user_Management/userprojectrights.css' %}">
+
+<div>
+  <div class="row">
+    <div class="col-12 text-end">
+      <button type="button" class="btn btn-clr"><a href="{% url 'projects:userlist' %}">Back</a></button>
+    </div>
+  </div>
+
+  <h3 class="from-head">User Project Specific Rights</h3>
+  
+  <div class="row">
+    <div class="col-11">
+      <label class="txt-name unique-colr">User :</label>
+      <span class="txt-detail uniq-name">{{users.name}} {{users.lastname}}</span>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table company-data-list-view irock-table creat-head user-roles-and-rights usesr-management-section"
+      id="alltaxes_list">
+
+      <thead>
+        <tr>
+          <th>S/N</th>
+          <th>Country</th>
+          <th>Project</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+    <tbody>
+      {% for project in projectlist %}
+      {%for i in project %}
+
+      <tr>
+        <td class="td-center">{{ forloop.parentloop.counter }}</td>
+        <td class="del_class td-left">{{i.country.name}}</td>
+        <td class="del_class td-left">{{i.projectname}}</td>
+        <td class="td-center icc-pd">
+
+          <a class="btn p-0" data-toggle="collapse" href="#collapseExample{{i.id}}" role="button" aria-expanded="false"
+            aria-controls="collapseExample">
+            <span class="action-edit align-icons">
+              <i class="fa fa-eye eyebutton" title="View" style="font-size:17px; color:#95183a;"></i>
+            </span>
+          </a>
+        </td>
+      </tr>
+
+      <tr>
+        <td colspan="12" class="p-0">
+          <div class="collapse" id="collapseExample{{i.id}}">
+            <div class="card card-body shadow-none master-crd pad-adj">
+              <div role="tabpanel" class="tab-pane active prt-viewlist space" id="roles{{i.id}}">
+                <div class="row prj-tablists">
+                  <div class="col-5">
+                    <h4 class="proj-hd">Roles</h4>
+                  </div>
+                  <div class="col-7">
+                    <h4 class="proj-hd">Rights</h4>
+                  </div>
+                </div>
+                <div class="row" id="name">
+                  <div class="col-12">
+                    {% get_related_roles i.id users.id i.company request as role_name %}
+                    {% for i in role_name %}
+                    <div class="row prj-decview">
+                      <div class="col-5 colum-line">
+                        <p class="role-cls prjt-viewfont" role_id="{{i.id}}" pk="{{obj.id}}">{{i}}</p>
+                      </div>
+                      <div class="col-7 sub-main-cls role-right-cls-{{i.id}}">
+                      </div>
+                    </div>
+                    {% empty %}
+                    <div class="row prj-decview">
+                      <div class="col-5 colum-line">
+                        <p class="role-cls prjt-viewfont">-
+                        </p>
+                      </div>
+                      <div class="col-7">
+                        <p class="role-cls prjt-viewfont">-
+                        </p>
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      </tr>
+        {%endfor%}
+        
+        {% empty %}
+        <tr class="text-center">
+          <td colspan="9" id="empty_class">---</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+
+</style>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+  var scheme = '{{scheme}}'
+  var gethost = '{{gethost}}'
+  var csrf_token = '{{csrf_token}}'
+
+</script>
+
+<script type="text/javascript" src="{% static 'js/projects/userprojectrights.js' %}"></script>
+{% endblock%}

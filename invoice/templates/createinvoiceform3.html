@@ -1,0 +1,521 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load wcc_custom_tags %}
+{% load static %}
+
+{% block content %}
+
+        <div class="row">
+            <div class="col-12 text-end">
+                <button class="btn btn-clr waves-effect waves-float waves-light" ><a href="{% url 'invoice:editinvoicesteptwo' pk=pk status=0 %}{% if wcc_id %}?wcc_id={{wcc_id}}{% endif %}">Back</a></button>
+            </div>
+        </div>
+
+        <div class="">
+
+        <h3 class="from-head">Checklist and Uploads</h3>
+        <form method="POST" id="invfileadd" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <table id="id_checklist" class="cre-invoice3">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th class="head-inv3">Document Name</th>
+                        <th class="head-inv3">Uploads</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td>Invoice No</td>
+                        <td>
+                            <input type="hidden" name="checksupportfile" value="1">
+                            {%for costinvoice in contractcostinvoice %}
+                                <div><label>{{costinvoice.invoice_number}}</label><input type="file" accept="image, .png, .jpeg, .pdf, .jpg" name="files" class="inv-main-file form-control inp-voice3 inv-wid-red filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                                    <input type="hidden" name="invoicecostinvoice" value="{{costinvoice.id}}">
+                                </div>
+                            {% endfor %}
+                        </td>
+                    </tr>
+
+                        {% for files in wcc_files %}
+                            {% if files.data == '2' %}
+                            <tr>
+                                <td><input type="checkbox" class="checkfile wrk-main" name="checksupportfile" {% if wcc_id %} checked {% endif %} wcc_id="{{wcc_id|default_if_none:"---"}}" value="{{files.data}}"></td>
+                                <td>
+                                    {{files.name}}
+                                    <!-- <label>Value</label> <i class="fa fa-info-circle" title= "WCC Value should match with total value of invoice Submitted" aria-hidden="true"></i> -->
+                                    <div class="wcc-cls" {% if wcc_id == None %} style="display: none;" {% endif %}>
+                                        {% getwccvalues wcc_id as wccvalues %}
+                                        <table class="che-table"><tbody><tr><td><input type="text" name="workcomplete" class="workval work_cls" value="{{wccvalues.wcc_amount}}" readonly></td> 
+                                     </tr></tbody></table>
+                                    </div>
+                                </td>
+                                <td class="addfilecls">
+                                    {% if wcc_id != None %}
+                                    <div class="colr-filename"><span>{{wccvalues.wcc_file|cut:"wccfile/"}}</span>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                                <tr>
+                                    {% getwccsupportfile wcc_id files.data as supportfiles %}
+                                    <td><input type="checkbox" class="checkfile"  {% if supportfiles.1 > 0 %} checked {% endif %} name="checksupportfile" {% if supportfiles.1 > 0 %} wcc_id="{{wcc_id}}" {% endif %}  value="{{files.data}}"></td>
+                                    <td>
+                                        {{files.name}}
+                                    </td>
+                                    <td class="addfilecls">
+                                        <div class="inv-file-cls">
+                                            {% for file in supportfiles.0 %}
+                                                <div class="colr-filename"><input type="hidden" class="supportingfile" name="hdnfileid" value="{{file.id}}"><span>{{file.wcc_support_file|cut:"wccfile/"}}</span>
+                                                    <!-- <i class="fa fa-close remove-file" style="font-size:24px"></i> -->
+                                                 </div>
+                                            {% endfor %}
+                                        </div>
+
+                                        <div class="addfilecls">
+                                            {% if supportfiles.1 > 0 %}
+                                                <table class="che-table"><tbody><tr><td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg" name="file{{files.data}}" class="form-control filecls inp-voice3 filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></td> <td class="in-btn-wid che-smline wid-but"><button id="add_file" class="btn btn-clr add-btn" type="button" dataid="{{files.data}}" value="add"><i class="fa fa-add"></i></button> <button id="remove_file" class="btn btn-clr add-btn" type="button" dataid="{{files.data}}" value="minus"><i class="fa fa-minus"></i></button></td> </tr></tbody></table>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>        
+                            {% endif %}
+                        {% endfor %}
+                   
+                    {% if contracttype != 'original' %}
+                    <tr>
+                        <td></td>
+                        <td>
+                            Original Contract
+                        </td>
+                        <td>
+                            <a href="{{contract.service.upload_contract.url}}" download>{{contract.service.upload_contract}}</a>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td></td>
+                        <td>
+                            {{contracttype|capitalize_letter}} {% if contracttype == 'original' %}Contract{% endif %}
+                        </td>
+                        <td>
+                            {% if contracttype == "original" %}
+                            <a href="{{contract.upload_contract.url}}" download>{{contract.upload_contract}}</a>{% else %}<a href="{{contract.amendment_upload_contract.url}}" download>{{contract.amendment_upload_contract}}</a>{% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            Price Table
+                        </td>
+                        <td>
+                            {% for price_table_file in price_table_files %}
+                                <p><a href="{{price_table_file.file_name.url}}" download>{{price_table_file.file_name}}</a></p>
+
+                            {% endfor %}
+
+                       
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-center btn-cls">
+
+                <button type="submit" id="draftsub" class="btn btn-clr text-left draft-cls" name="submit_type" value="0">Save as Draft</button>  
+                
+                <button type="submit" id="final_Save_id" value="3" class="dis-cls btn btn-clr text-left work" {% if created_inv_count != vendorinvoice %} disabled="true" {% endif %}>Save and Submit</button>
+                
+                <button type="submit" id="id_file_save" value="1" class="dis-cls btn btn-clr text-left final-cls work">Preview</button>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+
+var totalinvoicevalue="{{totalinvoicevalue}}"
+</script>
+<script src="{% static 'js/invoice/createinvoiceform3.js' %}"></script>
+<script>
+// $('.dis-cls').attr('disabled',true)
+
+// $(window).keydown(function(event){
+//     if(event.keyCode == 13) {
+//       event.preventDefault();
+//       return false;
+//     }
+//   });
+
+// function save_func(){
+//     var count=0
+//     var workvalue=$('.workvalcls').val()
+//     /*if ($('#id_checklist tbody tr').eq(1).find('.checkfile').is(':checked')){
+//         if (workvalue == ""){
+//             $('.workvalcls').addClass('add-error-cls')
+//             count ++;
+//         }
+//         else if(workvalue != totalinvoicevalue){
+//             $('.workvalcls').addClass('add-error-cls')
+//             count ++;
+//         }
+//     }*/
+//     $('.inv-main-file').each(function(){
+//         var val=$(this).val()
+//         if (val == ""){
+//             $(this).addClass('add-error-cls')
+//             count ++;
+//         }
+//         else{
+//             $(this).removeClass('add-error-cls')
+//         }
+//     })
+
+//     $('.filecls').each(function(){
+//         var val=$(this).val()
+//         if (val == ""){
+//             $(this).addClass('add-error-cls')
+//             count ++;
+//         }
+//         else{
+//             $(this).removeClass('add-error-cls')
+//         }
+//     })
+//     return count;
+// }
+
+// $(document).on('click','#id_file_save',function(e){
+//     e.preventDefault()
+//     var sum = 0;
+//     $('.workval').each(function(){
+//         var value = $(this).val().replace(/,/g , '');
+//         // add only if the value is number
+//         if(!isNaN(value) && value.length != 0) {
+//             sum += parseInt(value);
+//         }
+//     });
+//     /*if ($('.wrk-main').is(':checked')){
+//      if (Number(sum) != Number(totalinvoicevalue.replace(/,/g , ''))){
+//          swal.fire('WCC Value should match with total value of invoice Submitted')
+//          //$(this).addClass('add-error-cls')
+//          //$(this).val('')
+//          return false
+//          // $('.dis-cls').attr('disabled',true) 
+//      }
+//      else{
+//          //return true
+//          //$(this).removeClass('add-error-cls')
+//          // $('.dis-cls').removeAttr('disabled')
+//      }}*/
+//     $('.workvalcls').removeClass('add-error-cls')
+//     var error_value=save_func()
+//     if (error_value == 0){
+//         $("<input>").attr({name: "submit_type",id: "hiddenId",type: "hidden",value: 1}).appendTo("form");
+//         $('#invfileadd')[0].submit()
+//     }
+//     // alert(count)
+// })
+
+// $(document).on('change','.inv-main-file',function(){
+//     var count=0
+//     var workvalue=$('.workvalcls').val()
+//     // alert(workvalue)
+//     var wccfile=$(this).closest('tr').next('tr').find('.checkfile').is(':checked')
+//     $('.inv-main-file').each(function(){
+//         var val=$(this).val()
+//         if (val == ""){
+//             $(this).addClass('add-error-cls')
+//             count ++;
+//         }
+//         else{
+//             $(this).removeClass('add-error-cls')
+//         }
+//     })
+//     if (wccfile == true){
+//         if (workvalue == ""){
+//             $('.workvalcls').addClass('add-error-cls')
+//             count ++;
+//         }
+//     }
+
+//     console.log(count)
+//     if (count == 0){
+//         $("<input>").attr({name: "submit_type",id: "hiddenId",type: "hidden",value: 0}).appendTo("form");
+    
+//     }
+// })
+
+// $(document).on('click','.checkfile',function(){
+//     var val=$(this).val()
+//     if ($(this).is(':checked')){
+//         if (val == "2"){
+//             $('.wcc-cls').removeAttr('style')
+//         }
+//         else{
+
+//         }
+       
+//         var html ='<table class="che-table"><tbody><tr><td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg" name="file'+val+'" class="form-control filecls inp-voice3"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></td> <td class="in-btn-wid che-smline"><button id="add_file" class="btn btn-clr add-btn" type="button" dataid="'+val+'" value="add"><i class="fa fa-add"></i></button> <button id="remove_file" class="btn btn-clr add-btn" type="button" dataid="'+val+'" value="minus"><i class="fa fa-minus"></i></button></td> </tr></tbody></table>'
+//         $(this).closest('tr').find('.addfilecls').html(html)
+//     }
+//     else{
+//         console.log('a',$('.wrk-main').is(':checked'))
+//         if ($('.wrk-main').is(':checked')){
+//         }
+//         else{
+//             $('.wcc-cls').css('display','none')
+//         }
+//         $('.workvalcls').val('')
+//         $(this).closest('tr').find('.addfilecls').html('')
+//     }
+// })
+
+// $(document).on('click','#add_file',function(){
+//     var html=$(this).closest('tr').clone()
+//     $(this).closest('table').append(html)
+    
+//     $(this).closest('table').find('tr:last td:eq(0) .workval').val('')
+//     $(this).closest('table').find('tr:last td:eq(0) .filecls').val(null)
+// })
+
+// $(document).on('click','#remove_file',function(){
+//     var table_len=$(this).closest('table').find('tr').length;
+//     console.log(table_len)
+//     if (table_len >1){
+//         $(this).closest('tr').remove()
+//     }
+
+// })
+
+// function numberWithCommas(x) {
+//     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+// }
+
+
+// $(document).on('click','.work',function(){
+//     // jquery each function to get all the values of the input fields
+//     var sum = 0;
+//     $('.workval').each(function(){
+//         var value = $(this).val().replace(/,/g , '');
+//         // add only if the value is number
+//         if(!isNaN(value) && value.length != 0) {
+//             sum += parseInt(value);
+//         }
+//     });
+//     console.log(Number(sum),Number(totalinvoicevalue.replace(/,/g , '')))
+//     var val=$(this).val()
+//     var count=0 
+//     var remove_comma_current_val=val.replace(/,/g , '')
+//     var add_comma=numberWithCommas(remove_comma_current_val)
+//     $(this).val(add_comma)
+//     // alert(add_comma)
+//     // var removecomma=totalinvoicevalue.replace(/,/g , '')
+//     if (val == ""){
+//         count ++;
+//     }
+//     $('.inv-main-file').each(function(){
+//             var val=$(this).val()
+//             if (val == ""){
+//                 //$(this).addClass('add-error-cls')
+//                 count ++;
+//             }
+//             else{
+//                 //$(this).removeClass('add-error-cls')
+//             }
+//         })
+//     // alert(count)
+//     if (count > 0){
+//         // swal.fire('Invoice File Missing or Wcc Value Missing')
+//         // $('.dis-cls').attr('disabled',true) 
+//     }
+//     else{
+//         // $('.dis-cls').removeAttr('disabled')
+        
+//     }
+//   /*  if ($('.wrk-main').is(':checked')){
+//     if (Number(sum) != Number(totalinvoicevalue.replace(/,/g , ''))){
+//         swal.fire('WCC Value should match with total value of invoice Submitted')
+//         //$(this).addClass('add-error-cls')
+//         //$(this).val('')
+//         return false
+//         // $('.dis-cls').attr('disabled',true) 
+//     }
+//     else{
+//         //$(this).removeClass('add-error-cls')
+//         // $('.dis-cls').removeAttr('disabled')
+//     }}*/
+// })
+
+
+// $(document).on('click','#final_Save_id',function(e){
+//     e.preventDefault()
+//    var sum = 0;
+//    $('.workval').each(function(){
+//        var value = $(this).val().replace(/,/g , '');
+//        // add only if the value is number
+//        if(!isNaN(value) && value.length != 0) {
+//            sum += parseInt(value);
+//        }
+//    });
+//    /*if ($('.wrk-main').is(':checked')){
+//     if (Number(sum) != Number(totalinvoicevalue.replace(/,/g , ''))){
+//         swal.fire('WCC Value should match with total value of invoice Submitted')
+//         //$(this).addClass('add-error-cls')
+//         //$(this).val('')
+//         return false
+//         // $('.dis-cls').attr('disabled',true) 
+//     }
+//     else{
+//         //return true
+//         //$(this).removeClass('add-error-cls')
+//         // $('.dis-cls').removeAttr('disabled')
+//     }}*/
+//     var error_value=save_func()
+//     //alert(error_value)
+//     if (error_value == 0){
+//         Swal.fire({
+//                 text: 'Do You Want to Submit Invoice?',
+//                 showDenyButton: true,
+//                 // showCancelButton: true,
+//                 // textColor:'#77d61f',
+//                 confirmButtonColor: '#77d61f',
+//                 denyButtonColor:'#AF2B50',
+//                 confirmButtonText: 'Yes',
+//                 denyButtonText: 'No',
+//                 customClass: {
+//                 actions: 'my-actions',
+//                 //   cancelButton: 'order-1 right-gap',
+//                 confirmButton: 'order-2',
+//                 denyButton: 'order-3',
+//                 }
+//             }).then((result) => {
+//                 if (result.isConfirmed) {
+//                     $("<input>").attr({name: "submit_type",id: "hiddenId",type: "hidden",value: 3}).appendTo("form");
+//                     $('#invfileadd')[0].submit()
+//                     // window.location.href = '../invoicelist';
+//                     return true;
+//                 }
+//         })
+//     }
+// })
+
+
+// //$(document).on('click','#draftsub',function(e){
+// //    e.preventDefault()
+// //    var error_value=save_func()
+// //    //alert(error_value)
+// //    if (error_value == 0){
+// //        return true
+// //    }
+// //     e.preventDefault()
+// //     Swal.fire({
+// //             text: 'Are you sure you wish to submit?',
+// //             showDenyButton: true,
+// //             // showCancelButton: true,
+// //             // textColor:'#77d61f',
+// //             confirmButtonColor: '#77d61f',
+// //             denyButtonColor:'#AF2B50',
+// //             confirmButtonText: 'Yes',
+// //             denyButtonText: 'No',
+// //             customClass: {
+// //               actions: 'my-actions',
+// //             //   cancelButton: 'order-1 right-gap',
+// //               confirmButton: 'order-2',
+// //               denyButton: 'order-3',
+// //             }
+// //           }).then((result) => {
+// //             if (result.isConfirmed) {
+// //                 $("<input>").attr({name: "submit_type",id: "hiddenId",type: "hidden",value: 0}).appendTo("form");
+// //                 $('#invfileadd')[0].submit()
+// //                 // window.location.href = '../invoicelist';
+// //                 return true;
+// //             //   var current_url=$(location).attr("href")
+// //             //   var replace_url=current_url.replace("createmaster/",'createblock/'+project_id+'')
+// //             //   window.location.href = replace_url;
+// //                 // $(".step-1").hide();
+// //                 // $(".step-2").show();
+// //             //   Swal.fire('Saved!', '', 'success')
+// //             } else if (result.isDenied) {
+                
+// //             //   var current_url=$(location).attr("href")
+// //             //   var replace_url=current_url.replace("createmaster/","listmaster/")
+// //             //   window.location.href = replace_url;
+// //               // Swal.fire('Changes are not saved', '', 'info')
+// //             }
+// //           })
+// // })
+
+// $(document).on('change','.work_cls',function(){
+//         // $(this).next('span').remove();
+//         var val=$(this).val()
+//         // if (val!='No Max Limit')
+//         // {
+//         $(this).val(val.replace(/([-€~!@#$%^&*()_+=`{}\[\]\|\\:;'<>A-Za-z])+/g, ''));
+//         // }
+       
+//         // var number=$(this).val()
+//         // if ( number !=''){
+//         //     if (number==0){
+//         //         $(this).after('<span class="waring-err">Value cannot be Zero</span>')
+//         //     }
+//         //     else{
+//         //         $(this).next('span').remove();
+//         //     }
+//         // }
+//         // else{
+//         //     $(this).next('span').remove();
+//         // }
+//         $(".work_cls").each(function() {
+//             var num = $(this).val();
+//             var removecomma=num.replace(/,/g, '');
+//             var commaNum = numberWithCommas(decimal_value(removecomma));
+//             $(this).val(commaNum);
+//         });
+//         if($(this).val().indexOf('.')!=-1){         
+//             if($(this).val().split(".")[1].length > 2){                
+//                 if( isNaN( parseFloat( this.value ) ) ) return;
+//                 this.value = parseFloat(this.value).toFixed(2);
+//             }  
+//          }            
+//          return this; //for chaining
+//     });
+
+
+
+// function decimal_value(val){
+//     if (val != ''){
+//         var con_val=val.toString()
+//         var remove_commas= con_val.replace(/,/g, "");
+//         console.log(remove_commas)
+//         if (remove_commas == Math.floor(remove_commas)){
+//             return remove_commas
+//         }
+//         else{
+//             return parseFloat(remove_commas).toFixed(2)
+//         }
+//     }
+//     else{
+//         return val
+//     }
+
+
+// }
+
+// function numberWithCommas(number) {
+
+// var parts = number.toString().split(".");
+
+// parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+// console.log(parts)
+// return parts.join(".");
+// }
+</script>
+
+{% endblock %}

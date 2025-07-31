@@ -1,0 +1,453 @@
+{% extends "base.html" %}
+{% block content %}
+{% load custom_tags %}
+{% load static %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="{% static 'css/pages/app-user.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/poa_login/companies.css' %}">
+
+
+<section class="page-users-view">
+
+  <div class="row">
+
+    <div class="col-6">
+      <!-- Outline buttons -->
+      <a href="{% url 'custom_auth:companies' %}"
+        class="btn btn-clr btn-outline-danger mr-1 mb-1 waves-effect waves-light float-left">Back</a>
+    </div>
+
+    <div class="col-6">
+
+      {% if data.status == 0 %}
+      <button type="button" class="btn reject-bt float-right" data-bs-toggle="modal" data-bs-target="#rejectcnfm"
+        data-id="{{obj.id}}">Reject</button>
+      {% endif %}
+
+      {% if data.status == 0%}
+      <a href="{% url 'custom_auth:companyapprove' id=data.id %}" class="btn  float-right approve-com-bt approve"
+        data-id="{{data.amount}}">Approve</a>
+      {% endif %}
+
+      {% if data.status == 2 %}
+      <a href="{% url 'custom_auth:keygenerator' id=data.id status=0 %}" class="btn  float-right approve-com-bt"
+        data-id="{{data.amount}}">Re-Submit</a>
+      {% endif %}
+
+      <div class="red-green">
+
+        <!-- <a  href="{% url 'custom_auth:companyreject' id=data.id%}" class="btn btn-outline-danger mr-1 mb-1 waves-effect waves-light float-right">De-activate Licence</a> -->
+        {% if data.status == 1 %}
+        <button type="button" class="btn lic-re-rj float-right" data-bs-toggle="modal" data-bs-target="#deactivate"
+          data-id="{{data.id}}">Deactivate License Key</button>
+        <!-- <a  href="{% url 'custom_auth:companyapprove' id=data.id %}" class="btn btn-outline-success mr-1 mb-1 waves-effect waves-light float-right">Resend License</a> -->
+        <button type="button" class="btn  float-right license_resend lic-re-sd" data-bs-toggle="modal"
+          data-bs-target="#exampleModal" data-id="{{data.id}}">Resend License Key</button>
+        {% endif%}
+  
+      </div>
+
+    </div>
+
+    <!-- <div class="col-6">
+    </div>
+
+    <div class="col-6 red-green">
+
+      <a  href="{% url 'custom_auth:companyreject' id=data.id%}" class="btn btn-outline-danger mr-1 mb-1 waves-effect waves-light float-right">De-activate Licence</a>
+      
+      {% if data.status == 1 %}
+      <button type="button" class="btn lic-re-rj float-right" data-bs-toggle="modal" data-bs-target="#deactivate"
+        data-id="{{data.id}}">Deactivate License Key</button>
+     
+      <a  href="{% url 'custom_auth:companyapprove' id=data.id %}" class="btn btn-outline-success mr-1 mb-1 waves-effect waves-light float-right">Resend License</a>
+      <button type="button" class="btn  float-right license_resend lic-re-sd" data-bs-toggle="modal"
+        data-bs-target="#exampleModal" data-id="{{data.id}}">Resend License Key</button>
+      {% endif%}
+
+    </div> -->
+    
+  </div>
+
+
+
+  <div class="row">
+    <!-- account start -->
+    <div class="col-12">
+
+      <!-- <div class="card"> -->
+      <!-- <div class="card-header"> -->
+      <div class="from-head">Company Details</div>
+      <!-- </div> -->
+
+      <div class="card-body pare-nt">
+        <div class="row">
+          <div class="col-2"></div>
+          <div class="col-8 bto-spa">
+            <table>
+              <tr>
+                <td class="font-weight-bold admin-listhead">CIN</td>
+                <td class="colo-cllr">:</td>
+                <td class="company-cls">{{data.cin_number}}</td>
+              </tr>
+
+              <tr>
+                <td class="font-weight-bold admin-listhead">Company Name</td>
+                <td class="colo-cllr">:</td>
+                <td class="company-cls">{{data.company_name}}</td>
+              </tr>
+
+              {% if data.status == 1 %}
+              <tr>
+                <td class="admin-listhead-li">License key</td>
+                <td class="colo-cllr">:</td>
+                <td class="company-cls-li">{{data.licensekey|default_if_none:"---"}}</td>
+              </tr>
+
+              {% elif data.status == 2 %}
+              <tr>
+                <td class="admin-listhead-li">License Status</td>
+                <td class="colo-cllr">:</td>
+                <td class="company-cls-li"> Company Deactivated</td>
+          </div>
+          </tr>
+          {% else %}
+          <tr>
+            <td class="admin-listhead-li">License Status</td>
+            <td class="colo-cllr"> :</td>
+            <td class="company-cls-li font-weight-bold"> Pending</td>
+          </tr>
+
+
+          {%endif%}
+          </table>
+
+
+          <!-- {% if data.status == 1 %}
+                            <div class="admin-listhead-li">License key:<span class="company-cls-li">{{data.licensekey|default_if_none:"---"}}</span></div>
+                         
+                            {% elif data.status == 2 %}
+                            <div class="admin-listhead-li">License Status :<span class="company-cls-li"> Company Deactivated</span></div>
+                            {% else %}
+                            <div class="admin-listhead-li">License Status :<span class="company-cls-li"> Pending</span></div>
+
+                            
+                             {%endif%} -->
+        </div>
+        <div class="col-2 bto-spa linc_payment_btn">
+          {%if data.licencestatus == 0 and data.status != 2 %}
+          <button class="key-lic-btn"><a href="{% url 'custom_auth:keygenerator' id=data.id status=0 %}"
+              class="float-right">Payment</a></button>
+          {% endif %}
+
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-2"></div>
+        <div class="col-8">
+          <table class="admin-status">
+
+            <tr>
+              <td class="font-weight-bold admin-head">Status</td>
+              <td>
+                {% if data.status == 0 %}
+
+                <div class="chip chip-warning">
+                  <div class="chip-body">
+                    <div class="chip-text app-ro"><span class="bck-appo-p font-weight-bold">Pending</span></div>
+                  </div>
+                </div>
+                {% elif data.status == 1 %}
+
+                <div class="chip chip-success">
+                  <div class="chip-body">
+                    <div class="chip-text app-ro"><span class="bck-appo">Approved</span></div>
+                  </div>
+                </div>
+                {% elif data.status == 2 %}
+
+                <div class="chip chip-danger">
+                  <div class="chip-body">
+                    <div class="chip-text app-ro"><span class="bck-appo-r">Rejected</span></div>
+                  </div>
+                </div>
+                {% endif %}
+
+
+              </td>
+            </tr>
+            <tr>
+              <td class="font-weight-bold admin-head">First Name</td>
+              <td class="admin-detail">{{data.first_name}}</td>
+            </tr>
+
+            <tr>
+              <td class="font-weight-bold admin-head">Last Name</td>
+              <td class="admin-detail">{{data.last_name}}</td>
+            </tr>
+
+            <tr>
+              <td class="font-weight-bold admin-head">Country</td>
+              <td class="admin-detail">{{data.country}}</td>
+            </tr>
+
+            <tr>
+              <td class="font-weight-bold admin-head">Email</td>
+              <td class="admin-detail">{{data.email}}</td>
+            </tr>
+            <tr>
+              <td class="font-weight-bold admin-head">Mobile</td>
+              <td class="admin-detail">{{data.phone_countrycode}} {{data.mobile|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+              <td class="font-weight-bold admin-head">Contact Person</td>
+              <td class="admin-detail">{{data.contact_person|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+              <td class="font-weight-bold admin-head">Designation</td>
+              <td class="admin-detail">{{data.designation|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+              <td class="font-weight-bold admin-head">Type Of License</td>
+              {% if data.type_of_license == '1' %}
+              <td class="admin-detail">Perpetual</td>
+              {% else %}
+              <td class="admin-detail">Corporate Yearly</td>
+              {% endif %}
+
+            </tr>
+            <tr>
+              <td class="font-weight-bold admin-head">Package</td>
+              <td class="admin-detail">
+
+                {% if data.package == '1'%}
+                I-R
+                {%elif data.package == '2'%}
+                I-R-O
+                {%elif data.package == '3'%}
+                I-R-C
+                {%elif data.package == '4'%}
+                I-R-O-C
+                {%else%}
+                I-R-O-C-K
+                {%endif%}
+              </td>
+            </tr>
+            <tr>
+              <td class="font-weight-bold admin-head">Number of Users</td>
+              <td class="admin-detail">{{data.number_of_users|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+              <td class="font-weight-bold admin-head">Concurrent Users</td>
+              <td class="admin-detail">{{data.concurent_users|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+              <td class="font-weight-bold admin-head">Cloud Server</td>
+              <td class="admin-detail">{{data.cloud_server|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+              <td class="font-weight-bold admin-head">Customization</td>
+              <td class="admin-detail">{{data.customisation|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+              <td class="font-weight-bold admin-head">Support Services</td>
+              <td class="admin-detail">{{data.support_services|default_if_none:"---"}}</td>
+            </tr>
+
+          </table>
+          {% if paymenthistorycount > 0 %}
+
+          <div class="pay-hy">
+            <div class="from-head pay-topbot">Payment History</div>
+            <button class="key-lic-btn new-dd-pay"><a href="{% url 'custom_auth:keygenerator' id=data.id status=1 %}"
+                class="float-right"> Add Additional Payment</a></button>
+          </div>
+          <table class="admin-status">
+            <tbody>
+              {% for history in paymenthistorys %}
+              <tr>
+                <td class="font-weight-bold admin-head">Currency</td>
+                <td class="admin-detail">{{history.currency.currency_symbol}}  - {{history.currency.name}}</td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold admin-head">Amount</td>
+                <td class="admin-detail">{{history.amount}}</td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold admin-head">Date</td>
+                <td class="admin-detail">{{history.invoicedate}}</td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold admin-head">Invoice Number</td>
+                <td class="admin-detail">{{history.invoicenumber}}</td>
+              </tr>
+              <tr>
+                <td class="font-weight-bold admin-head">File</td>
+                <td class="admin-detail">
+                  {% for file in history.id|get_history_file %}
+                  <div><a href="{{file.file.url}}" target="_blank">{{file.file|cut:"uploads/"}}</a></div>
+                  {% endfor %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% endif %}
+        </div>
+
+        <div class="col-2"></div>
+      </div>
+
+    </div>
+  </div>
+  <!-- </div> -->
+  </div>
+  <!-- account end -->
+  <!-- permissions start -->
+  </div>
+  </div>
+  <!-- permissions end -->
+  </div>
+
+
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Confirmation Alert</h5>
+          <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+        </div>
+
+
+        <div class="modal-body">
+          Do you want to send the license key again?
+        </div>
+        <div class="modal-footer">
+          <input type="hidden" name="proposal_id" id="proposal_id">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <a href="{% url 'custom_auth:companyapprove' id=data.id %}" class="btn btn-primary resen-d maroon">Resend</a>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- //modal for payments checking -->
+  <!-- Modal -->
+  <div class="modal fade" id="payment_checking" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Confirmation Alert</h5>
+          <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+        </div>
+        <div class="modal-body">
+          Payment process to be completed to approve the Company.
+        </div>
+        <div class="modal-footer">
+          <input type="hidden" name="proposal_id" id="proposal_id">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button> -->
+
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- //modal for de-activate Confirmation  -->
+
+  <div class="modal fade" id="deactivate" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Confirmation Alert</h5>
+          <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+        </div>
+        <div class="modal-body">
+          Do you want to Deactivate the company License?
+        </div>
+        <div class="modal-footer">
+          <input type="hidden" name="proposal_id" id="proposal_id">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <a href="{% url 'custom_auth:companyreject' id=data.id%}"
+            class="btn btn-outline-danger mr-1 mb-1 waves-effect waves-light float-right yes-btn maroon">Yes</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+  <!-- <a  href="{% url 'custom_auth:companyreject' id=data.id%}" class="btn btn-outline-danger mr-1 mb-1 waves-effect waves-light float-right">Reject</a> -->
+
+
+  <!-- //modal for Confirmation to Reject -->
+
+  <div class="modal fade" id="rejectcnfm" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Confirmation Alert</h5>
+          <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+        </div>
+        {% if data.amount == None%}
+        <div class="modal-body">
+          Are you sure want to reject this company?
+        </div>
+        {%else%}
+        <div class="modal-body">
+          Payment Details Added Already, Are you sure you want to still reject this company?
+        </div>
+
+        {%endif%}
+        <div class="modal-footer">
+          <input type="hidden" name="proposal_id" id="proposal_id">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <a href="{% url 'custom_auth:companyreject' id=data.id%}"
+            class="btn btn-outline-danger mr-1 mb-1 waves-effect waves-light float-right yes-btn">Yes</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+</section>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://jqueryvalidation.org/files/dist/jquery.validate.min.js"></script>
+<script src="https://jqueryvalidation.org/files/dist/additional-methods.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+
+
+  $(document).on('click', '.approve', function (e) {
+
+
+    var payment = $('.approve').attr('data-id')
+    if (payment == 'None') {
+      $("#payment_checking").modal('show');
+      e.preventDefault()
+    }
+
+  });
+
+
+
+
+
+
+</script>
+{% endblock %}

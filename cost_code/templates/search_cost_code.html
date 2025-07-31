@@ -1,0 +1,286 @@
+{% load static %}
+{% load cost_code_tags %}
+
+<section id="data-list-view" class="data-list-view-header">
+<div>
+  <h3 class="from-head">Cost Code Generation</h3>
+
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+        <div class="col-6">
+        </div>
+        <div class="col-6">
+          {% if request.user.roles_id == 3 %}
+            {% if rights.create == '1' %} 
+            <button type="button" class="btn btn-clr btn-master mr-0 edit_cost_code_type.css"><a href="{% url 'cost_code:generate_cost_code' %}">Add</a></button>
+            {%endif%}
+          {%else%}
+          <button type="button" class="btn btn-clr btn-master mr-0 edit_cost_code_type.css"><a href="{% url 'cost_code:generate_cost_code' %}">Add</a></button>
+          {%endif%}
+            
+            {% if request.user.roles_id == 3 %}
+              {% if rights.create == '1' %}
+            <a data-toggle="modal" href="#myvendorModal" class="btn btn-clr btn-master">Import Cost Code</a>
+            {% endif%}
+            {% else %}
+            <a data-toggle="modal" href="#myvendorModal" class="btn btn-clr btn-master">Import Cost Code</a>
+            {% endif %}
+            <div class="modal" id="myvendorModal">
+              <div class="modal-dialog modal-lg">
+                  <div class="modal-content back-clr-full">
+                      <div class="modal-header">
+                        <h4 class="modal-title">
+                        Import or Download Excel Template
+                        </h4>    
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                      </div>
+                      
+                      <div class="container">
+                        <div class="row">
+                          <div class="col-6 pos-rel">
+                              <input type="hidden" name="costcode_type" class="costcode_type" id="costcode_type">
+                              <input type="hidden" name="total_rows" class="total_rows" id="total_rows">
+                  
+                              <div class="down-arrow-sig">
+                                <img src="../../../static/images/icons/icons8-down-arrow-18s.png" alt="">
+                              </div>
+                  
+                              <label for="staticEmail" class="col-form-label src-style">Select Root Category<span
+                                  class="star-clr">*</span></label>
+                              <input type="hidden" name="level1_costcode" class="level1_costcode" id="level1_costcode">
+                              <select id="level1_category" name="level1_category" class="form-control">
+                                  <option value="" selected="selected">---Select ---</option>
+                                  {% for discipline in alldiscipline %}
+                                      {% for development in alldevelopment %}
+                                          <option value="{{discipline.id}}_{{development.id}}">{{discipline.name}}({{development.development_type}})</option>
+                                      {% endfor %}
+                                  {% endfor %}
+                              </select>
+                          </div>
+                          <div class="col-6">
+                              <label for="staticEmail" class="col-form-label src-style">Select Sub Category<span
+                                  class="star-clr">*</span></label>
+                              <input type="hidden" name="level2_costcode" class="level2_costcode" id="level2_costcode">
+                              <select id="level2_category" name="level2_category" class="form-control"></select>
+                          </div>
+                      </div>
+
+                      <div class="row my-3 align-items-center">
+                        <div class="col-6 text-start">
+                            <button type="button" class="btn btn-clr"><a href="{% url 'cost_code:downloadcostcode_template' %}">Download Cost Code Template</a></button>
+                        </div>
+                        <div class="col-6">
+                          <input type="file" name="costcodefile" id="cost_cost_file" class="filesize"> <span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                        </div>
+                      </div>
+                      
+                      </div>
+                      
+                      <div class="modal-footer">
+                        <button type="submit" data-toggle="modal" href="#myModal3" class="btn btn-clr btn-master con_file_id" id="submitbtn">Upload</button>
+                      </div>
+                  </div>
+              </div>
+              <div id="loader" class="lds-dual-ring hidden overlay">
+                <h5 class="head_cls">Please Wait...</h5>
+              </div>
+            </div>
+            <!--<button type="button" class="btn btn-clr btn-master"><a href="{% url 'cost_code:importcostcode' %}">Import CostCode</a></button>-->
+            <!-- <button type="button" class="btn btn-clr btn-master"><a href="{% url 'cost_code:exportcostcode' %}">Export CostCode</a></button> -->
+            <button type="button" class="btn btn-clr btn-master"><a href="{% url 'cost_code:generatecostcode_excel' %}">Generate Cost Code</a></button>
+
+
+
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-9"> 
+          <div class="card all-noti-box">
+            <div class="show-noti p-0">
+                <label>Show <select id="datafilters" class="changevalue select-style">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select> entries</label>
+        </div>
+        </div>
+        </div>
+        <div class="col-3 text-end">
+          <!--<form method="get">-->
+            <div class="buttonIn">
+              <input type="search" id="myInput" class="search-f-inf deletable" name="q" placeholder="Search Category" value="{{query}}">
+             
+            </div>
+            <!--</form>-->
+        </div>
+    </div>
+  </form>
+    <div class="table-responsive text-nowrap inv-table_wid">
+        <table class="table prj-back_clr settings-data-list-view data-list-view invoicelist tot-in irock-table cost-code-table" id="costcodelist_table">
+            <thead >
+                <tr >
+                    <th>S/N</th> 
+                    <th>Cost Code</th>     
+                    <!-- <th>Category</th> -->
+                    <th>Code Category Path</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody class="table-list">
+              {% if count > 0 %}
+
+              {% for subcode in costcode_list %}
+              {% if subcode.type_name.component_name in costcode_types %}
+              {% get_sub_type subcode.order subcode.main_costcode_id as counter_val %}
+              <tr data-id='{{subcode.main_costcode_id}}' class="ak">
+                <td class="text-center">{{costcode_list.start_index|add:forloop.counter0 }}</td>
+                  <td>{{counter_val}}</td>
+                  <!-- <td>{{subcode.type_name.component_name}}</td> -->
+                  <td>{{subcode.allcostcode_string}}/{{subcode.type_name.component_name}}</td>
+                  <td class='check_type'>
+
+                    {% Check_generate subcode.order subcode.main_costcode_id as generate %}
+                    {% if generate %}
+                      {% if request.user.roles_id == 3 %}
+                        {% if rights.edit == '1' %}
+                          <a class="text-decoration-none" href="/cost_code/editcostcode/{{subcode.order}}/{{subcode.main_costcode_id}}">
+                            <span class="action-edit align-icons"><i class="fa fa-pencil" title="Edit"></i></span>
+                          </a>
+                        {%endif%}
+                        {% if rights.delete == '1' %} 
+                        <a class="project_delete align-icons" data-id='{{subcode.order}}'>
+                          <span class="action-delete"><i class="fa fa-trash-o" title="Delete"></i></span>
+                        </a>
+                        {%endif%}
+                      {%else%}
+                        <a class="text-decoration-none" href="/cost_code/editcostcode/{{subcode.order}}/{{maincode.id}}">
+                          <span class="action-edit align-icons"><i class="fa fa-pencil" title="Edit"></i></span>
+                        </a>
+                        <a class="project_delete align-icons" data-id='{{subcode.order}}'>
+                          <span class="action-delete"><i class="fa fa-trash-o" title="Delete"></i></span>
+                        </a>
+                      {%endif%}
+                    {% endif %}
+
+                  </td>
+              </tr>
+             {% endif %}
+              {% endfor %}
+
+              {% endif %}
+                {% if query_len == 0 %}
+                {% for subcode in costcode_list %}
+                {% get_sub_type subcode.order subcode.main_costcode_id as counter_val %}
+                <tr data-id='{{subcode.main_costcode_id}}' class="ak">
+                  <td class="text-center">{{costcode_list.start_index|add:forloop.counter0 }}</td>
+                    <td>{{counter_val}}</td>
+                    <!-- <td>{{subcode.type_name.component_name}}</td> -->
+                    <td>{{subcode.allcostcode_string}}/{{subcode.type_name.component_name}}</td>
+                    <td class='check_type text-center'>
+                      {% Check_generate subcode.order subcode.main_costcode_id as generate %}
+                                {% if generate %}
+                                  {% if request.user.roles_id == 3 %}
+                                    {% if rights.edit == '1' %}
+                                      <a class="text-decoration-none" href="/cost_code/editcostcode/{{subcode.order}}/{{subcode.main_costcode_id}}">
+                                        <span class="action-edit align-icons"><i class="fa fa-pencil" title="Edit"></i></span>
+                                      </a>
+                                    {%endif%}
+                                    {% if rights.delete == '1' %} 
+                                    <a class="project_delete align-icons" data-id='{{subcode.order}}'>
+                                      <span class="action-delete"><i class="fa fa-trash-o" title="Delete"></i></span>
+                                    </a>
+                                    {%endif%}
+                                  {%else%}
+                                    <a class="text-decoration-none" href="/cost_code/editcostcode/{{subcode.order}}/{{maincode.id}}">
+                                      <span class="action-edit align-icons"><i class="fa fa-pencil" title="Edit"></i></span>
+                                    </a>
+                                    <a class="project_delete align-icons" data-id='{{subcode.order}}'>
+                                      <span class="action-delete"><i class="fa fa-trash-o" title="Delete"></i></span>
+                                    </a>
+                                  {%endif%}
+                                {% endif %}  
+                    </td>
+                </tr>
+               
+                {% endfor %}
+                {% endif %}
+                {% comment %} {% if query_len > 0 %}
+                {% if count == 0 %}
+                  <tr>
+                    <td colspan='9'>---</td>
+                  </tr>
+                {% endif %}
+                {% endif %} {% endcomment %}
+                {% if listcount == 0 %}
+                <tr>
+                  <td colspan="9" id="empty_class">---</td>
+                </tr>
+                {%endif%}
+                <input type="hidden" class="scheme" value="{{scheme}}">
+                <input type="hidden" class="gethost" value="{{gethost}}">
+                <input type="hidden" class="csrf_token" value="{{csrf_token}}">
+                <input type="hidden" class="entries" value="{{pageper_data}}">
+            </tbody>
+        </table>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+            {% if costcode_list.has_previous %}
+                <li class="page-item">
+                <a class="btn-clr page-link" href="{{ request.META.HTTP_REFERER }}">Previous</a>
+              </li>
+            {% else %}
+                <li class="page-item disabled">
+                <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Previous</a>
+              </li>
+            {% endif %}
+    
+            {% if costcode_list.number|add:'-4' > 1 %}
+                <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ costcode_list.number|add:'-5' }}">&hellip;</a></li>
+            {% endif %}
+    
+            {% for i in costcode_list.paginator.page_range %}
+                {% if costcode_list.number == i %}
+                    <li class="page-item pg-count active" aria-current="page">
+                  <span class="btn-clr pg-circle page-link">
+                    {{ i }}
+                    <span class="sr-only">(current)</span>
+                  </span>
+                </li>
+                {% elif i > costcode_list.number|add:'-5' and i < costcode_list.number|add:'5' %}
+    
+                  {% if request.GET.vendor %}
+                <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&page={{ i }}">{{ i }}</a></li>
+                  {% elif request.GET.vendor and request.GET.sortname %}
+                  <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+                  {% elif request.GET.vendor and request.GET.sortvendorname %}
+                  <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+                  {% elif request.GET.sortname %}
+                  <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+                  {% elif request.GET.sortvendorname %}
+                  <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+                  {% else %}
+                    <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?page={{ i }}">{{ i }}</a></li>
+                  {% endif %}
+                {% endif %}
+          {% endfor %}
+            {% if costcode_list.paginator.num_pages > costcode_list.number|add:'4' %}
+              <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ costcode_list.number|add:'5' }}">&hellip;</a></li>
+            {% endif %}
+    
+            {% if costcode_list.has_next %}
+                <li class="page-item pg-count">
+                <a class="btn-clr page-link" href="?page={{ costcode_list.next_page_number }}">Next</a>
+              </li>
+            {% else %}
+                <li class="page-item disabled">
+                <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Next</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+    
+    </div>
+</div>
+</section>

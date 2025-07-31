@@ -1,0 +1,97 @@
+.vin-no {
+    margin: 10px auto;
+}
+
+.vin-no td:first-child {
+    padding-left: 0px !important;
+}
+
+.vin-no td:last-child {
+    padding-left: 0px !important;
+}
+
+.vin-no td {
+    border: none !important;
+}
+
+.ven-name td {
+    border: none !important;
+}
+
+.ven-name td:first-child {
+    padding-left: 0px !important;
+}
+
+.ven-name td:last-child {
+    padding-left: 0px !important;
+}
+
+.vin-no label {
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 0px;
+}
+
+.dot-colon {
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.vin-no span {
+    color: #000 !important;
+    font-size: 15px;
+    font-weight: 500;
+    padding-left: 5px;
+}
+
+.ven-name {
+    margin: 10px auto;
+}
+
+.ven-name label {
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 0px;
+}
+
+.ven-name span {
+    color: #000 !important;
+    font-size: 15px;
+    font-weight: 500;
+    padding-left: 5px;
+}
+
+.ccv-table {
+    /* width: 75%; */
+    width: 100%;
+}
+
+.ccv-table th {
+    text-align: center;
+    color: #AF2B50;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+}
+
+.ccv-table th, td {
+    border: 1px solid #e3e3e3 !important;
+    padding: 10px 10px;
+}
+
+.ccv-table td {
+    text-align:  var(--centertext-align);
+    color: #000;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.ccv-table td:nth-child(3), .ccv-table td:nth-child(4) {
+    text-align: var(--lefttext-align) !important;
+} 
+
+.cc-view-width {
+    width: 25% !important;
+}

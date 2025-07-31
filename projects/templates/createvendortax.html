@@ -1,0 +1,2019 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/vendorcontract.css' %}">
+<div>
+    <div class="row">
+        <div class="col-12 text-end">
+            <button class="btn btn-clr chck-tst waves-effect waves-float waves-light" ><a href="{% url 'projects:contractmasterlist'  %}">Back</a></button>
+        </div>
+    </div>
+    {% if amendment != None %}
+   <div class="box-vendox-ln">
+    <div class="row">
+        <div class="col-1"></div>
+        <!-- <div class="col-5">
+            <label class="cr-ven">Vendor Name:</label>
+            <span class="ame-co">{{amendment.contractvendor.vendor_name}}</span>
+            <input type="hidden" name="" value="{{amendment.amendment_currency.id}}" id="hdncurid">
+        </div> -->
+
+        <div class="col-5">
+            <table class="vendor-tabl">
+                <tr>
+            <td class="cr-ven">Vendor Name<span class="double-coln">:</span></td>
+            <td class="ame-co">{{amendment.contractvendor.vendor_name}}</td>
+            <input type="hidden" name="" value="{{amendment.amendment_currency.id}}" id="hdncurid">
+            </tr>
+            </table>
+        </div>
+
+        <!-- <div class="col-5">
+            <label class="cr-ven">Vendor Name:</label>
+            <span class="ame-co">{{amendment.contractvendor.vendor_name}}</span>
+            <input type="hidden" name="" value="{{amendment.amendment_currency.id}}" id="hdncurid">
+        </div> -->
+        <div class="col-5 text-right">
+            
+               <table class="contract-rfno-1">
+                   <tr>
+            <td class="cr-ven">Contract Reference No<span class="double-coln">:</span></td>
+    
+            <td class="ame-co">{{amendment.amendment_reference_number}}</td>
+            </tr>
+            </table>
+           </div>
+            <!-- <div class="row">
+                <div class="col-6">
+            <label class="cr-ven">Contract Reference Number:</label>
+            </div>
+            <div class="col-6 pl-0">
+            <p class="ame-co">{{amendment.amendment_reference_number}}</p>
+            </div>
+           </div> -->
+           
+        </div>
+        <div class="col-1">
+           
+        </div>
+        <!-- Already data created by amendment/addendum-->
+    {% if vendorcompanytaxdetailscount == 0 %}
+    <div class="row">
+        <div class="col-1">
+        </div>
+        <div class="col-5">
+        </div>
+        <div class="col-5">
+            <table class="che-ckbox-widd">
+            <td class="che-padd"><input type="checkbox" class="ch-eckbox" id="btnidcls" dataid="{{amendment.service.id}}" currencyid="{{amendment.service.currency.id}}"></input></td>
+            <td><label class="inc-clr">Copy From Original Contract <i class="fa fa-info-circle i-con-clr" aria-hidden="true" title="Replicate Taxes, Currency Split and Payment Terms from Original Contract"></i></label></td>
+        </table>
+  
+        </div>
+        <div class="col-1">
+        </div>
+        <!-- <div class="col-8">
+        </div>
+        <div class="col-4">
+            <label>Copy from Original</label>
+            <select id="conidcls" class="form-control">
+                <option value="">Select</option>
+                {% for original_contract in original_contracts %}
+                <option value="{{original_contract.id}}" currencyid="{{original_contract.currency.id}}">{{original_contract.reference_number}}</option>
+                {% endfor %}
+            </select>
+        </div> -->
+        
+    </div>
+    </div>
+    {% endif %}
+        </div>
+
+   
+    
+    
+
+
+    {% else %}
+    <div class="box-vendox-ln create-ven-tax">
+    <div class="row">
+        
+        <div class="col-1"></div>
+        <div class="col-5 pl-0">
+            <table class="vendor-tabl">
+            <td class="cr-ven ven-wid">Vendor Name<span class="double-coln">:</span></td>
+            <td class="ame-co">{{contract.contractvendor.vendor_name}}</td>
+            <input type="hidden" name="" value="{{contract.currency.id}}" id="hdncurid">
+            </table>
+            <!-- <label class="cr-ven">Vendor Name:</label><span class="ame-co">{{contract.contractvendor.vendor_name}}</span>
+            <input type="hidden" name="" value="{{contract.currency.id}}" id="hdncurid"> -->
+        </div>
+        <div class="col-5 text-left">
+           
+                <table class="contract-rfno">
+                    <tr>
+            <td class="cr-ven">Contract Reference No<span class="double-coln">:</span></td>
+            <td class="ame-co">{{contract.reference_number}}</td>
+            </tr>
+        </table>
+            
+            </div>
+            <div class="col-1"></div>
+            <!-- <div class="row">
+                <div class="col-6">
+            <label class="cr-ven">Contract Reference Number:</label>
+            </div>
+            <div class="col-6 pl-0">
+            <p class="ame-co">{{contract.reference_number}}</p>
+            </div>
+            </div> -->
+            
+        </div>
+        <div class="col-lg-1 col-md-0"></div>
+        {% if vendorcompanytaxdetailscount == 0 %}
+        <div class="row pt-2">
+        <div class="col-1">
+        </div>
+        <div class="col-5">
+        </div>
+        <div class="col-5">
+            <table class="inp-copy-contr" {% if original_contracts|length == 0 %}style="display:none;" {% endif %}>
+                <tr>
+                <td class="inc-clr copy-width">Copy From Original Contract <i class="fa fa-info-circle i-con-clr" aria-hidden="true" title="Replicate Taxes, Currency Split and Payment Terms from Another Contract"></i><span class="double-coln">:</span></td>
+                <td><select id="conidcls" class="form-control bor-cllr">
+                    <option value="">Select</option>
+                    {% for original_contract in original_contracts %}
+                    <option value="{{original_contract.id}}" currencyid="{{original_contract.currency.id}}">{{original_contract.reference_number}}</option>
+                    {% endfor %}
+                </select></td>
+                </tr>
+            </table>
+            <!-- <div class="copy-par">
+            <label class="inc-clr">Copy From Original Contract <i class="fa fa-info-circle" aria-hidden="true" title="Replicated Taxes, Currency Split and Payment Terms from Another Contract"></i>:</label>
+            <select id="conidcls" class="form-control bor-cllr">
+                <option value="">Select</option>
+                {% for original_contract in original_contracts %}
+                    {% if original_contract.reference_number != '' %}
+                    <option value="{{original_contract.id}}" currencyid="{{original_contract.currency.id}}">{{original_contract.reference_number}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            </div> -->
+        </div>
+        <div class="col-1">
+        </div>
+        </div>
+        <div class="row pt-2">
+        <div class="col-1">
+        </div>
+        <div class="col-5">
+        </div>
+        <div class="col-5">
+            <button type="button" id="remove_btn" class="btn btn-clr text-left waves-effect waves-float waves-light" style="display: none;">Remove Copied Data</button>
+        </div>
+        <div class="col-1">
+        </div>
+        </div>
+        {% endif %}
+    </div>
+    </div>
+
+    {% endif %}
+
+    
+    <select name="companycurrenices" id="id_companycurrenices" style="display:none">
+        {% for country in companycurrency%}
+        <option value="{{country.id}}">{{country.currency_symbol}}-{{country.currency}} ({{country.name}})</option>
+        {% endfor %}
+    </select>
+
+    <select id="id_all_taxes" style="display:none">
+        {% for companytax in companytaxlist%}
+            <option value="{{companytax.id}}">{{companytax.Tax_Name}}</option>
+        {% endfor %}
+    </select>
+
+<form method="POST" id="postform">
+    {% csrf_token %}
+    <div class="box-txs">
+        <div class="row">
+            <div class="col-md-8"></div>
+            <div class="col-md-4">
+                {% if amendment != None %}
+                <input type="hidden" name="reference_name_user_log" value="{{amendment.amendment_reference_number}}" id="reference_name_user_log">
+                <input type="hidden" name="vendor_name_user_log" value="{{amendment.contractvendor.vendor_name}}" id="vendor_name_user_log">
+                {% else %}
+                <input type="hidden" name="reference_name_user_log" value="{{contract.reference_number}}" id="reference_name_user_log">
+                <input type="hidden" name="vendor_name_user_log" value="{{contract.contractvendor.vendor_name}}" id="vendor_name_user_log">
+                {% endif %}
+                {% with contractId|check_contract_tax:contracttype as tax_count %}
+                {% if tax_count > 0 %}
+<!-- <div class=""><p class="cr-ven mb-0 text-center">Status : <span class="ame-co">{% if draft_count > 0 %} Submitted {% else %} Draft {% endif %}</span></p></div> -->
+            <!-- <div class=""><p class="cr-ven mb-0 text-center">Status : <span class="ame-co">{% if draft_count > 0 %} Submitted {% else %} Draft {% endif %}</span></p></div> -->
+            <div class="">
+                <p class="cr-ven mb-0 text-center" style="white-space: nowrap;">Status : <span class="ame-co">{% if draft_count > 0 %} Submitted {% else %} Draft {% endif %}</span></p>
+              </div>
+              
+                {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+        <div class="">
+            <h3 class="vend-tax-head1">Tax/Levy Selection</h3>
+        </div>
+       
+        
+        <div class="row create-ven-tax">
+          <div class="col-lg-1 col-md-0"></div>
+            <div class="col-lg-5 col-md-10">
+                <h6 class="inc-clr">Inclusive Taxes/Levies <i class='fa fa-info-circle jqtooltip i-con-clr' title = "Select Taxes/Levies Included in Prices Quoted in Contract(s)" style='color:#000000'></i></h6>
+                <div class="row">
+                    <div class="col-12">
+                        <label class="col-form-label t-ax-na">Tax Name<span class="star-clr">*</span></label>
+                        <select name="inclusivetax" class="check-error form-control form-select inclusive-cls bor-cllr" id="idinclusive">
+                            <option value="">--Select--</option>
+                            {% if amendment != None %}
+                            
+                            {% checknotamendmentapplicable amendment.id amendment.contractvendor.company.id 'Inclusive' as selectcount %}
+                            {% for companytax in companytaxlist %}
+                            <option value="{{companytax.id}}" {% if selectcount == companytax.id %} selected {% endif %}>{{companytax.Tax_Name}}</option>
+                            {% endfor %}
+                            {% else %}
+
+                            {% checknotapplicable contract.id contract.contractvendor.company.id 'Inclusive' as selectcount %}
+                            {% for companytax in companytaxlist %}
+
+                            <option value="{{companytax.id}}" {% if selectcount == companytax.id %} selected {% endif %}>{{companytax.Tax_Name}}</option>
+                            {% endfor %}
+
+                            {% endif %}
+                        </select>
+                        <div class="f-div maincls maiin-cls">
+                        {%for inclusivetax in getinclusivetax %}
+                            {% if inclusivetax.tax == None %}
+                            <div class="removeappcls"><input type="hidden" name="inclusivecompanytax" id="remove_applicable" value="not_applicable" class="removeappcls" style="display:none;"></div>
+                            {% else %}
+                            <div class="subdivinclusive{{inclusivetax.tax.id}} top-bot-pa row submaincls"><div class="col-5 11"><input type="text" name="" class="out-li-ne taxmaincls form-control" dataid="{{inclusivetax.tax.id}}" value="{{inclusivetax.tax.Tax_Name}}" readonly> <input type="hidden" name="inclusivecompanytax" value="{{inclusivetax.tax.id}}"></div> <div class="col-6"><table id="inclusivetable{{inclusivetax.tax.id}}"><tbody> 
+                                {% for percentage in inclusivetax.id|taxwithpercentage %}
+                                    
+                                    <tr><td class="texx-rgh"><input type="text" name="inclusivepercentage{{inclusivetax.tax.id}}" placeholder="%" class="taxwithpercls inclusivecls form-control" value="{{percentage.taxpercentage}}" > <input type="hidden" name="hdninclusivepercentage{{inclusivetax.tax.id}}" value="{{percentage.id}}"> </td> <td class="mi-n"><i class="fa fa-plus addrowinclusive clo-se tx-cl" aria-hidden="true" dataid="{{inclusivetax.tax.id}}"></i> <i class="fa fa-minus inclusiveclosecls clo-se" aria-hidden="true" dataid="{{inclusivetax.tax.id}}"></i></td> </tr>
+                                {% endfor %}
+                            </tbody></table></div></div>
+                            {% endif %}
+
+                        {% endfor %}
+                        
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5 col-md-10">
+                <h6 class="inc-clr">Exclusive Taxes/Levies <i class='fa fa-info-circle jqtooltip i-con-clr' title = "Select Taxes/Levies Excluded in Prices Quoted in Contract(s)" style='color:#000000'></i></h6> 
+                <div class="row">
+                    <div class="col-12">
+                        <label class="col-form-label t-ax-na">Tax Name<span class="star-clr">*</span></label>
+                        <select name="exclusivetax" id="idexclusive" class="form-control form-select exclusive-cls  bor-cllr check-error">
+                            <option value="">--Select--</option>
+                            {% if amendment != None %}
+                            {% checknotamendmentapplicable amendment.id amendment.contractvendor.company.id 'Exclusive' as selectcount %}
+                            {% for companytax in companytaxlist %}
+
+                            <option value="{{companytax.id}}"{% if selectcount == companytax.id%} selected {% endif %}>{{companytax.Tax_Name}}</option>
+                            {% endfor %}
+                            {% else %}
+                            {% checknotapplicable contract.id contract.contractvendor.company.id 'Exclusive' as selectcount %}
+                            {% for companytax in companytaxlist %}
+                            <option value="{{companytax.id}}" {% if selectcount == companytax.id %} selected {% endif %}>{{companytax.Tax_Name}}</option>
+                            {% endfor %}
+
+                            {% endif %}
+                        </select>
+                        <div class="f-div exclusivemaincls">
+                        {%for exclusivetax in getexclusivetax %}
+                            {% if exclusivetax.tax == None %}
+                                <div class="removeappcls"><input type="hidden" name="exclusivecompanytax" id="remove_applicable" value="not_applicable" class="removeappcls" style="display:none;"></div>
+                            {% else %}
+                                <div class="subdivinclusive{{exclusivetax.tax.id}} top-bot-pa row excsubmaincls"><div class="col-5"><input type="text" name="" class="out-li-ne taxmaincls form-control" dataid="{{exclusivetax.tax.id}}" value="{{exclusivetax.tax.Tax_Name}}" readonly> <input type="hidden" name="exclusivecompanytax" value="{{exclusivetax.tax.id}}"></div> <div class="col-6"><table id="exclusivetable{{exclusivetax.tax.id}}"><tbody> 
+                                    {% for percentage in exclusivetax.id|taxwithpercentage %}
+                                        <tr><td class="texx-rgh"><input type="text" name="exclusivepercentage{{exclusivetax.tax.id}}" placeholder="%" class="taxwithpercls form-control" value="{{percentage.taxpercentage}}" > <input type="hidden" name="hdnexclusivepercentage{{exclusivetax.tax.id}}" value="{{percentage.id}}"> </td> <td class="mi-n"><i class="fa fa-plus addrowexclusive clo-se tx-cl" aria-hidden="true" dataid="{{exclusivetax.tax.id}}"></i> <i class="fa fa-minus exclusiveclosecls clo-se" aria-hidden="true" dataid="{{exclusivetax.tax.id}}"></i></td> </tr>
+                                {% endfor %}
+                                </tbody></table></div></div>
+                            {% endif %}
+                    {% endfor %}
+                    
+                            
+                    </div>
+                    </div>  
+                </div>
+            </div>
+            <div class="col-1 col-md-1"></div>
+           
+        
+        </div>
+     </div>
+
+    <div class="box-cs">
+     <div class="row">
+        <h3 class="vend-tax-head Currency-Split">Currency Split</h3>
+        <div class="col-12 text-center"><label class="do-you">Do you want to add a Split?</label><input type='radio' id='yes_id' name='type' value='yes' class="splitcls" {% if invoicenumber > 0 %} checked {% endif %}/><label class="op-ti">Yes</label><input type='radio' id='no_id' name='type' value='no' class="splitcls"  {% if invoicenumber == None or invoicenumber <= 1 %} checked {% endif %}/><label class="op-ti">No</label></div>
+        <div class="">
+            <div class="line_border">
+            <div class="row invoiceclass">
+                <div class="col-1"></div>
+                <div class="col-10">
+                    <div class="sm-lin inv-sub-div" style="display:none">
+                        <label class="contractfilehead">No of Invoice:<span class="star-clr">*</span></label>
+                        <input type="text" name="totalinvoice" id="id_totalinvoice" class="form-control in-bor-clr inp-ut-wid" autocomplete="off" placeholder="No of Invoice" value="{{invoicenumber|default_if_none:"---"}}">
+                    </div>
+                {% if invoicesplitlistcount > 0%}
+                    
+                        <div class="tablecls"><table id="invoicetblcls" class="Currency-Split-table">
+                            <thead><th class="text-center">S.No</th><th>Currency</th><th>Percentage</th></thead>
+                            <tbody>
+                                {% for invoice in invoicesplitlist %}
+                                <tr> <td class="text-center"><input type="hidden" name="hdninvoicesplit" value="{{invoice.id}}">{{forloop.counter}}</td> <td><select name="invoicecurrency" class="form-control invoicecurcls postform">
+                                    {% for country in companycurrency%}
+                                    <option value="{{country.id}}" 
+                                        {% if invoice.currency.id == country.id %} 
+                                            selected 
+                                        {% else %}
+                                            
+                                        {% endif %}>
+                                    {{country.currency_symbol}}-{{country.currency}} ({{country.name}})
+                                    </option>
+                                    {% endfor %}
+                                </select></td> <td><input type="text" name="invoicepercentage" class="form-control invoicepercls" placeholder="%"
+                                     value="{{invoice.percentage|default_if_none:"---"}}">
+                                </td>
+                                {% endfor %}
+                                </tr>
+                            </tbody>
+                            </table>
+                        </div>
+                        <div class="exchange-sm-lin" {% if invoicesplitlistcount <= 1 %} style="display:none"> {% endif %}<label  class="contractfilehead ex-cha">Exchange Rate Terms:<span class="star-clr">*</span></label><select name="exchangerate" class="exchange-cls form-control in-bor-clr reduce_size_cls exc-cls ex-width postform"><option value="">--Select--</option> <option value="1" {% if exchangerate == 1 %} selected {% endif %}>At the Time of Invoice Submission</option><option value="2" {% if exchangerate == 2 %} selected {% endif %}>At the Time of Invoice Payment</option></select></div>
+                    
+                
+                {% else %}
+                    
+                        <div class="tablecls mb-2"><table id="invoicetblcls">
+                            <thead><th>S.No</th><th>Currency</th><th>Percentage</th></thead>
+                            <tbody>
+                                <tr> <td><input type="hidden" name="totalinvoice" value="1">1</td> <td><select name="invoicecurrency" class="form-control invoicecurcls postform">
+
+                                    {% for country in companycurrency%}
+                                    <option value="{{country.id}}" 
+                                    {% if amendment != None %}
+                                        {% if amendment.amendment_currency.id == country.id %} selected {% endif %}
+                                    {% else %}
+                                        {% if contract.currency.id == country.id %} selected {% endif %}
+                                    {% endif %}
+                                    >{{country.currency_symbol}}-{{country.currency}} ({{country.name}})</option>
+                                    {% endfor %}
+                                </select></td> <td><input type="text" name="invoicepercentage" class="form-control invoicepercls" placeholder="%" readonly value="100">
+                                </td>
+                                </tr>
+                            </tbody>
+                            </table>
+                        </div>
+                        <div class="exchange-sm-lin" style="display:none"><label  class="contractfilehead">Exchange Rate Terms:<span class="star-clr">*</span></label><select name="exchangerate" class="exchange-cls form-control in-bor-clr reduce_size_cls exc-cls ex-width postform"><option value="">--Select--</option><option value="1" selected>At the Time of Invoice Submission</option><option value="2">At the Time of Invoice Payment</option></select></div>
+                    
+                {% endif %}
+                </div>
+                <div class="col-1"></div>
+            </div> 
+            </div>
+        </div>
+        <div class="">
+            <div class="line_border1">
+            <div class="row">
+                <div class="col-1"></div>
+                <div class="col-10 hide-paymetdiv">
+                    <h3 class="vend-tax-head">Payment Terms</h3>
+                    <!-- <div><label  class="contractfilehead"></label></div> -->
+                        <table id="paymenttableid">
+                            <thead>
+                                <tr>
+                                    <th>Type</th><th>Days for Payment</th><th>Percentage of total value of Contract</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    {% if vendorpaymenttermscount > 0 %}
+                                        {% for vendorpayment in vendorpaymentterms %}
+                                        <tr>
+                                        <td class="wid-contm">
+                                                <input type="hidden" name="hdnpaymentvalues" value="{{vendorpayment.id}}">
+                                                <input type="hidden" name="hdnselected" class="hdnnamecls" value="{{vendorpayment.payment_name|default_if_none:"---"}}">
+                                                <select name="paymentype" class="paymentypecls form-control form-select postform" >
+                                                    <option value="">--Select--</option>
+                                                    {% if forloop.counter == 1 %}
+                                                        <option value="1" {% if vendorpayment.payment_type == '1' %}  selected {% endif %}>Advance Payment</option>
+                                                    {% endif %}
+                                                    {% if forloop.counter <= 2 %}
+                                                        <option value="2" {% if vendorpayment.payment_type == '2' %}  selected {% endif %} >Regular Payment</option>
+                                                    {% endif %}
+                                                        <option value="3" {% if vendorpayment.payment_type == '3' %}  selected {% endif %} >Milestone Payment 1</option>
+                                                </select>
+                                            </td>
+                                            <td class="wid-noo">
+                                                <input type="text" name="paymentday" class="paymentdaycls form-control" value="{{vendorpayment.payment_day}}">
+                                                    <!-- {% if vendorpayment.payment_type == '1' %}  
+                                                        <option value="">Immediate</option>
+                                                    {% else %}
+                                                        {% for i in range %}
+                                                            <option value="{{i}}" {% if vendorpayment.payment_day|add:"0" == i %} selected {% endif %}>{{i}}</option>  
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </select> -->
+                                            </td>
+                                            <td class="wid-percen">
+                                                <input type="text" name="paymentpercentage" class="paymentpercls form-control" {% if vendorpayment.payment_type == '2' %} readonly {% endif %} value="{{vendorpayment.payment_percentage}}">
+                                            </td>
+                                            
+                                            <td class="hidebtncls"{% if vendorpayment.payment_type == '2' %} style="display:none;" {% endif %}>
+                                                <button type="button" class="paymentaddcls"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                                                {% if forloop.counter != 1 %}
+                                                <button type="button" class="paymentminuscls min-pt"><i class="fa fa-minus" aria-hidden="true"></i></button>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td class="wid-contm">
+                                                <input type="hidden" name="hdnpaymentvalues" value="">
+                                                <input type="hidden" name="hdnselected" class="hdnnamecls" value="">
+                                                <select name="paymentype" index="1" class="paymentypecls form-control postform" >
+                                                    <option value="" selected>--Select--</option>
+                                                    <option value="1">Advance Payment</option>
+                                                    <option value="2">Regular Payment</option>
+                                                    <option value="3">Milestone Payment 1</option>
+                                                </select>
+                                            </td>
+                                            <td class="wid-noo">
+                                                <input type="text" name="paymentday" class="paymentdaycls form-control">
+                                            </td>
+                                            <td class="wid-percen">
+                                                <input type="text" name="paymentpercentage" class="paymentpercls form-control">
+                                            </td>
+                                            <td class="hidebtncls">
+                                                <button type="button" class="paymentaddcls"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                                                
+                                                <!-- <button type="button" class="paymentminuscls"><i class="fa fa-minus" aria-hidden="true"></i></button> -->
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-1"></div>
+            </div> 
+        </div>
+        </div>
+    </div>
+
+
+    <div class="text-center btn-cls">
+        <!-- <button type="submit" id="submitid" class="btn btn-clr text-left">Submit</button> -->
+        <button type="submit" name="submit_type"id="saveasdraft" value="0" class="btn btn-clr text-left draft-cls">Save as Draft</button>
+        <button type="submit" name="submit_type" id="submitid" value="1" class="btn btn-clr text-left">Submit</button>
+    </div>
+
+</div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+
+<script>
+
+
+    var invoicenum="{{invoicenumber}}"
+    if (parseInt(invoicenum) > 1 ){
+        $('.inv-sub-div').removeAttr('style')
+        // $('.hide-paymetdiv').removeAttr('style')
+    }
+    else if (parseInt(invoicenum) == 1){
+        $('.invoicepercls').attr('readonly',true)
+    }
+    var check_tax_count="{{check_count}}"
+    // alert(check_tax_count)
+    if (parseInt(check_tax_count) == 0){
+        let role_id = '{{request.user.roles_id}}'
+        if (parseInt(role_id) == 3){
+            // call ajax post method
+            $.ajax({
+                type: "POST",
+                headers: { "X-CSRFToken": "{{ csrf_token }}"},
+                url: "{% url 'projects:authorizeuser' %}",
+                success: function (data) {
+                    if (data.status){
+                        console.log('success', data);
+                        swal.fire({
+                        text: "No Tax Available",
+                        background:'#D3D3D !important',
+                        type: "success"
+                        }).then(function() {
+                            window.location.href="../../createtax"
+                        });
+                    }
+                    else{
+                        swal.fire({
+                        text: "No Tax Available. Kindly Contact Client Administrator for addition of Tax",
+                        background:'#D3D3D !important',
+                        type: "success"
+                        }).then(function() {
+                            window.location.href="../../contractmasterlist"
+                        });
+                    }
+                },
+                error: function (data) {
+                    console.log('Error:', data);
+                }
+            });
+        }
+        else{
+            swal.fire({
+                text: "No Tax Available",
+                background:'#D3D3D !important',
+                type: "success"
+                }).then(function() {
+                    window.location.href="../../createtax"
+                });
+        }
+      
+    }    
+    var contractcurrencyid=$('#hdncurid').val()
+    var optiondict={}
+    var list=[]
+    $("#id_companycurrenices option").each(function(){
+        var thisOptionValue=$(this).val();
+        var thistext=$(this).text()
+        optiondict={"id":thisOptionValue,"symbol":thistext}
+
+        list.push(optiondict)
+    });
+
+
+    var tax_option_dict={}
+    var all_tax_list=[]
+    $("#id_all_taxes option").each(function(){
+        var this_option_value=$(this).val();
+        var this_text=$(this).text()
+        tax_option_dict={"name":this_text,"val":this_option_value}
+
+        all_tax_list.push(tax_option_dict)
+    });
+
+
+    $('#invoicetblcls > tbody > tr').each(function(index, tr) {
+        if (index == 0){
+            $(this).find('td:eq(1)').find('.invoicecurcls option:not(:selected)').remove();
+        } 
+        //var value=parseFloat($(this).find('td:eq(2)').find('.invoicepercls').val())|| 0 contractcurrencyid
+     });
+
+    
+    var vendorpaymenttermscount="{{vendorpaymenttermscount}}"
+
+    if (parseInt(vendorpaymenttermscount) > 0){
+        var indexval=1
+    $('#paymenttableid tbody tr').each(function(index,value){
+        var selectedvalue=$(this).find('td:eq(0) > .paymentypecls :selected').val()
+        
+        if (selectedvalue == "1"){
+        var selectedname=$(this).find('td:eq(0) > .paymentypecls :selected').text()
+        $(this).find('td:eq(0) > .paymentypecls > option').each(function(){
+            if ($(this).val() == "3"){
+                $(this).text('Milestone Payment '+indexval+'')
+                // console.log($(this).closest('.paymentypecls').prev('.hdnnamecls').val('Milestone Payment '+indexval+''))
+            }
+        })
+
+        }
+        else{
+            
+        $(this).find('td:eq(0) > .paymentypecls > option').each(function(){
+            if ($(this).val() == "3"){
+                $(this).text('Milestone Payment '+indexval+'')
+                // console.log($(this).closest('.paymentypecls').prev('.hdnnamecls').val('Milestone Payment '+indexval+''))
+            }
+        })
+        indexval ++;
+        }
+        gettext=$(this).find('td:eq(0) > .paymentypecls :selected').text()
+        console.log(gettext)
+        $(this).find('td:eq(0) > .hdnnamecls').val(gettext) 
+        
+    })
+
+    }
+$(document).on('change','.inclusive-cls',function(){
+    
+    var val = $(this).val()
+    $(this).removeClass('con_error')
+    if (val == ""){
+       
+        $('.maincls').html(' ')
+    }
+    else{
+        if (val != 'not_applicable'){
+            
+            //$('.maincls').remove()
+            $('.hdnsubdivinclusive').remove()
+            var taxname=$( ".inclusive-cls option:selected" ).text();
+            $(".exclusive-cls option[value="+val+"]").each(function() {
+                $(this).remove();
+            });
+            $(".inclusive-cls option[value="+val+"]").each(function() {
+                $(this).remove();
+            });
+           
+            // $('.maincls').append('<div class="subdivinclusive'+val+' top-bot-pa row submaincls"><div class="col-5"><input type="text" name="" class="out-li-ne taxmaincls form-control" dataid="'+val+'" value="'+taxname+'" readonly> <input type="hidden" name="inclusivecompanytax" value="'+val+'"></div> <div class="col-6"><table id="inclusivetable'+val+'"><tbody> <tr><td class="texx-rgh"><input type="text" name="inclusivepercentage'+val+'" placeholder="%" class="taxwithpercls inclusivecls form-control" >  <input type="hidden" name="hdninclusivepercentage'+val+'" value=""> </td> <td class="mi-n"><i class="fa fa-plus addrowinclusive clo-se tx-cl" aria-hidden="true" dataid="'+val+'"></i> <i class="fa fa-minus inclusiveclosecls clo-se" aria-hidden="true" dataid="'+val+'"></i></td> </tr></tbody></table></div>')
+            $('.maincls').append('<div class="subdivinclusive'+val+' top-bot-pa row submaincls"><div class="col-5"><input type="text" name="" class="out-li-ne taxmaincls form-control" dataid="'+val+'" value="'+taxname+'" readonly> <input type="hidden" name="inclusivecompanytax" value="'+val+'"></div> <div class="col-6"><table id="inclusivetable'+val+'"><tbody> <tr><td class="texx-rgh"><input type="text" name="inclusivepercentage'+val+'" placeholder="%" class="taxwithpercls inclusivecls form-control" >  <input type="hidden" name="hdninclusivepercentage'+val+'" value=""> </td> <td class="mi-n"><i class="fa fa-plus addrowinclusive clo-se tx-cl" aria-hidden="true" dataid="'+val+'"></i> <i class="fa fa-minus inclusiveclosecls clo-se" aria-hidden="true" dataid="'+val+'"></i></td> </tr></tbody></table></div>');
+
+// Apply fixed 2 decimal places to the input fields
+$('.taxwithpercls').on('blur', function() {
+    var inputValue = parseFloat($(this).val());
+    if (!isNaN(inputValue)) {
+        $(this).val(inputValue.toFixed(2));
+    }
+});
+
+            console.log($('.inclusive-cls'))
+            $('.maincls').find('.removeappcls').remove()
+            console.log($('.exclusive-cls'))
+        }
+        else{
+            
+                $(this).next(".maincls").find('.submaincls').each(function(){
+                    var data=$(this).find('.taxmaincls')
+                    var id=data.attr('dataid') 
+                    var taxname=data.val()
+                    $('.exclusive-cls').append('<option value="'+id+'">'+taxname+'</option>')
+                    $('.inclusive-cls').append('<option value="'+id+'">'+taxname+'</option>')
+                })
+                $('.maincls').html('<div class="removeappcls"><input type="hidden" name="inclusivecompanytax" id="remove_applicable" value="not_applicable" class="removeappcls" style="display:none;"></div>')
+                //$('.maincls').append('<div class="maincls"><div class="subdivinclusive top-bot-pa row"><div class="col-6"><input type="hidden" name="" class="out-li-ne" dataid="'+val+'" value="'+taxname+'" readonly></div> <div class="col-6"> </div> </div></div>')
+            //$('.inclusive-cls').val('')
+            //$('.subdivinclusive').remove()
+        }
+    }
+})
+
+
+
+
+
+$(document).on('click','.addrowinclusive',function(){
+    var id=$(this).attr('dataid')
+    
+    var html='<tr><td class="texx-rgh"><input type="text" name="inclusivepercentage'+id+'" placeholder="%" class="taxwithpercls inclusivecls form-control"> <input type="hidden" name="hdninclusivepercentage'+id+'" value=""> </td> <td class="mi-n"><i class="fa fa-plus addrowinclusive clo-se tx-cl" aria-hidden="true" dataid='+id+'></i> <i class="fa fa-minus inclusiveclosecls clo-se" aria-hidden="true" dataid='+id+'></i> </td> </tr>'
+    
+    $(this).closest('table').append(html)
+})
+
+$(document).on('change','.taxwithpercls',function(){
+    
+    $(this).removeClass('add-error-cls')
+    $(this).next('#remove-error').remove();
+    //$('#remove-error').remove()
+    $(this).removeClass('con_error')
+    $(this).val(decimal_value($(this).val()))
+    var val=$.trim($(this).val())
+    if (val != ''){
+        
+        if (!$.isNumeric(val)){ 
+        swal.fire('Accept only Numbers')
+        $(this).val('')
+    } 
+    }
+
+    if (parseFloat(val) > 100){
+        swal.fire('Percentage Limit Reached')
+        $(this).val('')
+
+    }
+    $('.taxwithpercls').on('blur', function() {
+                var inputValue = parseFloat($(this).val());
+                if (!isNaN(inputValue)) {
+                    $(this).val(inputValue.toFixed(2));
+                }
+    });
+    var count=0;
+    var tableid=$(this).closest('table').attr('id')
+    var decimalNumber = parseFloat(val);
+    var formattedNumber = decimalNumber.toFixed(2)
+    $('#'+tableid+' tbody tr').each(function(index,value){
+        // console.log($(value).find('td:eq(0) > .taxwithpercls').val())
+        var current_val=$.trim($(value).find('td:eq(0) > .taxwithpercls').val())
+        var current_decimalNumber = parseFloat(current_val);
+        var current_formattedNumber = current_decimalNumber.toFixed(2)
+        if (formattedNumber == current_formattedNumber){
+            // console.log('ch')
+            //$(this).addClass('add-error-cls')
+            // console.log({'val':val,'current_val':current_val})
+            count ++;
+        }
+    })
+    console.log('count',count)
+    if (count > 1){
+        $(this).addClass('add-error-cls').after('<p class="error duplicate-value" id="remove-error">Duplicate Value</p>');
+        //$('#submitid').prop('disabled',true)
+    }
+    else{
+        //$('#submitid').removeAttr('disabled')
+    }
+    // $(this).val(decimal_value($(this).val()))
+})
+
+// $(document).on('change','.inclusivecls',function(){
+//     var value = $(this).val()
+//     $('input').each(function(index,ele){
+//         if($(ele).val() == value){
+//             console.log('ele',typeof $(ele).val())
+//             $('#submitid').prop('disabled',true)
+//         }
+//     })
+
+// })
+
+
+
+$(document).on('click','.inclusiveclosecls',function(){
+    var table=$(this).closest('table')
+    
+    var gettablelen=table.find('tbody > tr').length
+    if (gettablelen <= 1){
+        var gettaxdetails=table.parent('div').prev('div').find('.taxmaincls')
+        var id=gettaxdetails.attr('dataid') 
+        var taxname=gettaxdetails.val()
+        console.log('gettaxdetails',gettaxdetails)
+        $('.subdivinclusive'+id+'').remove()
+        $('.exclusive-cls').append('<option value="'+id+'">'+taxname+'</option>')
+        $('.inclusive-cls').append('<option value="'+id+'">'+taxname+'</option>')
+    }
+    else{
+        $(this).closest('tr').remove()
+        $('#submitid').removeAttr('disabled')
+        $('#saveasdraft').removeAttr('disabled')
+    }
+})
+
+
+$(document).on('change','.exclusive-cls',function(){
+    
+    var val = $(this).val()
+    $(this).removeClass('con_error')
+    if (val == ""){
+        
+    $('.exclusivemaincls').html(' ')
+    }
+    else{
+        if (val != 'not_applicable'){
+            
+            $('.hdnsubdivexclusive').remove()
+            var taxname=$( ".exclusive-cls option:selected" ).text();
+            $(".inclusive-cls option[value="+val+"]").each(function() {
+                
+                $(this).remove();
+            });
+            $(".exclusive-cls option[value="+val+"]").each(function() {
+                
+                $(this).remove();
+            });
+            $('.exclusivemaincls').remove('#exclusive_remove_applicable')
+            // $('.exclusivemaincls').append('<div class="subdivinclusive'+val+' top-bot-pa row excsubmaincls"><div class="col-5"><input type="text" name="" class="out-li-ne taxmaincls form-control" dataid="'+val+'" value="'+taxname+'" readonly> <input type="hidden" name="exclusivecompanytax" value="'+val+'"></div> <div class="col-6"><table id="inclusivetable'+val+'"><tbody> <tr><td class="texx-rgh"><input type="text" name="exclusivepercentage'+val+'" placeholder="%" class="taxwithpercls form-control" > <input type="hidden" name="hdnexclusivepercentage'+val+'" value=""> </td> <td class="mi-n"><i class="fa fa-plus addrowexclusive clo-se" aria-hidden="true" dataid="'+val+'"></i> <i class="fa fa-minus exclusiveclosecls clo-se" aria-hidden="true" dataid="'+val+'"></i></td> </tr></tbody></table></div>')
+            $('.exclusivemaincls').append('<div class="subdivinclusive'+val+' top-bot-pa row excsubmaincls"><div class="col-5"><input type="text" name="" class="out-li-ne taxmaincls form-control" dataid="'+val+'" value="'+taxname+'" readonly> <input type="hidden" name="exclusivecompanytax" value="'+val+'"></div> <div class="col-6"><table id="inclusivetable'+val+'"><tbody> <tr><td class="texx-rgh"><input type="text" name="exclusivepercentage'+val+'" placeholder="%" class="taxwithpercls form-control" > <input type="hidden" name="hdnexclusivepercentage'+val+'" value=""> </td> <td class="mi-n"><i class="fa fa-plus addrowexclusive clo-se" aria-hidden="true" dataid="'+val+'"></i> <i class="fa fa-minus exclusiveclosecls clo-se" aria-hidden="true" dataid="'+val+'"></i></td> </tr></tbody></table></div>');
+// Apply fixed 2 decimal places to the input fields
+            $('.taxwithpercls').on('blur', function() {
+                var inputValue = parseFloat($(this).val());
+                if (!isNaN(inputValue)) {
+                    $(this).val(inputValue.toFixed(2));
+                }
+            });
+
+            $('.exclusivemaincls').find('.excremoveappcls').remove()
+        }
+        else{
+            $(this).next(".exclusivemaincls").find('.excsubmaincls').each(function(){
+                
+                    var data=$(this).find('.taxmaincls')
+                    var id=data.attr('dataid') 
+                    var taxname=data.val()
+                    $('.exclusive-cls').append('<option value="'+id+'">'+taxname+'</option>')
+                    $('.inclusive-cls').append('<option value="'+id+'">'+taxname+'</option>')
+                })
+                $('.exclusivemaincls').html('<div class="excremoveappcls"><input type="hidden" name="exclusivecompanytax" id="exclusive_remove_applicable" value="not_applicable" style="display:none;"></div>')
+            }
+        }
+    
+})
+
+$(document).on('click','.addrowexclusive',function(){
+    var id=$(this).attr('dataid')
+    var html='<tr><td class="texx-rgh"><input type="text" name="exclusivepercentage'+id+'" placeholder="%" class="taxwithpercls form-control" >  <input type="hidden" name="hdnexclusivepercentage'+id+'" value=""> </td> <td class="mi-n"><i class="fa fa-plus addrowexclusive clo-se" aria-hidden="true" dataid='+id+'></i> <i class="fa fa-minus exclusiveclosecls clo-se" aria-hidden="true" dataid='+id+'></i> </td> </tr>'
+    $(this).closest('table').append(html)
+})
+
+
+$(document).on('click','.exclusiveclosecls',function(){
+    var table=$(this).closest('table')
+    
+    var gettablelen=table.find('tbody > tr').length
+    if (gettablelen <= 1){
+        var gettaxdetails=table.parent('div').prev('div').find('.taxmaincls')
+        var id=gettaxdetails.attr('dataid') 
+        var taxname=gettaxdetails.val()
+        //console.log(gettaxdetails)
+        $('.subdivinclusive'+id+'').remove()
+        $('.exclusive-cls').append('<option value="'+id+'">'+taxname+'</option>')
+        $('.inclusive-cls').append('<option value="'+id+'">'+taxname+'</option>')
+    }
+    else{
+        $(this).closest('tr').remove()
+        $('#submitid').removeAttr('disabled')
+        $('#saveasdraft').removeAttr('disabled')
+
+    }
+})
+
+
+$(document).on('click','.splitcls',function(){
+    var val=$(this).val()
+    if (val == "yes"){
+        $('#id_totalinvoice').val('')
+        $('#invoicetblcls').css("display","none")
+        $('.inv-sub-div').removeAttr('style')
+        $('.exchange-sm-lin').removeAttr('style')
+        $('.exc-cls').html('<option value="">--Select--</option><option value="1">At the Time of Invoice Submission</option><option value="2">At the Time of Invoice Payment</option>')
+        // $(this).closest('div').next('.invoiceclass').find('.inv-sub-div > #id_totalinvoice').val('')
+        // $(this).closest('div').next('.invoiceclass').find('.inv-sub-div').removeAttr('style')
+        // $(this).closest('div').next('.invoiceclass').find('#invoicetblcls').css("display","none")
+        // $('.exchange-sm-lin').removeAttr('style')
+        // $('.exc-cls').html('<option value="">--Select--</option><option value="1">At the Time of Invoice Submission</option><option value="2">At the Time of Invoice Payment</option>')
+    }
+    else{
+        $('.inv-sub-div').css("display","none")
+        $('#id_totalinvoice').val('1')
+        $('.invoicepercls').removeClass('con_error')
+        $('#invoicetblcls').removeAttr('style')
+        $('.exchange-sm-lin').css('display','none')
+        $('.exc-cls').html('<option selected value="1">At the Time of Invoice Submission</option><option value="2">At the Time of Invoice Payment</option>')
+        $('#invoicetblcls tbody tr').each(function(index,val){
+            console.log(index)
+            if (index == 0){
+                $(this).find('td:eq(2)').find('.invoicepercls').val('100').attr('readonly',true)
+            }
+            else{
+                $(this).remove()
+            }
+        })
+
+    }
+})
+
+var global_value=''
+$(document).on('change','#id_totalinvoice',function(){
+    
+    // $('#invoicetblcls').remove()
+    // $('.exchangetypecls').remove()
+    // $('.hide-paymetdiv').removeAttr('style')
+    var val=$(this).val()
+    global_value=val
+    var new_val=global_value.replace(/[[^a-z`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi,'');
+    $(this).val(new_val)
+    $(this).removeClass('con_error')
+    if ($.isNumeric(new_val)){
+        if (new_val == "1"){
+            $(this).val('')
+            var html= ''
+            var count=1 
+            for(var i = 0; i < new_val; i++){
+            html +='<tr> <td>'+count+'</td> <td><select name="invoicecurrency" class="form-control invoicecurcls postform"></select></td> <td><input type="text" name="invoicepercentage" class="form-control invoicepercls" placeholder="%" readonly value="100"></td>' 
+            html +='</tr>'
+            count ++;
+        }
+        $('#invoicetblcls tbody').html(html)
+        $('#invoicetblcls').css('display','none')
+        var selectoption='<option value="">--Select--</option>'
+
+        $.each(list,function(key,value){
+            selectoption+='<option value='+value.id+'>'+value.symbol+'</option>'
+        })
+        $('.invoicecurcls').html(selectoption)
+        $('#invoicetblcls > tbody > tr').each(function(index, tr) {
+            if (index == 0){
+                $(this).find('td:eq(1)').find('.invoicecurcls option[value='+contractcurrencyid+']').attr({"selected":"selected"});
+                $(this).find('td:eq(1)').find('.invoicecurcls option:not(:selected)').remove();
+            } 
+            //var value=parseFloat($(this).find('td:eq(2)').find('.invoicepercls').val())|| 0 contractcurrencyid
+        });
+
+        }
+        else{
+            
+        var html= ''
+        // html+='<div class="tablecls"><table id="invoicetblcls">'
+        // html+='<thead><th>S.No</th><th>Currency</th><th>Percentage</th></thead>'
+        // html+='<tbody>'
+        var count=1 
+        for(var i = 0; i < new_val; i++){
+            html +='<tr> <td class="text-center 3">'+count+'</td> <td><select name="invoicecurrency" class="form-control invoicecurcls postform"></select></td> <td><input type="text" name="invoicepercentage" class="form-control invoicepercls" placeholder="%"></td>' 
+            /*
+            if (i == 0){
+                html +='<td><select name="exchangerate" class="form-control" style="display:none;"><option value="" selected></option></select></td>'
+            }
+            else{
+                html +='<td><select name="exchangerate" class="form-control"><option value="">--Select--</option><option value="1">at the time of billing</option><option value="2">t the time of payment</option></select></td>' 
+            }
+            */
+            html +='</tr>'
+            count ++;
+        }
+        // html+='</tbody>'
+        // html +='</table></div>'
+        // html+='<div class="exchange-sm-lin exchangetypecls"><label class="contractfilehead">Exchange rate:<span class="star-clr">*</span></label><select name="exchangerate" class="form-control in-bor-clr reduce_size_cls"><option value="">--Select--</option><option value="1">At The Time of Submission</option><option value="2">At The Time of Payment</option></select></div>'
+        $('#invoicetblcls tbody').html(html)
+        $('#invoicetblcls').removeAttr('style')
+        var selectoption='<option value="">--Select--</option>'
+
+        $.each(list,function(key,value){
+            selectoption+='<option value='+value.id+'>'+value.symbol+'</option>'
+        })
+        $('.invoicecurcls').html(selectoption)
+        $('#invoicetblcls > tbody > tr').each(function(index, tr) {
+            if (index == 0){
+                $(this).find('td:eq(1)').find('.invoicecurcls option[value='+contractcurrencyid+']').attr({"selected":"selected"});
+                $(this).find('td:eq(1)').find('.invoicecurcls option:not(:selected)').remove();
+            } 
+            //var value=parseFloat($(this).find('td:eq(2)').find('.invoicepercls').val())|| 0 contractcurrencyid
+        });
+        }
+    }
+    else{
+        var new_val=global_value.replace(/[[^a-z`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi,'');
+        // alert(new_val)
+        $(this).val(new_val)
+        // swal.fire('Accept Only Numbers')
+    }
+
+})
+
+
+$(document).on('change','.invoicecurcls',function(){
+    $(this).removeClass('con_error')
+    var current_val = $(this).val()
+    var val=$(this).find(':selected').val()
+    if (val == contractcurrencyid){
+        $(this).closest('td').next('td').next('td').find('select').css("display","none")
+    }
+    else{
+        $(this).closest('td').next('td').next('td').find('select').removeAttr('style')
+    }
+})
+
+$(document).on('change','.invoicepercls',function(){
+    $(this).removeClass('con_error')
+    var current_val = $(this).val()
+    if (current_val != ''){
+        if (!$.isNumeric(current_val)){ 
+            swal.fire('Accept only Numbers')
+            $(this).val('')
+        }
+    }
+    var count=0
+    var newarray=[]
+    $('#invoicetblcls > tbody > tr').each(function(index, tr) { 
+        var value=parseFloat($(this).find('td:eq(2)').find('.invoicepercls').val())|| 0
+        count += value
+        if (value == 0){
+            newarray.push(index)
+        }
+     });
+     if (count > 100){
+        Swal.fire('Percentage Limit Reached')
+        $(this).val('')
+        // $('#submitid').prop('disabled',true)
+    }
+    else{
+        $('#submitid').prop('disabled',false)
+        $('#saveasdraft').prop('disabled',false)
+        var balance_value=100-count
+        if (newarray.length == 1){
+            $('#invoicetblcls > tbody > tr').each(function(index, tr) { 
+                if (newarray[0] == index){
+                    $(this).find('td:eq(2)').find('.invoicepercls').val(decimal_value(balance_value))
+                }
+            })
+        }
+       
+        $(this).val(decimal_value(current_val))
+    }
+    
+    })
+
+    
+$(document).on('change','.paymentypecls',function(){
+    $(this).removeClass('con_error')
+    var current_val = $(this).val()
+    var val=$(this).val()
+    if (val != ''){
+        if (val == "1"){
+            $(this).closest('tr').find('.paymentpercls').val('')
+            $(this).closest('tr').find('.paymentpercls').removeAttr('readonly')
+            var nextvalue=$(this).closest('tr').next('tr').find('.paymentypecls :selected').val()
+            if (nextvalue == "2"){
+                $(this).closest('tr').find('.hidebtncls').css('display','none')
+                var balance_percentage=100-parseFloat(val)
+                if (!isNaN(balance_percentage)){
+                    $(this).closest('tr').find('.paymentpercls').val(decimal_value(balance_percentage))
+                }
+            }
+            else{
+                $(this).closest('tr').find('.hidebtncls').removeAttr('style')
+            }
+
+            var indexval=1
+            $('#paymenttableid tbody tr').each(function(index,value){
+                var selectedvalue=$(this).find('td:eq(0) > .paymentypecls :selected').val()
+                if (selectedvalue == "1"){
+                    
+                $(this).find('td:eq(0) > .paymentypecls > option').each(function(){
+                    if ($(this).val() == "2"){
+                        $(this).text('Regular Payment')
+                    }
+                    else if ($(this).val() == "3"){
+                        $(this).text('Milestone Payment '+indexval+'')
+                    }
+                })
+
+                }
+                else if (selectedvalue == "3"){
+                    
+                $(this).find('td:eq(0) > .paymentypecls > option').each(function(){
+                    if ($(this).val() == "3"){
+                        $(this).text('Milestone Payment '+indexval+'')
+                    }
+                })
+                indexval ++;
+                }
+                gettext=$(this).find('td:eq(0) > .paymentypecls :selected').text()
+                console.log(gettext)
+                $(this).find('td:eq(0) > .hdnnamecls').val(gettext) 
+            })
+        }
+        else if (val == "2"){
+            $(this).closest('tr').find('.hidebtncls').css('display','none')
+            $(this).closest('tr').prev('tr').find('.hidebtncls').css('display','none')
+            $(this).closest('tr').find('.paymentpercls').removeClass('con_error')
+            $(this).closest('tr').find('.paymentpercls').attr('readonly',true)
+
+            $(this).closest('tr').nextAll('tr').remove()
+            var gettext=$(this).find(':selected').text()
+            tabele_length=$('#paymenttableid > tbody > tr').length
+            if (tabele_length == 1){
+                $(this).closest('tr').find('.paymentpercls').val('100')
+            }
+            else{
+                var prev_percentage=parseFloat($(this).closest('tr').prev('tr').find('.paymentpercls').val())
+                var balance_percentage=100-prev_percentage
+                if (!isNaN(balance_percentage)){
+                    $(this).closest('tr').find('.paymentpercls').val(balance_percentage)
+                }
+                else{
+                    $(this).closest('tr').find('.paymentpercls').val('')
+                }
+                
+            }
+            $(this).closest('select').prev('.hdnnamecls').val(gettext)
+            // var indexval=1
+            // $('#paymenttableid tbody tr').each(function(index,value){
+            //     var selectedvalue=$(this).find('td:eq(0) > .paymentypecls :selected').val()
+            //     if (selectedvalue == "1"){
+                    
+            //     $(this).find('td:eq(0) > .paymentypecls > option').each(function(){
+            //         if ($(this).val() == "2"){
+            //             $(this).text('Regular Payment'+indexval+'')
+            //         }
+            //         else if ($(this).val() == "3"){
+            //             $(this).text('Milestone Payment'+indexval+'')
+            //         }
+            //     })
+
+            //     }
+            //     else{
+                    
+            //     $(this).find('td:eq(0) > .paymentypecls > option').each(function(){
+            //         if ($(this).val() == "2"){
+            //             $(this).text('Regular Payment'+indexval+'')
+            //         }
+            //         else if ($(this).val() == "3"){
+            //             $(this).text('Milestone Payment'+indexval+'')
+            //         }
+            //     })
+            //     indexval ++;
+            //     }
+
+                
+            // })
+        }
+        else{
+            $(this).closest('tr').find('.paymentpercls').val('')
+            $(this).closest('tr').find('.paymentpercls').removeAttr('readonly')
+            $(this).closest('tr').nextAll('tr').remove()
+            $(this).closest('tr').find('td:eq(3)').removeAttr('style')
+            // var nextvalue=$(this).closest('tr').next('tr').find('.paymentypecls :selected').val()
+
+            // if (nextvalue == "2"){
+            //     // alert(nextvalue)
+            //     //console.log($(this).closest('tr').next('tr').find('.paymentypecls').prop("selected", false))
+            //     $(this).closest('tr').next('tr').find('.paymentypecls option[value=""]').attr('selected','selected');
+            //     $(this).closest('tr').find('.hidebtncls').removeAttr('style')
+            // }
+            // else{
+            //     $(this).closest('tr').find('.hidebtncls').removeAttr('style')
+            // }
+            
+            // var indexval=1
+            // $('#paymenttableid tbody tr').each(function(index,value){
+            //     var selectedvalue=$(this).find('td:eq(0) > .paymentypecls :selected').val()
+            //     if (selectedvalue == "1"){
+                    
+            //     $(this).find('td:eq(0) > .paymentypecls > option').each(function(){
+            //         if ($(this).val() == "3"){
+            //             $(this).text('Milestone Payment '+indexval+'')
+            //         }
+            //     })
+
+            //     }
+            //     else{
+                    
+            //     $(this).find('td:eq(0) > .paymentypecls > option').each(function(){
+            //         if ($(this).val() == "3"){
+            //             $(this).text('Milestone Payment '+indexval+'')
+            //         }
+            //     })
+            //     indexval ++;
+            //     }
+            //     gettext=$(this).find('td:eq(0) > .paymentypecls :selected').text()
+            //     console.log(gettext)
+            //     $(this).find('td:eq(0) > .hdnnamecls').val(gettext) 
+                
+            // })    
+        }
+        
+    }
+})
+
+
+$(document).on('keyup','.paymentdaycls',function(){
+    $(this).removeClass('con_error')
+    var current_val = $(this).val()
+    var val=$(this).val()
+    var type=$(this).closest('tr').find('.paymentypecls :selected').val()
+    if (val.match(/^\d+$/)){
+        if (type == "1"){
+            if (val.length > 2){
+                $(this).addClass('con_error')
+            }
+            else{
+                $(this).removeClass('con_error')
+            }
+        }
+        else{
+            if (val.length > 3){
+                $(this).addClass('con_error')
+            }
+            else{
+                $(this).removeClass('con_error')
+            }
+        }
+    }
+    else{
+        $(this).val('')
+        $(this).removeClass('con_error')
+    }
+
+})
+
+
+
+$(document).on('change','.paymentpercls',function(){
+    $(this).removeClass('con_error')
+    var current_val = $(this).val()
+    var val = $(this).val()
+    var type=$(this).closest('tr').find('.paymentypecls :selected').val()
+    if (type == '1'){
+        if (val > 100){
+            $(this).val('')
+            $(this).closest('tr').next('tr').find('.paymentpercls').val('')
+        }
+        else{
+            var next_type=$(this).closest('tr').next('tr').find('.paymentypecls :selected').val()
+            if (next_type == '2'){
+                var balance_val=100-parseFloat(val)
+                $(this).closest('tr').next('tr').find('.paymentpercls').val(decimal_value(balance_val))
+            }
+        }
+        $(this).val(decimal_value($(this).val()))
+    }
+    else{
+        var rgx = /^[0-9]*\.?[0-9]*$/;;
+        if (val.match(rgx)){
+            var conval=parseFloat(val)
+            var totalval=0
+            $('.paymentpercls').each(function(){
+                totalval +=parseFloat($(this).val())
+            })
+            if (totalval > 100){
+                console.log('c')
+                swal.fire('Percentage Limit Reached')
+                $(this).val('')
+            }
+            $(this).val(decimal_value($(this).val()))
+        }
+        else{
+            $(this).val('')
+        }
+    }
+    
+
+
+})
+
+
+$(document).on('click','.paymentaddcls',function(){
+    // var data=$(this).closest('tr').find('.paymentypecls :selected').val()
+    // if (data == "1"){
+    //     var indexvalue=$(this).closest('table').find('tbody tr:last').index()+1
+    // }
+    // else{
+    //     var indexvalue=$(this).closest('table').find('tbody tr:last').index()+2
+    // }
+
+    // console.log(indexvalue)
+    var regular_value=$('#paymenttableid tbody tr:last').find('td:eq(0) > .paymentypecls > :selected').val()
+    if (regular_value != '2'){
+
+        var emptyval=0;
+        $('#paymenttableid tbody tr').each(function(index,value){
+            var textVal = $(this).find('td:eq(0) > .paymentypecls > :selected').val();
+            var inputdayval= $(this).find('td:eq(1) > .paymentdaycls').val();
+            var inputpercentageval= $(this).find('td:eq(2) > .paymentpercls').val();
+            console.log(textVal,inputdayval,inputpercentageval)
+            if(textVal==''){
+                $(this).find('td:eq(0) > .paymentypecls').addClass('con_error')
+                emptyval ++;
+            }
+
+            if (inputdayval == ''){
+                $(this).find('td:eq(1) > .paymentdaycls').addClass('con_error')
+                emptyval ++;
+            }
+
+            if (inputpercentageval == ''){
+                $(this).find('td:eq(2) > .paymentpercls').addClass('con_error')
+                emptyval ++;
+            }
+
+        });
+        // alert(emptyval)
+        if (emptyval > 0){
+
+        }
+        else{
+            var checktype=$(this).closest('tr').find('.paymentypecls :selected').val()
+            if (checktype == "1"){
+                var count=0
+                $('#paymenttableid tbody tr').each(function(index,value){
+                    $(this).find('td:eq(0) > .paymentypecls > option').each(function(){
+                        if ($(this).val() == "2"){
+                            count ++;
+                        }
+                    })
+                })
+                console.log(count)
+                if (count < 2){
+                    var html='<tr> <td> <input type="hidden" name="hdnpaymentvalues" value=""> <input type="hidden" name="hdnselected" class="hdnnamecls" value=""> <select name="paymentype" class="paymentypecls form-control postform"><option value="" selected>--Select--</option> <option value="2">Regular Payment</option> <option value="3">Milestone Payment </option></select></td>  <td><input type="text" name="paymentday" class="paymentdaycls form-control"></td><td class="wid-percen"><input type="text" name="paymentpercentage" class="paymentpercls form-control"></td> <td class="hidebtncls"><button type="button" class="paymentaddcls"><i class="fa fa-plus" aria-hidden="true"></i></button><button type="button" class="paymentminuscls"><i class="fa fa-minus" aria-hidden="true"></i></button></td> </tr>'
+                }
+                else{
+                    //<option value="" selected>--Select--</option> 
+                    var html='<tr> <td> <input type="hidden" name="hdnpaymentvalues" value=""> <input type="hidden" name="hdnselected" class="hdnnamecls" value=""> <select name="paymentype" class="paymentypecls form-control postform"><option value="3">Milestone Payment </option></select></td>  <td><input type="text" name="paymentday" class="paymentdaycls form-control"></td><td class="wid-percen"><input type="text" name="paymentpercentage" class="paymentpercls form-control"></td> <td class="hidebtncls"><button type="button" class="paymentaddcls"><i class="fa fa-plus" aria-hidden="true"></i></button><button type="button" class="paymentminuscls"><i class="fa fa-minus" aria-hidden="true"></i></button></td> </tr>'
+                }
+
+            }
+            else{
+                var html='<tr> <td> <input type="hidden" name="hdnpaymentvalues" value=""> <input type="hidden" name="hdnselected" class="hdnnamecls" value=""> <select name="paymentype" class="paymentypecls form-control postform"><option value="3">Milestone Payment </option></select></td>  <td><input type="text" name="paymentday" class="paymentdaycls form-control"></td><td class="wid-percen"><input type="text" name="paymentpercentage" class="paymentpercls form-control"></td> <td class="hidebtncls"><button type="button" class="paymentaddcls"><i class="fa fa-plus" aria-hidden="true"></i></button><button type="button" class="paymentminuscls"><i class="fa fa-minus" aria-hidden="true"></i></button></td> </tr>'
+            }
+
+            $(this).closest('table').append(html)
+            var indexval=1
+            $('#paymenttableid tbody tr').each(function(index,value){
+                var selectedvalue=$(this).find('td:eq(0) > .paymentypecls :selected').val()
+                if (selectedvalue == "1"){
+                    
+                $(this).find('td:eq(0) > .paymentypecls > option').each(function(){
+                    if ($(this).val() == "3"){
+                        $(this).text('Milestone Payment '+indexval+'')
+                    }
+                })
+
+                }
+                else{
+                $(this).find('td:eq(0) > .paymentypecls > option').each(function(){
+                    if ($(this).val() == "3"){
+                        $(this).text('Milestone Payment '+indexval+'')
+                    }
+                })
+                indexval ++;
+                }
+
+                gettext=$(this).find('td:eq(0) > .paymentypecls :selected').text()
+                console.log(gettext)
+                $(this).find('td:eq(0) > .hdnnamecls').val(gettext)   
+            })
+        }
+    }
+})
+// 
+
+$(document).on('click','.paymentminuscls',function(){
+    var tablen=$('#paymenttableid tbody tr').length
+    if (tablen > 1){
+        $(this).closest('tr').remove()
+    }
+    var indexval=1
+    var adv_count=0
+    $('#paymenttableid tbody tr').each(function(index,value){
+        var selectedvalue=$(this).find('td:eq(0) > .paymentypecls :selected').val()
+        if (selectedvalue == "1"){
+            
+        $(this).find('td:eq(0) > .paymentypecls > option').each(function(){
+            if ($(this).val() == "2"){
+                $(this).text('Regular Payment')
+            }
+            else if ($(this).val() == "3"){
+                $(this).text('Milestone Payment '+indexval+'')
+            }
+        })
+        }
+        else{
+            
+        $(this).find('td:eq(0) > .paymentypecls > option').each(function(){
+            if ($(this).val() == "2"){
+                $(this).text('Regular Payment')
+            }
+            else if ($(this).val() == "3"){
+                $(this).text('Milestone Payment '+indexval+'')
+            }
+        })
+        indexval ++;
+        }
+        gettext=$(this).find('td:eq(0) > .paymentypecls :selected').text()
+        console.log(gettext)
+        $(this).find('td:eq(0) > .hdnnamecls').val(gettext) 
+        adv_count ++;
+
+    })
+    if (adv_count == 1){
+        $('#paymenttableid tbody tr').each(function(index,value){
+            console.log('a',$(this).find('td:eq(3)').removeAttr('style'))
+        })
+    }
+    // alert(adv_count) 
+})
+
+$(document).on('change','.exchange-cls',function(){
+    if ($(this).val() == ""){
+        $(this).addClass('con_error')
+    }
+    else{
+        $(this).removeClass('con_error')
+    }
+})
+$("#submitid").click(function(e){
+    // e.preventDefault();
+    // alert('a')
+    var count = 0
+    $('input[type=text]').each(function(index,value){ 
+  var textVal = $(value).val(); 
+  if (textVal==''){
+    //   console.log(index,textVal); 
+      $(value).addClass('con_error')
+    //   console.log($(this))
+      count ++;
+    // value.addClass('con_error')
+  }
+//   console.log(index,textVal); 
+});
+ $('.postform').each(function(index,value){
+    var textVal = $(this).find(':selected').val();
+    if(textVal==''){
+        // console.log(index.value);
+        $(value).addClass('con_error')
+        // console.log($(this))
+        count ++;
+    }
+    if ($('.add-error-cls').length > 0) {
+        count ++;    
+    }
+ });
+
+ var calculate_value=0
+ var inv_count=0
+    $('#invoicetblcls > tbody > tr').each(function(index, tr) { 
+        var value=parseFloat($(this).find('td:eq(2)').find('.invoicepercls').val())|| 0
+        calculate_value += value
+    })
+    if(calculate_value == 99.99999999999999)
+    {
+        pass
+    }
+    if (calculate_value != 100){
+        inv_count ++;
+    }
+
+var calculate_payment_value=0
+var payment_count=0
+$('#paymenttableid > tbody > tr').each(function(index, tr) { 
+        var value=parseFloat($(this).find('td:eq(2)').find('.paymentpercls').val())|| 0
+        calculate_payment_value += value
+    })
+    if (calculate_payment_value != 100){
+        payment_count ++;
+    }
+
+// alert(count)
+
+$('.check-error').each(function(index,value){
+    var div=$(this).closest('select').next('.f-div').children().length
+    if (div == 0){
+        $(this).addClass('con_error')
+        count ++;
+    }
+    else {
+        $(this).removeClass('con_error')
+    }
+})
+
+// alert(count)
+if (count > 0){
+    // alert('a')
+    // alert('f')
+    e.preventDefault();
+}
+else if (inv_count > 0){
+    e.preventDefault();
+    swal.fire('Total Invoice Split Should Be 100%')
+}
+else if (payment_count > 0){
+    e.preventDefault();
+    swal.fire('Total Payment Terms should Be 100%')   
+}
+    
+
+});
+
+$("#saveasdraft").click(function(e){
+    // e.preventDefault();
+    // alert('a')
+    var count = 0
+    $('input[type=text]').each(function(index,value){ 
+  var textVal = $(value).val(); 
+  if (textVal==''){
+    //   console.log(index,textVal); 
+      $(value).addClass('con_error')
+    //   console.log($(this))
+      count ++;
+    // value.addClass('con_error')
+  }
+
+  
+//   console.log(index,textVal); 
+});
+
+
+ $('.postform').each(function(index,value){
+    var textVal = $(this).find(':selected').val();
+    if(textVal==''){
+        // console.log(index.value);
+        $(value).addClass('con_error')
+        // console.log($(this))
+        count ++;
+    }
+    if ($('.add-error-cls').length > 0) {
+        count ++;    
+    }
+ });
+
+ var calculate_value=0
+ var inv_count=0
+    $('#invoicetblcls > tbody > tr').each(function(index, tr) { 
+        var value=parseFloat($(this).find('td:eq(2)').find('.invoicepercls').val())|| 0
+        calculate_value += value
+    })
+    if(calculate_value == 99.99999999999999)
+    {
+        pass
+    }
+    if (calculate_value != 100){
+        inv_count ++;
+    }
+
+var calculate_payment_value=0
+var payment_count=0
+$('#paymenttableid > tbody > tr').each(function(index, tr) { 
+        var value=parseFloat($(this).find('td:eq(2)').find('.paymentpercls').val())|| 0
+        calculate_payment_value += value
+    })
+    if (calculate_payment_value != 100){
+        payment_count ++;
+    }
+
+// alert(count)
+
+$('.check-error').each(function(index,value){
+    var div=$(this).closest('select').next('.f-div').children().length
+    if (div == 0){
+        $(this).addClass('con_error')
+        count ++;
+    }
+    else {
+        $(this).removeClass('con_error')
+    }
+})
+
+// alert(count)
+if (count > 0){
+    // alert('a')
+    // alert('f')
+    e.preventDefault();
+}
+else if (inv_count > 0){
+    e.preventDefault();
+    swal.fire('Total Invoice Split Should Be 100%')
+}
+else if (payment_count > 0){
+    e.preventDefault();
+    swal.fire('Total Payment Terms should Be 100%')   
+}
+    
+
+})
+
+
+
+
+// $(function (){
+//       $("form[id='#postform']").validate({ 
+//         rules: {
+
+//             exchangerate:{
+//                 required:true,
+//             },  
+            
+//         },
+//       messages: {
+
+
+//         exchangerate:'Exchange Rate Terms is Required',
+
+
+//             },
+//     submitHandler: function(form) {
+
+//         form.submit();
+        
+//     },
+
+//        });
+// });
+
+// jquery custom form validation for all form fields
+$(document).on('blur','.form-control',function(){
+    var value=$(this).val()
+    var name=$(this).attr('name')
+    if (name == "paymentday"){
+        if (value == ""){
+            $(this).closest('td').find('.paymentdaycls').addClass('con_error')
+        }
+        else{
+            $(this).closest('td').find('.paymentdaycls').removeClass('con_error')
+        }
+    }
+    else if (name == "paymentpercentage"){
+        if (value == ""){
+            $(this).closest('td').find('.paymentpercls').addClass('con_error')
+        }
+        else{
+            $(this).closest('td').find('.paymentpercls').removeClass('con_error')
+        }
+    }
+})
+
+function get_original_contract(contarctid,currencyid){
+    var value=contarctid
+    var currencyid=currencyid
+    const notyf = new Notyf({
+        duration: 5000,
+        position: {
+            x: 'right',
+            y: 'top',
+        },
+        types: [
+            {
+            type: 'warning',
+            background: '#D3D3D3',
+            duration: 4000,
+            icon: {
+                className: 'material-icons',
+                tagName: 'i',
+                // text: 'warning',
+                // dismissible: true
+            }
+            },
+            {
+            type: 'error',
+            background: '#D3D3D',
+            duration: 4000,
+            // dismissible: true
+            },
+            {
+            type: 'success',
+            background: '#D3D3D',
+            // background: '#7eff7c',
+            duration: 4000,
+            // dismissible: true
+            }
+        ]
+        });
+    // if (contractcurrencyid != currencyid){
+
+    //     notyf.open({
+    //     type: 'warning',
+    //     message: 'Original Contract Currency and Amendment/Addendum Currency Should Be Same'
+    //     });
+    // }
+    // else{
+        var origin   = window.location.origin; 
+        var currentelement=$(this)
+        var html='<option value="">--Select--</option>'
+        $(all_tax_list).each(function(index,value){
+            html+='<option value="'+value.val+'">'+value.name+'</option>'
+        })
+        $('.inclusive-cls').html(html)
+        $('.exclusive-cls').html(html)
+        $('.maincls').html(' ')
+        $('.exclusivemaincls').html(' ')
+        $.ajax({
+            type:"GET",
+            url:origin+'/projects/getoriginalcontract',
+            data:{'contractid':value},
+            success: function(data)
+            {   
+                console.log(data)
+                if (data.status == 'no_data'){
+                    notyf.open({
+                    type: 'error',
+                    background: '#D3D3D3',
+                    // background:'#ff6060',
+                    message: 'No Tax Data Found in Original Contract'
+                    });
+                }
+                else{
+                    $.each(data.getinclusivetax,function(ind,val){
+                        if (val.tax_id == null){
+                            $('.inclusive-cls option[value=not_applicable]').attr("selected", "selected");
+                            $('.maincls').html('<div class="removeappcls"><input type="hidden" name="inclusivecompanytax" id="remove_applicable" value="not_applicable" class="removeappcls" style="display:none;"></div>')
+                        }
+                        else{
+                            $('.inclusive-cls option[value='+val.tax_id+']').remove()
+                            $('.exclusive-cls option[value='+val.tax_id+']').remove()
+                            $('.maincls').find('.removeappcls').remove()
+                            $('.inclusive-cls option[value=""]').attr("selected", "selected");
+                            var divlen=$('.maincls').find('.subdivinclusive'+val.tax_id+'').length
+                            // console.log('divlen',divlen)
+                            if (divlen == 0){
+                                $('.maincls').append('<div class="subdivinclusive'+val.tax_id+' top-bot-pa row submaincls"><div class="col-5"><input type="text" name="" class="out-li-ne taxmaincls form-control" dataid="'+val.tax_id+'" value="'+val.tax_name+'" readonly> <input type="hidden" name="inclusivecompanytax" value="'+val.tax_id+'"></div> <div class="col-6"><table id="inclusivetable'+val.tax_id+'"><tbody></tbody></table></div></div></div>')
+                                $.ajax({
+                                    type:"GET",
+                                    url:origin+'/projects/getalltaxes',
+                                    data:{'tax_id':val.id},
+                                    success: function(data)
+                                    {   
+                                        // console.log(val.id)
+                                        // console.log('data',data)
+                                        var html=''
+                                        $.each(data.data,function(index,value){
+                                            
+                                            html+='<tr><td class="texx-rgh"><input type="text" name="inclusivepercentage'+val.tax_id+'" placeholder="%" class="taxwithpercls inclusivecls form-control" value="'+value.taxpercentage+'" > <input type="hidden" name="hdninclusivepercentage'+val.tax_id+'" value=""> </td> <td class="mi-n"><i class="fa fa-plus addrowinclusive clo-se tx-cl" aria-hidden="true" dataid="'+val.tax_id+'"></i> <i class="fa fa-minus inclusiveclosecls clo-se" aria-hidden="true" dataid="'+val.tax_id+'"></i></td> </tr>'
+                                            
+                                        })
+                                        
+                                        
+                                        $('#inclusivetable'+val.tax_id+'').append(html)
+                                    }
+
+                                })
+                                
+                            }
+                        }
+                    })
+                    $.each(data.getexclusivetax,function(ind,val){
+                        if (val.tax_id == null){
+                            $('.exclusive-cls option[value=not_applicable]').attr("selected", "selected");
+                            $('.exclusivemaincls').html('<div class="removeappcls"><input type="hidden" name="exclusivecompanytax" id="remove_applicable" value="not_applicable" class="removeappcls" style="display:none;"></div>')
+                        }
+                        else{
+                            $('.inclusive-cls option[value='+val.tax_id+']').remove()
+                            $('.exclusive-cls option[value='+val.tax_id+']').remove()
+                            $('.exclusivemaincls').find('.removeappcls').remove()
+                            $('.exclusive-cls option[value=""]').attr("selected", "selected");
+                            var divlen=$('.exclusivemaincls').find('.subdivinclusive'+val.tax_id+'').length
+                            // console.log('divlen',divlen)
+                            if (divlen == 0){
+                                $('.exclusivemaincls').append('<div class="subdivinclusive'+val.tax_id+' top-bot-pa row excsubmaincls"><div class="col-5"><input type="text" name="" class="out-li-ne taxmaincls form-control" dataid="'+val.tax_id+'" value="'+val.tax_name+'" readonly> <input type="hidden" name="exclusivecompanytax" value="'+val.tax_id+'"></div> <div class="col-6"><table id="exclusivetable'+val.tax_id+'"><tbody></tbody></table></div></div></div>')
+                                $.ajax({
+                                    type:"GET",
+                                    url:origin+'/projects/getalltaxes',
+                                    data:{'tax_id':val.id},
+                                    success: function(data)
+                                    {   
+                                        // console.log(val.id)
+                                        // console.log('data',data)
+                                        var html=''
+                                        $.each(data.data,function(index,value){
+                                            html+='<tr><td class="texx-rgh"><input type="text" name="exclusivepercentage'+val.tax_id+'" placeholder="%" class="taxwithpercls form-control" value="'+value.taxpercentage+'" > <input type="hidden" name="hdnexclusivepercentage'+val.tax_id+'" value=""> </td> <td class="mi-n"><i class="fa fa-plus addrowexclusive clo-se tx-cl" aria-hidden="true" dataid="'+val.tax_id+'"></i> <i class="fa fa-minus exclusiveclosecls clo-se" aria-hidden="true" dataid="'+val.tax_id+'"></i></td> </tr>'
+                                        })
+                                    
+                                        $('#exclusivetable'+val.tax_id+'').append(html)
+                                    }
+
+                                })
+                                
+                            }
+                        }
+                    })
+                    if (contractcurrencyid != currencyid){
+                        var selectoption=''
+                            $.each(list,function(key,value){
+                                if (value.id == contractcurrencyid){
+                                    selectoption+='<option value='+value.id+'>'+value.symbol+'</option>'
+                                    }
+                                })
+                            $('#no_id').prop("checked",true)
+                            $('.inv-sub-div').css('display','none')
+                            $('#id_totalinvoice').val('1')
+                            $('#invoicetblcls > tbody').children( 'tr:not(:first)' ).remove();
+                            $('#invoicetblcls > tbody > tr:first').find('.invoicecurcls').html(selectoption);
+                            $('#invoicetblcls > tbody > tr:first').find('.invoicepercls').val('100');
+                            $('#invoicetblcls > tbody > tr:first').find('.invoicepercls').attr('readonly',true);
+                            $('.exchange-sm-lin').css('display','none')
+                            $('.exchange-cls option[value="1"]').attr("selected", "selected");
+                        // notyf.open({
+                        // type: 'warning',
+                        // message: 'Original Contract Currency and Amendment/Addendum Currency Should Be Same'
+                        // });
+                    }
+                    else{
+                        if (data.invoice_count > 1){
+                            $('#yes_id').prop("checked",true)
+                            $('.inv-sub-div').removeAttr('style')
+                            $('#id_totalinvoice').val(data.invoice_count)
+                            var html=''        
+                            var count=1 
+                            var row=data.invoice_count
+                            // console.log('a',$('#invoicetblcls > tbody > tr').find('td:eq(0) > input[type=hidden]').remove())
+                            $('#invoicetblcls > tbody > tr').remove()
+                            for(var i = 0; i < row; i++){
+                                html +='<tr> <td>'+count+'</td> <td><select name="invoicecurrency" class="form-control invoicecurcls postform"></select></td> <td><input type="text" name="invoicepercentage" class="form-control invoicepercls" placeholder="%"></td></tr>' 
+                                count ++;
+                            }
+                            $('#invoicetblcls').append(html)
+                            var selectoption='<option value="">--Select--</option>'
+
+                            $.each(list,function(key,value){
+                                selectoption+='<option value='+value.id+'>'+value.symbol+'</option>'
+                            })
+                            $('.invoicecurcls').html(selectoption)
+                            
+                            $('#invoicetblcls > tbody > tr').each(function(index, tr) {
+                                if (index == 0){
+                                    // alert(contractcurrencyid)
+                                    $(this).find('td:eq(1)').find('.invoicecurcls option[value='+contractcurrencyid+']').attr({"selected":"selected"});
+                                    $(this).find('td:eq(1)').find('.invoicecurcls option:not(:selected)').remove();
+                                    invoices_percentage=data.invoices[index]['percentage']
+                                    $(this).find('td:eq(2)').find('.invoicepercls').val(invoices_percentage);
+                                    // console.log(invoices)
+                                } 
+                                else{
+                                    invoices_currency=data.invoices[index]['currency_id']
+                                    $(this).find('td:eq(1)').find('.invoicecurcls option[value='+invoices_currency+']').attr({"selected":"selected"});
+                                    invoices_percentage=data.invoices[index]['percentage']
+                                    $(this).find('td:eq(2)').find('.invoicepercls').val(invoices_percentage);
+                                }
+                            });
+                            $('.exchange-sm-lin').removeAttr('style')
+                            var exhange_rate_type=data.invoices[0]['exchange_rate']
+                            $('.exchange-cls option[value="'+exhange_rate_type+'"]').attr("selected", "selected");
+                        }
+                        else{
+                            $('#no_id').prop("checked",true)
+                            $('.inv-sub-div').css('display','none')
+                            $('#id_totalinvoice').val(data.invoice_count)
+                            $('#invoicetblcls > tbody').children( 'tr:not(:first)' ).remove();
+                            $('#invoicetblcls > tbody > tr:first').find('.invoicepercls').val('100');
+                            $('#invoicetblcls > tbody > tr:first').find('.invoicepercls').attr('readonly',true);
+                            $('.exchange-sm-lin').css('display','none')
+                            $('.exchange-cls option[value="1"]').attr("selected", "selected");
+                        }
+                    }
+                        // $('#invoicetblcls > tbody > tr').remove()
+                        var payment_count=data.vendorpaymenttermscount
+                        var $tableBody = $('#paymenttableid').find("tbody")
+                        // $trLast = $tableBody.find("tr:last")
+                        // remove_tr=$('#paymenttableid tbody').not($('#paymenttableid tbody tr:first')).remove();
+                        // $trNew = $trLast.clone();
+                        $('#paymenttableid > tbody > tr').remove()
+
+                        for(var i = 0; i < payment_count; i++){
+                            if (i == 0){
+                                var html='<tr><td class="wid-contm"><input type="hidden" name="hdnpaymentvalues" value=""><input type="hidden" name="hdnselected" class="hdnnamecls" value="Advance Payment"><select name="paymentype" index="1" class="paymentypecls form-control postform"></select></td><td class="wid-noo"><input type="text" name="paymentday" class="paymentdaycls form-control"></td><td class="wid-percen"><input type="text" name="paymentpercentage" class="paymentpercls form-control"></td><td class="hidebtncls"><button type="button" class="paymentaddcls"><i class="fa fa-plus" aria-hidden="true"></i></button></td></tr>'
+                                $('#paymenttableid > tbody').append(html)
+                            }
+                            else{
+                                var html='<tr><td class="wid-contm"><input type="hidden" name="hdnpaymentvalues" value=""><input type="hidden" name="hdnselected" class="hdnnamecls" value="Advance Payment"><select name="paymentype" index="1" class="paymentypecls form-control postform"></select></td><td class="wid-noo"><input type="text" name="paymentday" class="paymentdaycls form-control"></td><td class="wid-percen"><input type="text" name="paymentpercentage" class="paymentpercls form-control"></td><td class="hidebtncls"><button type="button" class="paymentaddcls"><i class="fa fa-plus" aria-hidden="true"></i></button><button type="button" class="paymentminuscls"><i class="fa fa-minus" aria-hidden="true"></i></button></td></tr>'
+                                $('#paymenttableid > tbody').append(html)
+                            }
+                        
+                        }
+                        $('#paymenttableid > tbody > tr').each(function(index,value){
+                            if (index == 0){
+                                var selectfield='<option value="">--Select--</option><option value="1">Advance Payment</option><option value="2">Regular Payment</option><option value="3">Milestone Payment 1</option>'
+                                $(this).closest('tr').find('.paymentypecls').html(selectfield)
+                                var val=data.vendorpaymentterms[index]['payment_type']
+                                $(this).closest('tr').find('.paymentypecls option[value="'+val+'"]').attr("selected", "selected")
+                                if (val == '2'){
+                                    $(this).closest('tr').find('.paymentpercls').attr('readonly',true)
+                                    $(this).closest('tr').find('.hidebtncls').css('display','none')
+                                }
+                                var type=data.vendorpaymentterms[index]['payment_name']
+                                $(this).closest('tr').find('.hdnnamecls').val(type)
+                                var payment_day=data.vendorpaymentterms[index]['payment_day']
+                                $(this).closest('tr').find('.paymentdaycls').val(payment_day)
+                                var payment_percentage=data.vendorpaymentterms[index]['payment_percentage']
+                                $(this).closest('tr').find('.paymentpercls').val(payment_percentage)  
+                            }
+                            else{
+
+                                var val=data.vendorpaymentterms[index]['payment_type']
+                                var type=data.vendorpaymentterms[index]['payment_name']
+                                $(this).closest('tr').find('.hdnnamecls').val(type)
+                                if (val == '2'){
+                                    var selectfield='<option value="">--Select--</option><option value="2">Regular Payment</option><option value="3">Milestone Payment 2</option>'
+                                    $(this).closest('tr').find('.paymentpercls').attr('readonly',true)
+                                    $(this).closest('tr').find('.paymentypecls').html(selectfield)
+                                    $(this).closest('tr').find('.hidebtncls').css('display','none')
+                                }
+                                else if (val == '3'){
+                                    var selectfield='<option value="3">'+type+'</option>'
+                                    $(this).closest('tr').find('.paymentypecls').html(selectfield)
+                                }
+                                $(this).closest('tr').find('.paymentypecls option[value="'+val+'"]').attr("selected", "selected")
+                                var payment_day=data.vendorpaymentterms[index]['payment_day']
+                                $(this).closest('tr').find('.paymentdaycls').val(payment_day)
+                                var payment_percentage=data.vendorpaymentterms[index]['payment_percentage']
+                                $(this).closest('tr').find('.paymentpercls').val(payment_percentage)  
+                            }
+                        })
+                        if (contractcurrencyid != currencyid){
+
+                            notyf.open({
+                            type: 'warning',
+                            message: 'Base Currency Does Not Match.Taxes and Payment Terms Copied Successfully',
+                            });
+                        }
+                        else{
+                            notyf.open({
+                            type: 'success',
+                            message: 'Copied Successfully',
+                            });
+                        }
+
+                } 
+            }       
+        })
+//    }     
+}
+
+$(document).on('change','#conidcls',function(){
+    var value=$(this).val()
+    if (value != ''){
+        $('#remove_btn').removeAttr('style')
+        var currencyid=$(this).find(':selected').attr('currencyid')
+        get_original_contract(value,currencyid)
+    }
+    else{
+        $('#remove_btn').css('display','none')
+    }
+})
+
+$(document).on('click','#remove_btn',function(){
+    var html='<option value="">--Select--</option>'
+    $(all_tax_list).each(function(index,value){
+        html+='<option value="'+value.val+'">'+value.name+'</option>'
+    })
+    var selectoption=''
+    $.each(list,function(key,value){
+        if (value.id == contractcurrencyid){
+            selectoption+='<option value='+value.id+'>'+value.symbol+'</option>'
+            }
+        })
+    $('.inclusive-cls').html(html)
+    $('.exclusive-cls').html(html)
+    $('.maincls').html(' ')
+    $('.exclusivemaincls').html(' ')
+    $('#no_id').prop("checked",true)
+    $('.inv-sub-div').css('display','none')
+    $('#id_totalinvoice').val('1')
+    $('#invoicetblcls > tbody').children( 'tr:not(:first)' ).remove();
+    $('#invoicetblcls > tbody > tr:first').find('.invoicecurcls').html(selectoption);
+    $('#invoicetblcls > tbody > tr:first').find('.invoicepercls').val('100');
+    $('#invoicetblcls > tbody > tr:first').find('.invoicepercls').attr('readonly',true);
+    $('.exchange-sm-lin').css('display','none')
+    $('.exchange-cls option[value="1"]').attr("selected", "selected");
+    $('#paymenttableid > tbody').children('tr:not(:first)').remove()
+    $('#paymenttableid > tbody > tr:first').find('.paymentpercls').val('')
+    $('#paymenttableid > tbody > tr:first').find('.paymentdaycls').val('')
+    $('#paymenttableid > tbody > tr:first').find('.paymentypecls option[value=""]').attr("selected", "selected")
+    $('#paymenttableid > tbody > tr:first').find('.hdnnamecls').val('')
+    $(this).css('display','none')
+    $('#conidcls').val('').change()
+})
+
+$(document).on('click','#btnidcls',function(){
+    var value=$(this).attr('dataid')
+    var currencyid=$(this).attr('currencyid')
+    if ($(this).is(':checked')){
+        get_original_contract(value,currencyid)
+    }
+    else{
+        var html='<option value="">--Select--</option>'
+        $(all_tax_list).each(function(index,value){
+            html+='<option value="'+value.val+'">'+value.name+'</option>'
+        })
+        var selectoption=''
+        $.each(list,function(key,value){
+            if (value.id == contractcurrencyid){
+                selectoption+='<option value='+value.id+'>'+value.symbol+'</option>'
+                }
+            })
+        $('.inclusive-cls').html(html)
+        $('.exclusive-cls').html(html)
+        $('.maincls').html(' ')
+        $('.exclusivemaincls').html(' ')
+        $('#no_id').prop("checked",true)
+        $('.inv-sub-div').css('display','none')
+        $('#id_totalinvoice').val('1')
+        $('#invoicetblcls > tbody').children( 'tr:not(:first)' ).remove();
+        $('#invoicetblcls > tbody > tr:first').find('.invoicecurcls').html(selectoption);
+        $('#invoicetblcls > tbody > tr:first').find('.invoicepercls').val('100');
+        $('#invoicetblcls > tbody > tr:first').find('.invoicepercls').attr('readonly',true);
+        $('.exchange-sm-lin').css('display','none')
+        $('.exchange-cls option[value="1"]').attr("selected", "selected");
+        $('#paymenttableid > tbody').children('tr:not(:first)').remove()
+        $('#paymenttableid > tbody > tr:first').find('.paymentpercls').val('')
+        $('#paymenttableid > tbody > tr:first').find('.paymentdaycls').val('')
+        $('#paymenttableid > tbody > tr:first').find('.paymentypecls option[value=""]').attr("selected", "selected")
+        $('#paymenttableid > tbody > tr:first').find('.hdnnamecls').val('')
+        
+
+    }
+})
+
+function decimal_value(val){
+    if (val != ''){
+        if (val == Math.floor(val)){
+            console.log('a')
+        return val
+        }
+        else{
+        console.log('b')
+        return parseFloat(val).toFixed(2)
+        }
+    }
+
+}
+
+
+</script>
+{% endblock %}
+
+

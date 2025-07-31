@@ -1,0 +1,420 @@
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}  
+{% load static %}
+{% block content %}
+<div id="successCard" class="card d-none">
+  <div class="card-body">
+    <h5 class="card-title">Success!</h5>
+    <p class="card-text">Contract Created Success </p>
+  </div>
+</div>
+<form id="contractMasterView"  method='POST' enctype="multipart/form-data">
+<input type="hidden" class="vendor_id" name="vendor_id" value="{% if edit %}{{contract_master.contractvendor_id}}{% endif %}">
+<input type="hidden" class="save_type" name="save_type" value="">
+{% if edit %}
+<input type="hidden" class="contract_id" name="contract_id" value="{{contract_master.id}}">
+<div class='gap-5'>
+  <div class="row mb-3">
+    <div class="col-5">
+      <strong>
+      Type of Contract
+      </strong>
+    </div>
+    <div class="col-7">
+      <input  type="radio" name="types_service" id="option1" value="service" {% if contract_master.types_service == 'service' %}checked{% endif %}  >
+      <label  for="option1" class='me-2'>
+        Services
+      </label>
+      <input  type="radio" name="types_service" id="option2" value="supply" {% if contract_master.types_service == 'supply' %}checked{% endif %} >
+      <label  for="option2" class='me-2'>
+        Supply
+      </label>
+      <input  type="radio" name="types_service" id="option3" value="service_supply" {% if contract_master.types_service == 'service_supply' %}checked{% endif %}>
+      <label  for="option3" class='me-2'>
+        Service & Supplies
+      </label>
+    </div>
+  </div>
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+      Name of Service/Supply/
+      Service & Supplies
+    </strong>
+  </div>
+  <div class="col-7">
+    <textarea rows="3" cols="30" id="name_service" name="name_service" class="form-control" placeholder="Name of service" >{{contract_master.name_service|default_if_none:""}}</textarea>
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Project
+    </strong>
+  </div>
+  <div class="col-7">
+    <select name="project" class="form-control projectcls" id="contract_project_list">
+      <option value="">--Select--</option>
+      {% for project in projects %}
+      <option  value="{{project.id}}" data-id="{{project.active_status}}" {% if contract_master.projects_id == project.id %}selected{% endif %}>{{project.projectname.name|default_if_none:""}}</option>
+      {% endfor %}
+  </select>
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>WCC <i class="fa fa-info-circle" title="Work Completion Certificate Submission Required"></i></strong>
+  </div>
+  <div class="col-7">
+    <input type="hidden" name="wcc" value="0">
+    <input type="checkbox" class="wcc-cbx wcc_flow_cls" name="wcc" value="1" {% if contract_master.wcc == 1 %}checked{% endif %}>
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Project Discipline
+    </strong>
+  </div>
+  <div class="col-7">
+    <select name="project_discipline" class="form-control p_discipline_cls" id="project_discipline" >
+      <option value="">--Select--</option>
+      {% for i in developmentlist %}
+      <option value="{{i.id}}" {% if i.id == contract_master.projectdiscipline_id %}selected{% endif %}>{{i.fieldname|default_if_none:""}}</option>
+      {% endfor %}
+    </select>
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Discipline Type
+    </strong>
+  </div>
+  <div class="col-7">
+    <select name="disciplinetype" class="form-control" id="disciplinetype_id">
+      <option value="">--Select--</option>
+      {% for i in projectdisciplinesubtype %}
+      <option value="{{i.id}}" {% if i.id == contract_master.projectdisciplinetype_id %}selected{% endif %}>{{i.discipline_subtype.discipline_subtype|default_if_none:""}}</option>
+      {% endfor %}
+  </select>
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+      SO/PO/CO Reference Number
+    </strong>
+  </div>
+  <div class="col-7">
+    <textarea row mb-3s="3" cols="30" id="ref_num" name="ref_number" class="form-control" >{{contract_master.reference_number|default_if_none:""}}</textarea>
+  </div>
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Executed Date
+    </strong>
+  </div>
+  <div class="col-7">
+    <input type="text" name="execute_date"  autocomplete="off" class="supplydateformat-cls form-control" value="{{contract_master.executed_date|checktime:company.company.id|default_if_none:""}}" >
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+      Maximum Value of SO/PO/CO 
+    </strong>
+  </div>
+  <div class="col-7">
+    <select id="maximum_value" name="currency" class="maximum-cls form-control">
+      <option value='' selected>--Select--</option>
+      {% for country in companycurrency %}
+      <option  value="{{country.id}}" {% if country.id == contract_master.currency_id %}selected{% endif %}>{{country.currency_symbol}}-{{country.currency}} ({{country.name}})</option>
+      {% endfor %}
+      </select>
+      <input list="brow mb-3sers" type="text" id="amount_currency" name="amount"  class="amount_currency_cls form-control contra-currency" autocomplete="off" value="{{contract_master.amount|default_if_none:""}}"><datalist id="brow mb-3sers"><option value="No Max Limit">
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Upload Contract
+    </strong>
+  </div>
+  <div class="col-7">
+    <table class="che-table">
+      <tbody>
+        {% for files in contract_files %}
+      <tr>
+        <td class='pe-3'>
+          <input type="file" accept="image, .png, .jpeg, .pdf, .jpg"  class="con_file_cls form-control" name="confiles{{files.id}}" >
+          <input type="hidden" name="contract_file_ids" value="{{files.id}}" class="contract_file_ids">
+          <p>{{files.original_file_name|default_if_none:""}}</p>
+        </td> 
+        <td class="in-btn-wid che-smline wid-but gap-2">
+          <button id="add_file" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> <button id="remove_file" class="btn btn-clr del-btn" type="button" value="minus"><i class="fa fa-minus"></i></button>
+        </td> 
+      </tr>
+      
+      {% empty %}
+      <tr>
+        <td class='pe-3'>
+          <input type="file" accept="image, .png, .jpeg, .pdf, .jpg" name="con_files" class="con_file_cls form-control">
+        </td> 
+        <td class="in-btn-wid che-smline wid-but gap-2">
+          <button id="add_file" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> <button id="remove_file" class="btn btn-clr del-btn" type="button" value="minus"><i class="fa fa-minus"></i></button>
+        </td> 
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+ 
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+      Upload Price Table
+    </strong>
+  </div>
+  <div class="col-7">
+      <table class="che-table">
+        <tbody>
+          {% for files in price_files %}
+          <tr>
+            <td class='pe-3'>
+              <input type="file" accept="image, .png, .jpeg, .pdf, .jpg" name="pricefiles{{files.id}}" class="con_price_file_cls form-control">
+              <input type="hidden" name="price_file_ids" value="{{files.id}}" class="price_file_ids">
+              <p>{{files.original_file_name|default_if_none:""}}</p>
+            </td> 
+            <td class="in-btn-wid che-smline wid-but gap-2">
+              <button id="add_file" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> 
+              <button id="remove_file" class="btn btn-clr del-btn" type="button" value="minus"><i class="fa fa-minus"></i></button>
+            </td> 
+          </tr>
+          {% empty %}
+          <tr>
+            <td class='pe-3'>
+              <input type="file" accept="image, .png, .jpeg, .pdf, .jpg" name="price_files" class="con_price_file_cls form-control">
+            </td> 
+            <td class="in-btn-wid che-smline wid-but gap-2">
+              <button id="add_file" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> 
+              <button id="remove_file" class="btn btn-clr del-btn" type="button" value="minus"><i class="fa fa-minus"></i></button>
+            </td> 
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+  </div>
+</div>
+</div>
+{% else %}
+<div class='gap-5'>
+  <div class="row mb-3">
+    <div class="col-5">
+      <strong>
+      Type of Contract
+      </strong>
+    </div>
+    <div class="col-7">
+      <input  type="radio" name="types_service" id="option1" value="service"  >
+      <label  for="option1" class='me-2'>
+        Services
+      </label>
+      <input  type="radio" name="types_service" id="option2" value="supply" >
+      <label  for="option2" class='me-2'>
+        Supply
+      </label>
+      <input  type="radio" name="types_service" id="option3" value="service_supply" >
+      <label  for="option3" class='me-2'>
+        Service & Supplies
+      </label>
+    </div>
+  </div>
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Name of Service/Supply/
+    Service & Supplies
+    </strong>
+  </div>
+  <div class="col-7">
+    <textarea rows="3" cols="30" id="name_service" name="name_service" class="form-control" placeholder="Name of Service/Supply/ Service & Supplies" ></textarea>
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Project
+    </strong>
+  </div>
+  <div class="col-7">
+    <select name="project" class="form-control projectcls pops">
+      <option value="">--Select--</option>
+      {% for project in projects %}
+      <option  value="{{project.id}}" data-id="{{project.active_status}}">{{project.projectname.name}}</option>
+      {% endfor %}
+  </select>
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>WCC <i class="fa fa-info-circle" title="Work Completion Certificate Submission Required"></i></strong>
+  </div>
+  <div class="col-7">
+    <input type="hidden" name="wcc" id="wcc_hidden" value="none">
+    <input type="checkbox" id="wcc" class="wcc-cbx wcc_flow_cls" name="wcc" value="1">
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Project Discipline
+    </strong>
+  </div>
+  <div class="col-7">
+    <select name="project_discipline" class="form-control p_discipline_cls pops" id="project_discipline" >
+      <option value="">--Select--</option>
+    </select>
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Discipline Type
+    </strong>
+  </div>
+  <div class="col-7">
+    <select name="disciplinetype" class="form-control pops" id="disciplinetype_id">
+      <option value="">--Select--</option>
+  </select>
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    SO/PO/CO Reference Number
+    </strong>
+  </div>
+  <div class="col-7">
+    <textarea row mb-3s="3" cols="30" id="ref_num" name="ref_number" class="form-control" ></textarea>
+  </div>
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Executed Date
+    </strong>
+  </div>
+  <div class="col-7">
+    <input type="text" name="execute_date"  autocomplete="off" class="supplydateformat-cls form-control" >
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Maximum Value of SO/PO/CO 
+    </strong>
+  </div>
+  <div class="col-7">
+    <select id="maximum_value" name="currency" class="maximum-cls form-control pops">
+      <option value='' selected>--Select--</option>
+      {% for country in companycurrency %}
+      <option  value="{{country.id}}">{{country.currency_symbol}}-{{country.currency}} ({{country.name}})</option>
+      {% endfor %}
+      </select>
+      <input list="brow mb-3sers" type="text" id="amount_currency" name="amount"  class="amount_currency_cls form-control contra-currency" autocomplete="off" ><datalist id="brow mb-3sers"><option value="No Max Limit">
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Upload Contract
+    </strong>
+  </div>
+  <div class="col-7">
+    <table class="che-table"><tbody><tr><td class='pe-3'><input type="file" accept="image, .png, .jpeg, .pdf, .jpg" name="con_files" class="con_file_cls form-control"></td> <td class="in-btn-wid che-smline wid-but gap-2"><button id="add_file" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> <button id="remove_file" class="btn btn-clr del-btn" type="button" value="minus"><i class="fa fa-minus"></i></button></td> </tr></tbody></table>
+  </div>
+ 
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+      Upload Price Table
+    </strong>
+  </div>
+  <div class="col-7">
+      <table class="che-table"><tbody><tr><td class='pe-3'><input type="file" accept="image, .png, .jpeg, .pdf, .jpg" name="price_files" class="con_price_file_cls form-control"></td> <td class="in-btn-wid che-smline wid-but gap-2"><button id="add_file" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> <button id="remove_file" class="btn btn-clr del-btn" type="button" value="minus"><i class="fa fa-minus"></i></button></td> </tr></tbody></table>
+  </div>
+</div>
+</div>
+{% endif %}
+</form>
+<script>
+  $(document).ready(function(){
+  $('#wcc_checkbox').change(function(){
+    if($(this).is(":checked")) {
+      $('#wcc_hidden').val("1");
+    } else {
+      $('#wcc_hidden').val("0");
+    }
+  });
+});
+</script>
+{% endblock %}

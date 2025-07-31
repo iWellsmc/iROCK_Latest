@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+{% load custom_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/notification/notification.css' %}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/pages/app-user.css' %}">
+    <div class="row">
+        <!-- account start -->
+        <div class="col-12">
+            <div class="row">
+                <div class="col-9"></div>
+                <div class="col-3">
+                    <!-- <button class="btn btn-clr btn-master waves-effect waves-float waves-light pc-bk-cls" ><a href="{% url 'dashboard:dashboard'%}">Close</a></button> -->
+                </div>
+            </div>
+            <div class="card all-noti-box">
+                <div class="show-noti">
+                    <label>Show <select id="datafilters" class="changevalue">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select> entries</label>
+            </div>
+            </div>
+                <!-- <div class="card-header view-lis-pge">
+                    <div class="card-title">Notifications</div>
+                </div> -->
+                <div class="row">
+                    <div class="col-9"><h4 class="noti-fi-hd">Notifications</h4></div>
+                    <div class="col-3">
+                        <button class="btn btn-clr btn-master waves-effect waves-float waves-light pc-bk-cls" ><a href="{% url 'dashboard:dashboard'%}">Close</a></button>
+                    </div>
+                </div>
+                <div class="mark-all-btn">
+                    <a class ="btn" href="{% url 'custom_auth:markallread' %}"> Mark All As Read</a>
+                </div>
+                <div>
+                    {% for notification in notifications %}
+                        {% empty %}
+                            <h5 class="notify">No New Notifications</h5>
+                    {% endfor %}
+                </div>
+                <div class="card-body">
+                    <div class="row">
+
+                        <div class="col-12">
+                            <table class="table notification-data-list-view tab-top">
+                                <thead>
+                                    <tr>
+                                        <!-- <th></th> -->
+                                    </tr>
+                                </thead>
+                                
+                                {% for notification in notifications %}
+                                
+                                <tr class="{% if notification.unread == 1 %} unreadnotifications{% endif %}">
+                                    <td class="view-all-notifii">
+                                        {% geturlname notification.data as dataurl %}
+                                        <a class="" href="{{notification.data.data}}?msg{{notification.id}}"><div class="media d-flex align-items-start"><div class="media-body">
+                                            {% if notification.unread == 1 %}
+                                            <h6 class="{{notification.level}} media-heading unred-head">{{notification.verb}}</h6>
+                                            <p class="notification-text un-red-clr">{{notification.description}}</p></div><small class="time-dt"><span class="time-meta"></span>
+                                            {% else %}
+                                            <h6 class="{{notification.level}} media-heading med-head-readed">{{notification.verb}}</h6>
+                                            <p class="notification-text noti-text">{{notification.description}}</p></div><small class="time-dt"><span class="time-meta"></span>
+                                            {% endif %}
+                                            {% show_date_format notification.timestamp hours minutes %}
+                                        </small></div></a>
+                                        
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                           </table>
+
+                           <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center">
+                            {% if notifications.has_previous %}
+                             <li class="page-item">
+                                <a class="btn-clr page-link" href="{{request.META.HTTP_REFERER }}">Previous</a>
+                              </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Previous</a>
+                              </li>
+                            {% endif %}
+                      
+                            <!-- {% if notifications.number|add:'-4' > 1 %}
+                                <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ notifications.number|add:'-5' }}">&hellip;</a></li>
+                            {% endif %} -->
+                      
+                            {% for i in notifications.paginator.page_range %}
+                                {% if notifications.number == i %}
+                                    <li class="page-item pg-count active" aria-current="page">
+                                    <span class="btn-clr page-link pg-circle">
+                                        {{ i }}
+                                        <span class="sr-only">(current)</span>
+                                    </span>
+                                    </li>
+                                  {% else %}
+                                     <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?page={{ i }}{% if request.GET.pageperdata %}&pageperdata={{ request.GET.pageperdata }}{% endif %}">{{ i }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                      
+                            {% if notifications.paginator.num_pages > notifications.number|add:'4' %}
+                               <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ notifications.number|add:'5' }}">&hellip;</a></li>
+                            {% endif %}
+                      
+                            {% if notifications.has_next %}
+                                <li class="page-item">
+                                <a class="btn-clr page-link " href="?page={{ notifications.next_page_number }}">Next</a>
+                              </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Next</a>
+                              </li>
+                            {% endif %}
+                          </ul>
+                        </nav>
+
+                        </div>
+                      </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    var url=window.location.hostname
+    $(".changevalue").change(function(){
+        window.location.href = `{{scheme}}://{{gethost}}/notifications/?pageperdata=${$(this).val()}`
+    });
+    $(document).ready(function() {
+        const queryString = window.location.search;
+        const parameters = new URLSearchParams(queryString);
+        const value = parameters.get('pageperdata');
+        if(value!=null){    
+        $('.changevalue').val(value)
+        }
+        else{
+            $('.changevalue').val(10)
+        }
+    });
+</script>
+{% endblock %}

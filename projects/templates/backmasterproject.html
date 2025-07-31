@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <h3 class="from-head">Create Project Master</h3>
+    <form method="POST" class="form-txt" id="created-masterproject">
+       {% csrf_token %}
+       <div class="row">
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+            <button type="button" class="btn btn-clr btn-master chck-tst"><a href="{% url 'projects:projectlist' %}">Back</a></button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="col-sm-6">
+            <label for="staticEmail" class="col-2 col-form-label pl-0">Country</label>
+            <select name="country"   class="form-control" id="id_country">
+                {% for country in countries %}
+                    <option  value="{{country.id}}"{%  if country.id == project.country.id %}selected{%endif%}>{{country.nicename}}</option>
+                {% endfor %}
+                </select>
+        </div>
+        <div class="col-3"></div>
+    </div>
+    <div class="row">
+        <div class="col-3"></div>
+    <div class="col-sm-6 col-form-label">
+        <label for="staticEmail" class="col-4 col-form-label pl-0">Project Name</label>
+        <input type="hidden" id="project_id" name="project_id" value={{project.id}}>
+          <input type="text" name="name" maxlength="255" class="form-control" value="{{project.name}}" id="id_name">
+    </div>
+    <div class="col-3"></div>
+    </div>
+    <div class="text-center">
+        <button type="button" class="btn btn-clr text-center submit-cls" data-id="1">Save & Next</button>
+    </div>
+    </form>
+  </div>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+
+var project_id="{{project.id}}"
+$('#id_country').change(function(){
+    $('#id_country').removeClass("error")
+})
+$('#id_name').change(function(){
+    $('#id_name').removeClass("error")
+})
+$('.submit-cls').click(function(){
+    var form=$("#created-masterproject");
+    var country=$('#id_country').val();
+    var projectname=$('#id_name').val();
+    var is_filled=true;
+    if (!country && projectname){
+        $('#id_country').addClass("error")
+        is_filled=false;
+    }
+    else if(!projectname && country) {
+        $('#id_name').addClass("error")
+        is_filled=false;
+        }
+    else if(!projectname && !country) {
+        $('#id_name').addClass("error")
+        $('#id_country').addClass("error")
+        is_filled=false;
+        }
+    else{
+        $('#id_country').removeClass("error")
+        $('#id_name').removeClass("error")
+        is_filled=true;
+    }
+    if(is_filled == false){
+
+    }
+    else{
+        $(this).prop('disabled', true);
+    $.ajax({
+        type:"POST",
+        container:"#created-masterproject",
+        url:'/projects/createdmasterproject/'+project_id,
+        data:form.serialize(),
+        success: function(data){   
+        }
+    })
+    var url = "{% url 'projects:createmasterblock' 123 %}";
+    document.location.href = url.replace('123', project_id);
+    }
+})
+</script>
+{% endblock %}

@@ -1,0 +1,486 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+{% block content %}
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendormanagement/vendormissed.css' %}">
+
+</head>
+<div>
+
+        <div class="row">
+            <div class="col-12 text-end">
+                <button type="button" class="btn btn-clr waves-effect waves-float waves-light"><a href="{% url 'invoice:listdisputeinvoices' %}">Back</a></button>
+            </div>
+        </div>
+    <h4 class="from-head">Disputed Invoice Query</h4>
+
+        <div class="qry-top-hd">
+
+            <!-- <div class="row align-items-center">
+                <div class="col-2 col-md-3 text-center">
+                    <h4 class="qur-titl">VIN: <span>{{vendor.vin}}</span></h4>
+                </div>
+                <div class="col-3 col-md-3">
+                    <div class="row">
+                        <div class="col-5 pr-0 col-md-6">
+                   <h4 class="qur-titl text-right">Vendor Name: </h4>
+                   </div>
+                   <div class="col-7 pl-0 col-md-6">
+                   <p class="qur-rf-no">{{vendor.vendor_name}}</p>
+                   </div>
+                   </div>
+                   
+                </div>
+                <div class="col-5 col-md-3">
+                    <div class="row">
+                        <div class="col-4 pr-0 col-md-7">
+                   <h4 class="qur-titl text-right">Contract Ref No:</h4>
+                   </div>
+                   <div class="col-8 pl-0 col-md-5">
+                   <p class="qur-rf-no">{{query.contract_refnum|default_if_none:"---"}}{{query.amendment_refnum|default_if_none:"---"}}</p>
+                   </div>
+                   </div>
+                </div>
+                <div class="col-2 col-md-3 text-center">
+                   <h4 class="qur-titl">Status: <span>{% if query.status == 0 %}Closed{% else %}Open{% endif %}</span></h4>
+                </div>
+            </div> -->
+
+            <div class="row align-items-baseline">
+                <div class="qur-titl col-lg-3 col-md-6">
+                    <h4>VIN :</h4> 
+                    <span>{{contact_person.vin}}</span>
+                </div>
+
+                <div class="qur-titl col-lg-3 col-md-6">
+                   <h4>Vendor Name : </h4>
+                   <p class="qur-rf-no">{{contact_person.vendor_name}}</p>
+                   </div>
+                   
+                <div class="qur-titl col-lg-3 col-md-6">
+                   <h4>Contract Ref No :</h4>
+                   <p class="qur-rf-no">{{ref_num.reference_number|default_if_none:"---"}}</p>
+                   </div>
+                <div class="qur-titl col-lg-3 col-md-6">
+                   <h4>Status :</h4>
+                   <span>{% if get_status.status == 0 %}Closed{% else %}Open{% endif %}</span>
+                </div>
+            </div>
+
+            </div>
+
+
+        <d class="row">
+                {% for query in querylists %}
+                <div class="col-12">
+                    <div class={% if request.user.roles.id == query.user.roles.id and request.user.id == query.user.id %}"send-in"{% else %}"rec-in"{% endif %}>
+                         {% if query.deniedreason != None and query.deniedreason != '' %}
+                                 <div class="{% if request.user.roles.id == query.user.roles.id %}right-cls{% else %}left-cls{% endif %} txt-clrr" dataid="{{query.user.roles.id}}">{{query.deniedreason|safe}}</div>
+                         {% endif %}
+                         {% comment %} {% if query.file != '' and query.file != None %}
+                                 <div class="{% if request.user.roles.id == query.user.roles.id %}right-cls{% else %}left-cls{% endif %} f-name" dataid="{{query.user.roles.id}}">File Name :<span class="nmc-nme"><a href="{{query.file.url}}" target="_blank">{{query.file.name}}</a></span></div>
+                         {% endif %} {% endcomment %}
+                         {% if query.file != '' and query.file != None %}
+                                 <div class="{% if request.user.roles.id == query.user.roles.id and request.user.id == query.user.id %}right-cls{% else %}left-cls{% endif %} f-name" dataid="{{query.user.roles.id}}">File Name :<span class="nmc-nme"><a href="{{query.file.url}}" target="_blank">{{query.file.name}}</a></span></div>
+                         {% endif %}
+                          {% comment %} <div class={% if request.user.roles.id == query.user.roles.id and request.user.id == query.user.id %}"right-cls"{% else %}"left-cls"{% endif %}>{{query.id|get_file_name}}</div> {% endcomment %}
+
+                         {% comment %} {% get_files query.id request as query_files %}
+                         {% for file in query_files %}
+                         {% if file.file != '' and file.file != None %}
+                         <div class="{% if request.user.roles.id == query.user.roles.id and request.user.id == query.user.id %}right-cls{% else %}left-cls{% endif %} f-name" dataid="{{query.user.roles.id}}">File Name :<span class="nmc-nme"><a href="{{file.file.url}}" target="_blank">{{file.file.name}}</a></span></div>
+                         {% endif %}
+                         {% endfor %} {% endcomment %}
+
+                         
+                         {% if request.user.id != query.user.id %}
+                         <div class="{% if request.user.roles.id == query.user.roles.id and request.user.id == query.user.id %}right-cls{% else %}left-cls{% endif %}"><label class="name-style">By : {{query.user.name|default_if_none:''}} {{query.user.lastname|default_if_none:''}}</label></div>
+                         {% else %}
+                         <div class="right-cls"><label class="name-style">By : you</label></div>
+                         {% endif %}
+                         <div class={% if request.user.roles.id == query.user.roles.id and request.user.id == query.user.id %}"right-cls utctolocal send-date"{% else %}"left-cls utctolocal rec-date"{% endif %}>{{query.date}}</div>
+                     </div>
+
+                 </div>
+                {% endfor %}
+                
+                {% if query.status == 1 %}
+                <div class="text-center spacing-button d-flex justify-content-center">
+                {% if query.dispute_status != 2 %}
+                    <button type="button" class="btn btn-clr text-center mx-1" data-toggle="modal" data-target="#exampleModal">Reply</button>
+                {% else %}
+                {% if request.user.roles_id == 2 or request.user.roles_id == 3 %}
+                    {% get_dispute_committee_member request query as dispute_user %}
+                    {% if dispute_user > 0 %}
+                    <div class=""> 
+                        <button type="button" class="btn btn-clr text-center mx-1" data-toggle="modal" data-target="#exampleModal">Reply</button>
+                    </div>
+                    {% endif %} 
+                {% else %}
+                <div class=""> 
+                    <button type="button" class="btn btn-clr text-center mx-1" data-toggle="modal" data-target="#exampleModal">Reply</button>
+                </div>
+                {% endif %}
+                {% endif %}
+                {% if request.user.roles.id == 3 or request.user.roles.id == 2 %}
+                {% if query.dispute_status == 2 %}
+                {% get_dispute_committee_member request query as dispute_user %}
+                {% if dispute_user > 0 %}
+                <div class=""> 
+                    <button type="button" class="btn btn-clr status_cls green mx-1" value="1" data-toggle="modal" data-target="#exampleModalCenter" >Approve</button>
+                  </div>
+                  {% if settlement_count == 0 %}
+                  <div class=""> 
+                    <button type="button" class="btn btn-clr status_cls red mx-1" value="10" data-toggle="modal" data-target="#exampleModalCenter" >Settlement</button>
+                  </div>
+                  {% endif %} 
+                  {% endif %} 
+                {% elif query.dispute_status == 1  %}
+                {% check_approvaluser request query.id as closed_user %}
+                {% if closed_user %}
+                    <div class=""> 
+                        <button type="button" class="btn btn-clr status_cls green mx-1" value="1" data-toggle="modal" data-target="#exampleModalCenter" >Proceed/Approve</button>
+                    </div>
+                    {% if get_dispute_users == 0 %}
+                    <div class=""> 
+                        <button type="button" class="btn btn-clr empty_user green mx-1" data-toggle="modal">Move to Dispute </button>
+                      </div>
+                    {% else %}
+                    <div class=""> 
+                        <button type="button" class="btn btn-clr status_cls green mx-1" value="8" data-toggle="modal" data-target="#exampleModalCenter" >Move to Dispute </button>
+                      </div>
+                    {% endif %}
+                {% endif %}
+                {% endif %}
+                {% comment %} {% endif %} {% endcomment %}
+                
+                {% endif %}
+                    {% comment %} {% endif %} {% endcomment %}
+                </div>
+                {% endif %}
+            <!-- Modal -->
+            <form id="queryform" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type='hidden' name='settlement_val' class='settlement_val'>
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Reason</h5>
+                        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button> -->
+                        </div>
+                        <div class="modal-body">
+                            <label class="label-message">Message :</label>
+                            <textarea name="message" class="form-control msgcls" id="summernote" rows="3" cols="40"></textarea>
+                            <input type='hidden' name='document_type' class='document_type'>
+                            <input type='hidden' name='document_name' class='document_name'>
+                            {% comment %} {% if request.user.roles.id == 4 %} {% endcomment %}
+                            <input type="file" name="file" class="filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                            <div class='upload_file_data'>
+                            </div>
+                            {% comment %} {% endif %} {% endcomment %}
+                            
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary btn-clr">Submit</button> <!-- querydenied, btn-primary -> class removed -->
+                        </div>
+                    </div>
+                    </div>
+
+                </div>
+
+                {% comment %} {% if request.user.roles.id == 3 or request.user.roles.id == 2 %}
+                {% if query.dispute_status == 1 %}
+                <div class="col-2 text-center"> 
+                    <button type="button" class="btn btn-clr status_cls green" value="1" data-toggle="modal" data-target="#exampleModalCenter" >Approve</button>
+                  </div>
+                  {% if settlement_count == 0 %}
+                  <div class="col-2 text-center"> 
+                    <button type="button" class="btn btn-clr status_cls red" value="10" data-toggle="modal" data-target="#exampleModalCenter" >Settlement</button>
+                  </div>
+                  {% endif %} {% endcomment %}
+
+
+                  <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header comment-head">
+                          <h5 class="modal-title" id="exampleModalCenterTitle">Comments</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body comment-body get_reason">
+                            <textarea name="main_comments" class="form-control">
+                            </textarea>
+                            <div class="excp_content">
+
+                            </div>
+                          </div>
+                        <div class="modal-footer comment-foot">
+                          <button type="button" class="btn btn-secondary" id="submit_id">Save</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+        </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script>
+    jQuery.noConflict();
+    let submit_val='';
+
+
+    $(document).on('click','.status_cls',function(e){
+        e.preventDefault();
+        submit_val=$(this).val();
+        addition_content=`<div><h4>Settlement</h4></div>`
+        if(submit_val == '10'){
+            addition_content+=`<table><tr><td>Settlement Amount</td><td><input type='text' oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))" class='percentage_val' name='percentage_val'>%</td></tr></table>`
+            $('.excp_content').html('')
+            $('.get_reason').html(addition_content)
+        }
+        else if(submit_val == '8'){
+            let html = '';
+            let data=exceptional_func(submit_val)
+            data.forEach(element => {
+                html +='<div><label for="'+element.value+'"><input type="checkbox" name="exceptional" value="'+element.value+'" id="'+element.value+'"> '+element.name+'</label></div>'
+            })
+            $('.excp_content').html(html)
+            
+        }
+        else{
+            $('.get_reason').html('<textarea name="main_comments" class="form-control"></textarea>')
+            $('.excp_content').html('')
+        }
+        $('#submit_id').attr('type','submit')
+    
+    })
+
+
+    $(document).on('click','#submit_id',function(e){
+        get_type=$(this).attr('type')
+        let submit_name="";
+        let check_err=0
+        
+        if (get_type == "submit"){
+            if(submit_val == '10'){
+                $('.percentage_val').each(function(){
+                    if($.trim($(this).val())==''){
+                        $(this).addClass('con_error')
+                        check_err++
+                    }
+                })
+                
+                e.preventDefault();
+                if(check_err == 0){
+                submit_val=6
+                $('.status_cls').val('6')
+                $(document).trigger('.status_cls');
+                $('.get_reason').html('<textarea name="main_comments" class="form-control"></textarea>')
+                }
+                else{
+                    return false
+                }
+            }
+            else{
+            if (submit_val == "5"){
+                submit_name = "Disputed"
+            }
+            else if(submit_val == "6"){
+                submit_name  = "Settlement"
+            }
+            else if(submit_val == "8"){
+                submit_name  = "Dispute Committee"
+            }
+            $(this).attr('disabled',true)
+            let getformid=$(this).parents("form").attr("id")
+            let form=$("#"+getformid);
+            $('.status_cls').attr('disabled','disabled');
+            $("<input>").attr({name: "submit_type",id: "hiddenId",type: "hidden",value: submit_val}).appendTo("form");
+            $("<input>").attr({name: "submit_name",id: "nameId",type: "hidden",value: submit_name}).appendTo("form");
+            // //use for generate payment
+            if ($('.confirm_action').length  > 0){
+                $('.confirm_action').val('confirm')
+            }
+          
+            if(check_err == 0){
+            form.submit();
+            }
+            else{
+                return false
+            }
+        }
+        }
+    })
+
+    $(document).on('change','.percentage_val',function(){
+        if(parseFloat($(this).val()) > 100){
+           swal.fire('Max Percentage Reached')
+           $(this).val('')
+        }
+        else{
+            $('#submit_id').attr('disabled',false)
+            $('.settlement_val').val($(this).val())
+        } 
+      })
+
+$('#summernote').summernote({
+    toolbar: false,
+    });
+
+    $(document).on('click','.querydenied',function(){
+        if ($('#summernote').summernote('isEmpty')) {
+            // show error message in span tag after the summernote
+            $('.note-frame').next().append('<span>Please enter the message</span>');
+            return false;
+        }
+        else{
+            let get_file= $('.files_upload').find('option:selected').val()
+            if(get_file !=''){
+            $('.qry-chos').each(function(){
+                    if($(this)[0].files.length == 0){
+                    $(this).addClass('con_error')
+                    }
+                    else{
+                        $(this).removeClass('con_error')
+                    }
+             })
+             if($('.con_error').length !=0){
+                return false
+             }
+             else{
+              return true
+             }
+           }
+          else{
+                return true;
+            }
+        }
+    
+    })
+    $('#queryform').submit(function() {
+        // Disable the submit button to prevent multiple submissions
+        $('.querydenied').prop('disabled', true);
+      });
+    $('#summernote').on('summernote.change', function() {
+        console.log('summernote change');
+        // Check if the editor content is empty
+        if ($('#summernote').summernote('isEmpty')) {
+          // Add a CSS class to the editor element to show the red outline
+          $('#summernote').addClass('error');
+        } else {
+          // Remove the CSS class to hide the red outline
+          $('#summernote').removeClass('warning');
+        }
+      });
+
+
+var pk_id="{{pk}}";
+
+$(document).ready(function(){
+    $('.utctolocal').each(function(){
+        var utc_time = $(this).text();
+        var local_time = moment.utc(utc_time).toDate();
+        // var local_time_format = moment(local_time).local().format('DD-MM-YYYY hh:mm A');
+        var local_time_format = moment(local_time).local().format('DD-MM-YYYY');
+        $(this).text(local_time_format);
+    });
+});
+    
+$(document).on('click','.show_alert',function(){
+
+    Swal.fire({
+            text: 'Do you want to Accept the Query?',
+            showDenyButton: true,
+            confirmButtonColor: '#77d61f',
+            allowOutsideClick:false,
+            denyButtonColor:'#AF2B50',
+            confirmButtonText: 'Yes',
+            denyButtonText: 'No',
+            customClass: {
+                actions: 'my-actions',
+                confirmButton: 'order-2',
+                denyButton: 'order-3',
+            }
+            }).then((result) => {
+            if (result.isConfirmed) {
+                var url = "{% url 'invoice:closeinvoicequery' pk %}";
+                document.location.href = url;
+            }
+    })
+});
+
+$(document).on('click','.empty_user',function(e){
+    e.preventDefault();
+    swal.fire('No designated dispute users')
+})
+
+$(document).on('change','.files_upload',function(){
+    let files='<div><div><input type="file" name="file" class="qry-chos filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span><button class="btn btn-clr btn-master add_file mr-0">+</button></div></div>'
+    $('.document_type').val($(this).val())
+    $('.document_name').val($(this).find('option:selected').text())
+    if($(this).val() != ''){
+        $(this).closest('div').find('.upload_file_data').html(files)
+    }
+    else{
+        $(this).closest('div').find('.upload_file_data').html('')
+    }
+    
+})
+
+
+
+
+
+
+function exceptional_func(type){
+    let data="";
+    let return_data=[{'name':'Changes in Supporting Documents','value':'1'},{'name':'Work Completion Certificate or Timesheet mismatch with Invoice billing details.','value':'2'},{'name':'Material Delivery Ticket or Certificate Mismatch with Invoice Billing details','value':'3'},,{'name':'Mismatch between price quoted on invoice and selected contract','value':'4'},{'name':'Asking for Credit Note','value':'5'},{'name':'Other Reasons','value':'6'}]
+
+    let reject_data=[{'name':'Supporting Documents Missing','value':'7'},{'name':'Wrong Supporting Documents','value':'8'},{'name':'Irrelevant Invoice','value':'9'},,{'name':'Relevant Contract not selected for invoice','value':'10'},{'name':'Work Done previously Invoiced','value':'11'},{'name':'Other Reasons','value':'12'}]
+
+    let dispute_data=[{'name':'Invoice details interpretation issues','value':'13'},{'name':'Supporting document issues','value':'14'},{'name':'Issues due to Verbal communication for work invoiced','value':'15'},,{'name':'Work done outside of approval limits','value':'16'},{'name':'Dispute on contract execution','value':'17'},{'name':'Dispute coming out of Audit findings','value':'18'},{'name':'Inability to clarify through normal methods','value':'19'},{'name':'Other Reasons','value':'20'}]
+    if (type == "3"){
+        data = return_data
+    }
+    else if (type == "4"){
+        data = reject_data      
+    }
+    else if (type == "8"){
+        data = dispute_data
+    }
+    return data
+}
+
+
+$(document).on('click','.add_file',function(e){
+    e.preventDefault();
+    $(this).closest('div').parent().append('<div><input type="file" name="file" class="qry-chos filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span><button class="btn btn-clr btn-master add_file mr-0">+</button> <button class="btn btn-clr btn-master del_file mr-0">-</button></div>')
+})
+
+$(document).on('click','.del_file',function(e){
+    e.preventDefault();
+    $(this).closest('div').remove()
+})
+
+$(document).on('change','.qry-chos',function(){
+    $(this).removeClass()
+})
+</script>
+
+{% endblock %}

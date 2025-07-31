@@ -1,0 +1,201 @@
+{% load custom_tags %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/taxmaster.css' %}">
+<section id="data-list-view" class="data-list-view-header">
+
+    <!-- DataTable starts -->
+    <div>
+        <h5 class="from-head">Taxes and Levies</h5>
+
+        <div class="text-end mb-3">
+            {% if request.user.roles_id == 3 %}
+            {%if rights.create == '1' %} 
+                <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'projects:createtax' %}">Add Tax/Levy</a></button>
+            {% endif %}
+        {% else %}
+            <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'projects:createtax' %}">Add Tax/Levy</a></button>
+        {% endif %}
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-9">
+                <div class="card all-noti-box">
+                    <div class="show-noti p-0">
+                        <label class="mb-0">Show <select id="datafilters" class="changevalue select-style">
+                          <option value="10">10</option>
+                          <option value="25">25</option>
+                          <option value="50">50</option>
+                          <option value="100">100</option>
+                    </select> entries</label>
+                </div>
+                </div>
+            </div>
+            <div class="col-3 text-end">
+                    <input type="text" id="myInput" class="search-f-inf" name="q" placeholder="Search Tax Name" value="{{query}}">
+
+                <!-- <input type="text" id="myInput" class="search-f-inf" name="q" placeholder="Search Tax Name" value="{{query}}"> -->
+            </div>
+        </div>
+
+       
+        
+        <div class="table-responsive text-nowrap">
+            <table class="table company-data-list-view creat-head irock-table bor-bot" id="alltaxes_list">
+
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>Type</th>
+                        <th>Tax/Levy Name</th>
+                        <th>Actions</th>
+                        </tr>
+                </thead>
+                <tbody class="table-list">
+                    {% for obj in alltaxes %}
+                    <tr>
+                        <td class="sno-center">{{ alltaxes.start_index|add:forloop.counter0 }}</td>
+                        <td class="td-left">{{obj.Tax_Type}}</td>
+                        <td class="td-left">{{obj.Tax_Name}}</td>
+                        <td  class="action-center icc-pd">
+                            {% if request.user.roles_id == 3 %}
+                                {%if rights.view == '1' %} 
+                                    <a class="text-decoration-none" href="{% url 'projects:viewcompanytax' pk=obj.id %}">
+                                        <span class="action-edit"><i class="fa fa-eye" title="Edit" ></i></span>
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                <a class="text-decoration-none" href="{% url 'projects:viewcompanytax' pk=obj.id %}">
+                                    <span class="action-edit"><i class="fa fa-eye" title="Edit" ></i></span>
+                                </a>
+                            {% endif %}
+
+                            {% if request.user.roles_id == 3 %}
+                                {%if rights.edit == '1' %} 
+                                    <a class="text-decoration-none" href="{% url 'projects:editcompanytax' pk=obj.id %}">
+                                        <span class="action-edit"><i class="fa fa-edit" title="Edit" ></i></span>
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                <a class="text-decoration-none" href="{% url 'projects:editcompanytax' pk=obj.id %}">
+                                    <span class="action-edit"><i class="fa fa-edit" title="Edit" ></i></span>
+                                </a>
+                            {% endif %}
+
+                            {% if request.user.roles_id == 3 %}
+                                {% if rights.delete == '1' %} 
+                                    <a class="delete_tax" data-id="{{obj.id}}" data-name="{{obj.Tax_Name}}">
+                                        <!-- href="{% url 'projects:deletecompanytax' pk=obj.id %}" -->
+                                        <span class="action-delete"><i class="fa fa-trash" title="Delete" ></i></span>
+                                    </a>
+                                    {% endif %}
+                                {% else %}
+                                    <a class="delete_tax" data-id="{{obj.id}}" data-name="{{obj.Tax_Name}}">
+                                        <!-- href="{% url 'projects:deletecompanytax' pk=obj.id %}" -->
+                                        <span class="action-delete"><i class="fa fa-trash" title="Delete" ></i></span>
+                                    </a>
+                                {% endif %}
+                            
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="9" id="empty_class">---</td>
+                    </tr>
+                    {% endfor %} 
+                    <input type="hidden" class="entries" value="{{pageper_data}}">
+                </tbody>
+            </table>
+        </div>
+      
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+        <!-- <ul class="pagination justify-content-center">
+        {% if alltaxes.has_previous %}
+            <li class="page-item">
+            <a class="btn-clr page-link" href="{{ request.META.HTTP_REFERER }}">Previous</a>
+          </li>
+        {% else %}
+            <li class="page-item disabled">
+            <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Previous</a>
+          </li>
+        {% endif %}
+
+        {% if alltaxes.number|add:'-4' > 1 %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ alltaxes.number|add:'-5' }}">&hellip;</a></li>
+        {% endif %}
+       
+        {% for i in alltaxes.paginator.page_range %}
+            {% if alltaxes.number == i %}
+                <li class="page-item pg-count active" aria-current="page">
+              <span class="btn-clr pg-circle page-link">
+                {{ i }}
+                <span class="sr-only">(current)</span>
+              </span>
+            </li>
+            {% elif i > alltaxes.number|add:'-5' and i < alltaxes.number|add:'5' %}
+
+              {% if request.GET.vendor %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&page={{ i }}">{{ i }}</a></li>
+              {% elif request.GET.vendor and request.GET.sortname %}
+              <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+              {% elif request.GET.vendor and request.GET.sortvendorname %}
+              <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+              {% elif request.GET.sortname %}
+              <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+              {% elif request.GET.sortvendorname %}
+              <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+              {% else %}
+                <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?page={{ i }}">{{ i }}</a></li>
+              {% endif %}
+            {% endif %}
+      {% endfor %}
+        {% if alltaxes.paginator.num_pages > alltaxes.number|add:'4' %}
+          <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ alltaxes.number|add:'5' }}">&hellip;</a></li>
+        {% endif %}
+
+        {% if alltaxes.has_next %}
+            <li class="page-item pg-count">
+            <a class="btn-clr page-link" href="?page={{ alltaxes.next_page_number }}">Next</a>
+          </li>
+        {% else %}
+            <li class="page-item disabled">
+            <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Next</a>
+          </li>
+        {% endif %}
+      </ul> -->
+      {% if alltaxes.has_other_pages %}
+  <ul class="pagination">
+    {% if alltaxes.has_previous %}
+    <li class="page-item">  <a class="btn-clr page-link"href="?page={{ alltaxes.previous_page_number }}">Previous</a></li>
+    {% else %}
+    <li class="page-item disabled">
+        <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Previous</a>
+      </li>
+      
+  {% endif %}
+ 
+    {% for i in alltaxes.paginator.page_range %}
+    
+      {% if alltaxes.number == i %}
+       <li class="page-item pg-count active"><span class="btn-clr pg-circle page-link">{{ i }}  <span class="sr-only">(current)</span></span></li>
+      {% else %}
+      
+       <li class="page-item pg-count"><a  class="page-link pg-circle" data-id="{{ i }}" href="?page={{ i }}">{{ i }}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if alltaxes.has_next %}
+      <li  class="page-item pg-count" ><a  class="btn-clr page-link" href="?page={{ alltaxes.next_page_number }}">Next</a></li>
+    {% else %}
+    <li class="page-item disabled">
+        <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Next</a>
+      </li>
+    {% endif %}
+  </ul>
+{% endif %}
+        </nav>
+    </nav>
+    </div>
+    <!-- DataTable ends-->
+    <!-- add new sidebar ends -->
+</section>

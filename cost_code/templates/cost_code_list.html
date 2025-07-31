@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% load cost_code_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/cost_code/cost_code_list.css' %}">
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li  {% if message.tags %} class="{{ message.tags }} msg-cls"{% endif %} style="display:none;"> {{ message }} </li>
+    {% endfor %}
+</ul>
+{% endif %}<section>
+
+<div>
+  <h3 class="from-head">Cost Code List</h3>
+  <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+    <div class="row">
+      <div class="col-3">
+      </div>
+      <div class="col-9">
+      {%if count1 > 0 %}
+        {% if request.user.roles_id == 3 %}
+          {% if rights.create == '1' %} 
+            <button type="button" class="btn btn-clr btn-master mr-0"><a href="{% url 'cost_code:generate_cost_code' %}">Add</a></button>
+          {%endif%}
+        {%else%}
+        <button type="button" class="btn btn-clr btn-master mr-0"><a href="{% url 'cost_code:generate_cost_code' %}">Add</a></button>
+        {%endif%}
+       {%else%} 
+       <button type="button" class="btn btn-clr btn-master mr-0 empty_list">Add</a></button>
+       {%endif%}
+        {% if request.user.roles_id == 3 %}
+            {% if rights.create == '1' %}
+          <a data-toggle="modal" href="#myvendorModal" class="btn btn-clr btn-master">Import Cost Code</a>
+          {% endif%}
+          {% else %}
+          <a data-toggle="modal" href="#myvendorModal" class="btn btn-clr btn-master">Import Cost Code</a>
+          {% endif %}
+          <div class="modal" id="myvendorModal">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content back-clr-full">
+                <div class="modal-header">
+                  <h4 class="modal-title">
+                  Import or Download Excel Template
+                  </h4>    
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="container">
+                  <div class="row">
+                    <div class="col-6 pos-rel">
+                        <input type="hidden" name="costcode_type" class="costcode_type" id="costcode_type">
+                        <input type="hidden" name="total_rows" class="total_rows" id="total_rows">
+                        <label for="staticEmail" class="col-form-label src-style">Select Root Category<span
+                            class="star-clr">*</span></label>
+                        <input type="hidden" name="level1_costcode" class="level1_costcode" id="level1_costcode">
+                        <select id="level1_category" name="level1_category" class="form-control form-select">
+                            <option value="" selected="selected">---Select ---</option>
+                            {% for alllevel1 in alllevel1_data %}
+                            <option value="{{alllevel1.value}}">{{alllevel1.name}}</option>
+                            {%endfor%}
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label for="staticEmail" class="col-form-label src-style">Select Sub Category<span
+                            class="star-clr">*</span></label>
+                        <input type="hidden" name="level2_costcode" class="level2_costcode" id="level2_costcode">
+                        <select id="level2_category" name="level2_category" class="form-control form-select"></select>
+                    </div>
+                  </div>
+
+                  <div class="row my-3 align-items-center">
+                    <div class="col-6 text-start">
+                        <button type="button" class="btn btn-clr cctemplate "><a href="{% url 'cost_code:downloadcostcode_template' %} " class="download_template_btn">Download Cost Code Template</a></button>
+                    </div>
+                    <div class="col-6">
+                      <input type="file" name="costcodefile" class="filesize" id="cost_cost_file"><br><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" data-toggle="modal" href="#myModal3" class="btn btn-clr btn-master con_file_id" id="submitbtn">Upload</button>
+                </div>
+              </div>
+            </div>
+            <div id="loader" class="lds-dual-ring hidden overlay">
+              <h5 class="head_cls">Please Wait...</h5>
+            </div>
+          </div>
+
+     
+          {%if listcount == 0 %}
+          <button type="button" class="btn btn-clr btn-master generatebtn">Generate Cost Code</a></button>
+          {%else%}
+          {% comment %} <button type="button" class="btn btn-clr btn-master"><a href="{% url 'cost_code:generatecostcode_excel' %}" target="_blank">Generate Report</a></button> {% endcomment %}
+          <button type="button" class="btn btn-clr btn-master"><a href="{% url 'cost_code:selectcodecategory' %}">Generate Report</a></button>
+          {%endif%}
+      </div>
+    </div>
+
+  </form>
+
+  <div class="modal" id="addsequence_modal_popup">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content back-clr-full">
+        <div class="modal-header">
+          <h4 class="modal-title">
+          Add Sequence
+          </h4>    
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        </div>
+        <div class="container">
+          <form action="{% url 'cost_code:add_sequence' %}" method="post" class="add_sequence_form">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-12">
+                <select class="form-control form-select costcode_sequence_level" name="sequence_level" id="sequence_level">
+                  <option>Select Level</option>
+                  {% for i in total_length %}
+                    <option value="{{i}}" level_id="{{i}}">Level {{i}}</option>
+                  {%endfor%}
+                </select>
+              </div>
+              <div class="remaining_level_inputs">
+
+              </div>
+              <input type="hidden" name="order" id="order">
+              <input type="hidden" name="costcode_main_id" id="costcode_main_id">
+
+            </div>
+            
+            <div class="row">
+              <div class="col-12 text-center">
+                <button type="submit" class="btn btn-clr">Submit</button>
+              </div>
+          </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+        </div>
+     
+      </div>
+    </div>
+  </div>
+  <div class="table-responsive text-nowrap inv-table_wid">
+    <table class="table irock-table cost-code-table cc-list-table" id="costcodelist_table"> <!-- class removed -> prj-back_clr settings-data-list-view data-list-view invoicelist tot-in  -->
+      <thead >
+        <tr >
+          <th>S/N</th> 
+          <th class="cc-width">Cost Code</th>
+          <th>Code Category Path</th>
+          <th class="actions-width">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="table-list">
+        
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+  var scheme = '{{scheme}}'
+  var gethost = '{{gethost}}'
+  var csrf_token = '{{csrf_token}}'
+  var totallevel='{{totallevel}}'
+</script>
+
+<script src="{% static 'js/cost_code/cost_code_list.js' %}" data-url="{% url 'cost_code:costcodemasterlist' %}"></script>
+<script src="{% static 'js/cost_code/generate_cost_code.js' %}"></script>
+
+
+
+
+
+{% endblock %}

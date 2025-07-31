@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+{% block content %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load cost_code_tags %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/checklist.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/calculator.css' %}">
+<div>
+    <h5 class="from-head">Invoice Receipt</h5>
+    <div class="row">
+            <div class="col-6">
+
+                <div class="cap-details">
+
+                    <div>
+                        <table>
+                           <tbody>
+                            <tr>
+                                <th valign="top">Vendor Name</th>
+                                <td valign="top" class="dot"><span>:</span></td>
+                                <td valign="top"><span class="datas">{{invoice.vendor.vendor_name}}</span></td>
+                            </tr>
+                            
+                            <tr>
+                                <th valign="top">VIN</th>
+                                <td valign="top" class="dot"><span>:</span></td>
+                                <td valign="top"><span class="datas">{{invoice.vendor.vin}}</span></td>
+                            </tr>
+    
+                            <tr>
+                                <th valign="top">Invoice No</th>
+                                <td valign="top" class="dot"><span>:</span></td>
+                                <td valign="top"><span class="datas">
+                                    {%for costinvoice in invoice.id|getinvoices %}
+                                    {{costinvoice.invoice_number}}{% if not forloop.last %},{% endif %}
+                                    {% endfor %}
+                                </span></td>
+                            </tr>
+                           </tbody>
+                        </table>
+                    </div>
+       
+                </div>
+
+
+
+            </div>
+            
+            <div class="col-6">
+                        <button type="button" class="btn btn-clr btn-master chck-tst mr-0"><a href="{% url 'invoice:vendorbasedinvoice' %}">Back</a></button>
+            </div>
+
+        <div class="col-6 center-line">
+            <div class="">
+
+                <!-- <div class="row">
+                    <div class="col-md-3">
+                        <p>Vendor Name :</p>
+                        <p>VIN :</p>
+                        <p>Invoice Name :</p>
+                    </div>
+                    <div class="col-md-7">
+                        <p><span>{{invoice.vendor.vendor_name}}</span></p>
+                        <p><span>{{invoice.vendor.vin}}</span></p>
+                        <p><span>
+                            {%for costinvoice in invoice.id|getinvoices %}
+                            {{costinvoice.invoice_number}}{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                        </span></p>
+                        
+                    </div>
+                </div> -->
+
+
+                <!-- <div>
+                    <table>
+                       <tbody>
+                        <tr>
+                            <th valign="top">Vendor Name</th>
+                            <td valign="top" class="dot"><span>:</span></td>
+                            <td valign="top"><span class="datas">{{invoice.vendor.vendor_name}}</span></td>
+                        </tr>
+                        
+                        <tr>
+                            <th valign="top">VIN</th>
+                            <td valign="top" class="dot"><span>:</span></td>
+                            <td valign="top"><span class="datas">{{invoice.vendor.vin}}</span></td>
+                        </tr>
+
+                        <tr>
+                            <th valign="top">Invoice Name</th>
+                            <td valign="top" class="dot"><span>:</span></td>
+                            <td valign="top"><span class="datas">
+                                {%for costinvoice in invoice.id|getinvoices %}
+                                {{costinvoice.invoice_number}}{% if not forloop.last %},{% endif %}
+                                {% endfor %}
+                            </span></td>
+                        </tr>
+                       </tbody>
+                    </table>
+                </div> -->
+
+
+                <!-- <p>Vendor Name : <span>{{invoice.vendor.vendor_name}}</span></p>
+                <p>VIN : <span>{{invoice.vendor.vin}}</span></p>
+                <p>Invoice Name : 
+                    <span>
+                        {%for costinvoice in invoice.id|getinvoices %}
+                        {{costinvoice.invoice_number}}{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    </span>
+                </p> -->
+            </div>
+
+            <div>
+                <h4 class="color margin-bott">Invoice and Supporting Documents</h4>
+                <div class="row line-left">
+                    {% for val in document_list %}
+                        <div class="col-md-12 col-lg-4 padd-btn"> 
+                            <button type="button" class="commonbtn" dataid="{{val.data}}">{{val.name}}</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="show_file_cls">
+            </div>
+                <div><iframe width="100%" class="doc_selinvhidcls" src=""></iframe></div>
+        </div>
+        <div class="col-6">
+            <div class="row">
+                <div class="text-end"> 
+                    <button type="button" class="btn btn-clr"><a href="{% url 'invoice:invoiceapprovaltrack' pk %}" target="_blank">Track Invoice</a></button>
+                    <button type="button" class="btn btn-clr"><a href="{% url 'invoice:coversheet' pk %}" target="_blank">Cover Sheet</a></button>
+                    <!-- <button type="button" class="btn btn-clr btn-master chck-tst mr-0"><a href="{% url 'invoice:vendorbasedinvoice' %}">Back</a></button> -->
+               </div>
+            <div>
+                <form method="POST" id="checklist_form">
+                    {% csrf_token %}
+                    <div class="table-responsive text-nowrap table-style">
+                        <table class="inv-pretbl">
+                            <thead >
+                                <tr >
+                                    <th></th> 
+                                    <th>Checklist for Submitted Documents</th>
+                                    <th>Select to Confirm Okay</th>
+                                    <th>Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-list">
+                                {% for val in document_list %}
+                                {% getinvoicesupportfile pk val.data as getdata %}
+                                {% if val.data == '9' or val.data == '10' %}
+                                <tr><td class="check-table"><input type="checkbox" class="check_box_list" checked=checked ></td> 
+                                {% else %}
+                                <tr><td class="check-table"><input type="checkbox" class="check_box_list" {% if getdata.1 > 0 %} checked=checked {% endif %}></td>
+                                {% endif %}
+                                <td>{{val.name}}</td>
+                                <td>{% if val.data == '9' or val.data == '10' %}<input type="checkbox" name="confirmlist-{{val.data}}" class="confirm_chk_cls" value="1">{% else %}{% if getdata.1 > 0 %}<input type="checkbox" name="confirmlist-{{val.data}}" class="confirm_chk_cls" value="1">{% else %}<input type="hidden" name="confirmlist-{{val.data}}" class="" value="0">{% endif %}{% endif %}</td>
+                                <td><textarea name="comment-{{val.data}}" class="form-control"></textarea></td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row color-btn justify-content-center g-2">
+                            {% check_rolerights 'Confirm Cost Code' get_role_id as checkconfirm_costcode_rights %}
+                            <input type="hidden" id="check_conform_costcode" value="{{checkconfirm_costcode_rights}}">
+
+                            {% if checkconfirm_costcode_rights %}
+                            <div class="col-4 text-center"> 
+                                <button type="button" class="btn btn-clr statuss_cls green" value="1" data-toggle="modal" data-target="#confirm_cost_code">Confirm Cost Code</button>
+                            </div>
+                            {%endif%}
+                            
+                            {% for rights in roles_rights %}
+                                {% if rights.right.right_name == "Approve Invoice" %}
+                                    <div class="col-4 text-center"> 
+                                        <button type="button" class="btn btn-clr status_cls green" value="1" data-toggle="modal" >Approve</button>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                            {% for rights in roles_rights %}
+                                {% if rights.right.right_name == "Proceed Invoice" %}
+                                    
+                                    <div class="col-4 text-center"> 
+                                        <button type="button" class="btn btn-clr status_cls proceed_blue" value="2" data-toggle="modal"  {% if confirm_costcode_rights and not invoice.is_conform_costcode %} disabled {% endif %}>Proceed</button>
+                                    </div>
+                                {% endif %}
+                                {% endfor %}
+                                
+                                {% for rights in roles_rights %}   
+                                {% if rights.right.right_name == "Return Invoice" %}
+                                {% if check_for_committe == 0 %}
+                                    <div class="col-4 text-center"> 
+                                        <button type="button" class="btn btn-clr status_cls beige" value="3" data-toggle="modal" >Return for Clarification</button> <!-- class removed -> violet -->
+                        
+
+                                    </div>
+                                {% endif %}
+                                {% endif %}
+                                {% endfor %}
+
+                                {% for rights in roles_rights %}  
+                                {% if rights.right.right_name == "Reject Invoice" %}
+                                {% if check_for_committe == 0 %}
+                                    <div class="col-4 text-center"> 
+                                        <button type="button" class="btn btn-clr status_cls red" value="4" data-toggle="modal" >Reject</button>
+                                    </div>
+                                {% endif %}
+                                {% endif %}
+                                {% endfor %}
+
+                                <div class="col-4 text-center"> 
+                                    <button type="button" class="btn btn-clr beige calbtn" data-toggle="modal" data-target="#exampleModalCenter2">Calculator</button>
+                                </div>
+
+
+                                {% for rights in roles_rights %}       
+                                {% if rights.right.right_name == "View/Comment On Invoice" %}
+                                    <div class="col-4 text-center"> 
+                                        <button type="button" class="btn btn-clr rose cmt_cls" data-toggle="modal" data-target="#exampleModalCenter">Comment</button>
+                                    </div>
+                                {% endif %}
+                                {% endfor %}
+                    </div>
+
+                    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true"  data-backdrop="static" data-keyboard="false">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header comment-head">
+                              <h5 class="modal-title" id="exampleModalCenterTitle">Comments</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close" >
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body comment-body">
+                                <textarea name="main_comments"  id="main_comments" class="form-control comnts"></textarea>
+                                <div class="excp_content">
+
+                                </div>
+                                <!-- <div>
+                                    {% for type in request.company|exceptional_data %}
+                                        <div><input name="" type="checkbox" value="{{type.value}}"><label>{{type.name}}</label></div>
+                                    {% endfor%}
+                                </div> -->
+                            </div>
+                            <div class="modal-footer comment-foot">
+                              <button type="button" class="btn btn-secondary"  id="submit_id">Submit</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {% include 'conform_costcode_popup.html' %}
+
+
+                      <div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter2" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+                          <div class="modal-content" data-backdrop="static">
+                            
+                            <div class="modal-header comment-head">
+                              <h5 class="modal-title" id="exampleModalCenterTitle">Calculator</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                
+                            <div class="modal-body calc-body">
+                              <iframe src="{% url 'invoice:calculator' %}" title="description"></iframe>
+                            </div>
+                
+                            <div class="modal-footer comment-foot">
+                              <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Save & Close</button> -->
+                            </div>
+                            </div>
+                        </div>
+                      </div>
+
+                      
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script>
+  $(function () {
+  
+    $(".calculator-draggable").draggable();
+  });
+var invoiceid="{{pk}}" 
+var wcc_id="{{wcc_id}}"|| ''
+var conform_costcode="{{conform_costcode}}"
+var scheme="{{request.scheme}}"
+var gethost="{{request.get_host}}"
+var user_signature="{{sign_data}}"
+var redirect_user_signature_url = '/editclientadmindetails/{{request.user.id}}'
+var currentdomain=scheme+'://'+gethost
+var package_src = "{% static 'js/web/viewer.html' %}"
+var module_id='{{get_role_id.module_id}}'
+// $(document).on('click','.check_box_list',function(){
+//     return false
+// })
+
+// $(document).ready(function(){
+//     $("input:checkbox[class=check_box]:checked").each(function () {
+//         console.log('this',$(this))
+//     })
+// })
+
+</script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="{% static 'js/invoice/invoiceflowprocessone.js' %}"></script>
+<script src="{% static 'js/common/invoiceflow.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<style>
+  #vendor-sort th{
+    text-transform: capitalize;
+  }
+</style>
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_process/flow.css' %}">
+
+<head>
+  </head>
+
+  
+
+  <h3 class="from-head">View Flow</h3>
+  <div class="row">
+    <div class="col-9">
+    </div>
+    <div class="col-3">
+        <button type="button" class="btn btn-clr btn-master chck-tst mr-0 mb-4"><a href="{% url 'InvoiceGuard:list-flow-form' %}">Back</a></button>
+    </div>
+</div>
+      <div class="vends-invite-lists">
+       
+        <table  id="vendor-sort" class="table settings-data-list-view data-list-view project_master irock-table creat-head vend-thead proj-lists master-pro vend-tt vend-border vin-no ascen-descen-class User-Roles-Rights-Details">
+            <thead>
+                <tr>
+                    <th>Flow Name</th> 
+                    <th>Process Name</th>
+                </tr>
+            </thead>
+            <tbody class="table-list wid-size-vend" id="myTable">
+                  <tr>
+                  <td>{{flow.flow_name}}</td>
+                  <td>
+                  {% for process in flow_process %}
+                  {{process.process.process_name}}
+                  <br>
+                  {% endfor %}
+                </td>
+                  </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>    
+{%endblock%}

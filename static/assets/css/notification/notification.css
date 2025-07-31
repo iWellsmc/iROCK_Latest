@@ -1,0 +1,11 @@
+/**********  **********/
+.tab-top {
+    margin-top: 1rem;
+    --bs-table-color: var(--tableborder-color);
+}
+
+.notify{
+    display: block;
+    text-align: center;
+}
+/**********  **********/

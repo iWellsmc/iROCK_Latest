@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% block content %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load credit_custom_tags %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/checklist.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/calculator.css' %}">
+
+<div>
+    <h5 class="from-head">Credit Note Receipt</h5>
+    <div class="row">
+            <div class="col-6">
+
+                <div class="cap-details">
+
+                    <div>
+                        <table>
+                           <tbody>
+                            <tr>
+                                <th valign="top">Vendor Name</th>
+                                <td valign="top" class="dot"><span>:</span></td>
+                                <td valign="top"><span class="datas">{{credit_detail.vendor.vendor_name}}</span></td>
+                            </tr>
+                            
+                            <tr>
+                                <th valign="top">VIN</th>
+                                <td valign="top" class="dot"><span>:</span></td>
+                                <td valign="top"><span class="datas">{{credit_detail.vendor.vin}}</span></td>
+                            </tr>
+    
+                            <tr>
+                                <th valign="top">Credit Note No</th>
+                                <td valign="top" class="dot"><span>:</span></td>
+                                <td valign="top"><span class="datas">
+                                    {%for creditnotes in credit_detail.id|get_credit_invoices %}
+                                    {{creditnotes.credit_note_no}}{% if not forloop.last %},{% endif %}
+                                    {% endfor %}
+                                </span></td>
+                            </tr>
+                           </tbody>
+                        </table>
+                    </div>
+       
+                </div>
+
+
+
+            </div>
+            
+            <div class="col-6">
+                        {% comment %} <button type="button" class="btn btn-clr btn-master chck-tst mr-0"><a href="{% url 'invoice:vendorbasedinvoice' %}">Back</a></button> {% endcomment %}
+            </div>
+
+        <div class="col-6 center-line">
+            <div class="">
+            </div>
+            <div>
+                <h4 class="color margin-bott">Credit Note and Supporting Documents</h4>
+                <div class="row line-left">
+                    {% for val in document_list %}
+                    {% if val.data == '5' %}
+                    <div class="col-md-12 col-lg-4 padd-btn"> 
+                        {% comment %} <a href="{% url 'invoice:invoiceview' pk=invoice_detail.id %}"> {% endcomment %}
+                        <button type="button" class="invoice_docs commonbtn">{{val.name}}</button>
+                        {% comment %} </a> {% endcomment %}
+                    </div>
+                    {% else %}
+                        <div class="col-md-12 col-lg-4 padd-btn"> 
+                            <button type="button" class="commonbtn" dataid="{{val.data}}">{{val.name}}</button>
+                        </div>
+                    {% endif %}
+                    {% endfor %}
+                    
+                </div>
+            </div>
+            <div class="show_file_cls">
+            </div>
+                <div><iframe width="100%" class="doc_selinvhidcls" src=""></iframe></div>
+        </div>
+        <div class="col-6">
+            <div class="row">
+                <div class="text-end"> 
+                    
+                    <button type="button" class="btn btn-clr"><a href="{% url 'credit:creditapprovaltrack' pk %}">Track credit Note</a></button>
+                    <button class="btn btn-clr waves-effect waves-float waves-light" onclick="goBack()">
+                        Back
+                    </button>
+                    {% comment %} <button type="button" class="btn btn-clr"><a href="{% url 'invoice:coversheet' pk %}">Cover Sheet</a></button> {% endcomment %}
+               </div>
+            <div>
+                {% for i in get_invoices_cost %}
+                <input type="hidden" class="invoice_num" value="{{i}}">
+                {% endfor %}
+                <form method="POST" id="checklist_form">
+                    {% csrf_token %}
+                    <div class="table-responsive text-nowrap table-style">
+                        <table class="inv-pretbl">
+                            <thead >
+                                <tr >
+                                    <th></th> 
+                                    <th>Checklist for Submitted Documents</th>
+                                    <th>Select to Confirm Okay</th>
+                                    <th>Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-list">
+                                {% for val in document_list %}
+                                {% getinvoicesupportfile invoice_detail.id val.data as getdata %}
+                                {% if val.data == '3' or val.data == '4' or val.data == '1' or val.data == '5' %}
+                                <tr><td class="check-table"><input type="checkbox" class="check_box_list" checked=checked ></td> 
+                                {% elif val.data == '2' %}
+                                <tr><td class="check-table"><input type="checkbox" class="check_box_list" {% if supportingdocument_count > 0 %}checked=checked{% endif %} ></td> 
+                                {% else %}
+                                <tr><td class="check-table"><input type="checkbox" class="check_box_list" {% if getdata.1 > 0 %} checked=checked {% endif %}></td>
+                                {% endif %}
+                                <td>{{val.name}}</td>
+                                <td>{% if val.data == '3' or val.data == '4' or val.data == '1' or val.data == '5' %}<input type="checkbox" name="confirmlist-{{val.data}}" class="confirm_chk_cls" value="1">{% elif val.data == "2" %}{% if supportingdocument_count > 0 %}<input type="checkbox" name="confirmlist-{{val.data}}" class="confirm_chk_cls" value="1"> {% else %} <input type="hidden" name="confirmlist-{{val.data}}" class="" value="0">{% endif %}{% else %}{% if getdata.1 > 0 %}<input type="checkbox" name="confirmlist-{{val.data}}" class="confirm_chk_cls" value="1">{% else %}<input type="hidden" name="confirmlist-{{val.data}}" class="" value="0">{% endif %}{% endif %}</td>
+                                <td><textarea name="comment-{{val.data}}" class="form-control"></textarea></td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row color-btn justify-content-center g-2">
+                            {% for rights in roles_rights %}
+                                {% if rights.right.right_name == "Approve Invoice" %}
+                                    <div class="col-4 text-center"> 
+                                        <button type="button" class="btn btn-clr status_cls green" value="1" data-toggle="modal">Approve</button>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                            {% for rights in roles_rights %}
+                                {% if rights.right.right_name == "Proceed Invoice" %}
+                                    <div class="col-4 text-center"> 
+                                        <button type="button" class="btn btn-clr status_cls proceed_blue" value="2" data-toggle="modal" data-target="#exampleModalCenter">Proceed</button>
+                                    </div>
+                                {% endif %}
+                                {% endfor %}
+                                
+                                {% for rights in roles_rights %}   
+                                {% if rights.right.right_name == "Return Invoice" %}
+                                {% if check_for_committe == 0 %}
+                                    <div class="col-4 text-center"> 
+                                        <button type="button" class="btn btn-clr status_cls beige" value="3" data-toggle="modal">Return for Clarification</button> <!-- class removed -> violet -->
+                        
+
+                                    </div>
+                                {% endif %}
+                                {% endif %}
+                                {% endfor %}
+
+                                {% for rights in roles_rights %}  
+                                {% if rights.right.right_name == "Reject Invoice" %}
+                                {% if check_for_committe == 0 %}
+                                    <div class="col-4 text-center"> 
+                                        <button type="button" class="btn btn-clr status_cls red" value="4" data-toggle="modal">Reject</button>
+                                    </div>
+                                {% endif %}
+                                {% endif %}
+                                {% endfor %}
+
+                                <div class="col-4 text-center"> 
+                                    <button type="button" class="btn btn-clr beige calbtn" data-toggle="modal" data-target="#exampleModalCenter2">Calculator</button>
+                                </div>
+
+
+                                {% for rights in roles_rights %}       
+                                {% if rights.right.right_name == "View/Comment On Invoice" %}
+                                    <div class="col-4 text-center"> 
+                                        <button type="button" class="btn btn-clr rose cmt_cls" data-toggle="modal" data-target="#exampleModalCenter">Comment</button>
+                                    </div>
+                                {% endif %}
+                                {% endfor %}
+                    </div>
+
+                    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true"  data-backdrop="static" data-keyboard="false">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header comment-head">
+                              <h5 class="modal-title" id="exampleModalCenterTitle">Comments</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close" >
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body comment-body">
+                                <textarea name="main_comments" id="main_comments" class="form-control comnts"></textarea>
+                                <div class="excp_content">
+
+                                </div>
+                            </div>
+                            <div class="modal-footer comment-foot">
+                              <button type="button" class="btn btn-secondary"  id="submit_id">Submit</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter2" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+                          <div class="modal-content" data-backdrop="static">
+                            
+                            <div class="modal-header comment-head">
+                              <h5 class="modal-title" id="exampleModalCenterTitle">Calculator</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                
+                            <div class="modal-body calc-body">
+                              <iframe src="{% url 'invoice:calculator' %}" title="description"></iframe>
+                            </div>
+                
+                            <div class="modal-footer comment-foot">
+                            </div>
+                            </div>
+                        </div>
+                      </div>
+
+                      
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script>
+  $(function () {
+  
+    $(".calculator-draggable").draggable();
+  });
+  function goBack() {
+    window.history.back();
+}
+var invoiceid="{{invoice_detail.id}}" 
+var credit_id="{{credit_detail.id}}"
+var scheme="{{request.scheme}}"
+var gethost="{{request.get_host}}"
+var currentdomain=scheme+'://'+gethost
+var package_src = "{% static 'js/web/viewer.html' %}"
+var vendor_name="{{credit_detail.vendor.vendor_name}}"
+</script>
+<script src="{% static 'js/credit_note/creditnoteflow.js' %}"></script>
+{% endblock %}

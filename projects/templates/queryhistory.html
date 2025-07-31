@@ -1,0 +1,430 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+<head>
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendormanagement/vendorqueries.css' %}">
+
+</head>
+<div>
+    
+
+        <div class="row text-end">
+            <div class="col-12">
+                <button type="button" class="btn btn-clr waves-effect waves-float waves-light"><a href="{% if request.user.roles.id == 4 %}{% url 'projects:vendorcontracchecklist' %}{% else %}{% url 'projects:vendorquerylist' %}{% endif %}">Back</a></button>
+            </div>
+        </div>
+        
+        {% if query.contract_type == "Original" %}
+        <h4 class="from-head query-hh">Query History</h4>
+        
+        <div class="qry-top-hd">
+
+        <!-- <div class="row align-items-center">
+            <div class="col-2 col-md-3 text-center">
+                <h4 class="qur-titl">VIN: <span>{{vendor.vin}}</span></h4>
+            </div>
+            <div class="col-3 col-md-3">
+                <div class="row">
+                    <div class="col-5 pr-0 col-md-7">
+               <h4 class="qur-titl text-end">Vendor Name: </h4>
+               </div>
+               <div class="col-7 pl-0 col-md-5">
+               <p class="qur-rf-no">{{vendor.vendor_name}}</p>
+               </div>
+               </div>
+               
+            </div>
+            <div class="col-5 col-md-3">
+                <div class="row">
+                    <div class="col-4 pr-0 col-md-7">
+               <h4 class="qur-titl text-end">Contract Ref No:</h4>
+               </div>
+               <div class="col-8 pl-0 col-md-5">
+               <p class="qur-rf-no">{{query.refnum}}</p>
+               </div>
+               </div>
+            </div>
+            <div class="col-2 col-md-3 text-center">
+               <h4 class="qur-titl">Status: <span>{% if query.status == 0 %}Closed{% else %}Open{% endif %}</span></h4>
+            </div>
+        </div> -->
+
+        <div class="row align-items-baseline">
+            <div class="qur-titl col-lg-3 col-md-6">
+                <h4>VIN :</h4>
+                <span>{{vendor.vin}}</span>
+            </div>
+
+            <div class="qur-titl col-lg-3 col-md-6">
+                        <h4>Vendor Name : </h4>
+                        <p class="qur-rf-no">{{vendor.vendor_name}}</p>
+            </div>
+
+            <div class="qur-titl col-lg-3 col-md-6">
+                        <h4>Contract Ref No :</h4>
+                        <p class="qur-rf-no">{{query.refnum}}</p>
+            </div>
+
+            <div class="qur-titl col-lg-3 col-md-6">
+                <h4>Status :</h4> 
+                <span>{% if query.status == 0 %}Closed{% else %}Open{% endif %}</span>
+            </div>
+        </div>
+           
+        </div>
+{%else%}
+        <h4 class="from-head query-hh">Query History</h4>
+        
+        <div class="qry-top-hd">
+
+        <!-- <div class="row align-items-center">
+            <div class="col-2 col-md-3 text-center">
+                <h4 class="qur-titl">VIN: <span>{{vendor.vin}}</span></h4>
+            </div>
+            <div class="col-3 col-md-3">
+                <div class="row">
+                    <div class="col-5 pr-0 col-md-7">
+               <h4 class="qur-titl text-end">Vendor Name: </h4>
+               </div>
+               <div class="col-7 pl-0 col-md-5">
+               <p class="qur-rf-no">{{vendor.vendor_name}}</p>
+               </div>
+               </div>
+               
+            </div>
+            <div class="col-5 col-md-3">
+                <div class="row">
+                    <div class="col-4 pr-0 col-md-7">
+               <h4 class="qur-titl text-end">Contract Ref No:</h4>
+               </div>
+               <div class="col-8 pl-0 col-md-5">
+               <p class="qur-rf-no">{{query.refnum}}</p>
+               </div>
+               </div>
+            </div>
+            <div class="col-2 col-md-3 text-center">
+               <h4 class="qur-titl">Status: <span>{% if query.status == 0 %}Closed{% else %}Open{% endif %}</span></h4>
+            </div>
+        </div> -->
+
+        <div class="row align-items-baseline">
+            <div class="qur-titl col-lg-2 col-md-6">
+                <h4>VIN :</h4>
+                <span>{{vendor.vin}}</span>
+            </div>
+
+            <div class="qur-titl col-lg-2 col-md-6">
+                        <h4>Vendor Name : </h4>
+                        <p class="qur-rf-no">{{vendor.vendor_name}}</p>
+            </div>
+            <div class="qur-titl col-lg-2 col-md-6">
+                <h4>Contract Ref No :</h4>
+              {% if contract_reference_number %}
+              <p class="qur-rf-no"> {{ contract_reference_number }}
+            </p> {% endif %}
+    </div>
+            <div class="qur-titl col-lg-3 col-md-6">
+                        <h4>Amendment/Addendum :</h4>
+                        <p class="qur-rf-no">{{query.refnum}}</p>
+            </div>
+  
+            <div class="qur-titl col-lg-3 col-md-6">
+                <h4>Status :</h4> 
+                <span>{% if query.status == 0 %}Closed{% else %}Open{% endif %}</span>
+            </div>
+        </div>
+        
+
+        </div>
+{%endif%}
+        <div class="row">
+                <!-- {% for query in querylists %}
+                    <div class="col-12 querydiv">
+                        {% if query.deniedreason != None and query.deniedreason != '' %}
+                                <div class={% if request.user.roles.id == query.user.roles.id %}"right-cls send-nmc"{% else %}"left-cls rec-nmc"{% endif %} dataid="{{query.user.roles.id}}">{{query.deniedreason|safe}}</div>
+                        {% endif %}
+                        {% if query.file != '' and query.file != None %}
+                                <div class={% if request.user.roles.id == query.user.roles.id %}"right-cls nmc-fle" {% else %}"left-cls reciv-nmc"{% endif %} dataid="{{query.user.roles.id}}">File Name:<span class="nmc-nme"><a href="{{query.file.url}}" download>{{query.file.name}}</a></span></div>
+                        {% endif %}
+                        <div class={% if request.user.roles.id == query.user.roles.id %}"right-cls utctolocal"{% else %}"left-cls utctolocal"{% endif %}">{{query.date}}</div>
+                    </div>
+                {% endfor %}
+                {% if query.status == 1 %}
+                <div class="text-center spacing-button">
+                    <button type="button" class="btn btn-clr text-center" data-toggle="modal" data-target="#exampleModal">Reply</button>
+                    {% if request.user.roles.id == 4 %}
+                        <button type="button" class="btn btn-clr text-center">
+                            <a href="{% url 'projects:querydenied' pk=query.id %}" class="close-sim">Close</a>
+                        </button>
+                    {% endif %}
+                </div>
+                {% endif %} -->
+                 {% for query in querylists %}
+                    {% if request.user.roles_id != 4 %}
+                    <div class="col-md-12">
+                        
+                       <div class={% if query.user.roles.id == 2 or query.user.roles.id == 3 %}"send-in"{% else %}"rec-in"{% endif %}>
+                        <input type="hidden" name="vendor" id="contractid" value="{{contractquery}}" data_id="{{contract_type}}"> 
+                            {% if query.deniedreason != None and query.deniedreason != '' %}
+                            {% if query.file != '' and query.file != None %}
+                            <div class="{% if query.user.roles.id == 2 or query.user.roles.id == 3 %}right-cls{% else %}left-cls{% endif %} f-name" dataid="{{query.user.roles.id}}">Existing File Name: <span class="nmc-nme filecls"><a href="{{query.query.contractfile.file_name.url}}" target="_blank">{{query.query.contractfile.original_file_name}}</a></span></div>
+                            {% endif %}
+                            <div class="{% if query.user.roles.id == 2 or query.user.roles.id == 3 %}right-cls{% else %}left-cls{% endif %} txt-clrr" dataid="{{query.user.roles.id}}">{{query.deniedreason|safe}}</div>
+                            {% endif %}
+                            
+                            
+                            {% if query.file != '' and query.file != None %}
+                           
+                                <input type="hidden" name="vendor" id="queryid" value="{{contractquery}}" data_id="{{contract_type}}" >
+                                    <div class="{% if query.user.roles.id == 2 or query.user.roles.id == 3 %}right-cls{% else %}left-cls{% endif %} f-name" dataid="{{query.user.roles.id}}">Replacement File Name:<span class="nmc-nme filecls"><a href="{{query.file.url}}" target="_blank">{{query.file}}</a></span></div>
+                            {% endif %}
+                            
+                            <div class={% if query.user.roles.id == 2 or query.user.roles.id == 3 %}"right-cls utctolocal send-date"{% else %}"left-cls utctolocal rec-date"{% endif %}">{{query.date}}</div>
+                        </div>
+
+
+                     
+                            {% if query.query_status == 1 %}
+                            <div class="button-dev query-history-two-btn">
+                                <button type="button" name="file-change" class="btn btn-clr text-right waves-effect waves-float waves-light file_change" id="file-change" value="{{query.id}}" data="1">Replace File</button>
+                                <button type="button" name="dont-agree" class="btn btn-clr text-right waves-effect waves-float waves-light file_change" id="dont-agree" value="{{query.id}}" data="2">Don't Confirm</button>
+                            </div>
+                            {% endif %}
+                        </div>
+                 
+                    {% else %}
+                        <div class="col-12">
+                            <div class={% if request.user.roles.id == query.user.roles.id %}"send-in"{% else %}"rec-in"{% endif %}>
+                                {% if query.deniedreason != None and query.deniedreason != '' %}
+                                {% if query.file != '' and query.file != None %}
+                                    <div class="{% if request.user.roles.id == query.user.roles.id %}right-cls{% else %}left-cls{% endif %} f-name" dataid="{{query.user.roles.id}}">Existing File Name:<span class="nmc-nme filecls"><a href="{{query.file.url}}" target="_blank">{{query.file}}</a></span></div>
+                                {% endif %}
+                                    <div class="{% if request.user.roles.id == query.user.roles.id %}right-cls{% else %}left-cls{% endif %} txt-clrr" dataid="{{query.user.roles.id}}">{{query.deniedreason|safe}}</div>
+
+                                {% endif %}
+    
+                                {% if query.file != '' and query.file != None %}
+                                <!-- {% if query.query_status == 0 %}
+                                <div class="button-dev">
+                                    <button type="button" name="rep-change" class="btn btn-clr text-right waves-effect waves-float waves-light query_change" value="{{query.id}}" data="1">Replacement</button>
+                                    <button type="button" name="ref-change" class="btn btn-clr text-right waves-effect waves-float waves-light query_change" value="{{query.id}}" data="3">Reference</button>
+                                </div>
+                                {% endif %} -->
+                                        <div class="{% if request.user.roles.id == query.user.roles.id %}right-cls{% else %}left-cls{% endif %} f-name" dataid="{{query.user.roles.id}}">Replacement File Name:<span class="nmc-nme filecls"><a href="{{query.query.contractfile.file_name.url}}" target="_blank">{{query.query.contractfile.file_name}}</a></span></div>
+                                {% endif %}
+                                <div class={% if request.user.roles.id == query.user.roles.id %}"right-cls utctolocal send-date"{% else %}"left-cls utctolocal rec-date"{% endif %}">{{query.date}}</div>
+                            </div>
+
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+
+                {% if query.status == 1 %}
+                <div class="text-center spacing-button">
+                    <button type="button" class="btn btn-clr text-center" data-toggle="modal" data-target="#exampleModal">Reply</button>
+                    {% if request.user.roles.id == 4 %}
+                        <button type="button" class="btn btn-clr text-center show_alert">
+                            Close Query
+                            <!-- <a href="{% url 'projects:querydenied' pk=query.id %}" class="close-sim">Close Query</a> -->
+                        </button>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+            <!-- Modal -->
+            <form id="queryform" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Reason</h5>
+                        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button> -->
+                        </div>
+                        <div class="modal-body">
+                            <label>Message<span class="star-clr">*</span></label>
+                            <textarea name="message" class="form-control msgcls r-txtarea"  id="summernote" rows="3" cols="40" ></textarea>
+                            <p id="address-error" class="waring-err"></p>
+                            {% if request.user.roles.id == 4 %}
+                                <div class="row">
+                                    <label>Document Type<span class="star-clr">*</span></label>
+                                    <select name="filetype" class="form-control querytype-cls quer-select">
+                                        <option value="4">Query</option>
+                                        <option value="1">Replacement</option>
+                                        <option value="3">Reference</option>
+                                    </select>
+                                </div>
+                                <br>
+                            {% else %}
+                                <input type="hidden" name="filetype" value="3"> 
+                            {% endif %}
+                            <p><select name="replace_filename" id="replace_filename" class="replace_filename form-control" style="display:none;"></select></p>
+                            <p><input type="file" name="file" class="file-cls filesize" {% if request.user.roles.id == 4 %} style="display:none;" {% endif %}><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></p>
+                            <input type="hidden" name="amendment_id" id="amendment_id" value="{{query.amendment.id}}">     
+                            <input type="hidden" name="contract_id" id="contract_id" value="{{query.contract.id}}">  
+                            <input type="hidden" name="contract_types" id="contract_types" value="{{query.contract_type}}">
+                            <input type="hidden" name="ref_num" id="ref_num" value="{{query.refnum}}">
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary querydenied {% if request.user.roles.id == 4 %}query-ven-cls{% endif %}">Submit</button>
+                        </div>
+                    </div>
+                    </div>
+                </form>
+        </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script src="{% static 'js/projects/queryhistory.js' %}"></script>
+<script>
+                                                                                                                                                                                                                                                                                  
+    $('#summernote').summernote({
+        
+        toolbar: false,
+      });
+
+var pk_id="{{pk}}"
+$(document).ready(function(){
+  $('.utctolocal').each(function(){
+        var utc_time = $(this).text();
+        console.log(utc_time)
+        var local_time = moment.utc(utc_time).toDate();
+        // var local_time_format = moment(local_time).local().format('DD-MM-YYYY hh:mm A');
+        var local_time_format = moment(local_time).local().format('DD-MM-YYYY');
+        $(this).text(local_time_format);
+    });
+});
+
+$(document).on('click','.show_alert',function(){
+    Swal.fire({
+            text: 'Do you want to Close the Query?',
+            showDenyButton: true,
+            confirmButtonColor: '#77d61f',
+            allowOutsideClick:false,
+            denyButtonColor:'#AF2B50',
+            confirmButtonText: 'Yes',
+            denyButtonText: 'No',
+            customClass: {
+                actions: 'my-actions',
+                confirmButton: 'order-2',
+                denyButton: 'order-3',
+            }
+            }).then((result) => {
+            if (result.isConfirmed) {
+                var url = "{% url 'projects:querydenied' 123 %}";
+                document.location.href = url.replace('123', pk_id);
+            }
+    })
+});
+
+
+var typeId;
+$(document).on('click','.file_change',function(){
+  let value=$(this).val()
+  let contract = $('#queryid')
+  let msg=($(this).attr('data') == '1') ?"Are you sure you want to replace the existing Contract file?":"Are you sure you don't agree with the replacement file?";
+  let type=($(this).attr('data') == '1')?'file':'dont_agree'
+  typeId = type
+  data={'contractfile_id':'{{query.contractfile_id}}','file':value,'type':type,'pk':pk_id,'contract_type':contract.attr('data_id'),'vendor_id':'{{vendor_id}}','contractType':'{{contractType}}'}
+  console.log({'File replacement data':data});
+  alertFunc(msg,data)
+})
+
+function alertFunc(msg,data){
+    console.log(msg,data)
+    Swal.fire({
+      title: msg,
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'No',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+            type:'GET',
+            url:'/projects/filechange',
+            data:data,
+            success:function(data){
+                console.log('data',data)
+                if (typeId=='file'){   
+                window.location.href = '../contractmasterlist';
+                }
+                else{
+                window.location.reload()
+                }
+            }
+        });
+    }
+  })
+}
+
+$(document).on('click','.querydenied',function(){
+    if ($('#summernote').summernote('isEmpty')) {
+        // show error message in span tag after the summernote
+        //$('.note-frame').next().append('<span>Please enter the message</span>');
+        $('#address-error').text('This field is required')
+        return false;
+    }
+    else{
+        $('#address-error').text('')
+        return true;
+    }
+
+})
+$('#queryform').submit(function() {
+    // Disable the submit button to prevent multiple submissions
+    $('.querydenied').prop('disabled', true);
+  });
+$('#summernote').on('summernote.change', function() {
+
+    // Check if the editor content is empty
+    if ($('#summernote').summernote('isEmpty')) {
+      // Add a CSS class to the editor element to show the red outline
+      $('#address-error').text('This field is required')
+    } else {
+      // Remove the CSS class to hide the red outline
+      $('#address-error').text('')
+    }
+  });
+
+
+// $(document).on('click','.query_change',function(){
+//     let value=$(this).val();
+//     let button_type=$(this).attr('data');
+//     $.ajax({
+//         type:'GET',
+//         url:'/projects/filechange',
+//         data:{'user_type':'vendor','file':value,'button_type':button_type},
+//         success:function(data){
+//             console.log('data',data)    
+//             window.location.reload()
+//         }
+//     })
+// })
+
+
+$('.query-ven-cls').click(function(e){
+
+    var val=$('.querytype-cls').find(':selected').val();
+    if (val == '3' || val == '1'){
+      if ($('.file-cls').val() == ''){
+        Swal.fire('Choose File')
+        e.preventDefault();
+      }
+    }
+    
+  })
+
+</script>
+{% endblock %}

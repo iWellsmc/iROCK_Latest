@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+{% load custom_tags %}
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script> 
+
+<section id="data-list-view" class="data-list-view-header">
+    <div>
+      <h5 class="from-head"> Userlog</h5>
+       
+     
+      <div class="row">
+        <div class="col-12">
+          <div class="table-responsive text-nowrap">
+            <table class="table settings-data-list-view data-list-view project_master all-tbl-hd list-user-table-width tab-res irock-table user_log"
+            id="user_log">
+            <thead class="list-user">
+              <tr>
+                <th>S/N</th>
+                <th class="wid-iin">Message</th>
+                <th class="wid-iin">Source Name</th>
+                <th class="wid-iin">Source Type</th>
+                <th class="wid-iin">Created By</th>
+                <!-- <th>company</th>
+                <th>Action</th>
+                <th>username</th> -->
+                <th class="wid-email">Date</th>
+                <!-- <th>role_id</th> -->
+              </tr>
+            </thead>
+            <tbody class=" table-list">
+              <!-- {% if usercount == 0 %}
+              <tr>
+                <td colspan="9" class="cls-nil">
+                  ---
+                </td>
+              </tr>
+              {%else%}
+              {%for user in create_user_log %}
+              
+              <tr>
+                <td>{{forloop.counter}}</td>
+                
+                <td class="txt-center">{{user.message|default_if_none:"---"}}</td>
+                <td class="txt-center">{{user.source_id}}</td>
+                <td class="txt-center">{{user.company_name}}</td>
+                <td class="txt-center">{{user.source_type}}</td>
+                <td class="txt-center">{{user.username.name}}</td>
+
+                <td class="txt-center" >{{user.created}}</td>
+                <td class="txt-center">{{user.roleId_id}}</td> 
+           
+               
+                </td>
+    
+              </tr>
+              {% endfor %}
+              {% endif %} -->
+                    <!-- <input type="hidden" class="scheme" value="{{scheme}}">
+                    <input type="hidden" class="gethost" value="{{gethost}}">
+                    <input type="hidden" class="csrf_token" value="{{csrf_token}}">
+                    <input type="hidden" class="entries" value="{{pageper_data}}"> -->
+                    </tbody>
+          </table>
+    
+          </div>
+              </div>
+      </div>
+    </div>
+  
+    </div>
+    
+    </div>
+    </section>
+    <script src="{% static 'js/custom_auth/userlog.js' %}"></script>
+    {% endblock %}

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_tags %}
+{% block content %}
+{% comment %}
+ <div class="table-bck" id="edit_project_create_div"> class="crt-table main_scroll" {% endcomment %}
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/projectcreate.css' %}">
+    <div class="row">
+        <div class="col-12 text-end">
+            <button class="btn btn-clr waves-effect waves-float waves-light">
+                <a href="{% url 'projects:projectlist'%}">Back</a></button>
+        </div>
+    </div>
+    <h3 class="from-head">Edit Project</h3>
+    <form autocomplete="off" method="post" novalidate id="project_edit" class="form-txt">
+        <div>
+        {% csrf_token %}
+            {% comment %} <h3 >Edit Project</h3> {% endcomment %}
+            <section class="crt-table1 main_scroll1">
+                {% for hidden in form.hidden_fields %}
+                    {{hidden}}
+                {% endfor %}
+                <div class="row par-top-arrow">
+                    <button type="button" class="scroll-top-proj"></button>
+                   
+                    
+                    <input type="hidden" name="projectid" id="projectid" value={{project.id}}>
+                    <div class="col-sm-12">
+                       
+                        <label for="staticEmail" class="unique-colr-crt-prj">Category of Entity <span class="star-clr"> :</span><span class="req-name">{{request.company.category_entity|category_replace}}</span></label><br>
+                        <label for="staticEmail" class="col-form-label">Company Name<span class="star-clr">*</span></label>
+                        <input type="text" name="company_name" class="col-sm-12 form-control" value="{{company}}" readonly>
+                    </div>
+                    <div class="col-sm-12">
+                        <label for="staticEmail" class="col-form-label">Entity/Subsidary Name</label>
+                        <input type="text" name="entity" value="{{project.entity|default_if_none:''}}" class="form-control" id="id_entity">
+                    </div>
+                    <div class="col-sm-12">
+                        <label for="staticEmail" class="col-form-label">Country<span class="star-clr">*</span></label>
+                        <input type="hidden" name="master_country_list" value="{{project.country.id}}" >
+                        <select id="country_id" name="master_country_list" class="form-control" {% if project.country.id != None %} disabled {% endif %}>
+                        <option value="">--Select Country--</option>
+                        {% for country in countries%}
+                            <option {% if project.id|checkprojectcountry:country.country_id > 0 %} selected={{country.country_id}} {% endif %} value="{{country.country_id}}">{{country.country_name}}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-sm-12">
+                        <label for="staticEmail" class="col-form-label">Project Name<span class="star-clr">*</span></label>
+                        <input type="hidden" name="project_list" value="{{project.projectname.id}}" >
+                        <input id="project_id" name="project_list" class="form-control" value="{{project.projectname.name}}" {% if project.projectname.id != None %} disabled {% endif %}>
+                    </div>
+                    {% comment %} <div class="col-sm-12">
+                        <label for="staticEmail" class="col-form-label">Category of Entity</label><br>
+                        {% for category in entitytype %}
+                        <input type="checkbox" id="project_type" name="projecttype" {% if project.id|checkentitytype:category > 0 %} checked=checked {% endif %} value="{{category}}">&emsp;<label class="pt-type">{{category|category_replace}}</label><br>
+                        {% endfor %}
+                    </div> {% endcomment %}
+                    <div class="col-sm-12" id="block_name_id">
+                        <label for="staticEmail" class="col-2 col-form-label-project">Block Name</label><br>
+                        {% for block in blocks %}
+                        <input type="hidden" name="blockid" value="{{block.id}}">
+                        <input type="checkbox" name="block" class="master_blk_cls" {%if project.id|checkprojectblock:block.id > 0%} checked=checked {% endif %} value="{{block.id}}">&emsp;<label>{{block.block_name}}</label><br>
+                        
+                        <div id="field_block{{block.id}}"> 
+                            {%if project.id|checkprojectblock:block.id > 0%}   
+                            <div id="master_block-{{block.id}}" class="master-block-field">
+                                <label for="staticEmail" class="col-2 col-form-label-project">Field Name</label><br>
+                                {% for field in block.id|get_field:block %}
+                                <input type="checkbox" name="field{{block.id}}" class="field_blk_cls" block="{{block.id}}" {% checkprojectfieldid block.id field.id project.id as fieldcount %} {% if fieldcount|datacount > 0 %} checked=checked {% endif%} value="{{field.id}}">&emsp;<label>{{field.field_name}}</label><br>
+                                <div id="field_environemnt{{field.id}}">
+                                    {% if fieldcount|datacount > 0 %}
+                                    <div id="environment-{{field.id}}" class="environement-cls">
+                                        <label for="staticEmail" class="col-2 col-form-label-project">Field Environment</label><br>
+                                        {% for fieldenvironment in field.id|get_environment:field %}
+                                            <input type ="checkbox" name="fieldenvironment-{{field.id}}" block="{{block.id}}" field="{{field.id}}" class="fieldenv-cls" {% checkprojectenvironmentid field.id fieldenvironment.id project.id as fieldenvcount %} {% if fieldenvcount|datacount > 0 %} checked=checked {% endif %}  value="{{fieldenvironment.id}}">&emsp;<label>{{fieldenvironment.project_environment}}-{{fieldenvironment.project_environment_subtype|default_if_none:"---"}}</label><BR>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="text-center spacing-button">
+                    <button class="btn btn-clr text-center next-cls" type="button">Save & Next</button>
+                </div>
+            </section>
+        </div>
+    </form>
+    {% comment %} <div id="loader" class="lds-dual-ring hidden overlay"></div> {% endcomment %}
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/projects/editmultistepproject.js' %}"></script>
+{% endblock %}
+

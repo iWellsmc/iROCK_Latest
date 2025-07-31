@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/bankdetails.css' %}">
+
+<div>
+  <div class="row">
+    <div class="col-12 text-end">
+      <a class="btn btn-clr chck-tst" href="{% url 'finance:list_details' %}">Back</a>
+    </div>
+  </div>
+  
+    <h4 class="from-head">Edit Bank Users</h4>
+    
+    <div class="row">
+      <div class="col-12">
+        <div class="table-responsive text-nowrap">
+            <form method="post" id="edit-bankinfo-form">
+                {% csrf_token %}
+          <table class="table settings-data-list-view creat-head data-list-view irock-table editbank-table"
+          id="master_project_list">
+          <thead class="list-user"> 
+            <tr>
+              <th>Currency*</th>
+              <th>Bank Name*</th>
+              <th>Account No*</th>
+              <th class="editbank-table-pia">Users*</th>
+              <th class="editbank-table-user">Payment Instruction Addressed*</th>
+            </tr>
+          </thead>
+          <tbody class="table-list">
+            <tr>
+            
+                <td><input class="form-control bank_name edit-currency" name="bank_name" type="text" value="{{bankdetails.currency.currency_symbol}}-{{bankdetails.currency.currency}} ({{bankdetails.currency.name}})" readonly></td>
+            
+              <td><input class="form-control bank_name edit-bankname" name="bank_name" type="text" value="{{bankdetails.bank_name.bank_name|default_if_none:''}}" readonly></td>
+              <td><input class="form-control account_number acnumber edit-accno" name="account_number" type="text" value="{{bankdetails.account_number.accountno|default_if_none:''}}"data-id='{{bank_data.id}}'readonly></td>
+              <td><table class="inner-table usertable m-bank-user">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                  </tr>
+                </thead>
+                <tbody>
+                <tr class="usertr">
+                  <td><select name="paymentinstructiontitle" class="form-control form-select usertitle">
+                    <option value>--Select--</opiton>
+                    <option {%if bankdetails.instructortitle == 'Mr'%} selected {%endif%}>Mr</opiton>
+                    <option {%if bankdetails.instructortitle == 'Mrs'%} selected {%endif%} value='Mrs'>Mrs</opiton>
+                    <option {%if bankdetails.instructortitle == 'Ms'%} selected {%endif%} value='Ms'>Ms</opiton>
+                    </select>
+                  </td>
+                    <td><input type="text" class="userfirstname form-control" name="paymentinstructionfirstname" value="{{bankdetails.instructorfirstname}}"></td>
+                    <td><input type="text" class="userlastname form-control" name="paymentinstructionlastname"value="{{bankdetails.instructorlastname}}"></td>
+                  </td>
+                </tr>
+              </tbody>
+              </table></td>
+              <td class="from-invoice"> 
+                <table class="inner-table usertable m-bank-user">
+                  <thead>
+                    <tr>
+                      <th class="edit-title">Title</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th>Email</th>
+                      <th>Designation</th>
+                      <th class="edit-action">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  
+                 {%for i in users %}
+                  <tr class="usertr">
+                   <input type="hidden" class="userid form-control" name="userid" value="{{i.user.id}}" data-id="{{i.id}}">
+                    <td><select name="usertitle" class="form-control form-select usertitle userfield">
+                      <option value="">--Select--</opiton>
+                      <option {%if i.user.Title == 'Mr'%} selected {%endif%}>Mr</opiton>
+                      <option {%if i.user.Title == 'Mrs'%} selected {%endif%} value='Mrs'>Mrs</opiton>
+                      <option {%if i.user.Title == 'Ms'%} selected {%endif%} value='Ms'>Ms</opiton>
+                      </select>
+                    </td>
+                      <td><input type="text" class="userfirstname form-control userfield" name="userfirstname" value="{{i.user.name}}"></td>
+                      <td><input type="text" class="userlastname form-control userfield" name="userlastname"value="{{i.user.lastname}}"></td>
+                    </td>
+                    <td><input type="text" class="useremail form-control userfield" name="useremail"value="{{i.user.email}}"></td>
+                    </td>
+                    <td><input type="text" class="userdesignation form-control userfield" name="userdesignation" value="{{i.user.designation_role}}"></td>
+                    </td>
+                    <td>
+                      <button id="adduser" class='btn btn-clr  adduser' type='button' value='Add'> <i class="fa fa-plus"></i> 
+                      <button id="removeolduser" class='ml-2 btn btn-clr  removeolduser' type='button'> <i class="fa fa-minus"></i> </button> </td>
+                  </tr>
+                  {%endfor%}
+                </tbody>
+                </table>
+                {%for i in users %}
+                {%endfor%}
+              </td>
+          </tr>
+        </table>
+        </div>
+        <div class="text-center">
+          <button id="mainsave" class='btn btn-clr add-btn pha-sebtn mt-3' type="submit">Save</button>
+        </div>
+      </form>
+        </div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script> 
+var csrf_token ='{{ csrf_token }}' 
+</script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>  
+<script src="{% static 'js/finance/companybankedit.js' %}"></script>
+{% endblock %}

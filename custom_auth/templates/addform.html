@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Add User Department</h1>
+  <div id="my-table">
+    <form id="my-formset" method="POST">
+      {% csrf_token %}
+      <table>
+        {{ formset.management_form }}
+        {% for form in formset.forms %}
+        <tr>
+          <td>{{ form.user }}</td>
+          <td>{{ form.department }}</td>
+          <td><button type="button" hx-get="{% url 'adduserdepartment' %}" hx-target="#my-table" hx-swap="afterbegin">Add</button></td>
+          {% if formset.can_delete %}
+          <td><button type="button" hx-delete="{% url 'deleteuserdepartment' form.prefix %}" hx-target="#my-formset">Remove</button></td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </table>
+      <button type="submit">Save</button>
+    </form>
+  </div>
+{% endblock %}

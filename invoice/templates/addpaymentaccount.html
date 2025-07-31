@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/reports/addpaymentaccount.css' %}">
+
+<div>
+  <h3 class="from-head">Payment on Account</h3>
+
+  <div class="row mb-3">
+        <div class="col-9"></div>
+        <div class="col-3 text-end">
+        <a class="btn btn-clr onClass" href="{% url 'invoice:view_allotedinvoice' %}">View Allocated Invoice</a>
+        </div>
+  </div>
+  <form  method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input name="reportname" value="{{reportname}}" type="hidden">
+<div class="row">
+    <div class="col-lg-4 col-md-4 cost-code-format">
+       
+        <select name="vendor" class="form-control ven-cls currency-clss multiselect vendor_src" id="vendor_id">
+            <option value="">--Select--</option>
+            {% for vendor in vendors_list %}
+            <option {%if select_vendor == vendor.id%} Selected {%endif%} value="{{vendor.id}}" data_id="{{vendor.vin}}">{{vendor.vendor_name}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-lg-4 col-md-4">
+        <select name="currency" class="form-control ven-cls currency-clss multiselect currency_src" id="currency">
+            <option value="">--Select Currency--</option>
+            {% for currency in companycurrency %}
+            <option  {%if select_currency == currency.id%} Selected {%endif%} value="{{currency.id}}">{{currency.currency_symbol}}-{{currency.currency}}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+<input class="inputfield" name='inputfield' type="hidden">   
+    <div class="tablefield">
+        <div class="row tr_row my-3">
+            <div class="col-md-4" >
+                <input type="text" name="amount"  autocomplete="off" class="form-control amount" placeholder="Amount">
+            </div>
+           <div class="col-md-4"> 
+                <input type="file" name="image" id="file-input" accept="image/png, image/jpeg, application/pdf" class="form-control edit-client-int file file_1 filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+            </div>
+           <div class="col-md-4 minus-btn"> 
+                <button id='add' class='btn btn-clr add-btn add' type='button' value='Add'>
+                    <i class="fa fa-plus"></i>
+           </div>
+        </div>
+    </div>
+
+<div class="">
+    <button type="submit" class="btn btn-clr com-save generate_report generate_report-1" id="Generate">Submit</button>
+    <button type="submit" class="btn btn-clr com-save view_list View-1 " id="View_btn" >View</button>  
+</div>
+<h4 class="from-head">Summary List For Payment Account</h4>
+
+<div class="table table-responsive">
+    <table class="table irock-table" id="master_project_list"> <!-- class removed -> prj-back_clr settings-data-list-view data-list-view invoicelist tot-in invoicevendor-table -->
+        <thead>
+            <tr>
+                <th>S/N</th> 
+                <th>Paid Amount {%if currency_symbol %}({{currency_symbol.currency}}){%endif%}</th>
+                <th>Amount Allocated {%if currency_symbol %}({{currency_symbol.currency}}){%endif%}</th>
+                <th>Amount Remaining {%if currency_symbol %}({{currency_symbol.currency}}){%endif%}</th>
+                <th class="file-width">File</th>
+                <th>Actions</th>
+                <th>Allocate</th>
+            </tr>   
+            {%for i in paymentacct_details %}
+            <tr>
+                <td>{{forloop.counter}}</td>
+                <td>{{currency_symbol.currency_symbol}}  {{ i.amount|commoseperator }}</td>
+                <td>{{currency_symbol.currency_symbol}}  {{i.id|amountallocated}}</td>
+                <td>{{currency_symbol.currency_symbol}}  
+                    {%if i.remaining_amount%}{{i.remaining_amount|commoseperator}}{%else%}{{ i.amount|commoseperator }}{%endif%}
+                </td>
+                <td>
+                    <div>
+                        <a target="_blank" href="{% url 'invoice:getpaymentacctfile' id=i.id  %}">{{i.paymentfile}}</a>
+                    </div>
+                </td>
+                <td>{%getpaymentaccount_count i.id as account_count%}
+                    {%if account_count == 0%}
+                    <a class="px-1 text-decoration-none" href="{% url 'invoice:editpaymentaccount' id=i.id %}">
+                        <span class="action-edit">
+                            <i class="fa fa-edit" title="Edit"></i>
+                        </span>
+                   </a>
+                <a class="px-1 delete_paymentact" data-id="{{i.id}}">
+                    <span class="action-delete">
+                        <i class="fa fa-trash" title="Delete"></i>
+                    </span>
+                </a>
+                {%else%}
+                -
+                {%endif%}
+              </td>
+             
+                <td>
+                    {%getaccount_action i.id as action_count%}
+                    {%if action_count == 0%}
+                    <a class="btn px-1 py-0 inv_app_cls check_sign all-icon-same-clr waves-effect waves-float waves-light" href="{% url 'invoice:allocateinvoice' id=i.id  %}" title="Allocate">
+                        <!-- <i class="fa-solid fa-list-check" title="Invoice Receipt"></i> --> 
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 48 48"><g fill="none"><path stroke="#95183a" stroke-linejoin="round" stroke-width="4" d="M40 12a4 4 0 1 0 0-8a4 4 0 0 0 0 8Zm0 32a4 4 0 1 0 0-8a4 4 0 0 0 0 8ZM8 12a4 4 0 1 0 0-8a4 4 0 0 0 0 8Zm0 32a4 4 0 1 0 0-8a4 4 0 0 0 0 8Z"/><path stroke="#95183a" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M20 8h8"/><path d="M32 16L16 32l16-16Z" clip-rule="evenodd"/><path stroke="#95183a" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M32 16L16 32m24-12v8"/></g></svg>
+                    </a>
+                </td>
+                
+                    {%else%}
+                    -
+                    {%endif%}
+            </tr>
+            {%empty%}
+            <td colspan="7">---</td>
+            <!-- <td>
+                <div class="border-empty-data">---</div>
+            </td> -->
+            {%endfor%}
+    </table>
+</div>
+        <h4 class="from-head">Summary List For Unpaid Invoice</h4>
+
+        <div class="table table-responsive table-scroll">
+            <table class="table irock-table" id="master_project_list"> <!-- class removed ->  prj-back_clr settings-data-list-view data-list-view invoicelist tot-in invoicevendor-table -->
+                <thead>
+                    <tr>
+                        <th>S/N</th> 
+                        <th>Country</th>
+                        <th>Invoice No</th>
+                        <th>Project Name</th>
+                        <th>Project Discipline</th>
+                        <th>Net Amount Payable {%if currency_symbol %}({{currency_symbol.currency}}){%endif%}</th>
+                        <th>Action</th>
+                    </tr>   
+                    {%for invoice in invoicecurrencylist %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        {%getcountry invoice.invoice_id as country%}
+                        <td>{{country|default_if_none:"---"}}</td>
+                        <td>{{invoice.invoice_number}}</td>
+                        <td>{{invoice.invoice.project_name}}</td>
+                        <td>{%getprojectdiscipline invoice.invoice_id as discipline%}{{discipline}}</td>
+                        <td>{% invoicegrossamount invoice.id as invdisval %}
+                            {% invoicetaxamount invoice.id as invdistax %}
+                            <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                            {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                            </div>
+                        </td>
+                        <td class="eye_test text-wrap"><a class="btn p-0" href="{% url 'invoice:invoiceview' invoice.invoice_id %}"><i class="fa fa-eye" title="View"></i>
+                        </a></td>
+                    </tr>
+                    {%empty%}
+                    <td colspan="7">---</td>
+                    <!-- <td>
+                        <div class="border-empty-data">---</div>
+                    </td> -->
+                    {%endfor%}
+            </table>
+        </div>
+</form>
+
+    {%endblock%}
+    {% block scripts %}
+    {{ block.super }}
+    <script>
+    var csrf_token = '{{csrf_token}}'
+    </script>
+<script type="text/javascript" src="{% static 'js/invoice/addpaymentaccount.js' %}"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script>
+</script>
+
+{%endblock%}

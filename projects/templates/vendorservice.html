@@ -1,0 +1,1146 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+
+
+
+
+<form class="form-txt"  method="POST" id="vendorserviceinfo"  enctype="multipart/form-data" >
+    {% csrf_token %}
+<div class="row">
+<h3 class="from-head">Vendor Company Service Information</h3>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <label class="txt-name unique-colr">Vendor Name:</label>
+        <span class="txt-detail uniq-name">{{vendorid.vendor_name}}</span>
+    </div>
+
+<div class="row">
+    <input type="hidden" id="hdn_dateformat" value="{{date_format.dateformat}}">
+    <div>
+        <input type="checkbox" name="types_service" class="service-input"  value="service">&emsp;<label class="txt-name">Services</label>
+    </div>
+    <div>
+        <input type="checkbox" name="types_service" class="supply-input" value="supply">&emsp;<label class="txt-name">Supply</label>
+    </div>
+
+    <div>
+        <input type="checkbox" name="types_service" class="serviceandsupply-input"   value="service-supply">&emsp;<label class="txt-name">Services and Supply</label>
+    </div>
+    <div>
+        <input type="hidden" name="vendor_id" id="vendor_id" value="{{data.vendorid}}">
+    </div>
+</div>
+
+
+
+<!-- <div>
+
+<h3 style="color: black; font-size: medium;"><b>List of active Contract Awarded to Date:</b></h3>
+</div> -->
+
+
+<div class="row">
+<div class="col-12" id="serviceven">
+
+
+
+</div>
+<div class="col-12" id="supplyven">
+
+
+    
+</div>
+<div class="col-12" id="serviceandsupplyven">
+
+
+    
+</div>
+
+
+
+
+<div class="row">
+    <div class="text-center btn-cls">
+        <button type="button" class="btn btn-clr text-left back-cls" ><a href="{% url 'projects:editinsidevendorregistration' pk=vendorid.id %}">Back</a></button>
+        <button type="submit" class="btn btn-clr text-left final-cls">Submit</button>
+    </div>
+  
+</div>
+
+
+</form>
+
+
+{%endblock%}
+
+
+
+
+{% block scripts %}
+{{ block.super }}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" ></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" ></script>
+
+
+<script>
+    
+    var hdn_dateformat=$('#hdn_dateformat').val()
+ 
+    $(document).on ("change",".service-input",function(){
+        var value=$(this).val();
+        var upper_val=value.replace('s','S')
+        var tableshow=""
+    
+    if($(this).is (":checked") ){
+        tableshow+='<table id="'+value+'table"><thead><tr id="content-head"><th></th><th>Name of '+upper_val+'</th><th>Brief Description of '+upper_val+'</th><th> SO Reference Number</th><th>SO Executed Date</th></tr></thead><tbody><tr class="vend-service-top"><td><div class="row"> <div class="col-6 out-vend-add"><button id="service-add" data-id='+value+' class="out-btn" type="button" value="Add"> <i class="fa fa-plus"></i> </button></div> <div class="col-6 out-vend-minu"> <button id="service-delete" class=" out-btn" delete-"btn" type="button" value="delete"> <i class="fa fa-minus"></i></button></div> </div></td><td id=servicerow0> <textarea rows="3" cols="30" class="form-control s-contract-cls service-contract-cls" name="'+value+'Contract"></textarea><td><textarea rows="3" cols="30" class="form-control service-des-cls service-abridged-cls" name="'+value+'Abridged_Scope" style="width:100%;"></textarea></td><td><textarea rows="3" cols="30" class="form-control s-num-cls" name="'+value+'contractnumber"></textarea></td><td><input type="text" autocomplete="off" class="dateformat-cls form-control" name="'+value+'Contract_Executed_Date"></td><td class="msg-wid"><div class="container-fluid service-file-addcls"><div class="row"><div class="col-6 file-input"><input type="file" class="file filesize" id="myfile" name="'+value+'file0"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></div> <div class="col-6 left-btn-top"> <button id="servicefile-add" data-id='+value+' class=" out-btn-right  sf-add" index="0" type="button" value="Add"><i class="fa fa-plus"></i></button> <button id="servicefile-delete" class=" out-btn-right sf-minu" delete-"btn" type="button" value="delete"><i class="fa fa-minus"></i></button></div></div></div></td></tr></tbody></table>'
+            $(this).parent().after(tableshow);
+    
+        
+        }
+    
+    else{
+        $('#'+value+'table').remove()
+    }
+    
+    });
+
+
+
+    
+    
+    $(document).on('click','#servicefile-add',function(){
+        //var matched = $(". *");
+
+        var spanid=$(this).closest('tr').index()
+        $('.file').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                files =false
+                $(this).closest('div').find('input').after('<span class="waring-err" id="ser_file-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                files = true
+                $('#ser_file-'+spanid+'').remove()
+            }
+        })
+        if (scopes == true && lenfilled == true && s_contract == true && s_des == true && s_num == true && date == true && files == true){
+            var index=$(this).attr('index')
+            var value=$(this).attr('data-id');
+
+
+            var fileadd=''
+            fileadd='<div class="row"> <div class="col-6 file-input filesize"> <input type="file" class="file filesize" id="myfile" name="'+value+'file'+index+'"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></div> <div class="col-6 left-btn-top"><button id="servicefile-add" data-id='+value+' class=" out-btn-right  sf-add" index="'+index+'" type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="servicefile-delete" class="out-btn-right sf-minu delete-"btn" type="button" value="delete"> <i class="fa fa-minus"></i></button></div></div>'
+            $(this).parent().parent().after(fileadd);
+
+        }
+
+        
+    })
+    
+
+    /* service */
+        $(document).on('click','#servicefile-delete',function(){
+            var service_class=$("div.service-file-addcls").children().length
+            if (service_class > 1){ 
+                files == true
+                $(this).closest('div').parent().remove()
+            }
+        })
+
+
+
+
+
+    
+    var row=1
+    var s_contract =true;
+    var s_des =true;
+    var s_num =true;
+    var date =true;
+    var files =true;
+    $(document).on("click","#service-add", function(){
+
+        var spanid=$(this).closest('tr').index()
+        $('#ser_name-'+spanid+'').remove()
+        $('#ser_des-'+spanid+'').remove()
+        $('#ser_ref-'+spanid+'').remove() 
+        $('#ser_date-'+spanid+'').remove()
+        $('#ser_file-'+spanid+'').remove()
+
+        $('.s-contract-cls').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                s_contract =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="ser_name-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                s_contract = true
+                $('#ser_name-'+spanid+'').remove()
+            }
+        })
+
+        $('.service-des-cls').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                s_des =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="ser_des-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                s_des = true
+                $('#ser_des-'+spanid+'').remove()
+            }
+        })
+        console.log(s_des)
+        
+       $('.s-num-cls').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                s_num =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="ser_ref-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                s_num = true
+                $('#ser_ref-'+spanid+'').remove()
+            }
+        })
+        console.log(s_num)
+
+        $('.dateformat-cls').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                date =false
+                $(this).closest('td').find('input').after('<span class="waring-err" id="ser_date-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                date = true
+                $('#ser_date-'+spanid+'').remove()
+            }
+        })
+        console.log(date) 
+        $('.file').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                files =false
+                $(this).closest('div').find('input').after('<span class="waring-err" id="ser_file-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                files = true
+                $('#ser_file-'+spanid+'').remove()
+            }
+        })
+        if (scopes == true && lenfilled == true && s_contract == true && s_des == true && s_num == true && date == true && files == true){
+        var data_id=$(this).attr('data-id');
+                newrow='<tr class="vend-service-top"><td><div class="row"> <div class="col-6 out-vend-add"><button id="service-add" class=" out-btn " data-id='+data_id+' type="button" value="Add"> <i class="fa fa-plus"></i> </button> </div><div class="col-6 out-vend-minu"><button id="service-delete" class=" out-btn sf-minu" delete-"btn" type="button" value="delete"> <i class="fa fa-minus"></i></button></div></div> </td><td id="servicerow'+row+'"><textarea rows="3" cols="30" class="form-control service-contract-cls s-contract-cls" name="'+data_id+'Contract"></textarea></td><td><textarea rows="3" cols="30" class="form-control service-abridged-cls service-des-cls" name="'+data_id+'Abridged_Scope"></textarea></td><td><textarea rows="3" cols="30" class="form-control s-num-cls" name="'+data_id+'contractnumber"></textarea></td><td><input type="text" autocomplete="off" class="form-control dateformat-cls" name="'+data_id+'Contract_Executed_Date"></td><td class="msg-wid"><div class="container-fluid"><div class="row"> <div class="col-6 file-input"><input type="file" class="file filesize" id="myfile" name="'+data_id+'file'+row+'"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></div> <div class="col-6 left-btn-top"><button id="servicefile-add" data-id='+data_id+' class=" out-btn-right  sf-add ser-add" index='+row+' type="button" value="Add"> <i class="fa fa-plus"></i></button><button id="servicefile-delete" class=" out-btn-right sf-minu" delete-"btn" type="button" value="delete"> <i class="fa fa-minus"></i> </button></div></div></div></td></tr>'
+                $('#'+data_id+'table').append(newrow);
+                
+                row++;
+            }
+
+    
+    })
+
+
+    $(document).on('keyup','.s-num-cls',function(){
+        var spanid=$(this).closest('tr').index()
+        var val=$(this).val()
+        if (val ==''){
+            s_num =false
+            //$(this).closest('td').find('textarea').after('<span class="waring-err" id="ser_ref-'+spanid+'" >This Field is Required</span>')
+        }
+        else{
+            s_num = true
+            $('#ser_ref-'+spanid+'').remove()
+        }
+
+    })
+
+    $(document).on('change','.dateformat-cls',function(){
+        var spanid=$(this).closest('tr').index()
+        var val=$(this).val()
+        if (val ==''){
+            date =false
+            //$(this).closest('td').find('textarea').after('<span class="waring-err" id="ser_ref-'+spanid+'" >This Field is Required</span>')
+        }
+        else{
+            date = true
+            $('#ser_date-'+spanid+'').remove()
+        }
+
+    })
+
+
+    if (hdn_dateformat ==''){
+        $('body').on('focus',".dateformat-cls", function(){
+            $(this).datepicker({
+                dateFormat: 'dd-M-yy',
+                maxDate:new Date(),
+            });
+          });
+    }
+    else{
+        $('body').on('focus',".dateformat-cls", function(){
+            $(this).datepicker({
+                dateFormat: hdn_dateformat,
+                maxDate:new Date(),
+            });
+          });
+    }
+
+
+
+    $(document).on('change','.file',function(){
+        var spanid=$(this).closest('tr').index()
+        var val=$(this).val()
+        if (val ==''){
+            files =false
+            //$(this).closest('td').find('textarea').after('<span class="waring-err" id="ser_ref-'+spanid+'" >This Field is Required</span>')
+        }
+        else{
+            files = true
+            $('#ser_file-'+spanid+'').remove()
+        }
+
+    })
+    
+    $(document).on("click", "#service-delete",function(){
+        console.log(scopes)
+        console.log(lenfilled)
+        console.log(s_contract)
+        console.log(s_des)
+        console.log(s_num)
+        console.log(date)
+        console.log(files)
+        if (scopes == true && lenfilled == true && s_contract == true && s_des == true && s_num == true && date == true && files == true){
+            if(row>1){
+            
+                $(this).closest('tr').remove();
+                row--;
+
+            }
+        }
+    
+    })
+    
+    var lenfilled = true;
+    $(document).on("keyup",".service-contract-cls",function(){
+        var x=$(this).val();
+        var spanid=$(this).closest('tr').index()
+        $('#ser_name-'+spanid+'').remove()
+        s_contract=true
+        if (x.length <= 250){
+            lenfilled = true;
+            $('#nameservice'+spanid+'').remove()
+        }
+        else {
+            lenfilled = false;
+            $('#nameservice'+spanid+'').remove()
+            $(this).closest('td').find('textarea').after('<span class="waring-err" id=nameservice'+spanid+'>Maximum 250 Characters only</span>')
+        }
+    
+    })
+
+    var scopes = true;
+    $(document).on("keyup",".service-abridged-cls",function(){
+        var x=$(this).val();
+        var spanid=$(this).closest('tr').index()
+        $('#ser_des-'+spanid+'').remove()
+        s_des =true 
+        if (x.length <= 1000){
+            scopes = true;
+            $('#scopes'+spanid+'').remove()
+        }
+        else {
+            scopes = false;
+            $('#scopes'+spanid+'').remove()
+            $(this).closest('td').find('textarea').after('<span class="waring-err" id=scopes'+spanid+'>Maximum 1000 Characters only</span>')
+        }
+    
+    })
+    
+
+    
+    $(document).on("change",".supply-input",function(){
+    
+    
+        var value=$(this).val();
+        var upper_val=value.replace('s','S')
+        var tableshow1=""
+    
+    
+    if ($(this).is (":checked")){
+    
+        tableshow1+='<table id="'+value+'table"><thead><tr id="supply-content-head"><th></th><th>Name of '+upper_val+'</th><th>Brief Description of '+upper_val+'</th><th>PO Reference Number</th><th>PO Executed Date</th></tr></thead><tbody id="wow-content"><tr id="con-data" class="vend-service-top"><td><div class="row"> <div class="col-6 out-vend-add"><button id="supplyadd" class=" out-btn " type="button" data-id='+value+' value="Add"> <i class="fa fa-plus"></i></button></div> <div class="col-6 out-vend-minu"><button id="supplydelete" class=" out-btn" delete-"btn" type="button" value="delete"> <i class="fa fa-minus"></i></button> </div></div></td><td><textarea rows="3" cols="30" class="form-control supply-validate" name="'+value+'Contract"></textarea></td><td><textarea rows="3" cols="30" class="form-control supplyscope-validate" name="'+value+'Abridged_Scope"></textarea></td><td><textarea rows="3" cols="30" class="form-control supply_num_cls" name="'+value+'contractnumber"></textarea></td><td><input type="text" class="form-control supplydates" name="'+value+'Contract_Executed_Date"></td><td class="msg-wid"><div class="container-fluid supply-add-filecls"><div class="row"> <div class="col-6 file-input"><input type="file" id="supplyfile" class="suppfile filesize" name="'+value+'file0"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></div> <div class="col-6 left-btn-top"><button id="supplyfile-add" data-id='+value+' class=" out-btn-right  sf-add ser-add" index="0" type="button" value="Add"> <i class="fa fa-plus"></i></button><button id="supplyfile-delete" class="out-btn-right sf-minu" delete-"btn" type="button" value="delete"> <i class="fa fa-minus"></i></button></div></div> </div></td></tr></tbody></table>'
+            $(this).parent().after(tableshow1);
+    
+    
+        
+    }
+    
+    else{
+    
+        $("#supplytable").remove();
+    }
+    })
+    
+
+
+    $(document).on('click','#supplyfile-add',function(){
+        var spanid=$(this).closest('tr').index()
+        $('#supply_file-'+spanid+'').remove()
+        $('.suppfile').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                supplyfiles =false
+                $(this).closest('div').find('input').after('<span class="waring-err" id="supply_file-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                supplyfiles = true
+                $('#supply_file-'+spanid+'').remove()
+            }
+        })
+
+        if (supplyscopes == true && supplylenfilled == true && supply_contract == true && supply_des == true && supply_num == true && supplydate == true && supplyfiles == true){
+            var index=$(this).attr('index')
+            var value=$(this).attr('data-id');
+            var fileadd=''
+            fileadd='<div class="row"><div class="col-6 file-input"><input type="file" class="suppfile filesize" id="myfile" name="'+value+'file'+index+'"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></div><div class="col-6 left-btn-top"><button id="supplyfile-add" data-id='+value+' class=" out-btn-right  sf-add" index="'+index+'" type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="supplyfile-delete" class=" out-btn-right sf-minu" delete-"btn" type="button" value="delete"> <i class="fa fa-minus"></i> </button></div></div>'
+            $(this).parent().parent().after(fileadd);
+        }
+    
+    })
+    
+
+    $(document).on('click','#supplyfile-delete',function(){
+        var supply_class=$("div.supply-add-filecls").children().length
+        if (supply_class > 1){ 
+            supplyfiles == true
+            $(this).closest('div').parent().remove()
+        }
+    })
+    
+    
+
+
+    var row1=1
+    var supply_contract =true;
+    var supply_des =true;
+    var supply_num =true;
+    var supplydate =true;
+    var supplyfiles =true;
+
+    $(document).on("click","#supplyadd",function(){
+
+
+        var spanid=$(this).closest('tr').index()
+        $('#supply_name-'+spanid+'').remove()
+        $('#supply_des-'+spanid+'').remove()
+        $('#supply_ref-'+spanid+'').remove() 
+        $('#supply_date-'+spanid+'').remove()
+        $('#supply_file-'+spanid+'').remove()
+
+        $('.supply-validate').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                supply_contract =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="supply_name-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                supply_contract = true
+                $('#supply_name-'+spanid+'').remove()
+            }
+        })
+
+        $('.supplyscope-validate').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                supply_des =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="supply_des-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                supply_des = true
+                $('#supply_des-'+spanid+'').remove()
+            }
+        })
+
+       $('.supply_num_cls').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                supply_num =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="supply_ref-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                supply_num = true
+                $('#supply_ref-'+spanid+'').remove()
+            }
+        })
+
+        $('.supplydates').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                supplydate =false
+                $(this).closest('td').find('input').after('<span class="waring-err" id="supply_date-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                supplydate = true
+                $('#supply_date-'+spanid+'').remove()
+            }
+        })
+
+        $('.suppfile').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                supplyfiles =false
+                $(this).closest('div').find('input').after('<span class="waring-err" id="supply_file-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                supplyfiles = true
+                $('#supply_file-'+spanid+'').remove()
+            }
+        })
+
+        if (supplyscopes == true && supplylenfilled == true && supply_contract == true && supply_des == true && supply_num == true && supplydate == true && supplyfiles == true){
+        var data_id=$(this).attr('data-id');
+    
+        newrow='<tr class="vend-service-top"><td><div class="row"> <div class="col-6 out-vend-add"><button id="supplyadd" class=" out-btn " data-id='+data_id+' type="button" value="Add"> <i class="fa fa-plus"></i> </button></div> <div class="col-6 out-vend-minu"><button id="supplydelete" class=" out-btn" delete-"btn" type="button" value="delete"><i class="fa fa-minus"></i></button></div></div></td><td id="supplyrow'+row1+'"><textarea rows="3" cols="30" class="form-control supply-validate" name="'+data_id+'Contract" ></textarea></td><td> <textarea rows="3" cols="30" class="form-control supplyscope-validate" name="'+data_id+'Abridged_Scope"></textarea> </td><td><textarea rows="3" cols="30" class="form-control supply_num_cls" name="'+data_id+'contractnumber"></textarea></td><td><input type="text" class="form-control supplydates" name="'+data_id+'Contract_Executed_Date"></td><td class="msg-wid"><div class="container-fluid"><div class="row"> <div class="col-6 file-input"> <input type="file" id="supplyfile" class="suppfile filesize" name="'+data_id+'file'+row1+'"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></div> <div class="col-6 left-btn-top"><button id="supplyfile-add" data-id='+data_id+' class=" out-btn-right  sf-add" index='+row1+' type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="supplyfile-delete" class=" out-btn-right sf-minu" delete-"btn" type="button" value="delete"> <i class="fa fa-minus"></i> </button></div></div></div> </td></tr>'
+        $("#supplytable").append(newrow);
+        row1++;
+        }
+    })
+    
+
+    var supplylenfilled = true;
+    $(document).on("keyup",".supply-validate",function(){
+        var x=$(this).val();
+        var spanid=$(this).closest('tr').index()
+        $('#supply_name-'+spanid+'').remove()
+        supply_contract=true
+        if (x.length <= 250){
+            supplylenfilled = true;
+            $('#namessupplyervice'+spanid+'').remove()
+        }
+        else {
+            supplylenfilled = false;
+            $('#namessupplyervice'+spanid+'').remove()
+            $(this).closest('td').find('textarea').after('<span class="waring-err" id=namessupplyervice'+spanid+'>Maximum 250 Characters only</span>')
+        }
+    
+    })
+
+    var supplyscopes = true;
+    $(document).on("keyup",".supplyscope-validate",function(){
+        var x=$(this).val();
+        var spanid=$(this).closest('tr').index()
+        $('#supply_des-'+spanid+'').remove()
+        supply_des =true 
+        if (x.length <= 1000){
+            supplyscopes = true;
+            $('#supplyscopes'+spanid+'').remove()
+        }
+        else {
+            supplyscopes = false;
+            $('#supplyscopes'+spanid+'').remove()
+            $(this).closest('td').find('textarea').after('<span class="waring-err" id=supplyscopes'+spanid+'>Maximum 1000 Characters only</span>')
+        }
+    
+    })
+
+
+
+    $(document).on('keyup','.supply_num_cls',function(){
+        var spanid=$(this).closest('tr').index()
+        var val=$(this).val()
+        if (val ==''){
+            supply_num =false
+            //$(this).closest('td').find('textarea').after('<span class="waring-err" id="supply_ref-'+spanid+'" >This Field is Required</span>')
+        }
+        else{
+            supply_num = true
+            $('#supply_ref-'+spanid+'').remove()
+        }
+
+    })
+
+    $(document).on('change','.supplydates',function(){
+        var spanid=$(this).closest('tr').index()
+        var val=$(this).val()
+        if (val ==''){
+            supplydate =false
+            //$(this).closest('td').find('textarea').after('<span class="waring-err" id="ser_ref-'+spanid+'" >This Field is Required</span>')
+        }
+        else{
+            supplydate = true
+            $('#supply_date-'+spanid+'').remove()
+        }
+
+    })
+
+
+    if (hdn_dateformat ==''){
+        $('body').on('focus',".supplydates", function(){
+            $(this).datepicker({
+                dateFormat: 'dd-M-yy',
+                maxDate:new Date(),
+            });
+          });
+    }
+    else{
+        $('body').on('focus',".supplydates", function(){
+            $(this).datepicker({
+                dateFormat: hdn_dateformat,
+                maxDate:new Date(),
+            });
+          });
+    }
+
+    $(document).on('change','.suppfile',function(){
+        var spanid=$(this).closest('tr').index()
+        var val=$(this).val()
+        if (val ==''){
+            supplyfiles =false
+            //$(this).closest('td').find('textarea').after('<span class="waring-err" id="ser_ref-'+spanid+'" >This Field is Required</span>')
+        }
+        else{
+            supplyfiles = true
+            $('#supply_file-'+spanid+'').remove()
+        }
+
+    })
+
+
+    $(document).on ("click","#supplydelete",function(){
+        console.log(supplyscopes)
+        console.log(supplylenfilled)
+        console.log(supply_contract)
+        console.log(supply_des)
+        console.log(supply_num)
+        console.log(supplydate)
+        console.log(supplyfiles)
+
+
+        if (supplyscopes == true && supplylenfilled == true && supply_contract == true && supply_des == true && supply_num == true && supplydate == true && supplyfiles == true){
+    
+        if(row1>1){
+        $(this).closest('tr').remove();
+        
+        row1--;
+        
+        }
+    }
+    
+    })
+    
+    
+    $(document).on("change", ".serviceandsupply-input" ,function(){
+    
+    var value=$(this).val();
+    
+    var tableshow2=""
+    
+    if($(this).is (":checked")){
+    
+        tableshow2+='<table id="'+value+'table"><thead><tr id="servicesupply-content-head"><th></th><th>Name of Contract</th><th>Brief Description of Contract</th><th>Contract Reference Number</th><th>Contract Executed Date</th></tr></thead><tbody><tr class="vend-service-top"><td><div class="row"> <div class="col-6 out-vend-add"><button id="servicesupplyadd" class=" out-btn" data-id='+value+' type="button"  value="Add" > <i class="fa fa-plus"></i> </button></div><div class="col-6 out-vend-minu"><button id="delete" class=" out-btn" delete-"btn" type="button" value="delete"> <i class="fa fa-minus"></i> </button></div></div></td><td><textarea rows="3" cols="30" class="form-control sersuppcontract" name="'+value+'Contract"></textarea></td><td> <textarea rows="3" cols="30" class="form-control sersuppscope" name="'+value+'Abridged_Scope"></textarea> </td><td><textarea rows="3" cols="30" class="form-control sersupp_num" name="'+value+'contractnumber"></textarea></td><td><input type="text" class="form-control sersuppdate" name="'+value+'Contract_Executed_Date"></td><td class="msg-wid"><div class="container-fluid ser-supp-file-addcls"><div class="row"> <div class="col-6 file-input"><input type="file" id="supplyandervicefile" class="sersuppfile filesize" name="'+value+'file0"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></div> <div class="col-6 left-btn-top"><button id="serviceandsupplyfile-add" data-id='+value+' class=" out-btn-right  sf-add" index="0" type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="serviceandsupplyfile-delete" class=" out-btn-right sf-minu" delete-"btn" type="button" value="delete"> <i class="fa fa-minus"></i> </button></div></div> </div></td></tr></tbody></table>'
+        $(this).parent().after(tableshow2);
+    }
+    else{
+    $("#service-supplytable").remove()
+    
+    }
+    
+    })
+    
+    
+    $(document).on('click','#serviceandsupplyfile-add',function(){
+        
+        var spanid=$(this).closest('tr').index()
+        $('#sersupply_file-'+spanid+'').remove()
+        $('.sersuppfile').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                sersupplyfiles =false
+                $(this).closest('div').find('input').after('<span class="waring-err" id="sersupply_file-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                sersupplyfiles = true
+                $('#sersupply_file-'+spanid+'').remove()
+            }
+        })
+
+        if (sersupplylenfilled == true && sersupplyscopes == true && sersupply_contract == true && sersupply_des == true && sersupply_num == true && sersupplydate == true && sersupplyfiles == true){
+
+            var index=$(this).attr('index')
+            var value=$(this).attr('data-id');
+            var fileadd=''
+            fileadd='<div class="row"><div class="col-6 file-input"><input type="file" id="myfile"  class="sersuppfile filesize" name="'+value+'file'+index+'"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></div><div class="col-6 left-btn-top"><button id="serviceandsupplyfile-add" data-id='+value+' class=" out-btn-right  sf-add" index="'+index+'" type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="serviceandsupplyfile-delete" class=" out-btn-right sf-minu" delete-"btn" type="button" value="delete"> <i class="fa fa-minus"></i> </button></div></div>'
+            $(this).parent().parent().after(fileadd);
+        }
+    
+    })
+
+
+    $(document).on('click','#serviceandsupplyfile-delete',function(){
+        var ser_supply_class=$("div.ser-supp-file-addcls").children().length
+        if (ser_supply_class > 1){ 
+        sersupplyfiles = true
+        $(this).closest('div').parent().remove()
+        }
+    })
+    
+    row2=1
+
+    var sersupply_contract =true;
+    var sersupply_des =true;
+    var sersupply_num =true;
+    var sersupplydate =true;
+    var sersupplyfiles =true;
+
+    $(document).on("click","#servicesupplyadd",function(){
+
+        var spanid=$(this).closest('tr').index()
+        $('#sersupply_name-'+spanid+'').remove()
+        $('#sersupply_des-'+spanid+'').remove()
+        $('#sersupply_ref-'+spanid+'').remove() 
+        $('#sersupply_date-'+spanid+'').remove()
+        $('#sersupply_file-'+spanid+'').remove()
+
+        $('.sersuppcontract').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                sersupply_contract =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="sersupply_name-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                sersupply_contract = true
+                $('#sersupply_name-'+spanid+'').remove()
+            }
+        })
+
+        $('.sersuppscope').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                sersupply_des =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="sersupply_des-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                sersupply_des = true
+                $('#sersupply_des-'+spanid+'').remove()
+            }
+        })
+
+       $('.sersupp_num').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                sersupply_num =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="sersupply_ref-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                sersupply_num = true
+                $('#sersupply_ref-'+spanid+'').remove()
+            }
+        })
+
+        $('.sersuppdate').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                sersupplydate =false
+                $(this).closest('td').find('input').after('<span class="waring-err" id="sersupply_date-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                sersupplydate = true
+                $('#sersupply_date-'+spanid+'').remove()
+            }
+        })
+
+        $('.sersuppfile').each(function(){
+            var val=$(this).val()
+            if (val ==''){
+                sersupplyfiles =false
+                $(this).closest('div').find('input').after('<span class="waring-err" id="sersupply_file-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                sersupplyfiles = true
+                $('#sersupply_file-'+spanid+'').remove()
+            }
+        })
+
+        if (sersupplylenfilled == true && sersupplyscopes == true && sersupply_contract == true && sersupply_des == true && sersupply_num == true && sersupplydate == true && sersupplyfiles == true){
+
+        var data_id=$(this).attr('data-id');
+    newrow='<tr class="vend-service-top"><td><div class="row"><div class="col-6 out-vend-add"><button id="servicesupplyadd" class=" out-btn" data-id='+data_id+' type="button" value="Add"  > <i class="fa fa-plus"></i> </button> </div><div class="col-6 out-vend-minu"><button id="servicesupplydelete" class=" out-btn" delete-"btn" type="button" value="delete"> <i class="fa fa-minus"></i> </button></div></div></td><td id="servicesupplyrow'+row2+'"><textarea rows="3" cols="30" class="form-control sersuppcontract" name="'+data_id+'Contract"></textarea></td><td>  <textarea rows="3" cols="30" class="form-control sersuppscope" name="'+data_id+'Abridged_Scope"></textarea> </td><td><textarea rows="3" cols="30" class="form-control sersupp_num" name="'+data_id+'contractnumber"></textarea></td><td><input type="text" class="form-control sersuppdate" name="'+data_id+'Contract_Executed_Date"></td><td class="msg-wid"><div class="container-fluid"><div class="row"><div class="col-6 file-input"><input type="file" class="sersuppfile filesize" id="servicesupply" name="'+data_id+'file'+row2+'"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></div><div class="col-6 left-btn-top"><button id="supplyfile-add" data-id='+data_id+' class=" out-btn  sf-add" index='+row2+' type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="supplyfile-delete" class=" out-btn-right sf-minu" delete-"btn" type="button" value="delete"> <i class="fa fa-minus"></i> </button></div></div></div></td></tr>'
+    
+    $("#service-supplytable").append(newrow);
+    row2++;
+        }
+    })
+    
+    
+    $(document).on("click","#servicesupplydelete",function(){
+        if (sersupplylenfilled == true && sersupplyscopes == true && sersupply_contract == true && sersupply_des == true && sersupply_num == true && sersupplydate == true && sersupplyfiles == true){
+        if(row2>1){
+        $(this).closest('tr').remove();
+        row2--;
+        }
+    }
+    
+    })
+    
+
+    var sersupplylenfilled = true;
+    $(document).on("keyup",".sersuppcontract",function(){
+        var x=$(this).val();
+        var spanid=$(this).closest('tr').index()
+        $('#sersupply_name-'+spanid+'').remove()
+        sersupply_contract =true
+        if (x.length <= 250){
+            sersupplylenfilled = true;
+            $('#namesersupplyervice'+spanid+'').remove()
+        }
+        else {
+            sersupplylenfilled = false;
+            $('#namesersupplyervice'+spanid+'').remove()
+            $(this).closest('td').find('textarea').after('<span class="waring-err" id=namesersupplyervice'+spanid+'>Maximum 250 Characters only</span>')
+        }
+    
+    })
+
+    var sersupplyscopes = true;
+    $(document).on("keyup",".sersuppscope",function(){
+        var x=$(this).val();
+        var spanid=$(this).closest('tr').index()
+        $('#sersupply_des-'+spanid+'').remove()
+        sersupply_des =true
+        if (x.length <= 1000){
+            sersupplyscopes = true;
+            $('#sersupplyscopes'+spanid+'').remove()
+        }
+        else {
+            sersupplyscopes = false;
+            $('#sersupplyscopes'+spanid+'').remove()
+            $(this).closest('td').find('textarea').after('<span class="waring-err" id=sersupplyscopes'+spanid+'>Maximum 1000 Characters only</span>')
+        }
+    
+    })
+
+
+    $(document).on('keyup','.sersupp_num',function(){
+        var spanid=$(this).closest('tr').index()
+        var val=$(this).val()
+        if (val ==''){
+            sersupply_num =false
+            //$(this).closest('td').find('textarea').after('<span class="waring-err" id="ser_ref-'+spanid+'" >This Field is Required</span>')
+        }
+        else{
+            sersupply_num = true
+            $('#sersupply_ref-'+spanid+'').remove()
+        }
+
+    })
+
+    $(document).on('change','.sersuppdate',function(){
+        var spanid=$(this).closest('tr').index()
+        var val=$(this).val()
+        if (val ==''){
+            sersupplydate =false
+            //$(this).closest('td').find('textarea').after('<span class="waring-err" id="ser_ref-'+spanid+'" >This Field is Required</span>')
+        }
+        else{
+            sersupplydate = true
+            $('#sersupply_date-'+spanid+'').remove()
+        }
+
+    })
+
+
+    if (hdn_dateformat ==''){
+        $('body').on('focus',".sersuppdate", function(){
+            $(this).datepicker({
+                dateFormat: 'dd-M-yy',
+                maxDate:new Date(),
+            });
+          });
+    }
+    else{
+        $('body').on('focus',".sersuppdate", function(){
+            $(this).datepicker({
+                dateFormat: hdn_dateformat,
+                maxDate:new Date(),
+            });
+          });
+    }
+
+
+    /*
+    $('body').on('focus',".sersuppdate", function(){
+        $(this).datepicker({
+            dateFormat: 'dd-M-yy',
+            maxDate:new Date(),
+        });
+      });
+      */
+
+    $(document).on('change','.sersuppfile',function(){
+        var spanid=$(this).closest('tr').index()
+        var val=$(this).val()
+        if (val ==''){
+            sersupplyfiles =false
+            //$(this).closest('td').find('textarea').after('<span class="waring-err" id="ser_ref-'+spanid+'" >This Field is Required</span>')
+        }
+        else{
+            sersupplyfiles = true
+            $('#sersupply_file-'+spanid+'').remove()
+        }
+
+    })
+
+
+
+
+    $(document).on("click" ,".Back-cls" ,function(){
+        var companyid=$(this).attr('companyid')
+        var vendorid=$(this).attr('vendorid')
+        //console.log(companyid)
+        //console.log(vendorid)
+        var current_url=$(location).attr("href")
+        var url = current_url.replace('outervendorservice/'+vendorid,'editoutervendorregistration/'+vendorid);
+        document.location.href = url;
+
+    })
+    
+    $(document).on('click','.final-cls',function(e){
+
+        $('.s-contract-cls').each(function(){
+            var val=$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#ser_name-'+spanid+'').remove()
+            if (val ==''){
+                s_contract =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="ser_name-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                s_contract = true
+                $('#ser_name-'+spanid+'').remove()
+            }
+        })
+
+        $('.service-des-cls').each(function(){
+            var val=$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#ser_des-'+spanid+'').remove()
+            if (val ==''){
+                s_des =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="ser_des-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                s_des = true
+                $('#ser_des-'+spanid+'').remove()
+            }
+        })
+        
+       $('.s-num-cls').each(function(){
+            var val=$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#ser_ref-'+spanid+'').remove()
+            if (val ==''){
+                s_num =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="ser_ref-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                s_num = true
+                $('#ser_ref-'+spanid+'').remove()
+            }
+        })
+
+
+        $('.dateformat-cls').each(function(){
+            var val=$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#ser_date-'+spanid+'').remove()
+            if (val ==''){
+                date =false
+                $(this).closest('td').find('input').after('<span class="waring-err" id="ser_date-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                date = true
+                $('#ser_date-'+spanid+'').remove()
+            }
+        })
+
+        $('.file').each(function(){
+            var val=$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#ser_file-'+spanid+'').remove()
+            if (val ==''){
+                files =false
+                $(this).closest('div').find('input').after('<span class="waring-err" id="ser_file-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                files = true
+                $('#ser_file-'+spanid+'').remove()
+            }
+        })
+
+
+        $('.supply-validate').each(function(){
+            var val=$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#supply_name-'+spanid+'').remove()
+            if (val ==''){
+                supply_contract =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="supply_name-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                supply_contract = true
+                $('#supply_name-'+spanid+'').remove()
+            }
+        })
+
+        $('.supplyscope-validate').each(function(){
+            var val=$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#supply_des-'+spanid+'').remove()
+            if (val ==''){
+                supply_des =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="supply_des-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                supply_des = true
+                $('#supply_des-'+spanid+'').remove()
+            }
+        })
+
+       $('.supply_num_cls').each(function(){
+            var val=$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#supply_ref-'+spanid+'').remove()
+            if (val ==''){
+                supply_num =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="supply_ref-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                supply_num = true
+                $('#supply_ref-'+spanid+'').remove()
+            }
+        })
+
+        $('.supplydates').each(function(){
+            var val=$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#supply_date-'+spanid+'').remove()
+            if (val ==''){
+                supplydate =false
+                $(this).closest('td').find('input').after('<span class="waring-err" id="supply_date-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                supplydate = true
+                $('#supply_date-'+spanid+'').remove()
+            }
+        })
+
+        $('.suppfile').each(function(){
+            var val=$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#supply_file-'+spanid+'').remove()
+            if (val ==''){
+                supplyfiles =false
+                $(this).closest('div').find('input').after('<span class="waring-err" id="supply_file-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                supplyfiles = true
+                $('#supply_file-'+spanid+'').remove()
+            }
+        })
+
+        $('.sersuppcontract').each(function(){
+            var val=$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#sersupply_name-'+spanid+'').remove()
+            if (val ==''){
+                sersupply_contract =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="sersupply_name-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                sersupply_contract = true
+                $('#sersupply_name-'+spanid+'').remove()
+            }
+        })
+
+        $('.sersuppscope').each(function(){
+            var val=$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#sersupply_des-'+spanid+'').remove()
+            if (val ==''){
+                sersupply_des =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="sersupply_des-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                sersupply_des = true
+                $('#sersupply_des-'+spanid+'').remove()
+            }
+        })
+
+       $('.sersupp_num').each(function(){
+            var val=$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#sersupply_ref-'+spanid+'').remove()
+            if (val ==''){
+                sersupply_num =false
+                $(this).closest('td').find('textarea').after('<span class="waring-err" id="sersupply_ref-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                sersupply_num = true
+                $('#sersupply_ref-'+spanid+'').remove()
+            }
+        })
+
+        $('.sersuppdate').each(function(){
+            var val=$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#sersupply_date-'+spanid+'').remove()
+            if (val ==''){
+                sersupplydate =false
+                $(this).closest('td').find('input').after('<span class="waring-err" id="sersupply_date-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                sersupplydate = true
+                $('#sersupply_date-'+spanid+'').remove()
+            }
+        })
+
+        $('.sersuppfile').each(function(){
+            var val=$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#sersupply_file-'+spanid+'').remove()
+            if (val ==''){
+                sersupplyfiles =false
+                $(this).closest('div').find('input').after('<span class="waring-err" id="sersupply_file-'+spanid+'" >This Field is Required</span>')
+            }
+            else{
+                sersupplyfiles = true
+                $('#sersupply_file-'+spanid+'').remove()
+            }
+        })
+
+
+
+        if (scopes == true && lenfilled == true && s_contract == true && s_des == true && s_num == true && date == true && files == true && supplyscopes == true && supplylenfilled == true && supply_contract == true && supply_des == true && supply_num == true && supplydate == true && supplyfiles == true && sersupplylenfilled == true && sersupplyscopes == true && sersupply_contract == true && sersupply_des == true && sersupply_num == true && sersupplydate == true && sersupplyfiles == true){
+        }
+        else{
+            e.preventDefault();
+        }   
+    })
+    $('.final-cls').submit(function()
+    {
+       $("input[type='submit']", this)
+         .attr('disabled', 'disabled');
+   
+       return true;
+     });
+
+    </script>
+
+{%endblock%}

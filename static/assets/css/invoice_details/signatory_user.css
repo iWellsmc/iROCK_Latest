@@ -1,0 +1,116 @@
+.head-inv-pre {
+    color: #AF2B50 !important;
+    font-size: 1.5rem !important;
+    text-align: left !important;
+}
+
+.head-inv-pre.mid {
+    text-align: center !important;
+}
+
+.btn-space {
+    margin-bottom: 3px !important;
+}
+
+.color-btn button {
+    width: 100% !important;
+}
+
+.dark_green {
+    background-color: #607e4b !important;
+}
+
+.rose {
+    background-color: #bd2753 !important;
+    /* background-color: #8faadc !important; */
+}
+
+.beige {
+  background-color: #c55e0b !important;
+}
+
+.dark_green {
+    background-color: #607e4b !important;
+}
+
+.violet {
+    background-color: #9C27B0 !important;
+}
+
+
+.tab-styling th, td {
+    text-align: var(--centertext-align) !important;
+}
+
+.tab-styling tbody {
+    border-top: none !important;
+}
+
+.tab-styling th {
+    color: var(--irock-green);
+    background-color: #fff !important;
+    text-transform: capitalize !important;
+    text-align: var(--centertext-align) !important;
+    font-size: 15px !important;
+    font-weight: 600;
+    border-right: 1px solid var(--tableborder-color) !important;
+}
+
+.tab-styling td {
+    color: #000;
+    font-size: 15px;
+    font-weight: 500;
+    text-align: var(--centertext-align) !important;
+}
+
+.tab-styling thead tr {
+    border-bottom: 2px solid var(--tableborder-color);
+}
+
+/********** Comment Pop-up **********/
+.comment-head {
+    background-color: #FFE9E9 !important;
+    border: none !important;
+}
+
+.comment-head button {
+    padding: 0px !important;
+}
+
+.comment-head span {
+    font-size: 28px;
+    color: #96193a !important;
+    /* padding: 0px 10px !important; */
+    line-height: 0 !important;
+    /* outline: 1px solid #96193a;
+    outline-offset: -10px; */
+    border-radius: 25px;
+    /* padding: 0px 12px 5px 12px !important; */
+    /* padding: 0px 12px 5.8px 12px !important; */
+    padding: 1px 12px 1px 12px !important;
+}
+
+.comment-body {
+    background-color: #FFE9E9 !important;
+}
+
+.comment-foot {
+    background-color: #FFE9E9 !important;
+    border: none;
+    justify-content: center;
+    padding: 10px 15px !important;
+}
+
+.comment-foot button {
+    background-color: #BD2753 !important;
+    margin: 0px !important;
+}
+
+.comment-foot button:hover {
+    box-shadow: 0 8px 10px -8px #8D1636 !important;
+}
+.error-border {
+    border: 1px solid red;
+}
+
+/********** Comment Pop-up **********/

@@ -1,0 +1,881 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load InvoiceGuardTags %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/projectcreate.css' %}">
+<section id="data-list-view " class="data-list-view-header">
+ 
+  <!-- <div class="card"> -->
+    
+    <div class="card-header cd-head px-0 project-card-header">
+      <div class="row">
+    <div class="col-12">
+      <h4 class="from-head">Invoice Approval Workflow</h4>
+      </div>
+      <div class="col-9 col-md-12">
+        <form method="POST">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-lg-3 col-md-4" id="countries">
+              <select id="country_id" name="country_name" class="form-control form-select list-control">
+                <option value=" " selected>--Select Country--</option>
+                {% for country in get_countries %}
+                  <option value="{{country.country_id}}" {% if country.country_id == post_country %} selected{% endif %}>{{country.country_name}}</option>
+                {% endfor %} 
+              </select>
+            </div>
+            <div class="col-lg-3 col-md-4" id="projects">
+              <select id="project_id" name="project_name" class="form-control form-select list-control">
+                <option value=" " selected>--Select Project--</option>
+                {% for project in project_country %}
+                  <option value="{{project.id}}" {% if project.id == post_project %} selected{% endif %}>{{project.projectname.name}}</option>
+                {% endfor %}
+
+              </select>
+            </div>
+            <div class="col-lg-3 p-0 col-md-4">
+              <button type="submit" class="btn btn-clr " id="country_btn">Search</button>
+              <button type="submit" class="btn btn-clr"><a href="{% url 'projects:projectwcc' %}">Reset</a></button>
+            </div>
+          </div>
+      </form>
+      </div>
+
+      <div class="col-3">
+    </div>
+    </div>
+    </div>
+    <div class="card-body card-plist p-0">
+
+    <div class="table-responsive">
+      <table class="table settings-data-list-view data-list-view project_master irock-table" id ="master_project_list">
+
+          <thead >
+              <tr class="project-transparent-header">
+                  <!-- <th></th> -->
+                  <th>S/N</th> 
+                  <th>Project</th>     
+                  <th>Country</th>
+                  <th>Category of Entity</th>
+                  <th>Actions</th>
+              </tr>
+          </thead>
+          <tbody class=" table-list">
+            {% if projects_count == 0 %}
+            <tr>
+              <td colspan="7" class="cls-nil">
+                ---
+              </td>
+            </tr>
+            {% elif  projects_count > 0%}
+              {% for obj in projects %}
+                            
+              <tr>
+                <td>{{forloop.counter|default_if_none:"---"}}</td>
+                <td class="projectlist-projectName">{{obj.projectname.name|default_if_none:"---"}}</td>
+                <td class="projectlist-projectCountry">{{obj.country.nicename|default_if_none:"---"}}</td>
+                <td class="projectlist-projectCategory">{{request.company.category_entity|category_replace|category_replace}}</td>
+                <td class=""> 
+                  <!-- {% if request.user.roles_id == 3 %}
+                    {% if rights.view == '1' %}
+                      <a class="btn p-0" data-toggle="collapse" href="#collapseExample{{obj.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                        <span class="action-edit align-icons">
+                          <i class="fa fa-eye" title="View" ></i>
+                        </span>
+                      </a> 
+                      {% endif %}
+                  {% else%}
+                      <a class="btn p-0" data-toggle="collapse" href="#collapseExample{{obj.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                        <span class="action-edit align-icons text-decoration-none">
+                          <i class="fa fa-eye" title="View" ></i>
+                        </span>
+                      </a>
+                  {% endif %} -->
+
+                  {% getcountinvoiceflow obj.id as invoicecount %}
+                   {%if invoicecount == 0 %}
+                        <a class="project_flow px-1" data-id="{{obj.id}}" project-name="{{obj.projectname.name}}" href="{% url 'projectflow:createprocessflow' pk=obj.id %}">
+                            <span class="action-delete" title="Create">
+                            <!-- <i class="fa fa-trash-o" title="Delete" ></i> -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" style="margin-top: -6px;" viewBox="0 0 24 24"><path fill="#95183a" d="m23.5 17l-5 5l-3.5-3.5l1.5-1.5l2 2l3.5-3.5l1.5 1.5M6 2a2 2 0 0 0-2 2v16c0 1.11.89 2 2 2h7.81c-.36-.62-.61-1.3-.73-2H6V4h7v5h5v4.08c.33-.05.67-.08 1-.08c.34 0 .67.03 1 .08V8l-6-6M8 12v2h8v-2m-8 4v2h5v-2Z"></path></svg>
+                                
+                            </span>
+                        </a> 
+                   {%else%}
+                    <a class="text-decoration-none px-1" href="{% url 'projectflow:createprocessflow' pk=obj.id %}" >
+                        <span class="action-edit"><i class="fa fa-edit" title="Edit"></i></span>
+                    </a> 
+                   {%endif%}
+                  <a class="text-decoration-none px-1" href="{% url 'projectflow:projectinvoiceflowview' pk=obj.id %}">
+                    <span class="action-edit">
+                      <i class="fa fa-eye" title="View" ></i>
+                    </span>
+                  </a> 
+                </td>
+              </tr>
+              <tr>
+                <td colspan="12" class="p-0">
+                  <div class="collapse" id="collapseExample{{obj.id}}">
+                    <div class="card card-body shadow-none master-crd">
+                        <ul id="myTabs" class="nav nav-pills nav-justified new-tab" role="tablist" data-tabs="tabs">
+                          <li class="active"><a class="prjlist-menu active" href="#project_overview{{obj.id}}" data-toggle="tab">Project Overview</a></li>
+                          <li><a class="prjlist-menu " href="#block_field{{obj.id}}" data-toggle="tab">Project Discipline</a></li>
+                          <li>
+                            <a class='prjlist-menu' href="#user_field{{obj.id}}" data-toggle="tab">Users</a>
+                          </li>
+                          <li>
+                            <a class='prjlist-menu' href="#project_signatory{{obj.id}}" data-toggle="tab">Project Signatory</a>
+                          </li>
+                       </ul>
+                        <div class="tab-content">
+                          <div role="tabpanel" class="tab-pane active" id="project_overview{{obj.id}}">
+                            <table class="prt-viewlist project-overview-table">
+                                  <tr><th>Country</th><td>{{obj.country.nicename}}</td></tr>
+                                  <tr><th>Project</th><td>{{obj.projectname.name}}</td></tr>
+                                  <tr><th>Company Name</th><td>{{obj.company.company_name}}</td></tr>
+                                  <tr><th>Entity/Subsidary</th><td>{{obj.entity|default_if_none:"---"}}</td></tr>
+                                  <tr><th>Category of Entity</th><td>{{request.company.category_entity|category_replace|category_replace}}</td> 
+                                  {% comment %} <li>{{obj.project_type|modify_name:"first_name"}}</li> {% endcomment %}</td></tr>
+                            </table>
+                          </div>
+                          <div role="tabpanel" class="tab-pane fade prt-viewlist" id="block_field{{obj.id}}">
+                            <div class="row prj-tablists">
+                              <div class="col-3">
+                                <h4 class="proj-hd">Block</h4>
+                              </div>
+                              <div class="col-3">
+                                <h4 class="proj-hd">Field</h4>
+                              </div>
+                              <div class="col-3">
+                                <h4 class="proj-hd">Project Environment</h4>
+                              </div>
+                              <div class="col-3">
+                                <h4 class="proj-hd">Cluster</h4>
+                              </div>
+                            </div>
+                            <div class="row" id="name">
+                              <div class="col-12">
+                                {% for block in obj.id|get_projectblock:"project_block"%}
+                                <div class="row prj-decview">
+                                  <div class="col-3 colum-line">
+                                    <p class="projectblock-cls prjt-viewfont" projectid="{{block.project.id}}" blockid="{{block.id}}">{{block.block.block_name}}<p>
+                                  </div>
+                                  <div class="col-9 pro-field-cls" projectid="{{block.project.id}}" id="projectfield-{{block.id}}">
+                                  </div>
+                                </div>
+                                <div class="row prj-tablists">
+                                  <div class=" col-12 pro-dev-types-cls cluster-{{block.id}}">
+                                  </div>
+                                </div>
+                                <div class="row prj-tablists">
+                                  <div class=" col-12 discipline-activity-cls activities-{{block.id}}">
+                                  </div>
+                                </div>
+                                {% endfor %}
+                              </div>
+                            </div>
+                          </div>
+                          <div role="tabpanel" class="tab-pane fade prt-viewlist" id="user_field{{obj.id}}">
+                            <table class="prt-viewlist project-overview-table tab-wid">
+                              <tr>
+                                <th>Users</th>
+                                <th>Designation</th>
+                                <th>Department</th>
+                              </tr>
+                              {% for values in obj.id|users_in_project:request %}
+                              <tr>
+                                
+                                <td>{{values}} {{values.lastname|default_if_none:''}}</td>
+                                <td>{{values.designation_role|default_if_none:''}}</td>
+                                <td>{% if values.roles.id == 2 %}Administration{% else %}{{values.user_department_id|get_dept_name|default_if_none:''}}{% endif %}</td>
+                              </tr>
+                              {% empty %}
+                              <tr>
+                                <td></td>
+                                <td  id="empty_class">---</td>
+                                <td></td>
+                              </tr>
+                              {% endfor %}
+                                
+                                 
+    
+                            </table>
+                          </div>
+
+                          <div role="tabpanel" class="tab-pane fade prt-viewlist" id="project_signatory{{obj.id}}">
+
+                            <div class="col-9 show-noti pt-0">
+                              <label for="">Select Signatory
+                              <select class="select-style select-invoice">
+                                <option value="1">With Invoice</option>
+                                <option value="2">Without Invoice</option>
+                              </select>
+                            </label>
+                            </div>
+                            <h4 class="from-head default-sig">{{obj.id|signatory_type|default_if_none:''}}</h4>
+                            <table class="table settings-data-list-view data-list-view project_master proj-lists creat-head pro-list all-tbl-hd list-user-table-width irock-table with_invoice"
+                            id="master_project_list">
+                            <thead>
+                              <tr>
+                                <th class="wid-iin com_curency">Currency</th>
+                                <th class="wid-iin">From Invoice Amount</th>
+                                <th class="wid-iin">To Invoice Amount</th>
+                                <th id="text-initial">No of Signatories</th>
+                                <th>Users</th>
+                              </tr>
+                            </thead>
+                            <tbody class="table-list">
+                              {% project_signatory obj.id request.company 1 as with_invoice %}
+                              {% for signatory in with_invoice %}
+                              <tr>
+                                <td>{{signatory.currency.currency_symbol}}-{{signatory.currency.currency}} ({{signatory.currency.name}})
+                                </td>
+                                <td>{{signatory.min_amount|default_if_none:''}}</td>
+                                <td>{{signatory.max_amount|default_if_none:''}}</td>
+                                <td>
+                                  <p class="txt-word-break">
+                                    {{signatory.id|no_of_users|default_if_none:"---"}}</p>
+                                </td>
+                                <td class="text-start">
+                                  {% for user in signatory|SignatoryUser %}
+                                  <p class="txt-word-break">{{user.user|default_if_none:"---"}}&nbsp;{{user.user.lastname|default_if_none:"---"}}
+                                  </p>
+                                  {% endfor %}
+                                </td>
+                              </tr>
+                              {% empty %}
+                              <tr>
+                                <td colspan="9" class="cls-nil">
+                                  ---
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                          <table class="table settings-data-list-view data-list-view project_master proj-lists creat-head pro-list all-tbl-hd list-user-table-width irock-table without_invoice"
+                            id="master_project_list" style="display: none;">
+                            <thead>
+                              <tr>
+                                <th class="wid-iin com_curency">Currency</th>
+                                <th id="text-initial">No of Signatories</th>
+                                <th>Users</th>
+                              </tr>
+                            </thead>
+                          <tbody class="table-list">
+                            {% project_signatory obj.id request.company 2 as without_invoice %}
+                            {%for signatory in without_invoice%}
+                            <tr>
+                              <td>{{signatory.currency.currency_symbol}}-{{signatory.currency.currency}} ({{signatory.currency.name}})
+                              </td>
+                              <td>
+                                <p class="txt-word-break">
+                                  {{signatory.id|no_of_users|default_if_none:"---"}}</p>
+                              </td>
+                              <td class="text-start">
+                                {% for user in signatory|SignatoryUser %}
+                                <p class="txt-word-break">{{user.user|default_if_none:"---"}}&nbsp;{{user.user.lastname|default_if_none:"---"}}
+                                </p>
+                                {% endfor %}
+                              </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                              <td colspan="9" class="cls-nil">
+                                ---
+                              </td>
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                          </div>
+
+                        </div>
+                    </div>
+                  </div>  
+                </td>
+              </tr>
+              {% endfor %}
+              {% endif %}
+          </tbody>
+      </table>
+      
+  </div>
+</div>
+
+</section>
+
+{% comment %} 
+
+
+
+  $(".project_delete").click(function(){
+    
+    var delete_id=$(this).attr('value');
+    console.log(delete_id);
+    
+    var project_name=$(this).closest('td').prev().prev().prev().prev().text();   
+
+  Swal.fire({
+      title: 'Are you sure you want to delete   '+project_name,
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes,I Confirm',
+      cancelButtonText: 'No',
+    }).then((result) => {
+      if (result.isConfirmed) {
+         $.ajax({
+        type: "GET",
+        url:'{% url "projects:delete" %}',
+        data: {
+          "id":delete_id,
+        },
+        cache: false,
+        success: function(data)
+        {
+          setTimeout(function(){  
+          location.reload();  
+          },1000);
+        }
+         });
+        Swal.fire(
+            project_name,
+            'Deleted Successfully'      
+          
+        )
+        
+      }
+    })
+    })
+          
+      
+
+    </script> {% endcomment %}
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+
+  $('#country_id').change(function(){
+    // alert('1');
+    var country_id=$(this).val();
+    var projects='';
+    if (country_id != ' '){
+    $.ajax({
+      type:"GET",
+      url:'/projects/getprojectcreation',
+      data:{'country_id':country_id},
+      success: function(data){
+          // console.log(data.data)
+          projects += '<option value=" " selected>--Select Project--</option>'
+          $.each(data.data,function(key,val){
+            projects +='<option value='+val.id+'>'+val.name+'</option>'
+          })
+          $('#project_id').html(projects);
+      }
+    })
+  }
+  else{
+    $('#project_id').html('<option value=" " selected>--Select Project--</option>')
+    
+  }
+  })
+
+
+  
+  $('.project_delete').click(function(){
+    var delete_id=$(this).attr('data-id')
+    var projectname=$(this).attr('project-name')
+    Swal.fire({
+      title: 'Are you sure you want to delete '+projectname,
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, I Confirm',
+      cancelButtonText: 'No',
+    }).then((result) => {
+      if (result.isConfirmed) {
+         $.ajax({
+        type: "GET",
+        url:'/projects/delete',
+        data: {
+          "id":delete_id,
+        },
+        success: function(data)
+        {
+          console.log(data)
+          setTimeout(function(){  
+          location.reload();  
+          },1000);
+        }
+         });
+        Swal.fire(projectname,'Deleted Successfully')
+      }
+    })
+  })
+
+
+  $('.projectblock-cls').click(function(){
+    var blockid=$(this).attr('blockid')
+    var projectid=$(this).attr('projectid')
+    $('#projectfield-'+blockid+'').html(' ')
+    $('.pro-field-cls').html(' ')
+    $('.pro-env-cls').html(' ')
+    $('.pro-cluster-cls').html(' ')
+    $('.pro-dev-types-cls').html(' ')
+    $('.discipline-activity-cls').html(' ')
+    $('.subtype-change').html(' ')
+    $('.projectblock-cls').removeClass("tree_menu active");
+    $(this).addClass('tree_menu active')
+    var html =''
+    $.ajax({
+      type:"GET",
+      data:{'projectid':projectid,'blockid':blockid},
+      url:'/projects/projectcreationfield',
+      success: function(data){
+        console.log(data)
+        $.each(data.field,function(key,val){
+          html += '<div class="row"><div class="col-4 colum-line"><p class="tree-content hand-icon projectfield-cls prjt-viewfont" blockid="'+blockid+'" fieldid="'+val.id+'">'+val.field+'</p></div><div class="col-8 pro-env-cls" id="projectenv-'+val.id+'"></div></div>'
+        })
+        $('#projectfield-'+blockid+'').html(html)
+      }
+    })
+
+  })
+
+  $(document).on('click','.projectfield-cls',function(){
+    var fieldid=$(this).attr('fieldid')
+    var blockid=$(this).attr('blockid')
+    var projectid=$(this).attr('projectid')
+    $('#projectenv-'+fieldid+'').html(' ')
+    $('.pro-env-cls').html(' ')
+    $('.pro-cluster-cls').html(' ')
+    $('.pro-dev-types-cls').html(' ')
+    $('.discipline-activity-cls').html(' ')
+    $('.subtype-change').html(' ')
+    $('.projectfield-cls').removeClass("tree_menu active");
+    $(this).addClass('tree_menu active')
+    var html =''
+    $.ajax({
+      type:"GET",
+      data:{'fieldid':fieldid},
+      url:'/projects/projectcreationfieldenv',
+      success: function(data){
+        console.log(data)
+        $.each(data.data,function(key,val){
+          html += '<div class="row"><div class="col-6 colum-line"><p class="tree-content hand-icon projectfieldenv-cls prjt-viewfont"  blockid="'+blockid+'" fieldenvid="'+val.id+'">'+val.environment+'</p></div><div class="col-6 colum-line pro-cluster-cls" id="projectcluster-'+val.id+'"></div></div>'
+        })
+        $('#projectenv-'+fieldid+'').html(html)
+      }
+    })
+  })
+
+
+$(document).on('click','.projectfieldenv-cls',function(){
+  var fieldenvid=$(this).attr('fieldenvid')
+  $('#projectcluster-'+fieldenvid+'').html(' ')
+  $('.pro-cluster-cls').html(' ')
+  $('.pro-dev-types-cls').html(' ')
+  $('.discipline-activity-cls').html(' ')
+  $('.subtype-change').html(' ')
+  $('.projectfieldenv-cls').removeClass("tree_menu active");
+  $(this).addClass('tree_menu active')
+  var blockid=$(this).attr('blockid')
+  var html =''
+  $.ajax({
+    type:"GET",
+    data:{'fieldenvid':fieldenvid},
+    url:'/projects/projectcreationcluster',
+    success: function(data){
+      console.log(data)
+      $.each(data.data,function(key,val){
+        html += '<p class="tree-content hand-icon env-cluster prjt-viewfont"  blockid="'+blockid+'" data-id="'+fieldenvid+'" clusterid="'+val.id+'">'+val.cluster+'</p>'
+      })
+      $('#projectcluster-'+fieldenvid+'').html(html)
+    }
+  })
+})
+
+  $(document).on('click','.env-cluster',function(){
+    clusterid=$(this).attr('clusterid')
+    blockid=$(this).attr('blockid')
+    curremt_element=$(this)
+    $('.cluster-'+blockid+'').html(' ')
+    $('.pro-dev-types-cls').html(' ')
+    $('.discipline-activity-cls').html(' ')
+    $('.subtype-change').html(' ')
+    $('.env-cluster').removeClass("tree_menu active");
+    $(this).addClass('tree_menu active')
+    var html = ''
+    $.ajax({
+      type:"GET",
+      data:{'clusterid':clusterid},
+      url:'/projects/projectdevelopment',
+      success: function(data){
+        console.log(data)
+        html +='<div class="row prj-tablists"><div class="col-3"><h4 class="proj-hd">Development Type</h4></div>'
+        html +='<div class="col-3"><h4 class="proj-hd">Project Discipline</h4></div>'
+        html +='<div class="col-3 "><h4 class="proj-hd">Discipline Type</h4></div>'
+        html +='<div class="col-3 subtype-change"></div></div>'
+        html +='<div class="row">'
+        $.each(data.data,function(key,val){
+          html +='<div class="col-3 colum-line"><p class="tree-content hand-icon development-cls proj-viewleft" blockid="'+blockid+'" devid="'+val.id+'">'+val.development+'</p></div><div class="col-9 pro-dis-cls" id="discipline-'+val.id+'"></div>'
+        })
+        html +='</div>'
+        $('.cluster-'+blockid+'').html(html)
+      }
+    })  
+  })
+
+  $(document).on('click','.development-cls',function(){
+    devid=$(this).attr('devid')
+    blockid=$(this).attr('blockid')
+    $('.pro-dis-cls').html(' ')
+    $('#discipline-'+devid+'').html(' ')
+    $('.discipline-activity-cls').html(' ')
+    $('.subtype-change').html(' ')
+    $('.development-cls').removeClass("tree_menu active");
+    $(this).addClass('tree_menu active')
+    var html = ''
+    $.ajax({
+      type:"GET",
+      data:{'devid':devid},
+      url:'/projects/projectdiscipline',
+      success: function(data){
+        console.log(data)
+        html +=''
+        $.each(data.data,function(key,val){
+          html +='<div class="row"><div class="col-4 colum-line"><p class="tree-content hand-icon dev-discpline-cls proj-viewleft" disname="'+val.discipline+'" blockid="'+blockid+'" data-id="'+val.id+'">'+val.discipline+'</p></div><div class="col-8 pro-dis-type-cls" id="disciplinetype-'+val.id+'"></div></div>'
+        })
+        $('#discipline-'+devid+'').html(html)
+      }
+    })
+  })
+
+  $(document).on('click','.dev-discpline-cls',function(){
+    disciplineid=$(this).attr('data-id')
+    blockid=$(this).attr('blockid')
+    disname=$(this).attr('disname')
+    $('.pro-dis-type-cls').html(' ')
+    $('.discipline-activity-cls').html(' ')
+    $('#disciplinetype-'+disciplineid+'').html(' ')
+    $('.subtype-change').html(' ')
+    $('.dev-discpline-cls').removeClass("tree_menu active");
+    $(this).addClass('tree_menu active')
+    var html = ''
+    $.ajax({
+      type:"GET",
+      data:{'disciplineid':disciplineid},
+      url:'/projects/disciplinetype',
+      success: function(data){
+        console.log(data)
+        if (disname == "Others"){
+          console.log("others")
+          $.each(data.data,function(key,val){
+            html+='<div class="row"><div class="col-6 colum-line"><p data-id='+val.id+' disname="'+disname+'" blockid="'+blockid+'" class="tree-content hand-icon otherdisciplinetype-cls proj-viewleft">'+val.disciplinetype+'</p></div><div class="col-6 colum-line pro-subtype-cls" id="otherdisciplinesubtype-'+val.id+'"></div></div>'
+          })
+          $('#disciplinetype-'+disciplineid+'').html(html)
+        }
+        else{
+          html +=''
+          $.each(data.data,function(key,val){
+            html+='<div class="row"><div class="col-6 colum-line"><p data-id='+val.id+' disname="'+disname+'" blockid="'+blockid+'" class="tree-content hand-icon disciplinetype-cls proj-viewleft">'+val.disciplinetype+'</p></div><div class="col-6 colum-line pro-subtype-cls" id="disciplinesubtype-'+val.id+'"></div></div>'
+          })
+          $('#disciplinetype-'+disciplineid+'').html(html)
+        }
+
+      }
+
+    })
+
+  })
+
+/* other activities*/
+  $(document).on('click','.otherdisciplinetype-cls',function(){
+    var data_id=$(this).attr('data-id')
+    var disname=$(this).attr('disname')
+    $('#otherdisciplinesubtype-'+data_id+'').html(' ')
+    $('.pro-subtype-cls').html(' ')
+    $('.otherdisciplinetype-cls').removeClass("tree_menu active");
+    $(this).addClass('tree_menu active')
+    var html = ''
+    var heading=''
+    $.ajax({
+      type:"GET",
+      data:{'discipline_subtypeid':data_id,
+            'disname':disname},
+      url:'/projects/subtypeactivitie',
+      success: function(data){
+        console.log(data)
+        heading +='<h4 class="proj-hd">Discipline Sub Activities</h4>'
+          $.each(data.data,function(key,val){
+            html +='<p class="tree-content hand-icon proj-viewleft" data-id="'+val.id+'">'+val.activities+'</p>'
+          })
+          //html +='</div>'
+          if ((data.data).length > 0){
+            $('#otherdisciplinesubtype-'+data_id+'').html(html)
+            $('.subtype-change').html(heading)
+          }
+      }
+    })
+  })
+
+    $(document).on('click','.disciplinetype-cls',function(){
+    typeid=$(this).attr('data-id')
+    blockid=$(this).attr('blockid')
+    disname=$(this).attr('disname')
+    $('.pro-subtype-cls').html(' ')
+    $('.discipline-activity-cls').html(' ')
+    $('#disciplinesubtype-'+typeid+'').html(' ')
+    $('.subtype-change').html(' ')
+    $('.disciplinetype-cls').removeClass("tree_menu active");
+    $(this).addClass('tree_menu active')
+
+    var html =''
+    var heading=''
+    $.ajax({
+      type:"GET",
+      data:{'typeid':typeid},
+      url:'/projects/devdisciplinesubtype',
+      success: function(data){
+        console.log(data)
+        var disciplinename=data.project_discipline
+        if (disname == "Green Field Development"){
+          if ((data.disciplinetype) == 4){
+            if ((data.data)){
+              heading +='<h4 class="proj-hd">Discipline Sub Activities</h4>'
+              html +='<div class="pro-dis-subtype-cls">'
+              $.each(data.data,function(key,val){
+                html +='<p class="tree-content hand-icon proj-viewleft" blockid="'+blockid+'" data-id="'+val.id+'">'+val.subtype+'</p>'
+              })
+              html +='</div>'
+            }
+            console.log('ab',(data.data).length)
+            if ((data.data).length > 0){
+              $('.subtype-change').html(heading)
+              $('#disciplinesubtype-'+typeid+'').html(html)
+              
+            }
+            /*
+             else {
+              heading +='<h4 class="proj-hd">Well Type</h4>'
+                $.each(data.well,function(key,val){
+                  html +='<p class="tree-content hand-icon subwelltype-cls proj-viewleft" blockid="'+blockid+'" data-id="'+val.id+'">'+val.welltype+'</p>'
+                })
+                $('#disciplinesubtype-'+typeid+'').html(html)
+                $('.subtype-change').html(heading)
+                
+              }*/
+          }
+          else {
+            if ((data.data)){
+              heading +='<h4 class="proj-hd">Discipline Activities</h4>'
+              html +='<div class="pro-dis-subtype-cls">'
+              $.each(data.data,function(key,val){
+                html +='<p class="tree-content hand-icon disciplinesubtypes-cls proj-viewleft" blockid="'+blockid+'" data-id="'+val.id+'">'+val.subtype+'</p>'
+              })
+              html +='</div>'
+              console.log('ab',(data.data).length)
+              if ((data.data).length > 0){
+                $('.subtype-change').html(heading)
+                $('#disciplinesubtype-'+typeid+'').html(html)
+              }
+
+            }
+            else {
+              heading +='<h4 class="proj-hd">Well Type</h4>'
+                $.each(data.well,function(key,val){
+                  html +='<p class="tree-content hand-icon subwelltype-cls proj-viewleft" blockid="'+blockid+'" data-id="'+val.id+'">'+val.welltype+'</p>'
+                })
+                $('#disciplinesubtype-'+typeid+'').html(html)
+                $('.subtype-change').html(heading)
+              }
+          }
+
+        }
+        else {
+          console.log('brown')
+          if ((data.disciplinetype) == 9){
+            heading +='<h4 class="proj-hd">Discipline Sub Activities</h4>'
+            html +='<div class="pro-dis-subtype-cls">'
+            $.each(data.data,function(key,val){
+              html +='<p class="tree-content hand-icon proj-viewleft" blockid="'+blockid+'" disciplinename="'+disciplinename+'" data-id="'+val.id+'">'+val.subtype+'</p>'
+            })
+            html +='</div>'
+            if ((data.data).length > 0){
+              $('.subtype-change').html(heading)
+              $('#disciplinesubtype-'+typeid+'').html(html)
+            }
+          }
+          else{
+            if ((data.data).length > 0){
+              heading +='<h4 class="proj-hd">Discipline Activities</h4>'
+              html +='<div class="pro-dis-subtype-cls">'
+              $.each(data.data,function(key,val){
+                html +='<p class="tree-content hand-icon onlybrownwell disciplinesubtypes-cls proj-viewleft" blockid="'+blockid+'" disciplinename="'+disciplinename+'" data-id="'+val.id+'">'+val.subtype+'</p>'
+              })
+              html +='</div>'
+              $('.subtype-change').html(heading)
+              $('#disciplinesubtype-'+typeid+'').html(html)
+            }
+            if (data.brownwell){
+              if((data.brownwell).length > 0){
+                var welldata ='<div class="row"><div class="col-3"><h4 class="proj-hd">Well Type</h4></div><div class="col-3"><h4 class="proj-hd">Well Name</h4></div><div class="col-3"><h4 class="proj-hd">Well Activities</h4></div></div>'
+                welldata += '<div class="row">'
+                  $.each(data.brownwell,function(key,val){
+                    welldata +='<div class="row"><div class="col-3 colum-line"><p class="tree-content hand-icon brownsubwelltype-cls proj-viewleft" blockid="'+blockid+'" data-id="'+val.id+'">'+val.welltype+'</p></div><div class="col-9" id="brownwell-'+val.id+'"></div></div>'
+                  })
+                  welldata +='</div>'
+                  $('.activities-'+blockid+'').html(welldata)
+              }
+            }
+          }
+
+        }
+      }
+    })
+  })
+
+//brown well name
+
+$(document).on('click','.brownsubwelltype-cls',function(){
+  var html =''
+  var welltypeid=$(this).attr('data-id')
+  $('.pro-brownwellnaem-cls').html(' ')
+  $('.pro-well-act-cls').html(' ')
+  $('.onlybrownwell').removeClass("tree_menu active");
+  $('.brown-act-clr').html(' ')
+  $('.brownsubwelltype-cls').removeClass("tree_menu active");
+  $(this).addClass('tree_menu active')
+  blockid=$(this).attr('blockid')
+  $.ajax({
+    type:"GET",
+    data:{'welltypeid':welltypeid},
+    url:'/projects/projectwellname',
+    success: function(data){
+      console.log(data)
+      $.each(data.data,function(key,val){
+        html +='<div class="row"><div class="col-4 pro-brownwellnaem-cls colum-line"><p class="tree-content hand-icon project-wellname-cls proj-viewleft" data-id="'+val.id+'">'+val.wellname+'</p></div><div class="col-5 pro-well-act-cls colum-line" id="wellnameactivity-'+val.id+'"></div></div>'
+      })
+      $('#brownwell-'+welltypeid+'').html(html)
+    }
+  })
+
+})
+
+$(document).on('click','.subwelltype-cls',function(){
+  var welltypeid=$(this).attr('data-id')
+  blockid=$(this).attr('blockid')
+  $('.pro-dis-subtype-cls').html(' ')
+  $('.subwelltype-cls').removeClass("tree_menu active");
+  $(this).addClass('tree_menu active')
+  var html =''
+  $.ajax({
+    type:"GET",
+    data:{'welltypeid':welltypeid},
+    url:'/projects/projectwellname',
+    success: function(data){
+      console.log(data)
+      html +='<div class="row prj-tablists"><div class="col-3"><h4 class="proj-hd">Well Name</h4></div><div class="col-3"><h4 class="proj-hd">Well Activities</h4></div></div>'
+      html +='<div class="row">'
+      $.each(data.data,function(key,val){
+        html +='<div class="row"><div class="col-3 colum-line"><p class="tree-content hand-icon project-wellname-cls proj-viewleft" data-id="'+val.id+'">'+val.wellname+'</p></div><div class="col-3 colum-line pro-well-act-cls  proj-viewleft" id="wellnameactivity-'+val.id+'"></div></div>'
+      })
+      html +='</div>'
+      $('.activities-'+blockid+'').html(html)
+    }  
+  })
+})
+
+$(document).on('click','.project-wellname-cls',function(){
+  var wellnameid=$(this).attr('data-id')
+  $('.pro-well-act-cls').html(' ')
+  $('#wellnameactivity-'+wellnameid+'').html(' ')
+  $('.project-wellname-cls').removeClass("tree_menu active");
+  $(this).addClass('tree_menu active')
+  var html = ''
+  $.ajax({
+    type:"GET",
+    data:{'wellnameid':wellnameid},
+    url:'/projects/wellnameactivities',
+    success: function(data){
+      console.log(data)
+
+      $.each(data.data,function(key,val){
+        html +='<p class="tree-content hand-icon proj-viewleft" data-id="'+val.id+'">'+val.wellactivities+'</p>'
+      })
+      $('#wellnameactivity-'+wellnameid+'').html(html)
+    }  
+  })
+})
+
+
+
+$(document).on('click','.disciplinesubtypes-cls',function(){
+  subtypeid=$(this).attr('data-id')
+  blockid=$(this).attr('blockid')
+  $('.brown-act-clr').html(' ')
+  disciplinename=$(this).attr('disciplinename')
+  curremt_element=$(this)
+  if (disciplinename == 'Brown Field Development'){
+    $('.brownsubwelltype-cls').removeClass("tree_menu active");
+    $('.brownsubwelltype-cls').closest('div').next('div').html('')
+  }
+  else{
+    $('.activities-'+blockid+'').html(' ')
+  }
+
+  $('.disciplinesubtypes-cls').removeClass("tree_menu active");
+  $(this).addClass('tree_menu active')
+  var html =''
+  $.ajax({
+    type:"GET",
+    data:{'discipline_subtypeid':subtypeid},
+    url:'/projects/subtypeactivitie',
+    success: function(data){
+      console.log(data)
+      console.log(disciplinename)
+      if (disciplinename != "Brown Field Development"){
+      html +='<div class="row prj-tablists"><div class="col-4 colum-line"><h4 class="proj-hd">Discipline Sub Activities</h4>'
+      $.each(data.data,function(key,val){
+        html +='<p class="tree-content hand-icon proj-viewleft" data-id="'+val.id+'">'+val.activities+'</p>'
+      })
+      html +='</div></div>'
+      if((data.data).length > 0){
+      $('.activities-'+blockid+'').html(html)
+      }
+    }
+    else{
+      html +='<div class="brown-act-clr"><h4 class="proj-hd">Discipline Sub Activities</h4>'
+        $.each(data.data,function(key,val){
+          html +='<p class="tree-content hand-icon proj-viewleft" data-id="'+val.id+'">'+val.activities+'</p>'
+        })
+        html +='</div>'
+        
+        if((data.data).length > 0){
+          $('.pro-dis-subtype-cls').after(html)
+        }
+
+    }
+    }  
+  })
+})
+
+
+$(document).on('change','.select-invoice',function(){
+  if (parseInt($(this).val()) == 2){
+    $('.with_invoice').css('display','none')
+    $('.without_invoice').css('display','block')
+  }
+  else{
+    $('.without_invoice').css('display','none')
+    $('.with_invoice').css('display','block')
+  }
+})
+
+</script>
+{% endblock %}
+<!--\ -->

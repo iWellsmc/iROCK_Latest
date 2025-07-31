@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendormanagement/vendormissed.css' %}">
+
+<div>
+    <h4 class="from-head">Vendor Missed Contract</h4>
+    </div>
+        <div class="row">
+            <div class="vends-invite-lists table-responsive text-nowrap">
+              <table class="table settings-data-list-view data-list-view project_master miss-con-cen vend-th-red irock-table vendor-missed">
+                  <thead>
+                      <tr>
+                          <th>S/N</th> 
+                          <th>VIN <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>
+                          <th>Vendor Name <button class="filter-btn" data-filter="last-name"> <i class="fas fa-sort"></i></button></th>
+                          <th>Contract Type <button class="filter-btn" data-filter="designation"> <i class="fas fa-sort"></i></button></th>
+                          <th>Name of Service <button class="filter-btn" data-filter="dept"> <i class="fas fa-sort"></i></button></th>
+                          <th>Contract Ref No <button class="filter-btn" data-filter="group"> <i class="fas fa-sort"></i></button></th>
+                          <th>Amendment/Addendum Ref No</th>     
+                          <th>Uploaded Documents</th>
+                          <!-- <th>Reason for Denial</th> -->
+                          <th>Status</th>
+                          <th>Action</th>
+                      </tr>
+                  </thead>
+                  <tbody class="table-list">
+                      {% if totalcount > 0 %}
+                        {% for newcontract in listnewcontract %}
+                        <tr>
+                        <td class="table-data">{{forloop.counter}}</td>
+                        <td class="middle">{{newcontract.user.cin_number|default_if_none:"---"}}</td>
+                        <td class="td-left">{{newcontract.vendor.vendor_name|default_if_none:"---"}}</td>
+                        <td class="td-left">{{newcontract.contract_type|default_if_none:"---"}}</td>
+                        <td class="td-left">{{newcontract.name_service|default_if_none:"---"}}</td>
+                        <td class="miss-con-cen">{{newcontract.contract_refnum|default_if_none:"---"}}</td>
+                        <td class="middle">{{newcontract.amendment_refnum|default_if_none:'---'}}</td>
+                        <td class="td-left">
+                        {% checkfile newcontract.c_file as filecount%}
+                        {% if  filecount > 0%}
+                        <p class="down-fl"><a class="up-clrchg" href="{{newcontract.c_file.url}}" target="_blank">{{newcontract.original_file_name|default_if_none:"---"}}</a></p>
+                        {% endif %}
+                        </td>
+                        <!-- <td class="text-leftt" id="{{newcontract.id}}"><p>{{newcontract.deniedreason|default_if_none:''}}</p></td> -->
+                        <td class="middle">
+                            {% if newcontract.status == 1 %}
+                                <div class="badge badge-warning sta-war">
+                                    Open
+                                </div>
+                            {% elif newcontract.status == 0 %}
+                                <div class="badge badge-danger sta-dan">
+                                    Closed
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td class="middle">
+                            <a href="{% url 'projects:newcontracthistory' pk=newcontract.id %}" class="btn his-oty px-1"><i class="fa fa-history" title="History" aria-hidden="true"></i></a>
+                        </td>
+                        </tr>
+                        {% endfor %}
+                      {% else %}
+                      <tr>
+                          <td colspan="10" class="cls-nil middle">
+                            ---
+                          </td>
+                        </tr>
+                      {% endif %}
+                  </tbody>
+              </table>
+              <form method="post">
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Reason For Denial</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        </div>
+                        <div class="modal-body">
+                            <label class="label-message">Message :</label>
+                            <textarea name="message" class="form-control msgcls" rows="3" cols="40"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary querydenied btn-clr" id="querydenied" value="">Submit</button>
+                        </div>
+                    </div>
+                    </div>
+                </form>
+              </div>
+          
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+{{ block.super }}
+
+<script>
+    $(document).on('click','.querydenied',function(){
+    var val=$('.msgcls').val()
+
+    var pk=$(this).val()
+
+        console.log(val)
+        $.ajax({
+            type: "POST",
+            url:'/projects/newcontractdenied',
+            data: {
+              "reason":val,
+              'pk':pk,
+              csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function(data)
+            {
+                console.log(data)
+              setTimeout(function(){  
+                location.reload();  
+                });
+            }
+          })
+    })
+
+$(document).on('click','.set_id',function(){
+let id = $(this).attr('data-id')
+console.log(id)
+$('#querydenied').val(id);
+})
+</script>
+<script type="text/javascript" src="{% static 'js/projects/userslist.js' %}"></script>
+{% endblock %}

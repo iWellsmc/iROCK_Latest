@@ -1,0 +1,53 @@
+.col-form-label {
+    color: #017474 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+}
+
+.cost-category-path {
+    width: 100%;
+}
+
+.cost-category-path td {
+    /* width: 33.33%; */
+    width: 25%;
+    padding: 5px 5px;
+}
+
+.cost-category-path td:first-child {
+    padding-left: 0px;
+}
+
+.cost-category-path select {
+    width: 100%;
+    margin: 8px auto;
+    margin-left: 0px;
+}
+
+.cost-category-path label {
+    margin-bottom: 0px;
+    color: grey;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.cost_code_preview {
+    color: #000;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.add-nxt-btn {
+    color: #fff;
+    background-color: #BD2753;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+@media screen and (min-width: 768px) and (max-width:1024px){
+    .edit_cost_code{
+        width: 35% !important;
+    }
+    }

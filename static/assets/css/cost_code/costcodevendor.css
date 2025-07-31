@@ -1,0 +1,25 @@
+.costvendor-table th {
+    background-color: #fff !important;
+}
+
+.costvendor-table td:nth-child(3){
+    text-align: var(--lefttext-align) !important;
+
+}
+#empty_class{
+    padding-left: 100px;
+  }
+
+.search-f-inf {
+    border: 1px solid #96183a;
+    border-radius: 3px;
+    padding: 5px;
+  }    
+
+  .search-f-inf::-webkit-search-cancel-button{
+    -webkit-appearance: none !important;
+    /* content: URL("../../images/icons/close.png");
+    width: 15px;
+    height: 15px;
+    cursor: pointer; */
+}

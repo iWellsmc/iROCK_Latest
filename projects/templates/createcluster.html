@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+    <h4 class="from-head">Create Cluster</h4>
+    <form method="POST" class="form-txt" id="create-cluster">
+        {% csrf_token %}
+    <div class="row">
+        <div class="col">
+            <h3 class="head-master">Country</h3>
+            <div class="project_country txt-name">
+                <p>{{project.country.name}}</p>
+            </div>
+        </div>
+        <div class="col">
+            <h3 class="head-master">Project Name</h3>
+            <div class="project_name txt-name">
+                <input type="hidden" id="project_id" name="project_id" value={{project.id}}>
+                <p>{{project.name}}</p>
+            </div>
+        </div>
+        <div class="col"><h3 class="head-master">Block Name</h3>
+            <div class="show-checked-block txt-name" >
+                {% for block in blocks %}
+                    {% if block.status == 1 %}
+                    <p>{{block.block_name}}</p><br>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="row">
+                <div class="col-md-6">                            
+                    <h3 class="head-master">Field Name</h3>
+                </div>
+                <div class="col-md-6">
+                    <h3 class="head-master">Cluster</h3>
+                </div>
+            </div>
+            {% for field in fields %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="field-checkbox-cls txt-name">
+                        
+                        <input type="checkbox" name="field_checkbox" p_id={{field.id}} class="fieldsubtype-class"  value="{{field.field_name}}">&emsp;<label>{{field.field_name}}</label><br>
+                        
+                    </div>
+                </div>  
+                <div class="col-md-6">
+                        <div class="field_subtype middle-subtype">
+                        </div>
+                        <div class="field_sub_subtype-cls">
+                        </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="text-center">
+    <button type="button" class="btn btn-clr save-draft text-center submit-cls" data-id="4">Save</button>
+    <button type="button" class="btn btn-clr save-draft text-center back-cls" data-id="4">Back</button>
+    </div>
+</form>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/projects/createmasterproject.js' %}"></script>
+{% endblock %}

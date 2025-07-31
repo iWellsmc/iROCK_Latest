@@ -1,0 +1,54 @@
+/* 19/10/23  ar Report form page*/
+.report {
+    width: unset !important;
+}
+
+#Report .select2-selection__choice,
+#Reports .select2-selection__choice {
+    padding: 5px 10px 5px 30px !important;
+    background-color: #bd2753 !important;
+    border: none;
+}
+
+#Report .select2-selection__choice__remove,
+#Reports .select2-selection__choice__remove {
+    top: 5px;
+    left: -2px;
+}
+
+#Report .select2-selection,
+#Reports .select2-selection {
+    padding: 0 !important;
+}
+
+#Report .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:before,
+#Reports .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:before {
+    width: 16px;
+    height: 16px;
+    background: url('/static/images/icons8-close-16.png') no-repeat !important;
+    top: 0;
+    left: 0px;
+}
+
+#Report .select2-results__option--highlighted,
+.select2-container--default .select2-results__option--highlighted,
+#Reports .select2-results__option--highlighted,
+.select2-container--default .select2-results__option--highlighted {
+    background-color: #bd275324 !important;
+    color: #bd2753 !important;
+}
+
+#Report .select2-results__option[aria-selected='true'],
+.select2-container--default .select2-results__option[aria-selected='true'],
+#Reports .select2-results__option[aria-selected='true'],
+.select2-container--default .select2-results__option[aria-selected='true'] {
+    background-color: #bd2753 !important;
+}
+
+.td-left {
+    text-align: var(--lefttext-align) !important;
+}
+
+.td-center {
+    text-align: var(--centertext-align) !important;
+}

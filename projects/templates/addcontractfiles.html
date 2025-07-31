@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/vendorcontract.css' %}">
+<div>
+    <div class="row">
+        <div class="col-12 text-end">
+            <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'projects:contractmasterlist' %}">Back</a></button>
+        </div>
+    </div>
+
+    <h3 class="from-head">Add File for Contracts</h3>
+    
+    <form class="form-txt"  method="POST" id="contractmaster"  enctype="multipart/form-data" >
+        {% csrf_token %}
+    <div class="row">
+
+        {% if contract_count > 0 %}
+            {% for file in contract_file %}
+            <input type="hidden" name="contractfileids" value="{{file.id}}">
+            {% if file.upload_contract == '' or file.upload_pricetable == ''%}
+            
+            <div class="box-addfiles table-responsive text-nowrap">
+            <div class="row addfiles-bottom-spae text-space_width">
+                <div class="col-lg-3 col-md-6 text-wrap">
+                    <div><label class="contractfilehead">Vendor Name</label></div>
+                    <div class="add-files-det">{{file.contractvendor.vendor_name}}</div>
+                </div>
+
+                <div class="col-lg-3 col-md-6 text-wrap">
+                    <div><label class="contractfilehead">Contract Reference Number</label></div>
+                    <div  class="add-files-det">{{file.reference_number}}</div>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <div><label class="contractfilehead">Contract File</label></div>
+                    <div class="add-files-det">
+                            {% if file.upload_contract == '' %}
+                                <input type="file" name="contractfile{{file.id}}" class="form-control filesize" accept="image, .png, .jpeg, .pdf, .jpg"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                            {% else %}
+                                {{file.upload_contract}}
+                            {% endif%}
+                            <br><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                    </div>
+                </div>
+                
+
+                <div class="col-md-6 col-lg-3">
+                    <div><label class="contractfilehead">Price Table File</label></div>
+                    <div class="add-files-det">
+                            {% if file.upload_pricetable == '' %}
+                            <input type="file" name="pricetable{{file.id}}" class="form-control filesize" accept="image, .png, .jpeg, .pdf, .jpg"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                            {% else %}
+                                {{file.upload_pricetable}}
+                            {% endif%}
+                            <br><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                     
+                    </div>     
+                </div>
+            </div>
+            </div>
+            {% endif %}
+                {% for amendment  in file.id|getcontractamendment %}
+                <input type="hidden" accept="image, .png, .jpeg, .pdf, .jpg" name="amendmentfileids{{file.id}}" value="{{amendment.id}}">
+                <div class="box-addfiles">
+                <div class="row addfiles-bottom-spae">
+                    <div class="col-lg-3 col-md-6">
+                        
+                        <div><label class="contractfilehead">Vendor Name</label></div>
+                        <div class="add-files-det">{{amendment.id | getvendornamebyamenment}}</div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div><label class="contractfilehead">{{amendment.amendment_type}} Reference Number</label></div>
+                        <div class="add-files-det">{{amendment.amendment_reference_number}}</div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div><label class="contractfilehead">{{amendment.amendment_type}} Contract File</label></div>
+                        <div class="add-files-det">
+                            {% if amendment.amendment_upload_contract == '' %}
+                                <input type="file" name="amendmentcontract{{amendment.id}}" class="form-control filecls filesize" accept="image, .png, .jpeg, .pdf, .jpg"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                            {% else %}
+                                {{amendment.amendment_upload_contract}}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div><label class="contractfilehead">{{amendment.amendment_type}} Price Table File</label></div>
+                        <div class="add-files-det">
+                            {% if amendment.amendment_upload_pricetable == '' %}
+                                <input type="file" name="amendmentprice{{amendment.id}}" class="form-control filecls filesize" accept="image, .png, .jpeg, .pdf, .jpg"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                            {% else %}
+                            {{amendment.amendment_upload_pricetable}}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                </div>
+                {% endfor %}
+
+            {% endfor%}
+            <div class="text-center spacing-button mt-4">
+                <button type="submit" class="btn btn-clr text-center submit-cls">Save</button>
+            {% else %}
+                    <p style="text-align:center;color:black;font-size: 16px;font-weight: 600;">No Contracts listed for Addition of files</p>
+            {% endif %}
+        </div>
+        </div>
+    </form>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+
+
+function checkfile(){
+    var count=0 
+    $('input.filecls').each(function() {
+        $(this).next('span').remove()
+        if ($(this).val() == ''){
+            count+=1
+        $(this).after('<span class="waring-err">This Field is Required</span>')
+        }
+    })
+    console.log(count)
+    if (count > 0){
+        $('.submit-cls').attr('disabled',true)
+    }
+    else{
+        $('.submit-cls').attr('disabled',false)
+    }
+}
+
+// $(document).ready(function(){
+    // checkfile()
+// })
+
+// $(document).on('change',function(){
+//     if ($(this).val() != ''){
+//         $(this).next('span').remove()
+//     }
+//     checkfile()
+// })
+
+
+</script>
+{% endblock %}

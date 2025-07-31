@@ -1,0 +1,796 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html class="loading" lang="en" data-textdirection="ltr">
+<!-- BEGIN: Head-->
+ 
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+   <title>Licensing Proposal Form</title>
+   <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600" rel="stylesheet">
+   <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/logo/irock.png' %}">
+ 
+   <!-- BEGIN: Vendor CSS-->
+   <link rel="stylesheet" type="text/css" href="{% static 'vendors/css/vendors.min.css' %}">
+   <!-- END: Vendor CSS-->
+ 
+   <!-- BEGIN: Theme CSS-->
+   <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-extended.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/colors.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/components.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/themes/dark-layout.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/themes/semi-dark-layout.css' %}">
+
+  <!-- BEGIN: Page CSS-->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/core/menu/menu-types/vertical-menu.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/core/colors/palette-gradient.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/pages/authentication.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+   <!-- END: Page CSS-->
+   <!-- BEGIN: Custom CSS-->
+   <link rel="stylesheet" type="text/css" href="{% static 'vendors/css/forms/select/select2.min.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+   <!-- END: Custom CSS-->
+ 
+</head>
+<!-- END: Head-->
+ 
+<!-- BEGIN: Body-->
+ 
+<body class="vertical-layout vertical-menu-modern 1-column  navbar-floating footer-static bg-full-screen-image  menu-collapsed blank-page blank-page" data-open="click" data-menu="vertical-menu-modern" data-col="1-column">
+   <!-- BEGIN: Content-->
+   <div class="app-content content">
+       <div class="content-overlay"></div>
+       <div class="header-navbar-shadow"></div>
+       <div class="content-wrapper">
+           <div class="content-header row">
+           </div>
+           <div class="content-body rg-bk">
+               <section class="row flexbox-container">
+                   <div class="col-xl-8 col-10 d-flex justify-content-center">
+                       <div class="card bg-authentication m-0 reg-box">
+                           <div class="row">
+
+                               <div class="col-lg-12 col-12">
+                                   <div class="reg-card">
+                                       <!-- <div class="card-header"> -->
+                             
+                            
+
+                                           <div class="card-title">
+                            
+                                               <h1 class="reg-head text-center">Licensing Proposal Form</h1>
+                                               
+                                   
+                                           </div>
+                                       <!-- </div> -->
+                                       
+                                       <div class="card-content ">
+            
+                                           <div class="card-body pt-0">
+                                               <form action="" method="post" name="registerform" id="register_form_id" enctype="multipart/form-data" class="reg-form">
+                                                {% csrf_token %}
+                             
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <input type="hidden" name="role" value="2">
+                                                        <input type="hidden" name="enquiry" value="{{enquiryid}}">
+                                                        <label class="sign-hed">Name Of Company<span class="star-clr">*</span></label>   <input type="text" class="form-control" name="company_name" id="inputCompanyName"> 
+                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <label class="sign-hed">Country<span class="star-clr">*</span></label> 
+                                                        <Select  name="country_select" class="form-control" id="country"><option value="">Select</option>
+                                                            {%for cont in countries %}
+                                                            <option name="country" class="con_code" value="{{cont.id}}" data-id="{{cont.phonecode}}">{{cont.name}}</option>
+                                                            {%endfor%}
+                                                        </Select>
+                                                          
+                                        
+                                                    </div>
+                                                </div>
+                                        
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <label class="sign-hed">First Name<span class="star-clr">*</span></label> <input type="text" class="form-control" name="name" id="first_name"> 
+                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <label class="sign-hed">Last Name<span class="star-clr">*</span></label> <input type="text" name="last_name" class="form-control" id="lastname">
+                                        
+                                                    </div>
+                                                </div>
+                                        
+                                        
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <label class="sign-hed">Contact Person<span class="star-clr">*</span> </label>   <input type="text" name="contactperson" class="form-control" id="contactperson">  
+                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <label class="sign-hed">Designation<span class="star-clr">*</span> </label>   <input type="text" name="designation" class="form-control" id="designation">
+                                        
+                                                    </div>
+                                                </div>
+                                        
+                                                <div class="row err-oor-con">
+                                                   
+                                                    <div class="col ">
+                                                        <label class="sign-hed">Contact No<span class="star-clr">*</span></label> 
+                                                        <div class="row">
+                                                        <div class="col-md-4 col-sm-6">
+                                                        
+                                                        <input type="text" name="code" class="floating-input form-control phone_code"  id="phone_code" maxlength="8"  placeholder="+0" readonly>  
+                                                        </div>
+                                                        <div class="col-8" style="padding-left:0px;">
+                                                        <input type="text"  name="contact_no" class="form-control con-spac" id="contactpersonno" style="margin-left:0px !important;">
+                                                        </div> 
+                                                        </div>
+                                        
+                                                    </div>
+                                                    <div class="col">
+                                                        <label for="inputEmail" class="sign-hed">Email<span class="star-clr">*</span></label>
+                                                               <input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email" >
+                                                    </div>
+                                                </div>
+                                        
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <label class="sign-hed">Type of License <span class="star-clr">*</span></label><Select name="type_of_license" class="form-control typeoflicense" id="typeoflicense"><option value="">Select</option><option value="1">Perpetual</option><option value="2">Corporate Yearly</option></Select>
+                                                    </div>
+                                                    <div class="col">
+                                                        <label class="sign-hed">Package<span class="star-clr">*</span></label><Select  name="package" class="form-control" id="package"><option value="">Select</option><option value="1">I-R</option><option value="2">I-R-O</option><option value="3">I-R-C</option><option value="4">I-R-O-C</option><option value="5">I-R-O-C-K</option></Select>
+                                                    </div>
+                                                </div>
+                                        
+                                        
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <label class="sign-hed">Number Of Users<span class="star-clr">*</span></label>   <input type="text"  name="number_of_users" class="form-control" id="numberofuseres">
+                                                    </div>
+                                                    <div class="col">
+                                                        <label class="sign-hed">Concurrent Users<span class="star-clr">*</span></label>   <input type="text" name="concurrent_user" class="form-control" id="concurent-users">
+                                                    </div>
+                                                </div>
+                                        
+                                                <div class="row">
+                                                    <div class="col-6 err-oor">
+                                                        <label class="sign-hed">Cloud Server<span class="star-clr">*</span></label><br>
+                                                            <input  name="cloudserver" class="form-check-input sign-chk cloudserver" type="radio" value="iROCK" id="irocksever">
+                                                            <label class="form-check-label sign-chklis" for="flexCheckDefault">
+                                                            iROCK Server
+                                                            </label>
+                                                            <div name="hideprivateserver" id="hideprivateserver">
+                                                            <input name="cloudserver" class="form-check-input sign-chk cloudserver" type="radio" value="Private" id="privateserver">
+                                                            <label class="form-check-label sign-chklis" for="flexCheckChecked">
+                                                                Private Server
+                                                            </label>
+                                                        </div>
+                                                        </div>
+                                                   
+                                                    <div class="col-6 err-oor">
+                                                        <label class="sign-hed">Do you need any customization to be done in the iROCK application ?<span class="star-clr">*</span></label><br> 
+                                                        <input name="customization" class="form-check-input sign-chk" type="radio" value="Yes" id="custom-yes">
+                                                        <label class="form-check-label sign-chklis" for="custom-yes">Yes</label>
+                                                    
+                                                    
+                                                    <input name="customization" class="form-check-input sign-chk" type="radio" value="No" id="custom-no">
+                                                    <label class="form-check-label sign-chklis" for="custom-no">
+                                                    No
+                                                        </label>
+                                                    </div>
+                                                    </div>
+                                        
+                                        
+                                                    
+                                                <div class="row">
+                                                    <div class="col-6 err-oor">
+                                                        <label class="sign-hed">Do you need Support Services ?<span class="star-clr">*</span></label> <br>
+                                                            <input name="support"class="form-check-input sign-chk" type="radio" value="Yes" id="support-yes">
+                                                            <label class="form-check-label sign-chklis" for="support-yes">
+                                                            Yes
+                                                            </label>
+                                                            <input name="support" class="form-check-input sign-chk" type="radio" value="No" id="support-no">
+                                                            <label class="form-check-label sign-chklis" for="support-no">
+                                                            No
+                                                            </label>
+                                                        </div>
+                                                </div>
+                                                <div class="col-md-12 float-center top-spacing ctr-btnsu">
+                                                    <!-- <a href="{% url 'custom_auth:login' %}"  class="btn btn-inline mb-50 btn-color">Back</a> -->
+                                                    <button type="submit" id="submit" class="btn btn-inline mb-50 btn-color sig-nbtn">Submit</a>
+                                                 </div>
+                                        
+                                               </form>
+                                           </div>
+                                       </div>
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+               </section>
+ 
+           </div>
+       </div>
+   </div>
+   <!-- END: Content-->
+ 
+   <!-- BEGIN: Vendor JS-->
+   <script src="{% static 'vendors/js/vendors.min.js' %}"></script>
+   <!-- BEGIN Vendor JS-->
+   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+   <!-- BEGIN: Page Vendor JS-->
+   <!-- END: Page Vendor JS-->
+ 
+   <!-- BEGIN: Theme JS-->
+   <script src="{% static 'js/core/app-menu.js' %}"></script>
+
+   <script src="{% static 'js/core/app.js' %}"></script>
+   <script src="{% static 'js/custom.js' %}"></script>
+
+
+   <script src="{% static 'js/scripts/components.js' %}"></script>
+   <!-- END: Theme JS-->
+   <script src="{% static 'vendors/js/forms/validation/jquery.validate.min.js' %}"></script>
+   <script src="{% static 'vendors/js/forms/select/select2.full.min.js' %}"></script>
+   <script src="{% static 'js/scripts/forms/select/form-select2.js' %}"></script>
+
+   <!-- BEGIN: Page JS-->
+   <!-- END: Page JS-->
+
+
+</body>
+<!-- END: Body-->
+<style>
+ .card
+ {
+     width:100%;
+ }
+ /* body {
+    background-image: url("{% static 'images/iwells-map.jpg' %}");
+    background-size: cover;
+    background-position: center;
+}    */
+.totalusersdiv,.operatorsubtype,.operatortype
+{
+    display: none;
+}
+</style>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://jqueryvalidation.org/files/dist/jquery.validate.min.js"></script>
+<script src="https://jqueryvalidation.org/files/dist/additional-methods.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+
+
+
+
+
+//for country code showing
+
+$(document).on('change','#country',function(){
+        // alert("salfkl;sdf");
+	var n=$('select#country option:selected').attr("data-id"); 
+    //  alert(n);
+        if(n==undefined)
+            {
+              
+                $("#phone_code").val();            
+            }
+        else
+            { 
+               
+               var test=n.startsWith("+");
+            
+               if(test==true)
+               {
+                $("#phone_code").val(n);  
+               }
+               else{
+                $("#phone_code").val("+" + n);  
+               
+	 
+	            
+            }
+        }
+});	
+
+
+
+    $(document).on('keyup','#inputEmail', function() {
+        var val=$(this).val();
+        var emailid=true;
+        $('#emailidexists').remove()
+        var pattern = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        $.ajax({
+            type: "GET",
+            url:"/checkemail/",
+            data: {
+              "email":val,
+            },
+            // cache: false,
+            success: function(data)
+            { 
+                if (data.exists){
+                    if(pattern.test(val)){
+                    swal.fire('Email Already Exists')
+                    //$('#emailidexists').remove();
+                    $('#inputEmail').after('<span id="emailidexists" class="error" >Email Already Exists</span>')}
+                    emailid=false;
+                    $('#submit').attr('disabled', 'disabled');
+                    
+                }
+                else{
+                    $('#emailidexists').remove()
+                    emailid=true;
+                    $('#submit').attr('disabled', false);
+                }
+            }
+        })
+    })
+   /* $(document).on('keyup','#inputEmail', function() {
+        if($('#inputEmail').val()==''){
+        $('#emailidexists').remove()
+        }
+    }) */
+    // $(function () {
+    //     $("#toggle_pwd").click(function () {
+    //         $(this).toggleClass("fa-eye fa-eye-slash");
+    //        var type = $(this).hasClass("fa-eye-slash") ? "text" : "password";
+    //         $("#inputPassword").attr("type", type);
+    //     });
+    // });
+    // $(function () {
+    //     $("#toggle_pwd2").click(function () {
+    //         $(this).toggleClass("fa-eye fa-eye-slash");
+    //        var type = $(this).hasClass("fa-eye-slash") ? "text" : "password";
+    //         $("#inputPassword2").attr("type", type);
+    //     });
+    // });
+
+
+
+    $.validator.addMethod("concurrent_valid", function(value, element) {
+
+       var  no_of_user=$('#numberofuseres').val()
+        // alert(no_of_user)
+       var concurentuser=$('#concurent-users').val()
+
+        // alert(no_of_user)
+        if(no_of_user != '')
+        {
+            console.log('no_of_user',no_of_user)
+        if(parseInt(no_of_user) > parseInt(concurentuser))
+        {
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+   
+	    
+});
+
+
+$.validator.addMethod("numberofusers_req", function(value, element) {
+
+var  no_of_user=$('#numberofuseres').val()
+ // alert(no_of_user)
+// var concurentuser=$('#concurent-users').val()
+
+ // alert(no_of_user)
+  console.log('no_of_user',no_of_user)
+ if(no_of_user !='')
+ {
+
+     return true;
+   
+ }
+ else{
+   console.log('else')
+    $('#concurent-users').val('')
+     return false;
+    
+
+ }
+
+
+ 
+});
+
+
+
+
+// mobile number validation
+
+
+const input = document.querySelector('#contactpersonno');
+// input.addEventListener('keyup', (e) => {
+    // alert(e.keycode)
+// input.value = input.value.replace(/ +/g, ' ');
+// });
+input.addEventListener('keypress', (e) => {
+    input.value = input.value.replace(/ {2,}/g,'');
+
+var x = e.which || e.keycode;
+
+if ((x >= 48 && x <= 57) || x == 32)
+{
+    var spaces = input.value.split(' ').length - 1;
+    if (spaces <= 3){
+        return true; 
+    }
+    else{
+        console.log(input.value)
+        input.value = input.value.slice(0, -1)
+        return false;
+    }
+
+
+  
+}
+
+else
+{
+    e.preventDefault();
+}
+
+});
+ 
+
+
+// var count=0;
+// const input_space = document.querySelector('#contactpersonno');
+// input.addEventListener('keyup', () => {
+//     // alert()
+//     input_space.value = input_space.value.replace(/ {2,}/g,' ');
+// // input.value = input.value.replace(/ +/g, ' ');
+// });
+// input_space.addEventListener('keypress', (e) => {
+// var x = e.which || e.keycode;
+
+// if(x==32)
+// {
+
+
+// count++;
+
+// if(count<=3)
+// {
+// console.log('working')
+//     e.preventDefault(); 
+// }
+// }
+
+
+// });
+ 
+//validation for type of licence
+
+
+$(document).on('change','.typeoflicense',function(){
+    var value = $('select.typeoflicense option:selected').val();
+
+if(value==2)
+{
+   
+    $('input:radio[name="cloudserver"]').filter('[value="irock"]').attr('checked', true);
+
+    $('#hideprivateserver').hide()
+}
+else{
+    $('input:radio[name="cloudserver"]').filter('[value="irock"]').attr('checked', false);
+
+    $('#hideprivateserver').show()
+}
+
+
+
+});	
+
+
+
+$.validator.addMethod("spacecheck", function(value, element,event) {
+
+
+    // alert(e.code)
+        space_count=value.replace(/\d/g, "").length;
+              if(space_count>4)
+              {
+              return false;
+              }
+              else{
+                  return true;
+              }
+
+
+});
+
+
+        $.validator.addMethod(
+    "regex",
+    function(value, element, regexp) {
+        return this.optional(element) || regexp.test(value);
+    },
+    "Accept Only Numbers"
+);
+
+$('#first_name').keyup(function() {
+var $th = $(this);
+$th.val($th.val().replace(/\d+/g, ''))
+$th.val($th.val().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+// $th.val($th.val().replace(/^\s*/, ''));
+remove_dot = $th.val().replace(/\.{2,}/g, '.');
+$(this).val(remove_dot)
+});
+
+$('#lastname').keyup(function() {
+var $th = $(this);
+$th.val($th.val().replace(/\d+/g, ''))
+$th.val($th.val().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+// $th.val($th.val().replace(/^\s*/, ''));
+remove_dot = $th.val().replace(/\.{2,}/g, '.');
+$(this).val(remove_dot)
+});
+
+// $('#designation').keyup(function() {
+// var $th = $(this);
+// $th.val($th.val().replace(/\d+/g, ''))
+// $th.val($th.val().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+// // $th.val($th.val().replace(/^\s*/, ''));
+// remove_dot = $th.val().replace(/\.{2,}/g, '.');
+// $(this).val(remove_dot)
+// });
+
+$('#contactperson').keyup(function() {
+var $th = $(this);
+$th.val($th.val().replace(/\d+/g, ''))
+$th.val($th.val().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+// $th.val($th.val().replace(/^\s*/, ''));
+remove_dot = $th.val().replace(/\.{2,}/g, '.');
+$(this).val(remove_dot)
+});
+
+
+$.validator.addMethod("alpha", function(value, element) {
+    return this.optional(element) || value == value.match(/^([\s.]?[a-zA-Z]+)+$/);
+    // --                                    or leave a space here ^^
+});
+
+$(document).on('keyup','#inputEmail',function(){
+    var inputvalue = $('input[name="email"]').val();
+
+inputvalue = inputvalue.trim();
+
+$('input[name="email"]').val(inputvalue);
+})
+
+
+$(document).on('keyup','#contactpersonno',function(){
+//     let value=$(this).val();
+// var text = value.replace("/[\d\s()+-]/g");
+// $('#id_phone_number_extenstion').val(text);
+
+if (/\D/g.test(this.value))
+{
+this.value = this.value.replace(/\D\s/g, ' ');
+var text = value.replace(/(\s{2,})|[^0-9\.'']/g, ' ');
+// this.value = (this.value().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+}
+})
+
+
+
+
+    $("#register_form_id").validate({
+    rules: {
+        email: {
+        required: true,
+        email: true,
+        regex:/^\b[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b$/i,
+        },
+        password: {
+          required:true,
+          minlength: 8,
+          regex:/^(?=.*[A-Z.-_])(?=.*[a-z.-_])(?=.*[0-9])(?=.*[!@#$%^&*()_+,.\\\/;':"-]).{8,}$/
+        },
+        password2: {
+            required: true,
+            equalTo: "#inputPassword",
+        },
+        name:{
+            required:true,
+            // regex:/^[a-zA-Z ]+$/,
+        },
+        last_name:{
+            required:true,
+            // regex:/^([\s.]?[a-zA-Z]+)+$/,
+            // lastname:true,
+        },
+        company_name:{
+            required:true,
+            // regex: /^[a-zA-Z_0-9 .%!@#&$-]+$/,
+        },
+        contact_no:{
+            required:true,
+            // regex:/^\d*[0-9](|.\d*[0-9]|,\d*[0-9])?$/,
+            // digits: true,
+            minlength:5,
+            maxlength:20,
+            // spacecheck:true,
+            // valid_contactno:true
+        },
+        concurrent_user:{
+            required:true,
+            // digits:true,
+            regex:/^[0-9]+$/,
+            // numberofusers_req:true,
+            concurrent_valid:true,
+        },
+        cloudserver:{
+            required:true,
+            
+        },
+        support:{
+            required:true,
+            
+        },
+        customization:{
+            required:true,
+            
+        },
+        type_of_license:{
+            required:true,
+            
+        },
+        
+        number_of_users:{
+            required:true,
+            regex:/^[0-9]+$/,
+            numberofusers_req:true,
+
+            
+        },
+        
+        country_select:{
+            required:true,
+            
+        },
+        
+        contactperson:{
+            required:true,
+            // alpha:true,
+            // contactperson:true,
+            
+        },
+        
+        designation:{
+            required:true,
+            // designation:true,
+        },
+        package:{
+            required:true,
+            
+        },
+        
+        
+
+    },
+    messages: {
+        contact_no:{
+            required:"Please Provide Contact No",
+            // digits:"Please Provide Characters Only",
+            minlength:"Enter Minimum 5 Numbers",
+            maxlength:"Allows Only 20 Numbers ",
+            spacecheck:"only allows 3 space"
+        },
+        company_name:{
+            required:"Please Provide a Company Name",
+            regex:"Should Accept Only Characters",
+        },
+        name:{
+            required:"Please Provide a First Name",
+            // first_name:"Accept Only Alphabets",
+        },
+        last_name:{
+            required:"Please Provide a Last Name",
+            // lastname:"Accept Only Alphabets",
+        },
+        email:{
+          required:"Please Provide an Email ID",
+          email: "Please Provide a Valid Email ID",
+          regex:"Please Provide a Valid Email ID",
+        },
+        password: {
+          required: "Please Provide a Password",
+          minlength: "Please Enter Atleast 8 Characters",
+          regex: "Password Should Have Minimum 8 Letters Consisting Atleast One From A-Z, a-z, 0-9 and Special Characters",
+
+        },
+        password2: {
+            required: "Confirm Password Required",
+            equalTo: "Password Mismatch",
+        },
+        concurrent_user: {
+            required: "Please Provide a Concurrent Users",
+            numberofusers_req: "Please Provide a Number of Users",
+            // regex:'Accept Only Numbers',
+            // concurrent_valid:"concurrent users is high compare with no-of-users or "
+            concurrent_valid:"Concurrent Users  cannot be more than number of users "
+        },
+        cloudserver: {
+            required: "Please Select the Cloud Server Type",
+            
+        },
+        support: {
+            required: "Please Select the Support Type",
+            
+        },
+        
+        customization: {
+            required: "Please Select the Customization Type",
+            
+        },
+        type_of_license: {
+            required: "Select the License Type",
+            
+        },
+        country_select: {
+            required: "Select the Country",
+            
+        },
+        package: {
+            required: "Select the Package",
+            
+        },
+        number_of_users: {
+            required: "Please Provide a Numbers of Users",
+            // regex:'Accept Only Numbers',
+            
+        },
+        contactperson: {
+            required: "Please Provide a Contact Person",
+            // alpha:"Accept Only Alphabets",
+            // contactperson:"Accept Only Alphabets",
+        },
+        designation: {
+            required: "Please Provide a Designation",
+            designation:"Accept Only Alphabets",
+            
+        },
+        
+    
+        errorElement : 'span',
+        },
+    submitHandler: function(form) {
+        $('#submit').attr('disabled','disabled');
+        Swal.fire({
+                    position: 'top',
+                    icon: 'success',
+                    title: 'Licensing Proposal Form Submitted Successfully.Please wait for Admin’s Feedback',
+                    showConfirmButton: true,
+                    timer:6000
+                    })
+        form.submit();
+        
+    }
+});
+
+
+
+
+
+
+
+</script> 
+</html>

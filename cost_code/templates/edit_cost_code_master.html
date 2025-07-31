@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% load cost_code_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/cost_code/edit_cost_code_master.css' %}">
+
+<div>
+    <div class="row">
+        <div class="col-9">
+        </div>
+        <div class="col-3 text-end">
+            <button type="button" class="btn btn-clr"><a href="{% url 'cost_code:costcodemasterlist' %}">Back</a></button>
+        </div>
+    </div>
+    
+    <h3 class="from-head">Edit Cost Code Master</h3>
+
+    
+    <form method="POST" id="edit_costcode_form">
+        <input type="hidden" name="pagetype" value="edit" id="pagetype">
+
+        {% csrf_token %}
+    <div class="row mb-3">
+        <div class="col-6">
+            <table>
+                <tr class="cost-code-format">
+                    <td class="pl-0"> <label>Cost Code Style</label></td>
+                    <td>:</td>
+                    <td> 
+                        {% if subtype_len > 0%}
+                        <input type="text" name="cost_code_format" class="form-control" readonly value="{{costcodeformat}}" >
+                        {% else %}
+                        <select name="cost_code_format" class="form-control" id="costcodeformat">
+                        <option value="">--Select--</option>
+                        {% for format in code_format %}
+                            <option value="{{format}}" {% if costcodeformat == format %} selected {% endif %}>{{format}}</option>
+                        {% endfor %}
+                        </select>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <!-- <div class="col-5 cost-code-format">
+            <label>Cost Code Format :</label>
+            <select name="cost_code_format" class="form-control" id="costcodeformat">
+                    <option value="">--Select--</option>
+                    {% for format in code_format %}
+                        <option value="{{format}}" {% if costcodeformat == format %} selected {% endif %}>{{format}}</option>
+                    {% endfor %}
+            </select>
+        </div> -->
+    </div>
+
+    <div class="row mb-3">
+       <div class="col-6">
+        <table>
+            <tr class="cost-code-format">
+                <td class="pl-0"><label>Input Type</label></td>
+                <td>:</td>
+                <td><input type="text" name="input_type" class="form-control type_cls" readonly value="Numeric" >
+                    {% comment %} <select name="input_type" class="form-control type_cls" readonly>
+                        <option value="">--Select--</option>
+                        <option value="Numeric"  selected>Numeric</option>
+                    </select> {% endcomment %}</td>
+            </tr>
+        </table>
+       </div>
+    <!-- <div class="col-5 cost-code-format" >
+        <label>Input Type :</label>
+        <input type="text" name="input_type" class="form-control type_cls" readonly value="Numeric" >
+        {% comment %} <select name="input_type" class="form-control type_cls" readonly>
+            <option value="">--Select--</option>
+            <option value="Numeric"  selected>Numeric</option>
+        </select> {% endcomment %}
+    </div> -->
+</div>
+    <div class="row">
+        <div class="col-12 table-responsive">
+            <table id="id_edit_cost_tbl"  class="cost-code-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Level Type</th>
+                        <th>No of Digits</th>
+                        <th>Start with</th>
+                        <th>Sequence Gap <i class="fa fa-info-circle" title="No. of items that can be added in between each cost line item for code generation"></i></th>
+                        <!-- <th></th> -->
+                        <!-- <th></th> -->
+                    </tr>
+    
+                </thead>
+                <tbody>
+                    {% getallcostcodemaster company 1 as costcodemaster %}
+                    {% for master in costcodemaster.costcodemaster %}
+                    {% checkcostcodetype company master as costcodetype %}
+                    <tr class="main_tr">
+                        <input type="hidden" name="edit_rows" id="edit_rows" value="{{costcodemaster.count}}">
+                        <input type="hidden" name="costcodemasterid" value="{{master.id}}" class="costcodemasterid">
+                        <td class="td-left"><label class="lev_nm_cls">Level {{forloop.counter}}</label></td>
+                        <td class="level_name">
+                            {% for level in levels %}
+                             {% if level.id == master.level_type_id %}
+                             <input type="hidden" value="{{level.level_name}}" class="form-control" name="level_cls" readonly>
+                               {%if master.leveltype == 'new' %}
+                                <input  value="{{level.level_name}}" class="form-control level_type" name="level_type">
+                                {%else%}
+                                <input  value="{{level.level_name}}" class="form-control level_type" name="level_type" {% if costcodetype > 0 %}readonly
+                                {% elif master.level_type_id <= 2 %} readonly {% endif %}>
+                                {%endif%}
+                             {%endif%}
+                           
+                            {% endfor %}
+                           
+                            <input name="level_type_name" value="{{master.leveltype}}" type="hidden">
+                            <input type="text" name="new_level" class="form-control new_level_cls level_new_cls" style="display:none" placeholder="Type New Level">
+                            <input type="hidden" name="leveltype" class="leveltype">
+    
+                        </td>
+                        <td>
+                            <input type="text" name="num_digits" maxlength='2' oninput="this.value = this.value.replace(/\D/g, '')" class="form-control digit_cls tdvalue-center" autocomplete="off" value="{{master.no_digits}}" {% if costcodetype > 0 %} readonly {% elif master.level_type_id <= 2 and subtype_len > 0 %}readonly{% endif %}>
+                        </td>
+                        <td>
+                            <input type="text" name="start_with" oninput="this.value = this.value.replace(/\D/g, '')" class="form-control type_based_cls tdvalue-center" maxlength="{{master.no_digits}}" autocomplete="off"  value="{{master.start_with}}" {% if costcodetype > 0 %} readonly {% elif master.level_type_id <= 2 and subtype_len > 0 %}readonly {% endif %}>
+                        </td>
+                        <td>
+                            <input type="text" name="Sequence_gap" oninput="this.value = this.value.replace(/\D/g, '')" maxlength='3' class="form-control seq_cls tdvalue-center" autocomplete="off" value="{{master.sequence_gap}}" {% if costcodetype > 0 %} readonly {% elif master.level_type_id <= 2 and subtype_len > 0 %}readonly {% endif %}>
+                        </td>
+                        <td class="tdvalue-center check_type">
+                            {% if master.level_type_id > 2 and costcodetype == 0 %}
+                            <button type="button" class="btn btn-clr del_button" data-id="{{master.id}}">Remove</button>
+                            {% endif %}
+
+                            {%if master.level_type_name == 'Development Type' %}
+                            <a class="btn p-0" data-toggle="collapse" href="#collapseExample{{master.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                <span class="action-edit align-icons">
+                                    <!-- <i class="fa fa-eye eyebutton" title="View" style="font-size:17px; color:#95183a;"></i> -->
+                                    <button class="comp-btn level_1"  title="View">Component L1 <i class="fa-solid fa-chevron-down pl-1" id="bac-eye"></i> </button>
+                                </span>
+                            </a>
+                            {%endif%}
+
+                            {%if master.level_type_name == 'Discipline' %}
+                            <a class="btn p-0" data-toggle="collapse" href="#collapseExample{{master.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                <span class="action-edit align-icons">
+                                    <!-- <i class="fa fa-eye eyebutton" title="View" style="font-size:17px; color:#95183a;"></i> -->
+                                    <button class="comp-btn level_2" title="View">Component L2 <i class="fa-solid fa-chevron-down pl-1" id="bac-eye"></i> </button>
+                                </span>
+                            </a>
+                            {%endif%}
+
+                        </td>
+                   
+              
+                </tr>
+
+                    <!-- Cost Code Level Detail View -->
+                    {%if master.level_type_name == 'Development Type' or master.level_type_name == 'Discipline' %}
+                    <tr>
+                        <td colspan="12" class="p-0">
+                          <div class="collapse {%if master.level_type_name == 'Development Type'%}coll_1 {% else %} coll_2{% endif %}" id="collapseExample{{master.id}}">
+                            <div class="card card-body shadow-none master-crd pad-adj">
+                                  <div role="tabpanel" class="tab-pane active space" id="roles{{obj.id}}">
+                                    <div class="row">
+                                      <div class="col-12">
+                                        {% if master.level_type_name == 'Development Type' %}
+                                        <h4 class="proj-hd">Development Type</h4>
+                                        {% else %}
+                                        <h4 class="proj-hd">Discipline Type</h4>
+                                        {% endif %}
+                                      </div>
+                                    </div>
+                                    <div class="row" id="name">
+                                      <div class="col-12">
+                                        {% if master.level_type_name == 'Development Type' %}
+                                        {% for discipline in alldiscipline%}
+                                        {% for development in alldevelopment%}
+                                        <div class="row">
+                                          <div class="col-12">
+                                            <li class="role-cls" process_id="{{flow.process.id}}" pk="{{obj.id}}">{{discipline.name}}({{development.development_type}})</li>
+                                          </div>
+                                        </div>
+                                        {% endfor %}
+                                        {% endfor %}
+                                        {% else %}
+                                        {%for disciplinesubtype in discipline_subtype%}
+                                        <div class="row">
+                                            <div class="col-12">
+                                              <li class="role-cls" process_id="{{flow.process.id}}" pk="{{obj.id}}">{{disciplinesubtype}}</li>
+                                            </div>
+                                          </div>
+                                       {%endfor%}
+                                        {% endif %}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                            </div>
+                          </div>  
+                        </td>
+                    </tr>
+                {%endif%}
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
+            <div class="col-1 one-wid"></div>
+            <div class="col-11 pl-0">            
+                <button id="add" type="button" class="add-nxt-btn">Add Next Level</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center btn-cls">
+        <button type="submit" class="btn btn-clr text-left final-cls waves-effect waves-float waves-light">Submit</button>
+    </div>
+    </form>
+</div>
+<div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter1" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+      <div class="modal-content" data-backdrop="static">
+        
+        <div class="modal-header comment-head">
+          <h5 class="modal-title" id="exampleModalCenterTitle">Development Type</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body calc-body">
+        {% for discipline in alldiscipline%}
+            {% for development in alldevelopment%}
+                <input value="{{discipline.name}}({{development.development_type}})" >
+            {% endfor %}
+        {% endfor %}
+        </div>
+       
+
+        <div class="modal-footer comment-foot">
+         
+        </div>
+        </div>
+    </div>
+  </div>
+  
+  <div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter2" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+      <div class="modal-content" data-backdrop="static">
+        
+        <div class="modal-header comment-head">
+          <h5 class="modal-title" id="exampleModalCenterTitle">Discipline</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body calc-body">
+           {%for disciplinesubtype in discipline_subtype%}
+           <input value="{{disciplinesubtype}}" >
+          {%endfor%}
+        </div>
+       
+        <div class="modal-footer comment-foot">
+        
+        </div>
+        </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> 
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" ></script>
+<script src="{% static 'js/cost_code/create_cost_code.js' %}"></script>
+<script>  
+    var csrf_token = '{{csrf_token}}'
+    let subtype='{{subtype}}'
+</script>
+{% endblock %}

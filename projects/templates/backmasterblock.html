@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+<section>
+    <h3 class="from-head">Create Block</h3>
+    <form method="POST" class="form-txt" id="edit-masterblock">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-4">
+                <label class="txt-name">Country</label>
+                <p class="txt-detail">{{project_details.country.nicename}}</p>
+            </div>
+            <div class="col-4">
+                <label  class="txt-name">Project Name</label>
+                <p class="txt-detail">{{project_details.name}}</p>
+            </div>
+            <div class="col-4">
+                <label  class="txt-name">Block Name <span id="block-add-row"><i class="fa fa-plus-circle"></i></span></label>
+                <table>
+                    <tbody id="block_table">
+                        {% for block in project_block%}
+                        <tr>
+                            <td>
+                                <input type="hidden" name="blockid" value="{{block.id}}" class="blockid">
+                                <input list="browsers"  autocomplete="off" type="text" name="blockname" value="{{block.block_name}}" class="form-control block-class">
+                                <datalist id="browsers"><option value="Not Applicable"></datalist>
+                            </td>
+                            <td>
+                                <button id="block-delete-row" data-id="{{block.id}}" class="btn btn-clr add-btn waves-effect waves-float waves-light" type="button" value="Add"><i class="fa fa-minus"></i></button>
+                            </td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+           
+              
+            </div>
+        </div>
+        <div class="text-center spacing-button">
+            <button type="button" class="btn btn-clr text-center submit-cls" data-id='2'>Save & Next</button>
+
+        </div>
+    
+    </form>
+
+</section>
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+var is_filled=true;
+var lenfilled=true;
+var project_id="{{project_details.id}}"
+$(document).on("click","#block-add-row", function(){
+    
+    if (is_filled==true && lenfilled==true){
+    var new_row='<tr><td><input type="hidden" name="blockid" value="" class="blockid"><input name="blockname" list="browsers" autocomplete="off" type="text" class="form-control block-class"><datalist id="browsers"><option value="Not Applicable"></datalist></td><td><button id="block-delete-row" class="btn-clr block-delete-row btn add-btn" type="button" value="delete"><i class="fa fa-minus"></i></button></td>'
+    $("#block_table").append(new_row);
+    }
+    else{
+
+    }
+})
+$(document).on("click", "#block-delete-row", function () {
+    block_val=$(this).closest('td').prev('td').find('.block-class').val()
+    if (block_val == ''){
+        $(this).closest('tr').remove()
+        is_filled = true
+    }
+    else{
+        if (is_filled==true && lenfilled==true){
+        var id=$(this).closest('tr').index()
+        $(this).closest('tr').remove()
+        $('#block'+id+'').remove()
+        }
+        else{
+
+        }
+    }
+})
+$(document).ready(function(){
+
+    $(document).on("keyup",".block-class",function(){
+        var x=$(this).val().toLowerCase();
+        var spanid=$(this).closest('tr').index()
+        if (x.length <= 14){
+            lenfilled = true;
+            $('#block'+spanid+'').remove()
+        }
+        else {
+            lenfilled = false;
+            $('#block'+spanid+'').remove()
+            $(this).closest('tr').after('<span class="waring-err" id=block'+spanid+'>Maximum 14 Characters Only</span>')
+        }
+        var z=0;
+        $("input").each(function(){
+            if (x != 'not applicable'){
+                if (x !='' && y !=''){
+                var y=$(this).val().toLowerCase();
+                if(x==y){
+                    z=z+1;
+                }
+            }
+        }
+        });
+        if(z>1){
+            var spanid=$(this).closest('tr').index()
+            $(this).addClass("error")
+            is_filled = false;
+            console.log(is_filled)
+            $(this).closest('tr').after('<span class="waring-err" id=block'+spanid+'>Block Name Already Exists</span>')
+        }
+        else{
+            $(this).removeClass("error")
+            is_filled = true;
+            $('block'+spanid+'').remove()
+        }
+    })
+ 
+$(document).on('click','.submit-cls',function(e){
+    $('.block-class').each(function(){
+        if ($(this).val()=='') {
+            is_filled = false;
+            Swal.fire({
+                icon: 'error',
+                title: 'Error...',
+                text: 'The block is required',
+                })
+        }
+        e.preventDefault()
+
+    })
+    console.log(is_filled)
+    console.log(lenfilled)
+    if(is_filled == false || lenfilled == false){
+        console.log('not create')
+    }
+    else{
+        $(this).prop('disabled', true);
+    btn_id=$(this).attr('data-id');
+    var form=$("#edit-masterblock");
+        $.ajax({
+          type:"POST",
+          container:"#edit-masterblock",
+          url:'/projects/editprojectmasterblock/'+project_id,
+          data:form.serialize(),
+          success: function(data){
+              if (btn_id == '1' ){
+                var current_url=$(location).attr("href")
+                var replace_url=current_url.replace("editprojectmasterblock/"+project_id+"","listmaster")
+                window.location.href = replace_url;
+
+              }
+              else{
+                var url = "{% url 'projects:createmasterfield' 123 %}";
+                document.location.href = url.replace('123', project_id);
+              }
+            }
+        })
+    }
+})
+})
+
+</script>
+{% endblock %}

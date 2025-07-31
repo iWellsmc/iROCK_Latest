@@ -1,0 +1,749 @@
+
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_tags %}
+{% load InvoiceGuardTags %}
+{% block content %}
+
+<head>
+</head>
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/projectcreate.css' %}">
+<div class="row">
+  <div class="col-12 text-end">
+      <button type="button"
+          class="btn btn-clr waves-effect waves-float waves-light"><a
+              href="{% url 'projects:projectlist' %}">Back</a></button>
+  </div>
+</div>
+
+<div class="table-bck top-btn-arrow" id="project_create_div">
+    <h3 class="from-head">Create Project</h3>
+    <form autocomplete="off" method="post"  id="project_create" novalidate class="form-txt">
+        <div>
+            {% csrf_token %}
+            {%if roleid == 3%}
+              <input value="{{userid.id}}" name="project_manager" type="hidden">
+            {%endif%}
+            {% comment %} <input type="hidden" name="csrf_name" value="{% csrf_token %}"> {% endcomment %}
+            <h3>Create Project</h3>
+            <section class="crt-table main_scroll">
+
+                {% for hidden in form.hidden_fields %}
+                {{hidden}}
+                {% endfor %}
+                <div class="row par-top-arrow">
+                    <div class="col-2"></div>
+                    <div class="col-8">
+                        <button type="button" class="scroll-top-proj"></button>
+                        
+                        <div class="col-sm-12">
+                            <label for="staticEmail" class="unique-colr-crt-prj">Category of Entity <span
+                                    class="star-clr"> :</span><span
+                                    class="req-name">{{request.company.category_entity|category_replace}}<input
+                                        type="hidden" id="gettype" dataid="{{request.company.id}}"
+                                        value="{{request.company.category_entity|category_replace}}"></span></label><br>
+                            <label for="staticEmail" class="col-form-label">Company Name</label>
+                            <input type="text" name="company_name" class="col-sm-12 form-control input-sizze"
+                                value="{{companyname}}" readonly>
+                        </div>
+                        <div class="col-sm-12">
+                            <label for="staticEmail" class="col-form-label ">Entity/Subsidary Name</label>
+                            {% render_field form.entity class="form-control input-sizze" %}
+                        </div>
+                        <div class="col-sm-12">
+                            <label for="staticEmail" class="col-form-label">Country<span
+                                    class="star-clr">*</span></label>
+                            <select id="country_id" name="master_country_list" class="form-control form-select input-sizze">
+                                <option value="" selected="selected">---Select Country---</option>
+                                {% for country in countries%}
+                                <option value="{{country.country_id}}">{{country.country_name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-12">
+                            <label for="staticEmail" class="col-form-label">Project Name<span
+                                    class="star-clr">*</span></label>
+                            <select id="project_id" name="project_list" class="form-control form-select input-sizze">
+                                <option value="" selected="selected">---Select Project---</option>
+                            </select>
+                        </div>
+                        {% comment %} <div class="col-sm-12">
+                            <label for="staticEmail" class="col-form-label">Category of Entity<span
+                                    class="star-clr">*</span></label><br>
+                            <input type="checkbox" id="project_type" name="projecttype"
+                                value="Oil_and_Gas_Operators">&emsp;<label class="pt-type">Oil and Gas
+                                Operators</label><br>
+                            <input type="checkbox" id="project_type" name="projecttype"
+                                value="Oil_and_Gas_Servicing_Companies">&emsp;<label class="pt-type">Oil and Gas
+                                Servicing Companies</label><br>
+                            <input type="checkbox" id="project_type" name="projecttype"
+                                value="Other_Industry">&emsp;<label class="pt-type">Other Industry</label><br>
+                        </div> {% endcomment %}
+                        <div class="col-sm-12" id="block_name_id">
+                        </div>
+                        <div class="col-sm-12" id="field_name_id">
+
+                        </div>
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+            </section>
+            <h3 class="head-name">Project Discipline</h3>
+            <section class="crt-table scroll-main-prj">
+                <div class="row par-top-arrow">
+                    <button type="button" class="scroll-top-proj"></button>
+                    <div id="field-form" class="pd-form"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 ">
+                        <div class="row">
+                            <div class="col-12 development-cls accord-tab">
+                            </div>
+                            <div class="col-12">
+                                <div id="development_subtype"></div>
+                                <div id="wells_id">
+                                </div>
+                                <div id="sub-type">
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div id="discipline-subtype" style="display:none">
+                    </div>
+                </div>
+            </section>
+            {% if request.user.roles_id == 3 %}
+              {% if rights.create == '1' %}
+                <h3>Users</h3>
+                <section class="crt-table users">
+                    <div class="row par-top-arrow">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-sm-12 mt-3">
+                                    <div class="down-arrow">
+
+                                  <img src="../../../static/images/icons/icons8-down-arrow-18s.png" alt="">
+                                    <div class="row align-items-baseline">
+                                        <div class="col-1">
+                                            <label for="staticEmail" class="col-form-label">Users<span
+                                                class="star-clr">*</span></label>
+                                        </div>
+                                        <div class="col-11">
+                                              <select id="project_manager" name="project_manager"
+                                              class="form-control input-sizze sel-cls" multiple="multiple">
+                                              {% for user in users%}
+                                                <option value="{{user.id}}">{{user.name}} {{user.lastname}}&nbsp;--
+                                                  {{user.designation_role}}&nbsp;
+                                                  {% if user.roles.id == 2 %}-- Administration{% else %}{% if user.user_department_id is not None %}-- {{user.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2"></div>
+                    </div>
+                </section>
+                {% endif %}
+            {% else %}
+              <h3>Users</h3>
+              <section class="crt-table users">
+                  <div class="row par-top-arrow">
+                      <div class="col-12">
+                          <div class="row">
+                              <div class="col-sm-12 mt-3 ">
+                                  <div class="down-arrow">
+
+                                <img src="../../../static/images/icons/icons8-down-arrow-18s.png" alt="">
+                                  <div class="row align-items-baseline">
+                                      <div class="col-1 p-0">
+                                          <label for="staticEmail" class="col-form-label">Users<span
+                                              class="star-clr">*</span></label>
+                                      </div>
+                                      <div class="col-11 multi-user-sel-new">
+                                          <select id="project_manager" name="project_manager"
+                                          class="form-control input-sizze sel-cls" multiple="multiple">
+                                          {% for user in users%}
+                                            <option value="{{user.id}}">{{user.name}} {{user.lastname}}&nbsp;--
+                                              {{user.designation_role}}&nbsp;
+                                              {% if user.roles.id == 2 %}-- Administration{% else %}{% if user.user_department_id is not None %}-- {{user.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>
+                                          {% endfor %}
+                                        </select>
+                                      </div>
+                                  </div>
+                              </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="col-2"></div>
+                  </div>
+              </section>
+            {% endif %}
+            <!-- Project Signatories section comment starts here-->
+            <!-- <h3>Project Signatories</h3>
+            <section class="proj-sig-tab-4">
+                <div class="row align-items-baseline">
+                    <div class="col-2">
+                        <label class="col-form-label">Signatory Settings</label>
+                        <input type="hidden" class="hidden_val" id="original_value" value="">
+                    </div>
+                    <div class="col-4">
+                      <div class="down-arrow-sig">
+                        <img src="../../../static/images/icons/icons8-down-arrow-18s.png" alt="">
+                      </div>
+
+                        <select id="sign_settings" name="sign_settings"
+                        class="form-control input-size settings_sign">
+                        <option value="">--Select--</option>
+                        {% for type in datatypes %}
+                        <option value="{{type.id}}">{{type.settings_type}}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                 <div class="project_sign dss-div" style="display:none;">
+                    <h4 class="from-head">Default Signatories Settings</h4>
+                    
+                    <table
+                      class="table dss-table settings-data-list-view data-list-view project_master proj-lists creat-head pro-list all-tbl-hd list-user-table-width irock-table with_invoice" >
+                      <thead>
+                        <tr>
+                          <th class="wid-iin com_curency">Currency</th>
+                          <th class="wid-iin">From Invoice Amount</th>
+                          <th class="wid-iin">To Invoice Amount</th>
+                          <th style="text-transform: initial !important;">No of Signatories</th>
+                          <th>Users</th>
+                        </tr>
+                      </thead>
+                      <tbody class="table-list">
+                        {%for signatory in with_invoice%}
+                        <tr>
+                          <td>{{signatory.currency.currency_symbol}}-{{signatory.currency.currency}} ({{signatory.currency.name}})
+                          </td>
+                          <td>{{signatory.min_amount|add_seperator|default_if_none:''}}</td>
+                          <td>{{signatory.max_amount|add_seperator|default_if_none:''}}</td>
+                          <td>
+                            <p class="txt-word-break">
+                              {{signatory.id|no_of_users|default_if_none:"---"}}</p>
+                          </td>
+                          <td class="text-start">
+                            {% for user in signatory|SignatoryUser %}
+                            <p class="txt-word-break">{{user.user|default_if_none:"---"}}&nbsp;{{user.user.lastname|default_if_none:"---"}}
+                            </p>
+                            {% endfor %}
+                          </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                          <td colspan="9" class="cls-nil">
+                            ---
+                          </td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                    <table
+                      class="table settings-data-list-view data-list-view project_master proj-lists creat-head pro-list all-tbl-hd list-user-table-width irock-table without_invoice dss-table"
+                      style="display: none;">
+                      <thead>
+                        <tr>
+                          <th class="wid-iin com_curency">Currency</th>
+                          <th style="text-transform: initial !important;">No of Signatories</th>
+                          <th>Users</th>
+                        </tr>
+                      </thead>
+                    <tbody class="table-list">
+                      {%for signatory in without_invoice%}
+                      <tr>
+                        <td>{{signatory.currency.currency_symbol}}-{{signatory.currency.currency}} ({{signatory.currency.name}})
+                        </td>
+                        <td>
+                          <p class="txt-word-break">
+                            {{signatory.id|no_of_users|default_if_none:"---"}}</p>
+                        </td>
+                        <td class="text-start">
+                          {% for user in signatory|SignatoryUser %}
+                          <p class="txt-word-break">{{user.user|default_if_none:"---"}}&nbsp;{{user.user.lastname|default_if_none:"---"}}
+                          </p>
+                          {% endfor %}
+                        </td>
+                      </tr>
+                      {% empty %}
+                      <tr>
+                        <td colspan="9" class="cls-nil">
+                          ---
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  </div>
+                  <div class="Default_sign pss-div" style="display:none;">
+                    <h4 class="from-head">Project Signatories Settings</h4>
+                    <div class="col-9 show-noti pt-0">
+                      <label for="">Select Signatory
+                      <select class="select-style select-invoice-project">
+                        <option value="1">With Invoice Amount</option>
+                        <option value="2">Without Invoice Amount</option>
+                      </select>
+                    </label>
+                    </div>
+                    <table class="pss-table with_invoice_project" id="master_project_list">
+                      <thead>
+                        <tr>
+                          <th class="currency">Currency</th>
+                          <th class="wid-iin">From Invoice Amount</th>
+                          <th class="wid-iin">To Invoice Amount</th>
+                          <th class="nos-sig p"><p>No of Signatories</p></th>
+                          <th class="user">Users</th>
+                        </tr>
+                      </thead>
+                      <tbody class="table-list newtrrow">   
+                      </tbody>
+                      </table>
+                      <table class="pss-table without_invoice_project" id="master_project" style="display: none;">
+                        <thead>
+                          <tr>
+                            <th class="currency">Currency</th>
+                            <th class="nos-sig p"><p>No of Signatories</p></th>
+                            <th class="user">Users</th>
+                          </tr>
+                        </thead>
+                        <tbody class="table-list new_row">
+                        </tbody>
+                        </table>
+                  </div>
+                </section> -->
+                <!-- Project Signatories section comment ends here-->
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+
+
+<script
+src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.2/js/bootstrap-multiselect.js"
+integrity="sha512-YwbKCcfMdqB6NYfdzp1NtNcopsG84SxP8Wxk0FgUyTvgtQe0tQRRnnFOwK3xfnZ2XYls+rCfBrD0L2EqmSD2sA=="
+crossorigin="anonymous"
+referrerpolicy="no-referrer">
+</script>
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.2/css/bootstrap-multiselect.css"
+integrity="sha512-tlP4yGOtHdxdeW9/VptIsVMLtgnObNNr07KlHzK4B5zVUuzJ+9KrF86B/a7PJnzxEggPAMzoV/eOipZd8wWpag=="
+ crossorigin="anonymous"
+ referrerpolicy="no-referrer" />
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script  type="text/javascript" src="{% static 'js/projects/multistepproject.js' %}"></script>
+<script  type="text/javascript" src="{% static 'js/projects/createsignatory.js'%}"></script>
+<script>
+
+
+
+// $(document).on('keyup','.min_amount,min_amountn,.max_amount,.max_amountn',function(){
+//   let check_limit=$(this).val().length
+//   if (check_limit>=19){
+//     new swal({
+//       title: "Maximum Amount",
+//       button: "Ok",
+//     })
+//     $(this).val('')
+//   }
+// })
+
+
+
+
+
+   
+    
+  
+    {% comment %} $(document).on('submit', '.mainform', function(e){
+      e.preventDefault();
+      // validate the form all fields are required
+        $('input').not('[readonly]').each(function(index,val) {
+          // validate the input fields if empty then add the class
+          if ($(this).val() == '') {
+            $(this).addClass('con_error')
+          }else{
+            $(this).removeClass('con_error')
+          }
+        })
+        $('select').not('[readonly]').each(function(index,val) {
+          // validate the input fields if empty then add the class
+          if ($(this).val() == '') {
+            $(this).addClass('con_error')
+          }else{
+            $(this).removeClass('con_error')
+          }
+        })
+        // if any input field is invalid then return false
+        if ($('.con_error').length > 0) {
+          return false
+        }
+        else{
+          // if all the input fields are valid then call the ajax function
+          $(document).find('table tbody tr input[name="newtr"]').each(function(index,value){
+            $(value).closest('tr').find('.currency, .without-invoice').attr('name',`new_currency${index+1}`)
+            $(value).closest('tr').find('.min_amount, .min_amountn').attr('name',`new_min_amount${index+1}`)
+            $(value).closest('tr').find('.max_amount, .max_amountn').attr('name',`new_max_amount${index+1}`)
+            $(value).closest('tr').find('.new_tr').attr('name',`new_invoice_type${index+1}`)
+            $(value).closest('tr').find('.signatory-user').attr('name',`new_newuser${index+1}`)
+          })
+            let main_form_data = $(this).serialize();
+            $('#mainsave').attr('disabled','disabled')
+        }
+    }) {% endcomment %}
+  
+    // remove the class con_error on change
+ 
+  
+  
+
+
+
+
+</script>
+
+<!-- Removing tooltip script -->
+<script>
+  let usersCount = '{{users.count}}';
+    $('.btn-default').removeAttr('title');
+   
+
+
+
+newtrcount=1
+    $(document).on('click','.add-with-invoice',function(e){
+        e.preventDefault();
+        $('html, body').animate({scrollTop:$(document).height()})
+        let form = `<tr><input type="hidden" name="newtr" value="new"><input type="hidden" name="new_invoice_type${newtrcount}" value="1"><td> <div class='align_items'><button id='add' class='btn btn-clr add-btn pha-sebtn add' type='button' value='Add'> <i class="fa fa-plus"></i> </button> <button id="delete" class="btn btn-clr delete-btn delete-usaved-tr delete" type="button" value="delete"> <i class="fa fa-minus"></i> </button><select class="form-control currency common_select disable" id="currency-id" name="new_currency${newtrcount}" class="signatory-user-id"><option value="">--- Select Currency ----</option>{% for countries in currency %}<option data-id="{{currency.id}}" value="{{countries.id}}">{{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}})</option>{% endfor %}</select></div></td><td><input type="number" class="min_amount common_cls form-control disable" oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))" name="new_min_amount${newtrcount}" value=""></td><td><input class="max_amount form-control common_cls disable" type="number" oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))" name="new_max_amount${newtrcount}" value=""></td><td><input type="number" class="no_of_users form-control" name="new_no_of_users" value="1" readonly> </td><td class="user-list"><div class="row" id="${newtrcount}"><div class="col-9"><select class="form-control common_select taxtypecls disable project_value signatory-user" name="new_newuser${newtrcount}"><option value="">--- Select User ----</option></select></div><div class="col-2"><button class='ml-0 btn btn-clr add-btn pha-sebtn addnewuser' data-id="${newtrcount}" type='button' value='Add'> <i class="fa fa-plus"></i> </button></div><div class="col-1"></div></div></td></tr>`
+        let countdown=0
+        $('.common_cls').not('[readonly]').each(function() {
+          if ($(this).val()=='') {
+            $(this).addClass('con_error')
+            countdown++
+          }
+        });
+        $('.common_select').not('[readonly]').each(function() {
+          if ($(this).val()=='') {
+            $(this).addClass('con_error')
+            countdown++
+          }
+        });
+        if(countdown==0){
+          $('#master_project_list tbody').append(form);
+          console.log('countdown',countdown)
+          var selectedTexts = [];
+        $('#project_manager option:selected').each(function() {
+        selectedTexts.push($(this).text());
+        let values=$(this).val()
+        console.log('selectedTexts',selectedTexts)
+        html='<option value="'+values+'">'
+        html+=''+$(this).text()+''
+        html+='</option>'
+        $('.project_value').append(html)
+        });
+        }
+        newtrcount++;
+      });
+
+
+      $(document).ready(function() {
+        var defaultValue = $('#sign_settings').val();
+        var firstChange = true;
+        console.log('defaultValue',defaultValue)
+  
+        $('#sign_settings').on('change', function() {
+          var currentValue = $(this).val();
+          if (currentValue !== defaultValue) {
+            if (firstChange) {
+              firstChange = false;
+            } else {
+              Swal.fire({
+                text: 'Are You sure want to change signatory type?',
+                showDenyButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+                allowOutsideClick:false,
+                confirmButtonColor: '#AF2B50',
+                denyButtonColor:'#AF2B50',
+                customClass: {
+                  actions: 'my-actions',
+                  confirmButton: 'order-2',
+                  denyButton: 'order-3',
+                }
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  $('.hidden_val').val(currentValue)
+                }
+                else{
+                  $(this).val(defaultValue);
+                  $('.project_sign').hide();
+                  $('.Default_sign').hide();
+                }
+            })
+            }
+          }
+          else{
+            $('.hidden_val').val('')
+          }
+        });
+      });
+
+
+      $(document).on('change','#sign_settings',function(){
+        let current_val=$(this).val()
+        let company_sign_count='{{signatory_count2}}' 
+        if($(this).val()==1){
+          if (company_sign_count == 0){
+            Swal.fire('Company Level Signatories Settings not updated')
+            $('.project_sign').hide();
+            const fixed_val=$('.hidden_val').val()
+            $('#sign_settings').val(fixed_val)
+            if(fixed_val==2){
+              $('.project_sign').hide();
+              $('.Default_sign').show();
+          }
+          if(fixed_val==1){
+              $('.Default_sign').hide();
+              $('.project_sign').show();
+          }
+          if(fixed_val == ''){
+            $('.Default_sign').hide();
+            $('.project_sign').hide();
+        }
+      }
+        }
+        if($(this).val()==2){
+          let get_project_id=$('.Default_sign').attr('data-id')
+          console.log('get_project_id',get_project_id)
+          form_1=``
+          form_2=``
+          $.ajax({
+            type: "GET",
+            headers: { "X-CSRFToken": "{{ csrf_token }}"},
+            url: "{% url 'InvoiceGuard:get-signatory-project' %}",
+             data: {'pk':get_project_id},
+             success: function(response) {
+              let withinv_count=0
+              let withoutinv_count=0
+              let ajax_count=response.length
+              if(ajax_count >= 1){
+              $.each(response, function(index, item) {
+                
+                let null_val_min=item.min_amount
+                let null_val_max=item.max_amount
+                if(isNaN(parseFloat(null_val_min)) || isNaN(parseFloat(null_val_max))){
+                  null_val_min=''
+                  null_val_max=''
+                }
+                else{
+                  null_val_min=parseFloat(null_val_min).toLocaleString();
+                  null_val_max=parseFloat(null_val_max).toLocaleString();
+                }
+                if(item.invoice_type == '1'){
+                withinv_count++
+                form_1+=`<tr><td>${item.currency_name}</td><td>${null_val_min}</td><td>${null_val_max}</td><td>2</td><td><div>${item.users_name[0].name} ${item.users_name[0].lastname}</div><div>${item.users_name[1].name} ${item.users_name[1].lastname}</div></td></tr>`
+              }
+              else{
+                withoutinv_count++
+                form_2+=`<tr><td>${item.currency_name}</td><td>2</td><td><div>${item.users_name[0].name} ${item.users_name[0].lastname}</div><div>${item.users_name[1].name} ${item.users_name[1].lastname}</div></td></tr>`
+              }
+              })
+              if(withinv_count == 0){
+                $('.newtrrow').html('<tr><td colspan="9" class="cls-nil">---</td></tr>') 
+              }
+              else{
+                $('.newtrrow').html(form_1) 
+              }
+              if(withoutinv_count == 0){
+                $('.new_row').html('<tr><td colspan="9" class="cls-nil">---</td></tr>') 
+              }
+              else{
+                $('.new_row').html(form_2) 
+              }
+              }
+              else{
+                $('.new_row').html('<tr><td colspan="9" class="cls-nil">---</td></tr>') 
+                $('.newtrrow').html('<tr><td colspan="9" class="cls-nil">---</td></tr>') 
+                Swal.fire('Project Level Signatories Settings not updated')
+                $('.Default_sign').hide();
+                const fixed_val=$('.hidden_val').val()
+                $('#sign_settings').val(fixed_val)
+              }
+             }
+            })
+          text_val=`<tr><input type="hidden" name="newtr" value="new"><input type="hidden" name="new_invoice_type1" value="1"><td class="add-sign"><div class='align_items'><button id='add' class='btn btn-clr add-btn pha-sebtn add' type='button' value='Add'> <i class="fa fa-plus"></i> </button><button id="delete" data-id="1" class="btn btn-clr delete-btn delete delete_new_row" type="button" value="delete"> <i class="fa fa-minus"></i> </button><select class="form-control common_select currency" id="currency-id" name="new_currency1"><option value="">--- Select Currency ----</option>{% for countries in currency %}<option data-id="{{currency.id}}" value="{{countries.id}}">{{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}})</option>{% endfor %}</select></div></td><td class="from-invoice"><input type="text" class="min_amountn form-control common_cls" name="new_min_amount1" oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))"></td><td class="To-Invoice"><input type="text" class="max_amountn common_cls form-control" name="new_max_amount1" oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))"></td><td class="small-td"><input type="text" class="no_of_users form-control" name="no_of_users" data-id="1" value="1" readonly></td><td class="user-list"><div class="row"><div class="col-9"><select class="form-control taxtypecls common_select signatory-user project_value" id="sign-user-id" name="new_newuser1" class="signatory-user-id"><option value="">--- Select User ----</option></select></div><div class="col-2 user-list-add-btn"><button class='btn btn-clr add-btn pha-sebtn addnewuser' data-id="1" type='button' value='Add'> <i class="fa fa-plus"></i> </button>{% if forloop.counter > 1 %}<button id="delete-user" class="mt-3 btn btn-clr desc-count delete-btn" data-id="1" type="button" value="delete"> <i class="fa fa-minus"></i> </button>{% endif %}</div><div class="col-1"></div></div></td></tr>`
+            var selectedTexts = [];
+            html='<option>--Select User--</option>'
+            $('#project_manager option:selected').each(function() {
+            selectedTexts.push($(this).text());
+            let values=$(this).val()
+            console.log('selectedTexts',selectedTexts)
+            html+='<option value="'+values+'">'
+            html+=''+$(this).text()+''
+            html+='</option>'
+            });
+            {% comment %} $('.newtrrow').html(text_val)  {% endcomment %}
+            {% comment %} $('.project_value').html(html) {% endcomment %}
+          }
+            
+      })
+
+
+
+      
+      {% comment %} $(document).on('click','.add-without-invoice',function(e){
+        e.preventDefault();
+        $('html, body').animate({scrollTop:$(document).height()})
+          let form=`<tr><input type="hidden" name="newtr" value="new"><input type="hidden" name="new_invoice_type${newtrcount}" value="2"><td class="add-sign"> <div class='align_items'><button id="delete" class="btn btn-clr delete-btn delete-usaved-tr delete" type="button" value="delete"> <i class="fa fa-minus"></i></button><select class="form-control without-invoice common_select" id="currency-id{{signatoryuser.currency.id}}" name="new_currency${newtrcount}" class="signatory-user-id "><option value="">--- Select Currency ----</option>{% for countries in currency %}<option data-id="{{currency.id}}" value="{{countries.id}}">{{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}})</option>{% endfor %}</select></div></td><td class="from-invoice"><input type="number" readonly class="min_amount form-control disable readonly_cls" name="new_min_amount${newtrcount}" value=""></td><td class="To-Invoice"><input readonly class="max_amount form-control readonly_cls disable" type="number" name="new_max_amount${newtrcount}" value=""></td><td class="small-td"><input type="number" class="no_of_users form-control" name="new_no_of_users" value="1" readonly> </td><td class="user-list"><div class="row" id="${newtrcount}"><div class="col-9"><select class="form-control common_select taxtypecls disable project_value signatory-user" name="new_newuser${newtrcount}"><option value="">--- Select User ----</option></select></div><div class="col-2 user-list-add-btn"><button class='ml-0 mr-0 btn btn-clr add-btn pha-sebtn addnewuser desc-count' data-id="${newtrcount}" type='button' value='Add'> <i class="fa fa-plus"></i> </button></div><div class="col-1"></div></div></td></tr>`
+          // append the form
+          let countdown=0
+          $('.common_select').not('[readonly]').each(function() {
+            if ($(this).val()=='') {
+              $(this).addClass('con_error')
+              countdown++
+            }
+          });
+          $('.common_cls').not('[readonly]').each(function() {
+            if ($(this).val()=='') {
+              $(this).addClass('con_error')
+              countdown++
+            }
+          });
+          if(countdown==0){
+            $('#master_project_list tbody').append(form);
+            console.log('countdown',countdown)
+            var selectedTexts = [];
+            $('#project_manager option:selected').each(function() {
+            selectedTexts.push($(this).text());
+            let values=$(this).val()
+            console.log('selectedTexts',selectedTexts)
+            html='<option value="'+values+'">'
+            html+=''+$(this).text()+''
+            html+='</option>'
+            $('.project_value').append(html)
+            });
+          }
+          newtrcount++;
+          //ids ++;
+      }) {% endcomment %}
+
+
+      {% comment %} $(document).on('click','.add',function(e){
+        e.preventDefault();
+          const add_val=$(this)
+          let id = $(this).data('id');
+          // id is not defined
+          if (id == undefined) {
+            id = 0
+          }
+    
+          // closest tr find currency id
+          let currency_id = $(this).closest('tr').find('.currency').val();
+          let min_id=$(this).closest('tr').find('.min_amountn,.min_amount').val();
+          let mini=$(this).closest('tr').find('.min_amountn,.min_amount')
+          let max_id = $(this).closest('tr').find('.max_amountn,.max_amount').val()
+          let maxi = $(this).closest('tr').find('.max_amountn,.max_amount')
+          // jquery each function
+          let max_amount_array = [0];
+          
+          $('.currency option[value="' + currency_id + '"]').filter('option:selected').each(function(index,value){
+            if($(this).val() == currency_id){
+              // get max amount
+              max = $(this).closest('tr').find('.max_amountn,.max_amount').val()
+              let parsedMax = parseInt(max.replace(/,/g, ''));
+              if (!isNaN(parsedMax)) {
+                max_amount_array.push(parsedMax);
+              }
+            }
+          })
+    
+          if(currency_id==''){
+            $(this).closest('tr').find('.currency').addClass('con_error')
+          }
+        if(!mini.prop('readonly')){
+          if(min_id==''){
+            $(this).closest('tr').find('.min_amountn,.min_amount').addClass('con_error')
+          }
+        }
+        if(!maxi.prop('readonly')){
+          if(max_id==''){
+            $(this).closest('tr').find('.max_amountn,.max_amount').addClass('con_error')
+          }
+        }
+
+        var selectedTexts = [];
+        html=''
+        $('#project_manager option:selected').each(function() {
+            selectedTexts.push($(this).text());
+            let values=$(this).val()
+            console.log('selectedTexts',selectedTexts)
+            html+='<option value="'+values+'">'
+            html+=''+$(this).text()+''
+            html+='</option>'
+            });
+         
+          
+          // get array max amount
+        let maxs = max_amount_array.reduce((a, b) => Math.max(a, b));
+        console.log({'max':maxs})
+        let form=`<tr><input type="hidden" name="newtr" value="new"><input type="hidden" name="new_invoice_type${newtrcount}" value="1"><td class="add-sign"> <div class='align_items'><button id='add' onclick="scroll_function()" class='btn btn-clr add-btn pha-sebtn add' type='button' value='Add'> <i class="fa fa-plus"></i> </button> <button id="delete" class="btn btn-clr delete-btn delete-usaved-tr delete" type="button" value="delete"> <i class="fa fa-minus"></i> </button><select class="form-control common_select currency disable" id="currency-id{{signatoryuser.currency.id}}" name="new_currency${newtrcount}" class="signatory-user-id"><option value="">--- Select Currency ----</option>{% for countries in currency %}<option data-id="{{currency.id}}" value="{{countries.id}}">{{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}})</option>{% endfor %}</select></div></td><td class="from-invoice"><input type="number" class="min_amount form-control common_cls disable" id='mini_id' oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))" name="new_min_amount${newtrcount}" value="${maxs+1}"></td><td class="To-Invoice"><input class="max_amount form-control common_cls disable" type="number" id='maxi_id' oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))" name="new_max_amount${newtrcount}" value=""></td><td class="small-td"><input type="number" class="no_of_users form-control" name="new_no_of_users" value="1" readonly> </td><td class="user-list"><div class="row" id="${newtrcount}"><div class="col-9"><select class="form-control common_select taxtypecls common_select disable project_value signatory-user" name="new_newuser${newtrcount}"><option value="">--- Select User ----</option>${html}</select></div><div class="col-2 user-list-add-btn"><button class='btn btn-clr add-btn pha-sebtn addnewuser' data-id="${newtrcount}" type='button' value='Add'> <i class="fa fa-plus"></i> </button></div><div class="col-1"></div></div></td></tr>`
+        let countdown=0
+        $('.common_cls').not('[readonly]').each(function() {
+        if ($(this).val()=='') {
+            $(this).addClass('con_error')
+            countdown++
+        }
+        });
+        $('.common_select').not('[readonly]').each(function() {
+        if ($(this).val()=='') {
+            $(this).addClass('con_error')
+            countdown++
+        }
+        });
+
+        if(currency_id!='' && countdown==0){
+        $(this).closest('tbody').append(form).find(`tr:last .currency option[value=${currency_id}]`).prop('selected', true)
+        }
+        console.log('countdown',countdown)
+        $('html, body').animate({scrollTop:$(document).height()})      
+        newtrcount++;
+    }) {% endcomment %}
+      
+    $(document).on('click','.addnewuser,.adduser',function(e){
+        e.preventDefault();
+        let id = $(this).data('id');  
+        console.log('new user id',id)
+        // id is not defined
+        if (id == undefined) {
+          id = 0
+        }
+        var selectedTexts = [];
+        html=''
+        $('#project_manager option:selected').each(function() {
+            selectedTexts.push($(this).text());
+            let values=$(this).val()
+            console.log('selectedTexts',selectedTexts)
+            html+='<option value="'+values+'">'
+            html+=''+$(this).text()+''
+            html+='</option>'
+            });
+        // append the select tag
+        $(this).closest('tr').find('.user-list').append(`<div class="row"><div class="col-9"><select class="form-control disable newuser signatory-user common_select" name="newuser${id}"><option value="">--- Select User ----</option>${html}</select></div><div class="col-2"><button  class="btn btn-clr delete-btn delete-unsaved-user desc-count" data-id="{{signatoryuser.id}}" type="button" value="delete"> <i class="fa fa-minus"></i> </button></div><div class="col-1"></div>`)
+        let get_noof_user = $(this).closest('tr').find('.no_of_users').val()
+        let set_no_of_user = $(this).closest('tr').find('.no_of_users').val(parseInt(get_noof_user)+1)
+    })
+</script>
+{% endblock %}
+
+

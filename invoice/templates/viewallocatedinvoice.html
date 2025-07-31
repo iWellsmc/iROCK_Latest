@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/reports/viewallocatedinvoice.css' %}">
+
+<div>
+    <div class="row">
+        <div class="col-9">
+
+        </div>
+        <div class="col-3 text-end">
+            <a class="btn btn-clr onClass" href="{% url 'invoice:add_paymentonaccount' %}">Back</a>
+        </div>
+    </div>
+
+  <h4 class="from-head">View Allocated Invoice</h4>
+  
+  <form  method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+   
+<div class="row">
+    <div class="col-lg-4 col-md-4">
+       
+        <select name="vendor" class="form-control ven-cls currency-clss multiselect vendor_src" id="vendor_id">
+            <option value="">--Select--</option>
+            {% for vendor in vendors_list %}
+            <option {%if select_vendor == vendor.id%} Selected {%endif%} value="{{vendor.id}}" data_id="{{vendor.vin}}">{{vendor.vendor_name}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-lg-4 col-md-4">
+        <select name="currency" class="form-control ven-cls currency-clss multiselect currency_src" id="currency">
+            <option value="">--Select Currency--</option>
+            {% for currency in companycurrency %}
+            <option {%if select_currency == currency.id%} Selected {%endif%} value="{{currency.id}}">{{currency.currency_symbol}}-{{currency.currency}}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+<br>
+
+<div class="">
+    <button type="submit" class="btn btn-clr com-save generate_report">View</button>
+</div>
+</form>
+<h4 class="from-head">Summary List For Unpaid Invoice</h4>
+<table class="table prj-back_clr settings-data-list-view data-list-view invoicelist tot-in irock-table invoicevendor-table" id="master_project_list">
+    <thead>
+        <tr>
+            <th>S/N</th> 
+            <th>Country</th>
+            <th>Invoice No</th>
+            <th>Project Name</th>
+            <th>Project Discipline</th>
+            <th>Date Allocated</th>
+            <th>Amount Allocated</th>
+            {% comment %} <th>ReAllocate</th> {% endcomment %}
+        </tr>   
+        {%for i in allocted_invoice %}
+        <tr>
+            <td>{{forloop.counter}}</td>
+            {%getcountry i.invoice.invoice_id as country%}
+            <td>{{country|default_if_none:"---"}}</td>
+            <td>{{i.invoice.invoice_number}}</td>
+            <td>{{i.invoice.invoice.project_name}}</td>
+            <td>{%getprojectdiscipline i.invoice.invoice_id as discipline%}{{discipline}}</td>
+            <td>{{i.date|date:"M. d, Y"}}</td>
+            <td>{% invoicegrossamount i.invoice.id as invdisval %}
+                {% invoicetaxamount i.invoice.id as invdistax %}
+                <div> {{currency_symbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                </div>
+            </td>
+            {% comment %} <td><a class="btn px-1 reallocate" data-id="{{i.id}}"><i class="fa fa-eye" title="View"></i></td> {% endcomment %}
+        </tr>
+        {%empty%}
+        <td colspan="8">---</td>
+        <!-- <td>
+            <div class="border-empty-data">---</div>
+        </td> -->
+        {%endfor%}
+</table>
+    {%endblock%}
+    {% block scripts %}
+    {{ block.super }}
+<script>
+    var csrf_token = '{{csrf_token}}'
+</script>
+<script type="text/javascript" src="{% static 'js/invoice/viewallocatedinvoice.js' %}"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+{%endblock%}

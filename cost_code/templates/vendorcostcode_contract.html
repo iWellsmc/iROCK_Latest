@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% load cost_code_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/cost_code/vendorcostcodeview.css' %}">
+
+<div>
+    <h3 class="from-head">Cost Code</h3>
+    <div class="table-responsive text-nowrap inv-table_wid">
+        <table id="cost_table_id" class="ccv-table">
+            <thead>
+                <tr >
+                    <th>S/N</th> 
+                    <th class="cc-view-width">Cost Code</th>     
+                    <th>Code Category Paths</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in vendor_costcode %}
+                {% getcostcode_preview data.costcode_main data.order request.company as subcostcode %}
+                {% getcostcode_string data.costcode_main data.order request.company as all_costcode_string %}
+                {% getcostcode_category  data.costcode_main data.order request.company.id as Category %}
+
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{subcostcode}}</td>
+                        <td>{{all_costcode_string}}/{{Category.cost_type.component_name}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+        
+
+{% endblock %}
+
+
+
+

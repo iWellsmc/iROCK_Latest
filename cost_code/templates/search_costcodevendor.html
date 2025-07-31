@@ -1,0 +1,203 @@
+{% load static %}
+{% load cost_code_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/cost_code/costcodevendor.css' %}">
+
+<section id="data-list-view" class="data-list-view-header">
+<div>
+  <h3 class="from-head">Assign Cost Code to Vendor</h3>
+  <div class="row mb-4">
+    <div class="col-6">
+      
+    </div>
+    
+    <div class="col-6">
+      {% if request.user.roles_id == 3 %}
+            {% if rights.create == '1' %} 
+              <button type="button" class="btn btn-clr btn-master mr-0"><a href="{% url 'cost_code:createcostcodevendor' %}">Assign Cost Code</a></button>
+            {%endif%}
+      {%else%}
+      <button type="button" class="btn btn-clr btn-master mr-0"><a href="{% url 'cost_code:createcostcodevendor' %}">Assign Cost Code</a></button>
+      {%endif%}
+        {% if count_val == 0 %}
+        <button type="button" class="btn btn-clr btn-master err_popup">Generate Report</button>
+        {% else %}
+        <button type="button" class="btn btn-clr btn-master"><a target="_blank" href="{% url 'cost_code:costcodevendorpdf' %}">Generate Report</a></button>
+        {% endif %}
+
+    </div>
+
+      </div>
+    <div class="row">
+      <div class="col-9"> 
+        <div class="card all-noti-box">
+          <div class="show-noti p-0">
+              <label>Show <select id="datafilters" class="changevalue select-style">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+          </select> entries</label>
+      </div>
+      </div>
+      </div>
+      <div class="col-3 text-end">
+        <form method="get">
+          <div class="buttonIn">
+            <input type="search" id="myInput" class="search-f-inf deletable" name="q" placeholder="Search Vendor Name" value="{{query}}">
+           
+          </div>
+          </form>
+      </div>
+        
+    </div>
+    <div class="table-responsive text-nowrap inv-table_wid">
+        <table class="table prj-back_clr settings-data-list-view data-list-view invoicelist tot-in irock-table costvendor-table" id="master_project_list">
+            <thead >
+                <tr >
+                    <th>S/N</th> 
+                    <th>VIN</th>     
+                    <th>Vendor Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+           
+            <tbody class="table-list">
+              {% for cost_vendor in flow reversed %}
+              <tr>
+                  <td>{{forloop.counter}}</td>
+                  <td class="delete_data" data-id={{cost_vendor.vendor_id}}>{{cost_vendor.vendor__vin}}</td>
+                  <td>{{cost_vendor.vendor__vendor_name}}</td>
+                  <td>
+                    {% if request.user.roles_id == 3 %}
+                      {% if rights.view == '1' %}
+                      <a class="btn py-0 px-1" href="{% url 'cost_code:vendorcostcodeview' vendor=cost_vendor.vendor_id %}">    
+                          <i class="fa fa-eye" title="View" ></i>
+                      </a>
+                      {%endif%}
+                      {%else%}
+                      <a class="btn py-0 px-1" href="{% url 'cost_code:vendorcostcodeview' vendor=cost_vendor.vendor_id %}">    
+                        <i class="fa fa-eye" title="View" ></i>
+                    </a>
+                    {%endif%}
+                      <!-- <a class="btn p-0" href="#">    
+                          <i class="fa fa-edit" ></i>
+                      </a> -->
+                      {% if request.user.roles_id == 3 %}
+                      {% if rights.delete == '1' %} 
+                      <a class="btn py-0 px-1 delete" href="#" data_id="{{cost_vendor.vendor_id}}">
+                          <i class="fa fa-trash-o" title="Delete"></i>
+                      </a>
+                      {%endif%}
+                      {%else%}
+                      <a class="btn py-0 px-1 delete" href="#" data_id="{{cost_vendor.vendor_id}}">
+                        <i class="fa fa-trash-o" title="Delete"></i>
+                    </a>
+                      {%endif%}
+                      {% comment %} {% url 'projects:generatespecificvendor' pk=contracts.id%} {% endcomment %}
+                      <a class="btn px-1" target="_blank" href="{% url 'cost_code:generateVendorReport' pk=cost_vendor.vendor_id %}">
+                        <span class="action-edit">   <!--  align-icons -> Class Removed -->
+                          <i title='Generate Specific Vendor Contract Report' class="fas fa-file-pdf" ></i>
+                        </span>
+                      </a> 
+                  </td>
+              </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="9" id="empty_class">---</td>
+                </tr>
+              {% endfor %}
+          </tbody>
+        </table>
+        <input type="hidden" class="entries" value="{{pageper_data}}">
+    </div>
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center">
+      {% if flow.has_previous %}
+          <li class="page-item">
+          <a class="btn-clr page-link" href="{{ request.META.HTTP_REFERER }}">Previous</a>
+        </li>
+      {% else %}
+          <li class="page-item disabled">
+          <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Previous</a>
+        </li>
+      {% endif %}
+
+      {% if flow.number|add:'-4' > 1 %}
+          <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ flow.number|add:'-5' }}">&hellip;</a></li>
+      {% endif %}
+
+      {% for i in flow.paginator.page_range %}
+          {% if flow.number == i %}
+              <li class="page-item pg-count active" aria-current="page">
+            <span class="btn-clr pg-circle page-link">
+              {{ i }}
+              <span class="sr-only">(current)</span>
+            </span>
+          </li>
+          {% elif i > flow.number|add:'-5' and i < flow.number|add:'5' %}
+
+            {% if request.GET.vendor %}
+          <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&page={{ i }}">{{ i }}</a></li>
+            {% elif request.GET.vendor and request.GET.sortname %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+            {% elif request.GET.vendor and request.GET.sortvendorname %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+            {% elif request.GET.sortname %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+            {% elif request.GET.sortvendorname %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+            {% else %}
+              <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+          {% endif %}
+    {% endfor %}
+      {% if flow.paginator.num_pages > flow.number|add:'4' %}
+        <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ flow.number|add:'5' }}">&hellip;</a></li>
+      {% endif %}
+
+      {% if flow.has_next %}
+          <li class="page-item pg-count">
+          <a class="btn-clr page-link" href="?page={{ flow.next_page_number }}">Next</a>
+        </li>
+      {% else %}
+          <li class="page-item disabled">
+          <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Next</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+  <!-- <nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+    
+      <ul class="pagination">
+        {% if cost_code_vendor_list.has_previous %}
+        <li class="page-item">  <a class="btn-clr page-link"href="?page={{ cost_code_vendor_list.previous_page_number }}">Previous</a></li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Previous</a>
+          </li>
+          
+      {% endif %}
+     
+        {% for i in cost_code_vendor_list.paginator.page_range %}
+        
+          {% if cost_code_vendor_list.number == i %}
+           <li class="page-item pg-count active"><span class="btn-clr pg-circle page-link">{{ i }}  <span class="sr-only">(current)</span></span></li>
+          {% else %}
+          
+           <li class="page-item pg-count"><a  class="page-link pg-circle" data-id="{{ i }}" href="?page={{ i }}">{{ i }}</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if cost_code_vendor_list.has_next %}
+          <li  class="page-item pg-count" ><a  class="btn-clr page-link" href="?page={{ cost_code_vendor_list.next_page_number }}">Next</a></li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Next</a>
+          </li>
+        {% endif %}
+      </ul>
+
+</nav> -->
+</div>
+</section>      

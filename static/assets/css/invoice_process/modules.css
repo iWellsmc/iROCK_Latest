@@ -1,0 +1,25 @@
+/*
+project module
+*/
+
+
+/*  */
+
+.invoice-sn-no-title{
+    width: 10% !important;
+}
+
+.usesr-management-modules tr {
+    border-bottom: 1px solid #e3e3e3 !important;
+}
+
+
+/********** modules **********/
+.sno-center {
+    text-align: var(--centertext-align);
+}
+
+.td-left {
+    text-align: var(--lefttext-align);
+}
+/********** modules **********/

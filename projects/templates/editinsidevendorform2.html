@@ -1,0 +1,463 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/vendorinfo.css' %}">
+
+<div class="row">
+    <div class="col-12 text-end">
+        <button type="button" class="btn btn-clr text-center "><a href="{% url 'projects:editinsidevendorbasicinfo' pk=vendor.id%}">Back</a></button>
+    </div>
+</div>
+    <h3 class="from-head">Vendor Company Contact Information</h3>
+    <form  class="form-txt" id="vendorresitraion2" method="POST">
+        {% csrf_token %}
+    <div class="row out-vendor">
+        <div class="col-sm-6"> 
+            <!-- <h4 class="vend-com-heading" >Primary Contact Details</h4> -->
+        </div>
+        <div class="col-sm-6"> 
+            <!-- <h4 class="vend-com-heading">Secondary Contact Details</h4> -->
+        </div> 
+    </div>
+    <!-- Key/Primary Contact Details       -->
+    <div class="row">
+        <div class="col-lg-6 col-md-12 mid-line">
+            <h4 class="vend-com-heading" >Primary Contact Details</h4>
+            <div class="row vendor_bottom_space">             
+                <div class="col-2">
+                    <input type="hidden" name="vendor" id="vendorid" value="{{vendor.id}}">
+                    <input type="hidden" name="vendor" id="companyid" value="{{companyid}}">
+                    <label for="staticEmail" class="col-form-label">Title<span class="star-clr">*</span></label>
+        
+                    <select name="Tile" id="Tile"  class="form-control form-select" > 
+                        <option  value="" selected>-Select-</option>
+                        {% for title in titles %}
+                            <option {% if vendor.contact_primary_title == title%} selected {% endif %} value="{{title}}">{{title}}</option>
+                        {% endfor %}
+                    </select>
+                  </div>
+                  
+            <div class="col-3">
+              <label for="staticEmail" class="col-form-label">First Name<span class="star-clr">*</span></label>
+              <input type="text" id="firstname" name="firstname" class="form-control character_validation"  placeholder="First Name" value="{{vendor.contact_primary_first_name|default_if_none:''}}">
+            </div>
+            
+            <div class="col-4">
+              <label for="staticEmail" class="col-form-label">Middle Name<span class="star-clr"></span></label>
+              <input type="text" id="middlename" name="middlename" class="form-control character_validation" placeholder="Middle Name" value="{{vendor.contact_primary_middle_name|default_if_none:''}}">
+            </div>
+            <div class="col-3">
+              <label for="staticEmail" class="col-form-label">Last Name<span class="star-clr">*</span></label>
+              <input type="text" id="lastname" name="lastname" class="form-control character_validation" placeholder="Last Name" value="{{vendor.contact_primary_last_name|default_if_none:''}}">
+            </div>
+              </div>
+              <div class="vendor_bottom_space">
+              <label for="staticEmail" class="col-form-label">Designation<span class="star-clr">*</span></label>
+              <input type="text" id="Designation" name="Designation" class="form-control" placeholder="Designation" value="{{vendor.primary_designation|default_if_none:''}}" ></div>
+              <div class="vendor_bottom_space">
+              <label for="staticEmail" class="col-form-label">Official Email Address<span class="star-clr">*</span></label>
+              <input type="email" id="Email" name="Email" class="form-control check_email" placeholder="Official Email Address" value="{{vendor.official_primary_email|default_if_none:''}}">
+              </div>
+              <div class="row vendor_bottom_space">
+                <div class="col-2">
+                    <label for="staticEmail" class="col-form-label">Country<br> Code </label>
+                    <select id="phonecountrycode" name="phonecountrycode" class="form-control form-select">
+                        <option  value="" selected>-Select-</option>
+                        {% for code in phone%}
+                        <option  {%if vendor.contact_primary_phone_code|check_for_condition:code.id %} selected {% endif %} value="{{code.id}}">{{code.iso}}  {{code.phonecode}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                
+                <div class="col-3">
+                    <label for="staticEmail" class="col-form-label">Area<br> Code</label>
+                    <input type="text" id="phone_areacode" name="phoneareacode" class="cls_common_valid form-control" placeholder="Area Code" value="{{vendor.contact_primary_area_code|default_if_none:''}}">
+                </div>
+
+                
+       
+        <div class="col-4">
+            <label for="staticEmail" class="col-form-label">Official Phone Number(Land Line)</label>
+            <input type="text" id="phone" name="phone" class="cls_common_valid form-control" placeholder="Official Phone Number(Land Line)" value="{{vendor.contact_primary_phone|default_if_none:''}}">
+        </div>
+        <div class="col-3">
+            <label for="staticEmail" class="col-form-label">Phone Number Extension</label>
+            <input type="text" id="phonenumber_extenstion" name="phonenumber_extenstion" class="cls_common_valid form-control" placeholder="Phone Number Extension" value="{{vendor.contact_primary_phone_number_extenstion|default_if_none:''}}">
+        </div>
+        </div>
+        <div class="row vendor_bottom_space">
+            <div class="col-4">
+                    <label for="staticEmail" class="col-form-label">Country Code</label>
+                    <select id="mobilecoutrycode" name="mobilecoutrycode" class="form-control form-select">
+                        <option value='' selected>-Select-</option>
+                        {% for code in phone%}
+                        <option {%if vendor.contact_primary_mobile_code|check_for_condition:code.id %} selected {% endif %} value="{{code.id}}">{{code.iso}}  {{code.phonecode}}</option>
+                        {% endfor %}
+                    </select>
+            </div>
+            
+            <div class="col-8">
+                <label for="staticEmail" class="col-form-label">Official Phone Number(Mobile No.)<span class="star-clr">*</span></label>
+            
+    
+                <input type="text" id="mobile" name="mobile" class="cls_common_valid form-control" placeholder="Official Phone Number(Mobile No.)" value="{{vendor.contact_primary_mobile|default_if_none:''}}">
+            </div>
+            </div>
+        </div>
+        
+ <!-- Alternate/Secondary Contact Details: -->
+        <div class="col-lg-6 col-md-12">
+            <h4 class="vend-com-heading">Secondary Contact Details</h4>
+            <div class="row vendor_bottom_space">
+            <div class="col-2">
+            <label for="staticEmail" class="col-form-label">Title<span class="star-clr">*</span></label>
+            <select name="Title" id="Title"  class="form-control form-select" placeholder="Title">
+                <option value="" selected>-Select-</option>
+                {% for title in titles %}
+                <option {% if vendor.contact_secondary_title == title%} selected {% endif %} value="{{title}}">{{title}}</option>
+            {% endfor %}
+            </select>
+            </div>
+            <div class="col-3">
+            <label for="staticEmail" class="col-form-label">First Name<span class="star-clr">*</span></label>
+            <input type="text" id="alternatefirstname" name="alternatefirstname" class="form-control character_validation" placeholder="First Name" value="{{vendor.contact_secondary_first_name|default_if_none:''}}">
+            </div>
+            <div class="col-4">
+                <label for="staticEmail" class="col-form-label">Middle Name<span class="star-clr"></span></label>
+                <input type="text" id="alternatemiddlename" name="alternatemiddlename" class="form-control character_validation" placeholder="Middle Name" value="{{vendor.contact_secondary_middle_name|default_if_none:''}}">
+                </div>
+                <div class="col-3">
+                    <label for="staticEmail" class="col-form-label">Last Name<span class="star-clr">*</span></label>
+                    <input type="text" id="alternatelastname" name="alternatelastname" class="form-control character_validation" placeholder="Last Name" value="{{vendor.contact_secondary_last_name|default_if_none:''}}">
+                    </div>
+        </div>
+        <div class="vendor_bottom_space">
+            <label for="staticEmail" class="col-form-label">Designation<span class="star-clr">*</span></label>
+            <input type="text" id="alternateDesignation" name="alternateDesignation" class="form-control" placeholder="Designation" value="{{vendor.secondary_designation|default_if_none:''}}"></div>
+            <div class="vendor_bottom_space">
+            <label for="staticEmail" class="col-form-label">Official Email Address<span class="star-clr">*</span></label>
+            <input type="email" id="alternateEmail" name="alternateEmail" class="form-control check_email" placeholder="Official Email Address" value="{{vendor.official_secondary_email|default_if_none:''}}">
+            </div>
+            <div class="row vendor_bottom_space">
+                <div class="col-2">
+                    <label for="staticEmail" class="col-form-label">Country <br> Code</label>
+                    <select id="phonecountryalternatecode" name="phonecountryalternatecode" class="form-control form-select" placeholder="Country Code">
+                        <option value='' selected>-Select-</option>
+                        {% for code in phone%}
+                        <option {%if vendor.contact_secondary_phone_code|check_for_condition:code.id %} selected {% endif %} value="{{code.id}}">{{code.iso}} {{code.phonecode}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-3">
+                    <label for="staticEmail" class="col-form-label">Area<br> Code</label>
+                    <input type="text" id="alternatephone_areacode" name="alternatephoneareacode" class="cls_common_valid form-control" placeholder="Area Code" value="{{vendor.contact_secondary_area_code|default_if_none:''}}">
+                </div>
+                <div class="col-4">
+            <label for="staticEmail" class="col-form-label">Official Phone Number(Land Line)</label>
+            <input type="text" id="alternatephone" name="alternatephone" class="cls_common_valid form-control" placeholder="Official Phone Number(Land Line)" value="{{vendor.contact_secondary_phone|default_if_none:''}}">
+        </div>
+        <div class="col-3">
+            <label for="staticEmail" class="col-form-label">Phone Number Extension</label>
+            <input type="text" id="alternatephonenumber_extenstion" name="alternatephonenumber_extenstion" class="cls_common_valid form-control" placeholder="Phone Number Extension"  value="{{vendor.contact_secondary_phone_number_extenstion|default_if_none:''}}">
+        </div>
+        </div>
+        <div class="row vendor_bottom_space">
+            <div class="col-4">
+          
+        
+
+        
+                <label for="staticEmail" class="col-form-label">Country Code</label>
+                <select id="alternate_country_code" name="alternate_country_code" class="form-control form-select">
+                    <option value='' selected>-Select-</option>
+                    {% for code in phone%}
+                    <option {%if vendor.contact_secondary_mobile_code|check_for_condition:code.id %} selected {% endif %}  value="{{code.id}}">{{code.iso}} {{code.phonecode}}</option>
+                    {% endfor %}
+                </select>
+        </div>
+        <div class="col-8">
+            <label for="staticEmail" class="col-form-label">Official Phone Number(Mobile No.)<span class="star-clr">*</span></label>
+        
+
+            <input type="text" id="alternatemobile" name="alternatemobile" class="cls_common_valid form-control" placeholder="Official Phone Number(Mobile No.)" value="{{vendor.contact_secondary_mobile|default_if_none:''}}">
+        </div>
+        </div>
+        </div>
+       
+    </div>
+
+    
+<div class="row">
+    <div class="text-center btn-cls">
+        <button type="submit" class="btn btn-clr text-center draft-cls dis-btn">Save as Draft</button>
+        <button type="submit" class="btn btn-clr text-center next-cls dis-btn">Save and Exit</button>
+    </div>
+</div> 
+      </form>
+{%endblock%}
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script>
+    $(function(){
+
+    
+    $('.character_validation').keyup(function() {
+        var $th = $(this);
+        $th.val($th.val().replace(/\d+/g, ''))
+        $th.val($th.val().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+        remove_dot = $th.val().replace(/\.{2,}/g, '.');
+        $(this).val(remove_dot)
+    });
+
+    $('.cls_common_valid').keyup(function(){
+        let value=$(this).val();
+        var text = value.replace(/[^0-9\-_\s]/g,'');
+        $(this).val(text);
+    });  
+    
+    
+
+    // $(document).on('click','.draft-cls',function(e){
+    //     $("<input>").attr({name: "submit_type",id: "hiddenId",type: "hidden",value: 0}).appendTo("form");
+    //     $("#vendorresitraion2").submit();
+    // })
+    $(document).on('click','.next-cls',function(e){
+        e.preventDefault();
+        var count=0
+        $('#Tile,#Title').each(function(){
+                var val=$(this).find(':selected').val()
+                if (val == ''){
+                    count ++;
+                    $(this).addClass('con_error')
+                }
+            })
+            $('input').each(function(){
+                var check_name=$(this).attr('name')
+                console.log(check_name)
+                var val=$(this).val()
+                if (check_name != 'middlename' && check_name !='alternatemiddlename'){
+                    if (val == ''){
+                        count ++;
+                        $(this).addClass('con_error')
+                    }
+                }
+
+                let check_email = $(this).attr('id')
+                if (check_email == 'Email' || check_email =='alternateEmail'){
+                    if (val == ''){
+                        count ++;
+                        // $(this).addClass('con_error')
+                    } else {
+                        inputvalue = val;
+                        $(this).next('.dup_email').remove();
+                        $('.dis-btn').attr('disabled',false)
+                        inputvalue = inputvalue.replace(/ /g,"");
+                        $(this).val(inputvalue)
+                        var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+                        var z=0
+                                if (regex.test(inputvalue)){
+                                    $(this).removeClass('con_error');
+                                    inputvalue=inputvalue.toLowerCase();
+                                    $('.check_email').each(function(index,value){
+                                        var val=$(value).val().toLowerCase();
+                                        if (val == inputvalue){
+                                            z += 1
+                                        }
+                                    })
+                                    if (z > 1){
+                                        count ++;
+                                        $(this).after('<span class="dup_email waring-err">Primary and Secondary Invoice Personnel Email can’t be Same</span>')
+                                        $('.dis-btn').attr('disabled',true)
+                                        
+                                    } else{
+                                        $('.dup_email').remove();
+                                    }
+                                } else {
+                                    count ++;
+                                   $(this).addClass('con_error')
+                                }
+                            }
+                }
+                if ($(this).attr('id') == 'phonenumber_extenstion' || $(this).attr('id') == 'alternatephonenumber_extenstion'|| $(this).attr('id') == 'phone_areacode'|| $(this).attr('id') == 'alternatephone_areacode'|| $(this).attr('id') == 'phone'|| $(this).attr('id') == 'alternatephone'){
+                    if (val == ''){
+                            count --;
+                            $(this).removeClass('con_error')
+                        
+                    }
+                }
+               
+                }
+        )
+        console.log('aaa',count)
+        if (count == 0){
+            if($('input.next-cls')){
+                $("<input>").attr({name: "submit_type",id: "hiddenId",type: "hidden",value: 1}).appendTo("form");
+                $("#vendorresitraion2").submit();
+            } else if($('input.draft-cls')){
+                $("<input>").attr({name: "submit_type",id: "hiddenId",type: "hidden",value: 0}).appendTo("form");
+                $("#vendorresitraion2").submit();
+            }
+           
+        }
+    })
+
+    $(document).on('keyup','.check_email', function() {
+        
+        var inputvalue = $(this).val();
+        $(this).next('.dup_email').remove();
+        $('.dis-btn').attr('disabled',false)
+        inputvalue = inputvalue.replace(/ /g,"");
+        $(this).val(inputvalue)
+        var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        var z=0
+        if (regex.test(inputvalue)){
+            $(this).removeClass('con_error');
+            inputvalue=inputvalue.toLowerCase();
+            $('.check_email').each(function(index,value){
+                var val=$(value).val().toLowerCase();
+                if (val == inputvalue){
+                    z += 1
+                }
+            })
+            if (z > 1){
+                $(this).after('<span class="dup_email waring-err">Primary and Secondary Invoice Personnel Email can’t be Same</span>')
+                $('.dis-btn').attr('disabled',true)
+                
+            }
+            else{
+                $('.dup_email').remove();
+            }
+        } else {
+            $(this).addClass('con_error')
+        }
+    })
+
+
+
+
+$(document).on('keyup','#phone_areacode',function(){
+let value=$(this).val();
+var text = value.replace(/(\s{2,})|[^0-9\.'']/g, ' ');
+$('#phone_areacode').val(text);
+
+})
+
+$(document).on('keyup','#phone',function(){
+    let value=$(this).val();
+    var text = value.replace(/(\s{2,})|[^0-9\.'']/g, ' ');
+$('#phone').val(text);
+
+
+//     if (/\D/g.test(this.value))
+//   {
+//     this.value = this.value.replace(/\D\s/g, ' ');
+//     this.value = this.value.replace(/(\s{2,})']/g, ' ')
+//     // this.value = (this.value().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+//   }
+})
+
+$(document).on('keyup','#mobile',function(){
+    let value=$(this).val();
+    var text = value.replace(/(\s{2,})|[^0-9\.'']/g, ' ');
+$('#mobile').val(text);
+
+
+//     if (/\D/g.test(this.value))
+//   {
+//     this.value = this.value.replace(/\D\s/g, ' ');
+//     this.value = this.value.replace(/(\s{2,})']/g, ' ')
+//     // this.value = (this.value().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+//   }
+})
+
+$(document).on('keyup','#alternatephone_areacode',function(){
+let value=$(this).val();
+var text = value.replace(/(\s{2,})|[^0-9\.'']/g, ' ');
+$('#alternatephone_areacode').val(text);
+
+})
+
+$(document).on('keyup','#alternatephone',function(){
+    let value=$(this).val();
+    var text = value.replace(/(\s{2,})|[^0-9\.'']/g, ' ');
+$('#alternatephone').val(text);
+
+
+//     if (/\D/g.test(this.value))
+//   {
+//     this.value = this.value.replace(/\D\s/g, ' ');
+//     this.value = this.value.replace(/(\s{2,})']/g, ' ')
+//     // this.value = (this.value().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+//   }
+})
+
+
+$(document).on('keyup','#alternatemobile',function(){
+    let value=$(this).val();
+    var text = value.replace(/(\s{2,})|[^0-9\.'']/g, ' ');
+$('#alternatemobile').val(text);
+
+
+//     if (/\D/g.test(this.value))
+//   {
+//     this.value = this.value.replace(/\D\s/g, ' ');
+//     this.value = this.value.replace(/(\s{2,})']/g, ' ')
+//     // this.value = (this.value().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+//   }
+})
+$(document).on('keyup','#phonenumber_extenstion',function(){
+    let value=$(this).val();
+    var text = value.replace(/(\s{2,})|[^0-9\.'']/g, ' ');
+$('#phonenumber_extenstion').val(text);
+
+
+//     if (/\D/g.test(this.value))
+//   {
+//     this.value = this.value.replace(/\D\s/g, ' ');
+//     this.value = this.value.replace(/(\s{2,})']/g, ' ')
+//     // this.value = (this.value().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+//   }
+})
+
+$(document).on('keyup','#alternatephonenumber_extenstion',function(){
+    let value=$(this).val();
+    var text = value.replace(/(\s{2,})|[^0-9\.'']/g, ' ');
+$('#alternatephonenumber_extenstion').val(text);
+
+
+//     if (/\D/g.test(this.value))
+//   {
+//     this.value = this.value.replace(/\D\s/g, ' ');
+//     this.value = this.value.replace(/(\s{2,})']/g, ' ')
+//     // this.value = (this.value().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+//   }
+})
+});
+
+
+$(document).ready(function() {
+
+    $('#firstname,#lastname,#Designation,#Email,#phone,#phonenumber_extenstion,#mobile,#phone_areacode,#alternatefirstname,#alternatelastname,#alternateDesignation,#alternateEmail,#alternatephone_areacode,#alternatephone,#alternatemobile').on('keyup', function() {
+        var val=$(this).val()
+        if(val !=''){
+            $(this).removeClass('con_error');
+        }
+        
+    });
+
+    $('#Tile,#phonecountrycode,#mobilecoutrycode,#Title,#phonecountryalternatecode,#alternate_country_code').on('change', function() {
+        
+        var val=$(this).val()
+        if(val !=''){
+            $(this).removeClass('con_error');
+        }
+    });
+});
+</script>
+
+{%endblock%}

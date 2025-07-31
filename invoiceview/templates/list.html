@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+{% load invoice_custom_tags %}
+
+{% block content %}
+
+<div>
+    <h3 class="from-head">Totals Invoices Submitted to Date</h3>
+    <div class="row">
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+        </div>
+    </div>
+    <div class="table-responsive text-nowrap">
+    <table class="table" id="list_view_invoice">
+        <thead >
+            <tr>
+                <th>S/N</th> 
+                <th>VIN</th>
+                <th>Vendor Name</th>
+                <th>Service Name</th>
+                <th>Invoice No</th>
+                <th>Submitted Date</th>
+
+            </tr>
+        </thead>
+        <tbody class="table-list">
+            <input type="hidden" id="user_sign" value="{{sign_data}}">
+            {% for invoice in allinvoice %}
+            {% getinvoice_url invoice.invoice_id invoice.module_name as redirect_url %}
+            <tr onclick="redirectToInvoice('{{ redirect_url }}')">                    
+                <td>{{forloop.counter}}</td>
+                <td>{{invoice.vin}}</td>
+                <td>{{invoice.vendor_name}}</td>
+                <td>{{invoice.name_service}}</td>
+                <td>{{invoice.title}}</td>
+                <td>{{invoice.submitted_date|confulldate:invoice.company_id|default_if_none:"---"}}</td>
+            
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script type="text/javascript" src="{% static 'js/invoice/tick.js' %}"></script>
+
+{% endblock %}
+
+
+
+
+

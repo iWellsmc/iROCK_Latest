@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+ <!-- <link rel="stylesheet" type="text/css" href="{% static 'assets/css/wcc/wcctrack.css' %}">  -->
+
+
+<div class="row">
+    <div class="col-9">
+    </div>
+    <div class="col-3">
+        <button class="btn btn-clr btn-master waves-effect waves-float waves-light pc-bk-cls" >
+            <a href="{% url 'wcc:approvalwcclist' %}">Back</a>
+        </button>
+    </div>
+</div>
+
+
+<div class="container">
+    <h3 class="from-head">Wcc Assign Users</h3>
+    <select id="users_id" style="display: none;">
+        {% for user in users_list %}
+            <option value="{{user.user_uid}}">{{user.user_name}} {{user.user_lastname}}-{{user.user_designation_role}}</option>
+        {% endfor %}
+    </select>
+    <div class="row d-flex justify-content-center">
+        <div class="col-6">
+        <div class="invite-cards">
+            <form  class="form-txt" id="assign_user_id" method="POST" action="">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-12">
+                        <table id="user_table" class="w-100">
+                            <thead>
+                                <th class="vend-appor-hd">Users<span class="star-clr">*</span></th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <select class="user_cls form-control" name="users">
+                                            <option value="">--Select User--</option>
+                                            {% for user in users_list %}
+                                                <option value="{{user.user_uid}}">{{user.user_name}} {{user.user_lastname}}-{{user.user_designation_role}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <!-- <td class="">
+                                        <button id="add-row" class="btn-clr add-row btn add-btn" type="button" value="add"><i class="fa fa-plus"></i></button> <button id="delete-row" class="btn-clr delete-row btn add-btn" type="button" value="delete"><i class="fa fa-minus"></i></button> 
+                                    </td> -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="text-center phase-vendor" id="btn">
+                    <button type="button" id="save_id" class="btn btn-clr text-left draft-cls" name="submit_type" value="1">Save</button>
+                </div>
+
+            </form>
+        </div>
+        </div>
+    </div>
+
+</div>
+        
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/wcc/wccoverride.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,201 @@
+{% comment %} {% load static %}
+<html>
+  <body>
+    <table>
+    Dear {{vendor.vendor_name}},<br>
+      Please note that the invoice submitted by you has been received by us on {{date}}.<br>
+      You can login as per your credentials to our Invoice Processing Portal to monitor the progress of your invoice.<br>
+      Regards,
+      <br>
+      The Finance Team,
+      <br>
+      {{company}},<br>
+      {% if image == '' %}
+      <img  src="{{url}}/static/images/icons/Character%20icon.svg" width="100" height="150" alt="Image" title="Image" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 100%;max-width: 100px; height:100px; padding: 12px 0px;"/>
+      {% else %}
+     <img  src="{{url}}{{image}}" width="100" height="150" alt="Image" title="Image" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 100%;max-width: 100px; height:100px; padding: 12px 0px;"/>
+     {% endif %}
+    </table>
+    <body>
+  </html> {% endcomment %}
+
+
+  <!DOCTYPE HTML
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:o="urn:schemas-microsoft-com:office:office">
+{% load static %}
+
+<head>
+  <!--[if gte mso 9]>
+<xml>
+  <o:OfficeDocumentSettings>
+    <o:AllowPNG/>
+    <o:PixelsPerInch>96</o:PixelsPerInch>
+  </o:OfficeDocumentSettings>
+</xml>
+<![endif]-->
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <!--[if !mso]><!-->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"><!--<![endif]-->
+  <title></title>
+
+  <!-- <style type="text/css">
+       table, td { color: #000000; } a { color: #0000ee; text-decoration: underline; }
+@media only screen and (min-width: 520px) {
+  .u-row {
+    width: 500px !important;
+  }
+
+  .u-row .u-col {
+    vertical-align: top;
+  }
+
+  .u-row .u-col-50 {
+    width: 250px !important;
+  }
+
+  .u-row .u-col-100 {
+    width: 500px !important;
+  }
+
+}
+
+@media (max-width: 520px) {
+  .u-row-container {
+    max-width: 100% !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+  .u-row .u-col {
+    min-width: 320px !important;
+    max-width: 100% !important;
+    display: block !important;
+  }
+  .u-row {
+    width: calc(100% - 40px) !important;
+  }
+  .u-col {
+    width: 100% !important;
+  }
+  .u-col > div {
+    margin: 0 auto;
+  }
+}
+body {
+  margin: 0;
+  padding: 0;
+}
+
+table,
+tr,
+td {
+  vertical-align: top;
+  border-collapse: collapse;
+}
+
+p {
+  margin: 0;
+}
+
+.ie-container table,
+.mso-container table {
+  table-layout: fixed;
+}
+
+* {
+  line-height: inherit;
+}
+
+a[x-apple-data-detectors='true'] {
+  color: inherit !important;
+  text-decoration: none !important;
+} 
+
+</style> -->
+
+<style>
+  *{
+  font-family:arial,helvetica,sans-serif;
+}
+</style>
+
+</head>         
+
+<body class="clean-body" style="margin: 0;padding: 0;-webkit-text-size-adjust: 100%;color: #000000">
+
+  <table style="font-family:arial,helvetica,sans-serif;max-width:800px;" role="presentation" cellpadding="0" cellspacing="0"
+    width="100%" border="0">
+    <tbody>
+      <tr>
+        <td style="overflow-wrap:break-word;word-break:break-word;font-family:arial,helvetica,sans-serif;" align="left">
+
+
+          <table style="font-family:arial,helvetica,sans-serif;">
+            <tbody>
+              <tr>
+                <td style="font-size: 15px;line-height: 25px;padding-bottom: 10px;">Dear {{recipientuser.Title|default_if_none:"---"}} {{recipientuser.name|default_if_none:"---"}} {{recipientuser.lastname|default_if_none:"---"}},</td>
+              </tr>
+              <tr>
+                <td style="font-size: 15px;line-height: 25px !important;padding-bottom:5px;">Please note that Vendor {{vendor.vendor_name}} had submitted a Credit Note {{all_credit}} for invoice {{all_invoice}} for services {{invoice.name_service}}.</td>
+              </tr>
+              <tr>
+                <td style="font-size: 15px;line-height: 25px !important;padding-bottom:20px;"> Please process the credit note as assigned. 
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-top:10px;">
+                  <table style="width:100%; max-width: 900px;" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td>
+                            <table style="padding:10px 0px 0px 0px">
+                              <tbody>
+                                <tr>
+                                  <td style="border-radius:10px;background-color:#8b1434;color:#fff" bgcolor="#8b1434">
+                              
+                                    <a href="https://irockinfo.mo.vc/" style="padding:10px 10px;background-color:#8b1434;border:1px solid #8b1434;border-radius:10px;font-family:arial,helvetica,sans-serif;font-size:15px;text-transform:none;text-decoration:none;font-weight:500;display:inline-block" target="_blank" data-saferedirecturl="https://www.google.com/url?q=https://irockinfo.mo.vc/&amp;source=gmail&amp;ust=1702531110887000&amp;usg=AOvVaw3X6YoPf3ZTI-yPFTSYaczE">
+                                      <strong style="color:#ffffff;font-weight:normal;text-decoration:none;font-style:normal">Login</strong>
+                                    </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        </td>
+                    </tr>
+              
+
+
+        
+
+            
+              <tr>
+                <td style="font-size: 14px; line-height:25px; font-weight: 400 !important;padding-bottom: 15px;">Regards,</td>
+              </tr>
+              <tr>
+                <td style="font-size: 14px; line-height:25px; font-weight: 400 !important;">The Invoice Approval Process System,</td>
+              </tr>
+              <tr>
+                <td style="font-size: 14px; line-height:25px; font-weight: 400 !important;"> {{request.company}},</td>
+              </tr>
+              <tr>
+                <td>
+              {% if image == '' %}
+              <img  src="{{url}}/static/images/icons/Character%20icon.svg" width="100" height="150" alt="Image" title="Image" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 100%;max-width: 100px; height:100px; padding: 12px 0px;"/>
+              {% else %}
+             <img  src="{{url}}{{image}}" width="100" height="150" alt="Image" title="Image" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 100%;max-width: 100px; height:100px; padding: 12px 0px;"/>
+             {% endif %}
+             </td>
+             </tr>
+
+            </tbody>
+          </table>
+
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+
+</html>

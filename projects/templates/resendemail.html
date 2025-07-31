@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+
+
+<div class="row">
+    <div class="col-3">
+    </div>
+    <div class="col-6">
+      <div class="invite-cards">
+        <h3 class="from-head">Resend Vendor Registration Form</h3>
+      <form  class="form-txt" id="vendorinvite" method="POST">
+        {% csrf_token %}
+        <div>
+          <input type="hidden" id="company_id" name="companyid" value={{vendor.company.id}}>
+          <label for="staticEmail" class=" col-form-label">Company Name<span class="star-clr">*</span></label>
+          <input type="text" id="company_name" name="companyname" class="form-control" placeholder="Company Name">
+        </div>
+        <div class = "row">
+            <div class="col-6">
+                <label for="staticEmail" class=" col-form-label">Vendor Name<span class="star-clr">*</span></label>
+                <input type="text" name="personname"  class="form-control"  value={{vendor.vendor_name}}>
+            </div>
+            <div class="col-6">
+                <label for="staticEmail" class=" col-form-label">Email Address<span class="star-clr">*</span></label> 
+                <input type="email" name="emailaddress"  class="form-control"  id="emailaddress" placeholder="Email Address">
+            </div>
+        </div>
+        <div>
+            <label for="staticEmail" class=" col-form-label">Message<span class="star-clr">*</span></label>
+            <textarea name="message" class="form-control" id="msgid"></textarea>
+        </div>
+        <div class="text-center phase-vendor" id="btn">
+          <button type="reset" class="btn btn-clr text-right submit-cls">Discard</button>
+          <button type="submit" class="btn invite-btn text-right submit-cls">Invite</button>
+        </div>
+      </form>
+      </div>
+    </div>
+    <div class="col-3">
+    </div>
+
+</div>
+
+{% endblock%}

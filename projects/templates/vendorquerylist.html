@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendormanagement/vendorqueries.css' %}">
+
+<div>
+    <h4 class="from-head">Vendor Queries</h4>
+
+        <div class="row">
+            <div class="vends-invite-lists table-responsive text-nowrap">
+              <table class="table settings-data-list-view data-list-view project_master irock-table one-class">
+                  <thead>
+                      <tr>
+                          <th>S/N</th>
+                          <th>VIN <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>
+                          <th>Vendor Name <button class="filter-btn" data-filter="last-name"> <i class="fas fa-sort"></i></button></th>
+                          <th>Contract Ref No <button class="filter-btn" data-filter="designation"> <i class="fas fa-sort"></i></button></th>     
+                          <!-- <th>Reason</th> -->
+                          <th>Uploaded Documents</th>
+                          <!-- <th>Reason For Denial</th> -->
+                          <th>Status</th>
+                          <th>Action</th>
+                          {% comment %} <th>Invite Sent Date</th> {% endcomment %}
+                      </tr>
+                  </thead>
+                  <tbody class="table-list">
+                      {% if len_querylist > 0 %}
+                        {% for query in querylists %}
+                        <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td class="vin-data">{{query.user.cin_number|default_if_none:"---"}}</td>
+                        <td class="vendor-data">{{query.vendor.vendor_name|default_if_none:"---"}}
+                        </td>
+
+                        <td class="middle">{{query.refnum|category_replace}}</td>
+                        <!-- <td class="qu-res">{{query.reason|safe}}</td> -->
+                        <td>
+                            {% checkfile query.c_file as filecount%}
+                            {% if filecount > 0%}
+                                {% if query.file_name %}
+                                    <a class="up-clrchg" href="{{ query.c_file.url }}" target="_blank">{{ query.file_name }}</a>
+                                {% elif query.c_file %}
+                                    <a class="up-clrchg" href="{{ query.c_file.url }}" target="_blank">{{ query.c_file }}</a>
+                                {% else %}
+                                    <p class="text-center">---</p>
+                                {% endif %}
+                            {% endif %}    
+                     
+                            
+                        </td>
+                        <!-- <td>{{query.deniedreason|default_if_none:"---"}}</td> -->
+                        <td class="middle">
+                            {% if query.status == 1 %}
+                            <div class="badge badge-warning sta-war">
+                                Open
+                            </div>
+                            {% elif query.status == 0 %}
+                            <div class="badge badge-danger sta-dan">
+                                Closed
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td class="middle">
+                            <a href="{% url 'projects:queryhistory' pk=query.id %}" class="btn his-oty px-1"><i
+                                    class="fa fa-history" title="History" aria-hidden="true"></i></a>
+                            <!-- <i class="fa fa-times-circle" title="Close" style="font-size:16px"></i> -->
+                        </td>
+                    </tr>
+                        {% endfor %}
+                      {% else %}
+                    <tr>
+                        <td colspan="7" class="cls-nil middle">
+                            ---
+                        </td>
+                    </tr>
+                      {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+{% endblock %}
+
+    {% block scripts %}
+    {{ block.super }}
+
+    <script>
+        $(document).on('click', '.querydenied', function () {
+            var val = $(this).closest('div').prev('div').find('.msgcls').val()
+
+            var pk = $(this).attr('data-id')
+            console.log(val)
+            // alert(pk)
+            $.ajax({
+                type: "POST",
+                url: '/projects/querydenied',
+                data: {
+                    "reason": val,
+                    'pk': pk,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function (data) {
+                    console.log(data)
+                    setTimeout(function () {
+                        location.reload();
+                    });
+                }
+            })
+        })
+    </script>
+    <script type="text/javascript" src="{% static 'js/projects/userslist.js' %}"></script>
+    {% endblock %}

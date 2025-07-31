@@ -1,0 +1,85 @@
+  <!DOCTYPE HTML
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:o="urn:schemas-microsoft-com:office:office">
+{% load static %}
+
+<head>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title></title>
+
+
+
+<style>
+  *{
+  font-family:arial,helvetica,sans-serif;
+}
+</style>
+
+</head>         
+
+<body class="clean-body" style="margin: 0;padding: 0;-webkit-text-size-adjust: 100%;color: #000000">
+
+  <table style="font-family:arial,helvetica,sans-serif;max-width:800px;" role="presentation" cellpadding="0" cellspacing="0"
+    width="100%" border="0">
+    <tbody>
+      <tr>
+        <td style="overflow-wrap:break-word;word-break:break-word;font-family:arial,helvetica,sans-serif;" align="left">
+
+
+          <table style="font-family:arial,helvetica,sans-serif;">
+            <tbody>
+              <tr>
+                <td style="font-size: 15px;line-height: 25px;padding-bottom: 10px;">Dear {{vendor_details.vendor_name}},</td>
+              </tr>
+              <tr>
+                <td style="font-size: 15px;line-height: 25px !important;padding-bottom:5px;"> Please note that Cost Code for invoice {{all_invoice}} for services {{service_name}} has been updated by {{company_name}} due to the {{conform_costcode_comments}}.</td>
+              </tr>
+            
+              <tr>
+                <table style="padding: 10px 0px 0px 0px;">
+                  <td style="border-radius:10px;background-color:#8b1434;color:#fff" bgcolor="#8b1434">
+                  
+                    <a href="https://irockinfo.mo.vc/" style="padding:10px 10px;background-color:#8b1434;border:1px solid #8b1434;border-radius:10px;font-family:arial,helvetica,sans-serif;font-size:15px;text-transform:none;text-decoration:none;font-weight:500;display:inline-block" target="_blank" data-saferedirecturl="https://www.google.com/url?q=http://127.0.0.1:8000&amp;source=gmail&amp;ust=1700131304088000&amp;usg=AOvVaw0fvhhzGbiZ9CKp_DK6er7d">
+                      <strong style="color:#ffffff;font-weight:normal;text-decoration:none;font-style:normal">Login</strong>
+                    </a>
+                  </td>
+                </table>
+            </tr>
+  
+
+
+        
+
+            
+              <tr>
+                <td style="font-size: 14px; line-height:25px; font-weight: 400 !important;padding-bottom: 15px;">Regards,</td>
+              </tr>
+              <tr>
+                <td style="font-size: 14px; line-height:25px; font-weight: 400 !important;">The Finance Team,</td>
+              </tr>
+              <tr>
+                <td style="font-size: 14px; line-height:25px; font-weight: 400 !important;"> {{request.company.company_name|default_if_none:"---"}}</td>
+              </tr>
+      
+              {% if request.company.address %}
+              <tr>
+                <td style="font-size: 14px; line-height:25px; font-weight: 400 !important;"> {{request.company.address|default_if_none:"---"|safe}}</td>
+              </tr>
+              {% endif %}
+    
+
+            </tbody>
+          </table>
+
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+
+</html>

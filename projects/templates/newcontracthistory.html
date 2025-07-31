@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendormanagement/vendormissed.css' %}">
+    
+</head>
+<div>
+
+        <div class="row text-end">
+            <div class="col-12">
+                <button type="button" class="btn btn-clr waves-effect waves-float waves-light"><a href="{% if request.user.roles.id == 4 %}{% url 'projects:newcontractlist' %}{% else %}{% url 'projects:vendormissedcontractlist' %}{% endif %}">Back</a></button>
+            </div>
+        </div>
+
+    <h4 class="from-head">Missed Contract History</h4>
+
+        <div class="qry-top-hd">
+
+            <!-- <div class="row align-items-center">
+                <div class="col-2 col-md-3 text-center">
+                    <h4 class="qur-titl">VIN: <span>{{vendor.vin}}</span></h4>
+                </div>
+                <div class="col-3 col-md-3">
+                    <div class="row">
+                        <div class="col-5 pr-0 col-md-6">
+                   <h4 class="qur-titl text-right">Vendor Name: </h4>
+                   </div>
+                   <div class="col-7 pl-0 col-md-6">
+                   <p class="qur-rf-no">{{vendor.vendor_name}}</p>
+                   </div>
+                   </div>
+                   
+                </div>
+                <div class="col-5 col-md-3">
+                    <div class="row">
+                        <div class="col-4 pr-0 col-md-7">
+                   <h4 class="qur-titl text-right">Contract Ref No:</h4>
+                   </div>
+                   <div class="col-8 pl-0 col-md-5">
+                   <p class="qur-rf-no">{{query.contract_refnum|default_if_none:"---"}}{{query.amendment_refnum|default_if_none:"---"}}</p>
+                   </div>
+                   </div>
+                </div>
+                <div class="col-2 col-md-3 text-center">
+                   <h4 class="qur-titl">Status: <span>{% if query.status == 0 %}Closed{% else %}Open{% endif %}</span></h4>
+                </div>
+            </div> -->
+
+            <div class="row align-items-baseline">
+                <div class="qur-titl col-lg-3 col-md-6">
+                    <h4>VIN :</h4> 
+                    <span>{{vendor.vin}}</span>
+                </div>
+
+                <div class="qur-titl col-lg-3 col-md-6">
+                   <h4>Vendor Name : </h4>
+                   <p class="qur-rf-no">{{vendor.vendor_name}}</p>
+                   </div>
+                   
+                <div class="qur-titl col-lg-3 col-md-6">
+                    <h4>Contract Ref No :</h4>
+                    <p class="qur-rf-no">
+                        {% if query.contract_refnum and not query.amendment_refnum %}
+                            {{ query.contract_refnum }}
+                        {% elif query.amendment_refnum %}
+                            {{ query.amendment_refnum }}
+                        {% else %}
+                            ---
+                        {% endif %}
+                    </p>
+                </div>
+                
+
+                <div class="qur-titl col-lg-3 col-md-6">
+                   <h4>Status :</h4>
+                   <span>{% if query.status == 0 %}Closed{% else %}Open{% endif %}</span>
+                </div>
+            </div>
+
+            </div>
+
+
+        <d class="row">
+                {% for query in querylists %}
+                <div class="col-12">
+                    <div class={% if request.user.roles.id == query.user.roles.id %}"send-in"{% else %}"rec-in"{% endif %}>
+                         {% if query.deniedreason != None and query.deniedreason != '' %}
+                                 <div class="{% if request.user.roles.id == query.user.roles.id %}right-cls{% else %}left-cls{% endif %} txt-clrr" dataid="{{query.user.roles.id}}">{{query.deniedreason|safe}}</div>
+                         {% endif %}
+                         {% if query.file != '' and query.file != None %}
+                         <div class="{% if request.user.roles.id == query.user.roles.id %}right-cls{% else %}left-cls{% endif %} f-name" dataid="{{query.user.roles.id}}">File Name: 
+                            <span class="nmc-nme"><a href="{{query.file.url}}" target="_blank">{{query.original_file_name}}</a></span>
+                        </div>
+                         {% endif %}
+                         <div class={% if request.user.roles.id == query.user.roles.id %}"right-cls utctolocal send-date"{% else %}"left-cls utctolocal rec-date"{% endif %}">{{query.date}}</div>
+                     </div>
+
+                 </div>
+                {% endfor %}
+                
+                {% if query.status == 1 %}
+                <div class="text-center spacing-button">
+                    <button type="button" class="btn btn-clr text-center" data-toggle="modal" data-target="#exampleModal">Reply</button>
+                    {% if request.user.roles.id == 4 %}
+                        <button type="button" class="btn btn-clr text-center show_alert">
+                            Close Query
+                            <!-- <a href="{% url 'projects:newcontractdenied' pk=query.id %}" class="close-sim">Close Query</a> -->
+                        </button>
+                    {% endif %}
+                </div>
+                {% endif %}
+            <!-- Modal -->
+            <form id="queryform" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Reason</h5>
+                        <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button> -->
+                        </div>
+                        <div class="modal-body">
+                            <label class="label-message">Message :</label>
+                            <textarea name="message" class="form-control msgcls" id="summernote" rows="3" cols="40"></textarea>
+                            <span class="error-message" style="color: red;"></span> <!-- Error message placeholder -->
+                            <br>
+                            <input type="file" name="file" class="qry-chos filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                        </div>
+                        
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary btn-clr pop-shadow">Submit</button>      <!-- Class removed -> querydenied-->
+                        </div>
+                    </div>
+                    </div>
+                </form>
+        </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script>
+
+$('#summernote').summernote({
+    toolbar: false,
+    });
+
+    $(document).on('click','.querydenied',function(){
+        if ($('#summernote').summernote('isEmpty')) {
+            // show error message in span tag after the summernote
+            $('.note-frame').next().append('<span>Please enter the message</span>');
+            return false;
+        }
+        else{
+            return true;
+        }
+    
+    })
+    $('#queryform').submit(function() {
+        // Disable the submit button to prevent multiple submissions
+        $('.querydenied').prop('disabled', true);
+      });
+    $('#summernote').on('summernote.change', function() {
+        console.log('summernote change');
+        // Check if the editor content is empty
+        if ($('#summernote').summernote('isEmpty')) {
+          // Add a CSS class to the editor element to show the red outline
+          $('#summernote').addClass('error');
+        } else {
+          // Remove the CSS class to hide the red outline
+          $('#summernote').removeClass('warning');
+        }
+      });
+
+
+var pk_id="{{pk}}";
+
+$(document).ready(function(){
+    $('.utctolocal').each(function(){
+        var utc_time = $(this).text();
+        var local_time = moment.utc(utc_time).toDate();
+        // var local_time_format = moment(local_time).local().format('DD-MM-YYYY hh:mm A');
+        var local_time_format = moment(local_time).local().format('DD-MM-YYYY');
+        $(this).text(local_time_format);
+    });
+});
+    
+$(document).on('click','.show_alert',function(){
+
+    Swal.fire({
+            text: 'Do you want to Close the Query?',
+            showDenyButton: true,
+            confirmButtonColor: '#77d61f',
+            allowOutsideClick:false,
+            denyButtonColor:'#AF2B50',
+            confirmButtonText: 'Yes',
+            denyButtonText: 'No',
+            customClass: {
+                actions: 'my-actions',
+                confirmButton: 'order-2',
+                denyButton: 'order-3',
+            }
+            }).then((result) => {
+            if (result.isConfirmed) {
+                var url = "{% url 'projects:newcontractdenied' 123 %}";
+                document.location.href = url.replace('123', pk_id);
+            }
+    })
+});
+$(document).ready(function() {
+    function isMessageEmpty() {
+        return $('#summernote').summernote('isEmpty');
+    }
+    function showError() {
+        $('.error-message').text('*Message is required');
+    }
+    function removeError() {
+        $('.error-message').text('');
+    }
+    $('#queryform').submit(function(event) {
+        if (isMessageEmpty()) {
+            showError(); 
+            event.preventDefault();
+        } else {
+            removeError();
+        }
+    });
+    $('#summernote').on('summernote.change', function() {
+        if (isMessageEmpty()) {
+            showError(); 
+        } else {
+            removeError();
+        }
+    });
+});
+
+
+
+</script>
+
+{% endblock %}

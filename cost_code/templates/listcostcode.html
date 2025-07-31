@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% load cost_code_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/cost_code/cost_code_list.css' %}">
+<div class="text-end">
+    <button type="button" class="btn btn-clr"><a href="{% url 'cost_code:costcodelist' %}">Back</a></button>
+</div>
+<section>
+    <div>
+        <h3 class="from-head">Cost Code List</h3>
+
+        <table>
+            <tbody>
+                <tr class="cost-code-format">
+                    <td class="pl-0">Level 1 ({{level1_master.level_type_name}})</td>
+                    <td>:</td>
+                    <td>{{level1}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table>
+            <tbody>
+                <tr class="cost-code-format">
+                    <td class="pl-0">Level 2 ({{level2_master.level_type_name}})</td>
+                    <td>:</td>
+                    <td>{{level2}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="table-responsive text-nowrap inv-table_wid">
+
+            <!-- <div><span>Level 1: {{level1}}</span></div>
+            <div><span>Level 2: {{level2}}</span></div> -->
+
+            <form method="POST" id="createcostcode_preview">
+                {% csrf_token %}
+                <input type="hidden" name="level1_code" value="{{first_row.level1_code}}">
+                <input type="hidden" name="level2_code" value="{{first_row.level2_code}}">
+                <input type="hidden" name="level1_development_id" value="{{level1_development}}">
+                <input type="hidden" name="level1_discipline_id" value="{{level1_discipline}}">
+                <input type="hidden" name="level2_id" value="{{level2_id}}">
+
+                <table class="table irock-table cost-code-table" id="costcodelist_table">
+                    <thead>
+                        <tr>
+                            {% for i in total_length %}
+                                {% getcostcodemaster_details i request.company as costcode_master %}
+                                <th>Level {{ i }} ({{costcode_master.level_type_name}})</th>
+                            {% endfor %}
+                            <th class="code-width">Cost Code</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-list">
+                        {% for data in allcost_code %}
+                        <tr>
+                            {% for i in total_length %}
+                            {% getdatafrom_allcostcode data i as level_data %}
+                            {% checklimit_exist i request.company.id level_data.code as limit_exist %}
+                            {% checkcomponent_exist i request.company level_data level1_discipline level1_development level2_id as component_exist %}
+
+                            <input type="hidden" name="remaininglevels{{forloop.parentloop.counter}}"
+                                value="{{level_data.name}}">
+                            <input type="hidden" name="code{{forloop.parentloop.counter}}" value="{{level_data.code}}">
+                           
+                            <td class="td-left">
+                                <span class="{% if component_exist %}  {%else%} old_component {% endif %}">{{level_data.name}}</span>
+                                {% if limit_exist %}
+                                    <input type="hidden" name="cost_code_type{{forloop.parentloop.counter}}" value="old">
+                                    <div class="new_component">Cost Code limit exceed</div>
+                                {% endif %}
+                            </td>
+                            {%endfor%}
+                            {% getcode_format total_length_code data cost_code_format as cost_code %}
+                            <input type="hidden" name="cost_code{{forloop.counter}}" value="{{cost_code}}">
+
+                            <td class="td-center">
+                                {{cost_code}}
+                                {% check_code_exist cost_code request.company as exist_error %}
+                                {% if exist_error %}
+                                <input type="hidden" name="cost_code_type{{forloop.counter}}" value="old">
+                                <div class="new_component">Cost Code Already exist</div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+                <div class="text-center btn-cls">
+                    <button type="submit"
+                        class="btn btn-clr text-left final-cls waves-effect waves-float waves-light" onclick="this.disabled=true; this.form.submit();">Submit</button>
+                </div>
+            </form>
+
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    var total_length_code = '{{total_length_code}}'
+</script>
+<script src="{% static 'js/cost_code/display_cost_code.js' %}"></script>
+
+
+
+{% endblock %}

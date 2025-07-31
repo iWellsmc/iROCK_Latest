@@ -1,0 +1,502 @@
+.table {
+    --bs-table-color: var(--tableborder-color) !important;
+}
+.align_items{
+    display: flex;
+    align-items: center;
+}
+.sign-curreny{
+    width: 12.5%;
+}
+.from-invoice{
+    width: 15%;
+}
+.add-sign{
+    width: 20%;
+    text-align: center;
+}
+.To-Invoice{
+    width: 15%;
+}
+
+
+.user-list{
+    width: 22%;
+}
+.small-td{
+    width: 15%;
+}
+
+.sign-curreny>select{
+    text-align: center;
+}
+.from-invoice>input{
+    text-align: center;
+}
+.add-sign>input{
+    text-align: center;
+}
+.To-Invoice>input{
+    text-align: center;
+}
+.user-list>input{  
+    text-align: center;
+}
+.small-td>input{
+    text-align: center;
+}
+
+.user-list>div{
+    margin-bottom: 10px;
+    /* align-items: end; */
+}
+
+.user-list-add-btn{
+    text-align: center;
+}
+.add{
+    margin-top: 0px !important;
+}
+.delete{
+    margin-top: 0px !important;
+}
+.currency{
+    width: 200px;
+    margin-left: 16px;
+}
+.min_amount{
+    text-align: center;
+}
+.max_amount{
+    text-align: center;
+}
+.no_of_users{
+    text-align: center;
+}
+
+.without-invoice{
+    width: 200px;
+    /* margin-left: 63px; */
+    margin-left: 16px;
+}
+
+.com_curency{
+    width: 8% !important;
+}
+.tab-wid{
+    width: 99% !important;
+}
+th.user{
+    width: 10% !important;
+}
+/* .user-comp{
+    width: 50% !important;
+} */
+@media screen and (min-device-width: 768px) and (max-device-width: 995px) { 
+    .sign-table-con>table{
+        width: 200% !important;
+    }
+}
+
+@media screen and (min-device-width: 996px) and (max-device-width: 1200px) { 
+    .sign-table-con>table{
+        width: 150% !important;
+    }
+}
+
+@media screen and (min-device-width: 1201px) and (max-device-width: 1400px) { 
+    .sign-table-con>table{
+        width: 99% !important;
+    }
+}
+
+.align_items {
+    display: flex !important;
+    display: -webkit-flex;
+    align-items: center !important;
+    justify-content: end !important;
+    /* width: 90% !important; */
+    width: 100% !important;
+    margin: auto !important;
+}
+
+.select-style {
+    border: 1px solid #96183a;
+    border-radius: 3px;
+    padding: 4px;
+    background-color: transparent;
+    width: auto;
+    margin: 0 0.5rem;
+}
+
+/******************** Invoice Trigger Timing ********************/
+.table-list-invoice td {
+    text-align: center;
+}
+.table-list-invoice input {
+    text-align: center;
+}
+/******************** Invoice Trigger Timing ********************/
+
+
+/******************** Create Bank User ********************/
+.createuser-table th {
+    background-color: transparent !important;
+}
+
+.create_align_items {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: end !important;
+    width: 100% !important;
+    margin: 0px auto 10px;
+}
+
+.create-wid {
+    width: 40%;
+}
+
+.inner-table {
+    border: 1px solid #c7c7c7;
+}
+
+.action-wid {
+    width: 13%;
+}
+
+.select2-selection.select2-selection--multiple {
+    border: 1px solid var(--tableborder-color) !important;
+}
+
+textarea {
+    margin-top: 8px !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    background-color: transparent !important;
+    /* border-right: 1px solid #7367f0 !important; */
+    border: none !important;
+    color: #7367f0 !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:before {
+    left: -6px !important;
+}
+
+.td-left {
+    text-align: var(--lefttext-align) !important;
+}
+/******************** Create Bank User ********************/
+
+
+/******************** Edit Bank User ********************/
+.edituser-table th {
+    background-color: transparent !important;
+
+}
+
+.edit_align_items {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: end !important;
+    width: 100% !important;
+    margin: 0px auto 10px;
+}
+.create-wid {
+    width: 40%;
+}
+
+.inner-table {
+    border: 1px solid #c7c7c7;
+}
+
+.action-wid {
+    width: 13%;
+}
+/******************** Edit Bank User ********************/
+
+
+/******************** list_signatories ********************/
+.list_signatories {
+    color: maroon !important;
+    font-weight: 500;
+    font-size: 15px;
+    /* width: 500px; */
+}
+
+.list_signatories td {
+    padding: 10px 0px;
+}
+
+.list_signatories td:nth-child(1) {
+    width: 175px;
+}
+
+.list_signatories td:nth-child(3) {
+    width: 200px;
+}
+
+.list_signatories label {
+    margin-bottom: 0px !important;
+}
+
+.list_signatories select {
+    width: 100%;
+    border: 1px solid #96183a;
+    border-radius: 3px;
+    padding: 4px;
+    background-color: transparent;
+    margin: 0 0.5rem;
+}
+
+.with_invoice th {
+    color: #8D1636 !important;
+    text-transform: capitalize !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    word-break: break-word;
+    border: 1px solid var(--tableborder-color) !important;
+    width: 20%;
+    background-color: transparent !important;
+}
+
+.with_invoice td {
+    color: #000;
+    border: 1px solid var(--tableborder-color) !important;
+}
+
+.without_invoice td {
+    color: #000;
+    border: 1px solid var(--tableborder-color) !important;
+}
+
+.without_invoice th {
+    color: #8D1636 !important;
+    text-transform: capitalize !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    word-break: break-word;
+    border: 1px solid var(--tableborder-color) !important;
+    width: 33.33%;
+    background-color: transparent !important;
+}
+
+.cls-nil {
+    color: #000 !important;
+    font-weight: 100 !important;
+    text-align: center !important;
+}
+
+/**********Project level **********/
+.select-project {
+    border: 1px solid #96183a;
+    border-radius: 3px;
+    padding: 4px;
+    background-color: transparent;
+    width: auto;
+    margin: 0 0.5rem;
+}
+
+.pss-div {
+    background: #fff;
+    padding: 1px 25px 25px 25px;
+    border-radius: 15px;
+    margin-top: 30px;
+}
+
+/* .pss-table {
+    width: 100%;
+    border: 1px solid var(--tableborder-color);
+    margin: 20px 0px 0px;
+}
+
+.pss-table th {
+    padding: 10px !important;
+    text-align: center;
+    color: #8D1636 !important;
+    background-color: transparent !important;
+    text-transform: capitalize !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-bottom: 2px solid var(--tableborder-color) !important;
+    border-right: 1px solid var(--tableborder-color) !important;
+    word-break: break-word;
+}
+
+.pss-table td {
+    text-align: center;
+    border-right: 1px solid var(--tableborder-color);
+    border-bottom: 1px solid var(--tableborder-color);
+    color: #000;
+    font-weight: 400 !important;
+    font-size: 15px !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+    padding: 5px 10px;
+} */
+
+/* .currency {
+    width: 258px;
+    margin-left: 16px;
+}
+
+.from-invoice {
+    width: 15%;
+}
+
+.To-Invoice {
+    width: 15%;
+}
+
+.small-td {
+    width: 15%;
+} */
+
+.nos-sig p {
+    text-transform: none;
+    margin-bottom: 0px;
+}
+
+/* .user-list {
+    width: 25%;
+}
+
+.user-list>div {
+    margin: 8px auto;
+    align-items: center;   
+} */
+
+.with_invoice_project {
+    border: 1px solid var(--tableborder-color);
+    width: 100%;
+}
+
+.with_invoice_project th {
+    color: #8D1636 !important;
+    text-transform: capitalize !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    word-break: break-word;
+    border: 1px solid var(--tableborder-color) !important;
+    width: 20%;
+    background-color: transparent !important;
+    padding: 10px 10px;
+}
+
+.with_invoice_project td {
+    border: 1px solid var(--tableborder-color) !important;
+    padding: 10px 10px !important;
+}
+
+.from-invoice , .To-Invoice, .small-td {
+    text-align: center !important;
+}
+
+.without_invoice_project {
+    border: 1px solid var(--tableborder-color);
+    width: 100%;
+}
+
+.without_invoice_project th {
+    color: #8D1636 !important;
+    text-transform: capitalize !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    word-break: break-word;
+    border: 1px solid var(--tableborder-color) !important;
+    width: 33.33%;
+    background-color: transparent !important;
+    padding: 10px 10px;
+}
+
+.without_invoice_project td {
+    padding: 10px 10px;
+    border: 1px solid var(--tableborder-color);
+}
+
+.add-sign, .small-tzd {
+    text-align: center !important;
+}
+
+
+/**********Project level **********/
+/******************** list_signatories ********************/
+
+
+
+/******************** add_update_signatory ********************/
+.css-div {
+    background: #fff;
+    padding: 1px 25px 25px 25px;
+    border-radius: 15px;
+    margin-top: 30px;
+}
+
+.css-table {
+    border: 1px solid var(--tableborder-color);
+    width: 100%;
+    margin: 20px auto;
+}
+
+.css-table th {
+    color: #8D1636 !important;
+    text-transform: capitalize !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    border-bottom: 2px solid var(--tableborder-color) !important;
+    border-top: none !important;
+    border-right: 1px solid var(--tableborder-color) !important;
+    word-break: break-word;
+    background-color: transparent !important;
+}
+
+.css-table td {
+    color: #000;
+    font-weight: 400 !important;
+    font-size: 15px !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+    border: 1px solid var(--tableborder-color) !important;
+}
+
+.css-table td input {
+    text-align: center !important;
+}
+
+.css-table .without-invoice {
+    /* width: 100% !important; */
+}
+
+.currency_project, .without-invoice-project {
+    margin-left: 16px;
+}
+
+@media only screen and (min-width:768px) and (max-width:1023px){
+    .pro-sig-setting{
+        margin: 0 10px;
+    }
+    .pro-sig-setting select {
+        width: 58px;
+    }
+    
+    /* Project Signatories Settings */
+    .pro-sing-sett {
+        overflow: scroll;
+    }
+    .pro-sing-sett table {
+        width: 152%;
+    }
+}
+
+/******************** add_update_signatory ********************/
+
+/********** editinvoicetriggertime, editwcctriggertime, invoicetriggertime, wcctriggertime, list_signatories **********/
+#text-initial {
+    text-transform: initial !important;
+}
+/********** edit invoice trigger time **********/

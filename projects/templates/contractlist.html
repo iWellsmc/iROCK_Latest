@@ -1,0 +1,691 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/contractinfo.css' %}">
+
+<div>
+  <h4 class="from-head">Vendor Contract</h4>
+  <form method="POST" id="checkedvendors" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-lg-9 col-md-8">
+      </div>
+      {% if getvendordetails.active_status == 1 %}
+      {% if request.user.contactpersonstatus == 1%}
+      <div class="col-lg-3 col-md-4 text-end">
+        <a type="button" class="btn btn-clr" href="{% url 'projects:addnewcontract' %}">Add Missed
+            Contract</a>
+      </div>
+      {% endif %}
+      {% endif %}
+    </div>
+
+    <!--
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+              <div class=""> newcontractlist
+                <a data-toggle="modal" href="#myvendorModal" class="btn btn-clr btn-master">Query</a>
+                <div class="modal" id="myvendorModal">
+                  <div class="modal-dialog modal-lg">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                            <h4 class="modal-title">
+                            All Contracts
+                            </h4>    
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                          </div>
+                          <div id="loader" class="lds-dual-ring hidden overlay">
+                            <h5 class="head_cls">Please Wait...</h5>
+                          </div>
+                          <div class="container">
+                          </div>
+                          <div class="modal-body">
+                            <table>
+                              <thead><th>Contract Type</th><th>Contract Reference Number</th><th>Action</th></thead>
+                                <tbody>
+                                {% for contracts in contractlist %}
+
+                                  {% if contracts.id|servicecontractcount:"service" > 0 %}
+                                    {% comment %} <tr class="from-head"><td>Services<td></tr> {% endcomment %}
+                                    {% for service in contracts.id|servicecontract:"service"%}
+                                      <tr><td>Original Contract</td><td>{{service.reference_number}}</td><td><input type="checkbox" name="checkedvendorcontrat" value="{{service.reference_number}}"></td></tr>
+                                      {% for amendment in service.id|serviceademdmentcontract %}
+                                        <tr><td>{{amendment.amendment_type}}</td><td>{{amendment.amendment_reference_number}}</td><td><input type="checkbox" name="checkedvendorcontrat" value="{{amendment.amendment_reference_number}}"></td></tr>
+                                      {% endfor %}
+                                    {% endfor %}
+                                  {% endif %}
+
+                                  {% if contracts.id|servicecontractcount:"supply" > 0 %}
+                                  {% comment %} <tr class="from-head"><td>Supply<td></tr> {% endcomment %}
+                                  {% for service in contracts.id|servicecontract:"supply"%}
+                                    <tr><td>Original Contract</td><td>{{service.reference_number}}</td><td><input type="checkbox" name="checkedvendorcontrat" value="{{service.reference_number}}"></td></tr>
+                                    {% for amendment in service.id|serviceademdmentcontract %}
+                                      <tr><td>{{amendment.amendment_type}}</td><td>{{amendment.amendment_reference_number}}</td><td><input type="checkbox" name="checkedvendorcontrat" value="{{amendment.amendment_reference_number}}"></td></tr>
+                                    {% endfor %}
+                                  {% endfor %}
+                                {% endif %}
+
+
+                                {% if contracts.id|servicecontractcount:"service_supply" > 0 %}
+                                {% comment %} <tr class="from-head"><td>Supply<td></tr> {% endcomment %}
+                                {% for service in contracts.id|servicecontract:"service_supply"%}
+                                  <tr><td>Original Contract</td><td>{{service.reference_number}}</td><td><input type="checkbox" name="checkedvendorcontrat" value="{{service.reference_number}}"></td></tr>
+                                  {% for amendment in service.id|serviceademdmentcontract %}
+                                    <tr><td>{{amendment.amendment_type}}</td><td>{{amendment.amendment_reference_number}}</td><td><input type="checkbox" name="checkedvendorcontrat" value="{{amendment.amendment_reference_number}}"></td></tr>
+                                  {% endfor %}
+                                {% endfor %}
+                              {% endif %}
+
+
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="submit" class="btn btn-clr btn-master">Submit</button>
+                            <a href="#" data-dismiss="modal" class="btn btn-clr btn-master">Close</a>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          -->
+      <div class="table-responsive text-nowrap">   
+    <table class="table prj-back_clr settings-data-list-view data-list-view vennd-conn irock-table" id="master_project_list">
+      <thead>
+        <tr>
+          <th>S/N</th>
+          <th class="vin-width">Vendor Identification Number (VIN)</th>
+          <th>Vendor Name </th>
+          <th class="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="table-list">
+        {% if count > 0 %}
+        {% for contracts in contractlist %}
+        <tr>
+          <td class="contra-first-tbl">{{forloop.counter}}</td>
+          <td class="contra-first-tbl">{{contracts.vin}}</td>
+          <td class="contra-first-tbl vin_left">{{contracts.vendor_name}}</td>
+          <td class="contra-first-tbl">
+            {% comment %} {% if request.user.roles_id == 3 %}
+            {%if rights.view == '1' %} {% endcomment %}
+            <a class="btn p-0" data-toggle="collapse" href="#collapseExample{{contracts.id}}" role="button"
+              aria-expanded="false" aria-controls="collapseExample">
+              <span class="action-edit align-icons">
+                <i class="fa fa-eye" title="View"></i>
+              </span>
+            </a>
+            {% comment %} {% endif %}
+            {% else %} {% endcomment %}
+            {% comment %} <a class="btn p-0" data-toggle="collapse" href="#collapseExample{{contracts.id}}"
+              role="button" aria-expanded="false" aria-controls="collapseExample">
+              <span class="action-edit align-icons">
+                <i class="fa fa-eye" title="View"></i>
+              </span>
+            </a> {% endcomment %}
+            {% comment %} {% endif %} {% endcomment %}
+
+            {% comment %} {% if request.user.roles_id == 3 %}
+            {%if rights.edit == '1' %}
+            <a class="btn p-0" href="{% url 'projects:editcontractmaster' pk=contracts.id%}">
+              <span class="action-edit align-icons">
+                <i class="fa fa-edit"></i>
+              </span>
+            </a>
+            {% endif %}
+            {% else %}
+            <a class="btn p-0" href="{% url 'projects:editcontractmaster' pk=contracts.id%}">
+              <span class="action-edit align-icons">
+                <i class="fa fa-edit"></i>
+              </span>
+            </a>
+            {% endif %}
+
+
+            {% if request.user.roles_id == 3 %}
+            {%if rights.delete == '1' %}
+            <a class="btn p-0 delete-contract" data_id="{{contracts.id}}" contract_name="{{contracts.vendor_name}}">
+              <span class="action-edit align-icons">
+                <i class="fa fa-trash-o"></i>
+              </span>
+            </a>
+            {% endif %}
+            {% else %}
+            <a class="btn p-0 delete-contract" data_id="{{contracts.id}}" contract_name="{{contracts.vendor_name}}">
+              <span class="action-edit align-icons">
+                <i class="fa fa-trash-o"></i>
+              </span>
+            </a>
+            {% endif %} {% endcomment %}
+
+          </td>
+        </tr>
+        <tr>
+          <td colspan='12' class="tbl-top-lines p-0">
+            <div class="collapse" id="collapseExample{{contracts.id}}">
+              <div class="card card-body">
+
+                {% if contracts.id|servicesubmitcontractcount:"service" > 0 %}
+                <h3 class="from-head">Services</h3>
+                <div class="table-responsive text-nowrap list_tab_vendor">
+                <table class="type-last-vend mid-view-tbl tlt-cap tbl-contra-list vieww-serr">
+                  <thead>
+                    <tr>
+                      <th class="wid-sn">S/N</th>
+                      <th>Name of Service</th>
+                      {% comment %} <th>Project Discipline</th>
+                      <th>Discipline Type</th> {% endcomment %}
+                      <th>SO Reference Number</th>
+                      <th>SO Executed Date</th>
+                      <th>Maximum Value of SO</th>
+                      <th>Contract</th>
+                      <th>WCC</th>
+                      {% if request.user.contactpersonstatus == 1%}
+                      <th>Action (Query)</th>
+                      {% endif %}
+                     
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {% for service in contracts.id|servicecontract:"service"%}
+                    {% if service.save_type != 1 %}
+                    <tr>
+                      <!-- <td class="text-wrap">{{forloop.counter}}</td> -->
+                      <td class="counter"></td>
+                      <td class="text-left text-wrap">{{service.name_service}}</td>
+                      {% comment %} <td class="text-wrap">{{service.discipline|disciplines_replace_cap}}</td>
+                      <td class="text-wrap">{{service.disciplinetype|disciplines_replace_cap}}</td> {% endcomment %}
+                      <td class="text-wrap">{{service.reference_number }}</td>
+                      <td class="text-wrap">{{service.executed_date|checktime:service.company.id}}</td>
+                      <td class="text-wrap">{{service.currency.currency_symbol}} {{service.amount|amount_convertion_to_separtors}}</td>
+
+                      <td class="text-left text-wrap">
+                        {% comment %} {% checkfile service.upload_contract as filecount%}
+                        {% if filecount > 0%}
+                        <a href="{{service.upload_contract.url}}" download>{{service.upload_contract}}</a>
+                        {% endif %} {% endcomment %}
+                        {% get_contract_file service.id 'original' 1 as contract_files %}
+                    {%if contract_files.1 != 0  %}
+                    <div class="col-12"> 
+                      <ul class="view-ul p-0">
+  
+                    {% for contract_file in contract_files.0 %}
+                      
+                    <li>
+                    <a target="_blank" href="{% url 'invoice:view_contractfiles' pk=contract_file.id %}">{{ contract_file.original_file_name }}</a>
+  
+                    </li>
+  
+                    {% empty %}
+  
+                    {% endfor %}
+                  </ul>
+                  </div>
+                  {% endif %}
+  
+                      </td>
+                      {% if service.wcc == 1 %}
+                      <td>
+                        Yes
+                      </td>
+                      {% else %}
+                      <td>
+                        No
+                      </td>
+                      {% endif %}
+
+                      {% if request.user.contactpersonstatus == 1%}
+                      <td class="vend-con-check text-wrap">
+                        {% if service.id|checkInvoiceExists:'original' == 0 %}
+                        <input type="checkbox" name="querycheck" class="querycls commoncls" data_name="Original"
+                          value="{{service.id}}">
+                        {% endif %}
+                      </td>
+                      {% endif %}
+
+                      {% comment %} {% checkfile service.upload_pricetable as filecount%}
+                      {% if filecount > 0%}
+                      <a href="{{service.upload_pricetable.url}}" download>{{service.upload_pricetable}}</a>
+                      {% endif %} {% endcomment %}
+
+                    </tr>
+                    {% for amendment in service.id|serviceademdmentcontract %}
+                    {%if amendment.save_type != 1 %}
+                                <tr class="amen-type-lists text1">
+                                  <td class="text-wrap"></td>
+                                  {% comment %} <td>{{forloop.counter}}</td> {% endcomment %}
+                                  <td class="text-wrap">{{amendment.amendment_type}}</td>
+                                  {% comment %} <td></td>
+                                  <td class="text-wrap"></td> {% endcomment %}
+                                  <td class="text-wrap">{{amendment.amendment_reference_number}}</td>
+                                  <td class="text-wrap">{{amendment.amendment_executed_date|checktime:amendment.company.id}}</td>
+                                  <td class="text-wrap">{{amendment.amendment_currency.currency_symbol}} {{amendment.amendment_amount|amount_convertion_to_separtors}}</td>
+                                  <td class="text-left text-wrap">
+                                    {% comment %} {% checkfile amendment.amendment_upload_contract as filecount%}
+                                    {% if filecount > 0%}
+                                    <a href="{{amendment.amendment_upload_contract.url}}"
+                                      download>{{amendment.amendment_upload_contract}}</a>
+                                    {% endif %} {% endcomment %}
+                                    {% get_contract_file amendment.id 'Amendment' 1 as contract_files %}
+                                {%if contract_files.1 != 0  %}
+                                <div class="col-12"> 
+                                  <ul class="view-ul p-0">
+              
+                                {% for contract_file in contract_files.0 %}
+                                  
+                                <li>
+                                <a target="_blank" href="{% url 'invoice:view_contractfiles' pk=contract_file.id %}">{{ contract_file.original_file_name }}</a>
+              
+                                </li>
+              
+                                {% empty %}
+              
+                                {% endfor %}
+                              </ul>
+                              </div>
+                              {% endif %}
+              
+                                  </td>
+                                  {% if amendment.wcc == 1 %}
+                                  <td>
+                                    Yes
+                                  </td>
+                                  {% else %}
+                                  <td>
+                                    No
+                                  </td>
+                                  {% endif %}
+
+                                  {% if request.user.contactpersonstatus == 1%}
+                                  <td class="vend-con-check text-wrap">
+                                    {% if amendment.id|checkInvoiceExists:'amendment' == 0 %}
+                                    <input type="checkbox" name="querycheck" class="querycls commoncls"
+                                      data_name="{{amendment.amendment_type}}" value="{{amendment.id}}">
+                                    {% endif %}
+                                  </td>
+                                  {% endif %}
+
+
+                                  {% comment %} {% checkfile amendment.amendment_upload_pricetable as filecount%}
+                                  {% if filecount > 0%}
+                                  <a href="{{amendment.amendment_upload_pricetable.url}}"
+                                    download>{{amendment.amendment_upload_pricetable}}</a>
+                                  {% endif %} {% endcomment %}
+
+                                </tr>
+                        {% endif %}
+                    {% endfor %}
+                    <tr class="down-line-contra"> </tr>
+                   {% endif %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+                {% endif %}
+
+
+                {% if contracts.id|supplycontractcount:"supply" > 0 %}
+                <h3 class="from-head">Supplies</h3>
+                <div class="table-responsive text-nowrap list_tab_vendor">
+                <table class="type-last-vend mid-view-tbl tlt-cap tbl-contra-list vieww-serr">
+                  <thead>
+                    <tr>
+                      <th class="wid-sn">S/N</th>
+                      <th>Name of Supply</th>
+                      {% comment %} <th>Project Discipline</th>
+                      <th>Discipline Type</th> {% endcomment %}
+                      <th>PO Reference Number</th>
+                      <th>PO Executed Date</th>
+                      <th>Maximum Value of PO</th>
+                      <th>Contract</th>
+                      <th>WCC</th>
+                      {% if request.user.contactpersonstatus == 1%}
+                      <th>Action (Query)</th>
+                      {% endif %}
+                      
+                    </tr>
+                  </thead>
+
+                  <tbody class="seek-left">
+                    {% for supply in contracts.id|supplycontract:"supply"%}
+                    {% if supply.save_type != 1 %}
+
+                              <tr>
+                                <!-- <td>{{forloop.counter}}</td> -->
+                                <td class="counters"></td>
+                                <td class="text-left">{{supply.name_service}}</td>
+                                {% comment %} <td>{{supply.discipline|disciplines_replace_cap}}</td>
+                                <td>{{supply.disciplinetype|disciplines_replace_cap}}</td> {% endcomment %}
+                                <td>{{supply.reference_number }}</td>
+                                <td>{{supply.executed_date|checktime:supply.company.id}}</td>
+                                <td>{{supply.currency.currency_symbol}} {{supply.amount|amount_convertion_to_separtors}}</td>
+
+                                <td class="text-wrap">
+                                  {% comment %} {% checkfile supply.upload_contract as filecount%}
+                                  {% if filecount > 0%}
+                                  <a href="{{supply.upload_contract.url}}" download>{{supply.upload_contract}}</a>
+                                  {% endif %} {% endcomment %}
+                                  {% get_contract_file supply.id 'original' 1 as contract_files %}
+                              {%if contract_files.1 != 0  %}
+                              <div class="col-12"> 
+                                <ul class="view-ul p-0">
+            
+                              {% for contract_file in contract_files.0 %}
+                                
+                              <li>
+                              <a target="_blank" href="{% url 'invoice:view_contractfiles' pk=contract_file.id %}">{{ contract_file.original_file_name }}</a>
+            
+                              </li>
+            
+                              {% empty %}
+            
+                              {% endfor %}
+                            </ul>
+                            </div>
+                            {% endif %}
+            
+                                </td>
+                                {% if supply.wcc == 1 %}
+                                <td>
+                                  Yes
+                                </td>
+                                {% else %}
+                                <td>
+                                  No
+                                </td>
+                                {% endif %}
+
+                                {% if request.user.contactpersonstatus == 1%}
+                                <td class="vend-con-check text-wrap">
+                                  {% if service.id|checkInvoiceExists:'original' == 0 %}
+                                  <input type="checkbox" name="querycheck" class="querycls commoncls" data_name="Original"
+                                    value="{{supply.id}}">
+                                  {% endif %}
+                                </td>
+                      {% endif %}
+                      
+                      
+
+
+                      {% comment %} {% checkfile supply.upload_pricetable as filecount%}
+                      {% if filecount > 0%}
+                      <a href="{{supply.upload_pricetable.url}}" download>{{supply.upload_pricetable}}</a>
+                      {% endif %} {% endcomment %}
+                    </tr>
+                    {% for amendment in supply.id|supplyademdmentcontract %}
+                                        {%if amendment.save_type != 1 %}
+                                        <tr class="amen-type-lists text2">
+                                          <td class="text-wrap"></td>
+                                          {% comment %} <td>{{forloop.counter}}</td> {% endcomment %}
+                                          <td class="text-wrap">{{amendment.amendment_type}}</td>
+                                          {% comment %} <td></td>
+                                          <td class="text-wrap"></td> {% endcomment %}
+                                          <td class="text-wrap">{{amendment.amendment_reference_number}}</td>
+                                          <td class="text-wrap">{{amendment.amendment_executed_date|checktime:amendment.company.id}}</td>
+                                          <td class="text-wrap">{{amendment.amendment_currency.currency_symbol}} {{amendment.amendment_amount|amount_convertion_to_separtors}}</td>
+
+                                          <td class="text-left text-wrap">
+                                            {% comment %} {% checkfile amendment.amendment_upload_contract as filecount%}
+                                            {% if filecount > 0%}
+                                            <a href="{{amendment.amendment_upload_contract.url}}"
+                                              download>{{amendment.amendment_upload_contract}}</a>
+                                            {% endif %} {% endcomment %}
+                                            {% get_contract_file amendment.id 'Amendment' 1 as contract_files %}
+                                        {%if contract_files.1 != 0  %}
+                                        <div class="col-12"> 
+                                          <ul class="view-ul p-0">
+                      
+                                        {% for contract_file in contract_files.0 %}
+                                          
+                                        <li>
+                                        <a target="_blank" href="{% url 'invoice:view_contractfiles' pk=contract_file.id %}">{{ contract_file.original_file_name }}</a>
+                      
+                                        </li>
+                      
+                                        {% empty %}
+                      
+                                        {% endfor %}
+                                      </ul>
+                                      </div>
+                                      {% endif %}
+                      
+                                          </td>
+                                          {% if amendment.wcc == 1 %}
+                                          <td>
+                                            Yes
+                                          </td>
+                                          {% else %}
+                                          <td>
+                                            No
+                                          </td>
+                                          {% endif %}
+
+                                          {% if request.user.contactpersonstatus == 1%}
+                                          <td class="vend-con-check text-wrap">
+                                            {% if amendment.id|checkInvoiceExists:'amendment' == 0 %}
+                                            <input type="checkbox" name="querycheck" class="querycls commoncls"
+                                              data_name="{{amendment.amendment_type}}" value="{{amendment.id}}">
+                                            {% endif %}
+                                          </td>
+                                          {% endif %}
+
+                                          {% comment %} {% checkfile amendment.amendment_upload_pricetable as filecount%}
+                                          {% if filecount > 0%}
+                                          <a href="{{amendment.amendment_upload_pricetable.url}}"
+                                            download>{{amendment.amendment_upload_pricetable}}</a>
+                                          {% endif %} {% endcomment %}
+                                        </tr>
+                                        {% endif %}
+                                    
+                    {% endfor %}
+                    <tr class="down-line-contra"> </tr>
+                    {% endif %}
+
+                    {% endfor %}
+                  </tbody>
+                </table>
+                </div>
+                {% endif %}
+
+
+                {% if contracts.id|servicesupplycontractcount:"service_supply" > 0 %}
+                <h3 class="from-head">Services & Supplies</h3>
+                <div class="table-responsive text-nowrap list_tab_vendor">
+                <table class="type-last-vend mid-view-tbl tlt-cap tbl-contra-list vieww-serr">
+                  <thead>
+                    <tr>
+                      <th class="wid-sn">S/N</th>
+                      <th>Name of Contract</th>
+                      {% comment %} <th>Project Discipline</th>
+                      <th>Discipline Type</th> {% endcomment %}
+                      <th>Contract Reference Number</th>
+                      <th>Contract Executed Date</th>
+                      <th>Maximum Value of Contract</th>
+                      <th>Contract</th>
+                      <th>WCC</th>
+                      {% if request.user.contactpersonstatus == 1%}
+                      <th>Action (Query)</th>
+                      {% endif %}
+                     
+                    </tr>
+                  </thead>
+
+                  <tbody class="seek-left">
+                    {% for servicesupply in contracts.id|servicesupplycontract:"service_supply"%}
+                    {% if servicesupply.save_type != 1 %}
+                    <tr >
+                        <!-- <td>{{forloop.counter}}</td> -->
+                        <td class="counterss"></td>
+                        <td class="text-left">{{servicesupply.name_service}}</td>
+                        {% comment %} <td>{{servicesupply.discipline|disciplines_replace_cap}}</td>
+                        <td>{{servicesupply.disciplinetype|disciplines_replace_cap}}</td> {% endcomment %}
+                        <td>{{servicesupply.reference_number	}}</td>
+                        <td>{{servicesupply.executed_date|checktime:servicesupply.company.id}}</td>
+                        <td>{{servicesupply.currency.currency_symbol}} {{servicesupply.amount|amount_convertion_to_separtors}}</td>
+                        <td>
+                          {% comment %} {% checkfile servicesupply.upload_contract as filecount%}
+                          {% if  filecount > 0%}
+                          <a href="{{servicesupply.upload_contract.url}}" download>{{servicesupply.upload_contract}}</a>
+                          {% endif %} {% endcomment %}
+                                     {% get_contract_file servicesupply.id 'original' 1 as contract_files %}
+                                      {%if contract_files.1 != 0  %}
+                                 <div class="col-12"> 
+                                  <ul class="view-ul p-0">
+  
+                                  {% for contract_file in contract_files.0 %}
+                                    
+                                  <li>
+                                   <a target="_blank" href="{% url 'invoice:view_contractfiles' pk=contract_file.id %}">{{ contract_file.original_file_name }}</a>
+  
+                                   </li>
+  
+                                      {% empty %}
+                                   
+                                        {% endfor %}
+                                      </ul>
+                                           </div>
+                                     {% endif %}
+  
+                            </td>
+                      {% if servicesupply.wcc == 1 %}
+                      <td>
+                        Yes
+                      </td>
+                      {% else %}
+                      <td>
+                        No
+                      </td>
+                      {% endif %}
+                        
+                          {% if request.user.contactpersonstatus == 1%}
+                          <td class="vend-con-check test text-wrap">
+                                {% if servicesupply.id|checkInvoiceExists:'original' == 0 %}
+                                      <input type="checkbox" name="querycheck" class="querycls commoncls" data_name="Original" value="{{servicesupply.id}}">
+                                {% endif %}
+                          </td>
+                          {% endif %}
+
+                          {% comment %} {% checkfile servicesupply.upload_pricetable as filecount%}
+                          {% if  filecount > 0%}
+                          <a href="{{servicesupply.upload_pricetable.url}}" download>{{servicesupply.upload_pricetable}}</a>
+                          {% endif %}  {% endcomment %}
+                             
+                    </tr>
+{% endif %}
+
+
+
+                    {% for amendment in servicesupply.id|servicesupplyademdmentcontract %}
+                    {%if amendment.save_type != 1 %}
+                       <tr class="amen-type-lists text3">
+                      <td class="text-wrap"></td>
+                      {% comment %} <td>{{forloop.counter}}</td> {% endcomment %}
+                      <td class="text-wrap">{{amendment.amendment_type}}</td>
+                      {% comment %} <td></td>
+                      <td class="text-wrap"></td> {% endcomment %}
+                      <td class="text-wrap">{{amendment.amendment_reference_number}}</td>
+                      <td class="text-wrap">{{amendment.amendment_executed_date|checktime:amendment.company.id}}</td>
+                      <td>{{amendment.amendment_currency.currency_symbol}} {{amendment.amendment_amount}}</td>
+                      <td class="text-left text-wrap">
+                              {% comment %} {% checkfile amendment.amendment_upload_contract as filecount%}
+                              {% if filecount > 0%}
+                              <a href="{{amendment.amendment_upload_contract.url}}"
+                                download>{{amendment.amendment_upload_contract}}</a>
+                              {% endif %} {% endcomment %}
+                              {% get_contract_file amendment.id 'Amendment' 1 as contract_files %}
+                                    {%if contract_files.1 != 0  %}
+                                        <div class="col-12"> 
+                                          <ul class="view-ul p-0">
+                      
+                                              {% for contract_file in contract_files.0 %}
+                                                
+                                                      <li>
+                                                      <a target="_blank" href="{% url 'invoice:view_contractfiles' pk=contract_file.id %}">{{ contract_file.original_file_name }}</a>
+                                    
+                                                      </li>
+                                    
+                                                      {% empty %}
+                                    
+                                              {% endfor %}
+                                        </ul>
+                                      </div>
+                                    {% endif %}
+  
+                      </td>
+                          {% if amendment.wcc == 1 %}
+                                <td>
+                                  Yes
+                                </td>
+                              {% else %}
+                              <td>
+                                No
+                              </td>
+                          {% endif %}
+                          {% if request.user.contactpersonstatus == 1%}
+                          <td class="vend-con-check text-wrap">
+                            {% if amendment.id|checkInvoiceExists:'amendment' == 0 %}
+                            <input type="checkbox" name="querycheck" class="querycls commoncls"
+                              data_name="{{amendment.amendment_type}}" value="{{amendment.id}}">
+                            {% endif %}
+                          </td>
+                          {% endif %}
+                      {% comment %} {% checkfile amendment.amendment_upload_pricetable as filecount%}
+                      {% if filecount > 0%}
+                      <a href="{{amendment.amendment_upload_pricetable.url}}"
+                        download>{{amendment.amendment_upload_pricetable}}</a>
+                      {% endif %} {% endcomment %}
+
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+
+
+
+                    <tr class="down-line-contra"> </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+          <td colspan="7" class="cls-nil text-center">
+            ---
+          </td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div> 
+  {% if getvendordetails.active_status == 1 %}
+      {% if request.user.contactpersonstatus == 1%}
+        <div class="text-center spacing-button">
+          <button type="submit" class="btn btn-clr text-center submit-cls">Submit</button>
+        </div>
+    {% endif %}
+  {% endif %}
+  </form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+{{ block.super }}
+
+<script src="{% static 'js/contract/contractlist.js' %}"></script>
+
+
+{% endblock %}

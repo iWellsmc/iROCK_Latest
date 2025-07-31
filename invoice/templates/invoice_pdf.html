@@ -1,0 +1,608 @@
+{% load invoice_custom_tags %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load cost_code_tags %}
+{% load wcc_custom_tags %}
+{% load credit_custom_tags %}
+{% load static %}
+{% block content %}
+<!-- <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="x-apple-disable-message-reformatting">
+<meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+{%clearpdfserial request%}
+<body>
+    <div class="row row-border align-items-center">
+        <div class="col-3">
+        <div class="logo">
+
+            <img src="{% if request.company.image %}{{request.company.image.url}}{% else %}{% static 'images/icons/Character_icon.svg' %}{% endif %}">
+            <!-- <img style="" src="/static/images/DP_n9SVw8C.jpg"> -->
+            <!-- <img style="" src="/static/images/irock.png"> -->               
+        </div>
+    </div>
+<div id="view-page">
+    <header style="display: flex; justify-content: center; align-items: center;">
+        <title>Invoice PDF</title>
+        <div class="company-details">
+            <h4 class="head-inv-pre">{{request.company.company_name|safe}}</h4>
+            <p>{{request.company.address|safe}}</p>  
+        </div>
+    </header>
+        <footer>
+            <table>
+                <tr style="vertical-align: baseline;">
+                    <td class="header_text">
+                        Vendor Name :
+                    </td>
+                    <td class="header_val">
+                        {{vendor_name.vendor_name}}
+                    </td>
+                </tr>
+                <tr style="vertical-align: baseline;">
+                    <td class="header_text">
+                        Contract Ref No :
+                    </td>
+                    <td class="header_val">
+                        {{contract_number}}
+                    </td>
+                </tr>
+                <tr style="vertical-align: baseline;">
+                    <td class="header_text">
+                        Inv No :
+                    </td>
+                    <td class="header_val">
+                        {{invoice_number | split_by_space}}
+                    </td>
+                </tr>
+            </table>
+            
+        </footer>
+    <table class="w-100">
+
+               <tr>
+                <td style="width:15%;"></td>
+                <td class="pdf-heading-section" style="text-align: center; width:85%;">
+                    <h3 class="from-sub-head summary_heading">Invoice Summary</h3>
+                    <h6 class="from-sub-head invoice_info">Invoice Information</h6>
+                </td>
+               </tr>
+               {% remove_session request pk as sessions %}
+         </table>
+
+ 
+    <table class="invoice-info table-heading-font" style="margin-top: 10px;">
+        <tbody>
+            <tr>
+                <th>Vendor Name</th>
+                <td>{{invoicedetail.vendor.vendor_name}}</td>   
+            </tr>
+            <tr>
+                <th>Period of Service</th>
+                <td>{{invoicedetail.fromdate|date:"d-M-Y"}} to {{invoicedetail.todate|date:"d-M-Y"}}</td>
+            </tr>
+            <tr>
+                <th>Contract/Amendment Variation Order Number</th>
+                {% getcontract invoicedetail.contractid invoicedetail.contracttype as Invdata %}
+                <td>{{Invdata.0}}</td>
+            </tr>
+            <tr>
+                <th>Name of Service</th>
+                <td>{{invoicedetail.name_service|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+                <th>Type of Service</th>
+                <td>{{invoicedetail.types_service|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+                <th>Brief Description of Service Rendered</th>
+                <td>{{invoicedetail.description_service|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+                <th>Location of Service</th>
+                <td>{{invoicedetail.location_service|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+                <th>Project Name</th>
+                <td>{{invoicedetail.project_name}}</td>
+            </tr>
+            <tr>
+                <th>Block</th>
+                <td>{{invoicedetail.block|checkblockval}}</td>
+            </tr>
+            <tr>
+                <th>Field</th>
+                <td>{{invoicedetail.field|checkfieldval}}</td>
+            </tr>
+            <tr>
+                <th>Well</th>
+                <td>{{invoicedetail.well|checkwellval}}</td>
+            </tr>
+            <tr>
+                <th>Cost Code</th>
+                {% getcostcode_preview costcodedata.costcode_main costcodedata.order request.company as subcostcode %}
+                {% getcostcode_string costcodedata.costcode_main costcodedata.order request.company as all_costcode_string %}
+                {% getcostcode_category costcodedata.costcode_main costcodedata.order request.company as category_costcode_string %}
+                    {% if category_costcode_string %}
+                             <td>{{subcostcode}}-{{all_costcode_string}}/{{category_costcode_string.cost_type.component_name}}</td>
+                    {%else%}
+                             <td>{{subcostcode}}-{{all_costcode_string}}</td>
+                    {% endif %}
+            </tr>
+        </tbody>
+    </table>
+
+    <h5 class="from-sub-head-Invoice head-inv-pre">Invoice Summary Details</h5>
+    {% for i in listdata %}
+    {% with values=0 %}
+            <table class="inv-pretbl Invoice-Summary-table-wid">
+                <thead>
+                    <tr>
+                        <th class="table-sn-wid">S/N</th>
+                        <th>Inv No</th>
+                        <th class="inv-date-wid">Inv Date</th>
+                        <th>Period of Service</th>
+                        <!-- <th>Contract No</th> -->
+                        
+                        <th>Gross Amount <br>{% for l in maininvoices %}{% if forloop.first %} {% for k in i %} {% if forloop.first %} {% if pk|get_split_currency:k == 1 %}({{pk|get_curreny:k}}){% else %}({{basecurreccy}}){% endif %}{% endif %}{% endfor %}{% endif %}{% endfor %}</th>
+                        <th>Tax <br>{% for l in maininvoices %}{% if forloop.first %} {% for k in i %} {% if forloop.first %} {% if pk|get_split_currency:k == 1 %}({{pk|get_curreny:k}}){% else %}({{basecurreccy}}){% endif %}{% endif %}{% endfor %}{% endif %}{% endfor %}</th>
+                        <th>Total Amount Inclusive Of All Taxes <br>{% for l in maininvoices %}{% if forloop.first %} {% for k in i %} {% if forloop.first %} {% if pk|get_split_currency:k == 1 %}({{pk|get_curreny:k}}){% else %}({{basecurreccy}}){% endif %}{% endif %}{% endfor %}{% endif %}{% endfor %}</th>
+                        {% for inv in maininvoices %}
+                        {% if forloop.first %}
+                        {% if inv.exchange_rate == '2' %}
+                        <th>Payment Currency</th>   
+                        {% endif %}
+                        {% endif %}
+                        {% endfor %}
+                        <th>Invoice File</th>
+                    </tr>
+                </thead>
+                <tbody>
+    {% for inv in maininvoices %}
+    {% for invoice in pk|subinvoice:inv.id %}
+    {% if invoice.currency.id in i %}
+        <tr>
+            {% with sno=request|pdfserialnumber %}
+            <td>{{sno}}</td>{% endwith %}
+            <td class="inv_name">{{invoice.invoice_number }}<br>{%if invoice.payment_account == 1%}(Allocated to Payment on Account){%endif%}</td></td>
+            <td>{{invoice.invoice_date|convertinvoicedate:request.company.id}}</td>
+            <td>{{invoice.invoice.fromdate|date:"d-M-Y"}} to {{invoice.invoice.todate|date:"d-M-Y"}}</td>
+            <td class="am-valu">{% invoiceafterdiscount invoice.invoice_percentage invoicedetails.total_after_otherdetails invoice.invoice_exchange_rate as invdisval %}{{invdisval}}</td>
+            {% comment %} <td class="am-valu">  {% invoiceafterdiscount invoice.invoice_percentage invoicedetails.total_discount_value invoice.invoice_exchange_rate as invdisval %}{{invdisval}}</td> {% endcomment %}
+            <td class="am-valu">  {% invoiceexclusivevalue invoice.invoice_percentage invoicedetails.total_exclusive_value invoice.invoice_exchange_rate as invexcval %}{{invexcval}}</td>
+            {% comment %} <td class="am-valu"> {% invoiceafterdiscount invoice.invoice_percentage invoicedetails.total_discount_value invoice.invoice_exchange_rate as invdisval %}{% invoiceexclusivevalue invoice.invoice_percentage invoicedetails.total_exclusive_value invoice.invoice_exchange_rate as invexcval %} {{invdisval|addvalues:invexcval}} {%with total=invdisval|addvalues:invexcval%}{%with dem=total|add:request%}    {%endwith%}    {% endwith %}</td> {% endcomment %}
+            <td class="am-valu">{% invoiceafterdiscount invoice.invoice_percentage invoicedetails.total_after_otherdetails invoice.invoice_exchange_rate as invdisval %}{% invoiceexclusivevalue invoice.invoice_percentage invoicedetails.total_exclusive_value invoice.invoice_exchange_rate as invexcval %} {{invdisval|addpreviewvalues:invexcval}}
+                {%with total=invdisval|addpreviewvalues:invexcval%}{%with dem=total|add:request%}    {%endwith%}    {% endwith %}
+            </td>
+            {% if inv.exchange_rate == '2' %}
+            <td>{% if forloop.parentloop.counter == 1 %}{{basecurreccy}}{% else %}{{invoice.currency.currency}}{% endif %}</td>
+            {% endif %}
+            <!-- <td class="inv-file">
+                <a target="_blank" href="{% url 'invoice:invoicefile' id=invoice.id type='invfile' pk=invoice.invoice.id %}">
+                    {{invoice.id|getinvoicefiles:invoice.invoice.id}}</a>
+                </td> -->
+                
+                
+                <td class="inv-file" id="invoicefile-td-left">
+                    <a target="_blank" >
+                        {{invoice.id|getinvoicefiles:invoice.invoice.id | split_addspace}}</a>
+                        <br>
+                        {% with payment_act_id=invoice.id|getpaymentaccountid %}
+                        {%if payment_act_id  %}
+                         <a target="_blank" href="{% url 'invoice:getpaymentacctfile' id=payment_act_id.payment.id  %}">{{payment_act_id.payment.paymentfile}}</a>
+                        {%endif%} 
+                    {% endwith %}
+                    </td>
+        </tr>
+    {% endif %}
+    {% endfor %}
+    {% endfor %}
+    {%clearpdfserial request%}
+    <tr>
+        <td></td><td></td><td></td><td></td><td></td>
+        <td><p class="pre-vvalue">Total Value {% for l in maininvoices %}{% if forloop.first %} {% for k in i %} {% if forloop.first %} {% if pk|get_split_currency:k == 1 %}({{pk|get_curreny:k}}){% else %}({{basecurreccy}}){% endif %}{% endif %}{% endfor %}{% endif %}{% endfor %}</p></td>
+        <td><p class="pre-vvalue">{%previoussessionvalue%}</p></td>
+    </tr>
+</tbody>
+</table>
+<br>
+<tr>
+    {% endwith %}
+</tr>
+    {% endfor %}
+
+
+    {% if check_creditnote > 0 %}
+    <div class="text-center">
+        <h3 class="credit_subhead">Applied Credit Note Summary Details</h3>
+    </div>
+
+    <div class="table-responsive inv-view_wrap text-nowrap">
+    {% for actuals in get_used_creditnotes %}
+        <table class="creditnote_table">
+            <thead>
+                <tr>
+                    <th style="width: 5%; ">S/No</th>
+                    <th>Credit Note No.</th>
+                    <th>Date</th>
+                    <th>Ref. Invoice No.</th>
+                    <th>Gross Amount</th>
+                    <th>Tax</th>
+                    <th>Total Amount(Inclusive of all Taxes)</th>
+                    <!-- <th>Applied Credit Value</th> -->
+                    <th>Payment Currency</th>
+                    <th>Credit Note File</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% get_creditnote_contract_invoice actuals as creditdatas %}
+                {% for i in creditdatas %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{i.credit_note_no}}</td>
+                    <td>{{i.date|convert_credit_date:i.credit.company.id}}</td>
+                    <td class="word-break-class">
+                        {% for invoice in i.credit.id|credit_contract_invoices:"inv" %}
+                            {{invoice}}{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    </td>
+                    {% check_exchage_value pk as exchangetype  %}
+                    {% check_exchage_percentage pk i.vendor_split_invoice.id as exchangepercentage%}
+                    {% credit_base_amount i.credit.total_value i.percentage as gross_amount%}
+                            <td class="">
+                                {% if i.credit.total_value %}
+                                    <!-- {% if exchange_rate == '1' %}
+                                        ({{credit.symbol}}
+                                    {% else %}
+                                        ({{basecurrency}}
+                                    {% endif %} -->
+                                    {% if exchangetype == 1 or exchangetype == '1' %}
+                                        {% comment %} ({{i.vendor_split_invoice.currency.currency_symbol}} {{gross_amount|floatformat:2}}) {% endcomment %}
+                                        {% exchange_grossamount gross_amount i.exchange_rate  as exchangeNetamount %}
+                                    ({{i.vendor_split_invoice.currency.currency_symbol}} {{exchangeNetamount}})
+                                    {% else %}
+                                        {% comment %} ({{i.vendor_split_invoice.currency.currency_symbol}} {{gross_amount|floatformat:2}})-- {{exchangetype}}--{{exchangepercentage}} {% endcomment %}
+                                        {% exchange_grossamount gross_amount exchangepercentage  as exchangeNetamount %}
+                                        ({{i.vendor_split_invoice.currency.currency_symbol}} {{exchangeNetamount}})
+                                    {% endif %}
+                                {% else %}
+                                    <!-- {% if exchange_rate == '1' %}
+                                        ({{credit.symbol}}
+                                    {% else %}
+                                        ({{basecurrency}}
+                                    {% endif %} -->
+                                    ({{i.vendor_split_invoice.currency.currency_symbol}} 0.00)
+                                {% endif %}</td>
+                            <td class="">
+                                <!-- {% if credit.credit.total_value %}{{credit.symbol}}{% endif %}  -->
+                                <!-- {% if exchange_rate == '1' %}
+                                ({{credit.symbol}}
+                                {% else %}
+                                ({{basecurrency}}
+                                {% endif %} -->
+                                {% if exchangetype == 1 or exchangetype == '1' %}
+                                    {% comment %} ({{i.vendor_split_invoice.currency.currency_symbol}} {{i.credit.exclusive_value|credit_excluive_tax:i.percentage}}) {% endcomment %}
+                                    {% credit_excluive_tax_with_exchangetype i.credit.exclusive_value i.percentage i.exchange_rate as exchangeTax %}
+                                    ({{i.vendor_split_invoice.currency.currency_symbol}} {{exchangeTax}})
+                                {% else %}
+                                    {% comment %} ({{i.vendor_split_invoice.currency.currency_symbol}} {{i.credit.exclusive_value|credit_excluive_tax:i.percentage}})-- {{exchangetype}}--{{exchangepercentage}}  {% endcomment %}
+                                    {% credit_excluive_tax_with_exchangetype i.credit.exclusive_value i.percentage exchangepercentage as exchangeTax %}
+                                    ({{i.vendor_split_invoice.currency.currency_symbol}} {{exchangeTax}})
+                                {% endif %}
+                            </td>
+                            <td class="">
+                                {% if exchangetype == 1 or exchangetype == '1' %}
+                                    ({{i.vendor_split_invoice.currency.currency_symbol}} {{i.payment_currency_amount|remove_symbol}})
+                                {% else %}
+                                    {% comment %} ({{i.vendor_split_invoice.currency.currency_symbol}} {{i.payment_currency_amount|remove_symbol}})-- {{exchangetype}}--{{exchangepercentage}} {% endcomment %}
+                                    {% exchange_netamount i.payment_currency_amount exchangepercentage  as exchangeNetamount %}
+                                    ({{i.vendor_split_invoice.currency.currency_symbol}} {{exchangeNetamount}})
+                                {% endif %}
+
+                            </td>
+                            <!-- <td>{% applied_credit_value i actuals pk as applied_val %}
+                                ({{i.vendor_split_invoice.currency.currency_symbol}} {{applied_val}})</td> -->
+                            <td>{{i.vendor_split_invoice.currency.currency}}</td>
+                            <td class="text-algin-txt-left">
+                                {% if i.file != "" %}
+                                    <a class="inv-link" href="{{i.file.url}}" target="_blank">{{i.file.name|cut:"creditdocuments/"}}</a>
+                                {% endif %}
+                            </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endfor %}
+    </div>
+    
+    <div class="text-center">
+        <h3 class="credit_subhead">Revised Invoice Summary Details</h3>
+    </div>
+
+    <div class="table-responsive inv-view_wrap text-nowrap">
+        <table class="creditnote_table">
+            <thead>
+                <tr>
+                    <th style="width: 5%; ">S/No</th>
+                    <th>Invoice Number/Applied credit Note No.</th>
+                    <th>Invoice Net Payable Amount</th>
+                    <th>Credit Note Net Amount</th>
+                    <th>Revised Net Payable Amount</th>
+                    <th>Payment Currency</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inv in maininvoices %}
+                {% for invoice in pk|subinvoice:inv.id %}
+                <tr>
+                    <td>{{forloop.parentloop.counter}}</td>
+                    <td>{{invoice.invoice_number}}{% for actuals in get_used_creditnotes %}
+                        {% get_creditnote_contract_invoice actuals as creditdatas %}{% for i in creditdatas %}{% if invoice.vendor_invoice.id == i.vendor_split_invoice.id %}/{{i.credit_note_no}}{% endif %}{% endfor %}{% endfor %}</td>
+                    <td class="am-valu">
+                            {%for split  in split_invoices %}
+                            {% if invoice.id == split.id %}
+                            {% getnetpayment_bysplit split.invoice_id split.id split.new_netpayable as netamount %}
+                            {{invoice.invoice_currency}}  {{netamount.netamount_separator}}
+                        {% endif %}
+                        {% endfor %}
+                    </td>
+                    
+                    {% new_credit_investment invoice request as total_credit %}
+                    <td>({{invoice.invoice_currency}} {{total_credit}})</td>
+                    <!-- <td>
+                        {% get_credit_investment invoice request as total_credit %}
+                        {% for actuals in get_used_creditnotes %}
+                            {% get_creditnote_contract_invoice actuals as creditdatas %}
+                            {% for i in creditdatas %}
+                                {% if invoice.vendor_invoice.id == i.vendor_split_invoice.id %} -->
+                                <!-- {{invoice.invoice_currency}} {{ total_credit }} + ({{ i.vendor_split_invoice.currency.currency_symbol }} {{ i.credit.exclusive_value | credit_excluive_tax:i.percentage }}) -->
+                                <!-- {% with credit_value=i.credit.exclusive_value|credit_excluive_tax:i.percentage %}
+                                {% get_tax_withcredit total_credit credit_value as total %}
+                               {{invoice.invoice_currency}}  {{ total}}
+                            {% endwith %}
+
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </td> -->
+
+                    <td class="payable_value">
+                        {% for split in split_invoices %}
+                            {% if invoice.id == split.id %}
+                                {% getnetpayment_bysplit split.invoice_id split.id split.new_netpayable as netamount %}
+                            
+                                
+                                {% new_credit_investment invoice request as total_credit %}
+                                {% if invoice.netamount %}
+                                    {% get_net_payamount netamount total_credit as net_payable %}
+                                {% else %}
+                                    {% get_net_payamount netamount total_credit as net_payable %}
+                                {% endif %}
+                                
+                                {{ invoice.invoice_currency }} {{ net_payable }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{{invoice.currency.currency}}</td>
+                </tr>
+                {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    {% endif %}
+
+
+    {% if check_settlement > 0 %}
+  <h3 class="from-sub-head">Approved Invoice Details</h3>
+  {% for i in listdata %}
+        <div class="table-responsive inv-view_wrap text-nowrap">
+                <table class="table-responsive invoice-sum-info inv-pretbl invoice-summary-table-width{% for inv in maininvoices %} {% if forloop.first %} {% if inv.exchange_rate == '2' %}payment-invoice-summary{% endif %} {% endif %} {% endfor %}">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Invoice Number</th>
+                            <th>Invoice Date</th>
+                            <th>Approved Percentage</th>
+                            <th>Approved Total Amount<br>{% for l in maininvoices %}{% if forloop.first %} {% for k in i %} {% if forloop.first %} {% if pk|get_split_currency:k == 1 %}({{pk|get_curreny:k}}){% else %}({{basecurreccy}}){% endif %}{% endif %}{% endfor %}{% endif %}{% endfor %}</th>
+                            <th>Tax<br>{% for l in maininvoices %}{% if forloop.first %} {% for k in i %} {% if forloop.first %} {% if pk|get_split_currency:k == 1 %}({{pk|get_curreny:k}}){% else %}({{basecurreccy}}){% endif %}{% endif %}{% endfor %}{% endif %}{% endfor %}</th>
+                            <th>Approved Total Amount of Inclusive of All Taxes<br>{% for l in maininvoices %}{% if forloop.first %} {% for k in i %} {% if forloop.first %} {% if pk|get_split_currency:k == 1 %}({{pk|get_curreny:k}}){% else %}({{basecurreccy}}){% endif %}{% endif %}{% endfor %}{% endif %}{% endfor %}</th>
+                            <th>Payment Currency</th>   
+                        </tr>
+                    </thead>
+                    <tbody>
+        <h3>{{j}}</h3>
+        {% for inv in maininvoices %}
+        {% for invoice in pk|subinvoice:inv.id %}
+        {% check_for_settlement invoice as settlement %}
+        {% if invoice.currency.id in i %}
+        <tr class="serial_count"> 
+                {% with sno=request|pdfserialnumber %}
+                <td>{{sno}}</td>{% endwith %}
+                <td class="word-break-class">{{invoice.invoice_number}}<br>{%if invoice.payment_account == 1%}(Allocated to Payment on Account){%endif%}</td>
+                <td>{{invoice.invoice_date|convertinvoicedate:request.company.id}}</td>
+                <td>{{settlement.1.accepted_percentage}}%</td>
+                <td class="am-valu">
+                    {% invoiceafterdiscount invoice.invoice_percentage invoicedetails.total_after_otherdetails invoice.invoice_exchange_rate as invdisval %}
+                    {% if settlement.0 %}
+                        {% settlement_value invdisval settlement.1.accepted_percentage as invdisval %}
+                    {% endif %}
+                    {{invdisval}} 
+                </td>
+                <td class="am-valu">
+                    {% invoiceexclusivevalue invoice.invoice_percentage invoicedetails.total_exclusive_value invoice.invoice_exchange_rate as invexcval %}
+                    {% if settlement.0 %}
+                        {% settlement_value invexcval settlement.1.accepted_percentage as invexcval %}
+                    {% endif %}
+                    {{invexcval}}
+                </td>
+                <td class="am-valu">
+                     {{invdisval|addvalues:invexcval}}
+                    {%with total=invdisval|addvalues:invexcval%}{%with dem=total|add:request%}    {%endwith%}    {% endwith %}
+                </td>
+                <td>
+                    {% if forloop.parentloop.counter == 1 %}{{basecurreccy}}{% else %}{{invoice.currency.currency}}{% endif %}
+                </td>
+            </tr>
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
+        {%clearpdfserial request%}
+        <tr><td></td><td></td><td></td><td></td><td></td><td class="total-vv">Total Value{% for l in maininvoices %}{% if forloop.first %} {% for k in i %} {% if forloop.first %} {% if pk|get_split_currency:k == 1 %}({{pk|get_curreny:k}}){% else %}({{basecurreccy}}){% endif %}{% endif %}{% endfor %}{% endif %}{% endfor %}</td><td class="total-amt-dol">{%previoussessionvalue%}</td></tr>
+    </tbody>
+</table>
+
+  {% endfor %}
+
+
+  <h3 class="from-sub-head">Disputed Invoice Details</h3>
+  {% for i in listdata %}
+  <div class="table-responsive inv-view_wrap text-nowrap">
+          <table class="table-responsive invoice-sum-info inv-pretbl invoice-summary-table-width{% for inv in maininvoices %} {% if forloop.first %} {% if inv.exchange_rate == '2' %}payment-invoice-summary{% endif %} {% endif %} {% endfor %}">
+              <thead>
+                  <tr>
+                      <th>S.No</th>
+                      <th>Invoice Number</th>
+                      <th>Invoice Date</th>
+                      <th>Disputed Percentage</th>
+                      <th>Disputed Total Amount<br>{% for l in maininvoices %}{% if forloop.first %} {% for k in i %} {% if forloop.first %} {% if pk|get_split_currency:k == 1 %}({{pk|get_curreny:k}}){% else %}({{basecurreccy}}){% endif %}{% endif %}{% endfor %}{% endif %}{% endfor %}</th>
+                      <th>Tax<br>{% for l in maininvoices %}{% if forloop.first %} {% for k in i %} {% if forloop.first %} {% if pk|get_split_currency:k == 1 %}({{pk|get_curreny:k}}){% else %}({{basecurreccy}}){% endif %}{% endif %}{% endfor %}{% endif %}{% endfor %}</th>
+                      <th>Disputed Total Amount of Inclusive of All Taxes<br>{% for l in maininvoices %}{% if forloop.first %} {% for k in i %} {% if forloop.first %} {% if pk|get_split_currency:k == 1 %}({{pk|get_curreny:k}}){% else %}({{basecurreccy}}){% endif %}{% endif %}{% endfor %}{% endif %}{% endfor %}</th>
+                  </tr>
+              </thead>
+              <tbody>
+  <h3>{{j}}</h3>
+  {% for inv in maininvoices %}
+  {% for invoice in pk|subinvoice:inv.id %}
+  {% check_for_settlement invoice as settlement %}
+  {% if invoice.currency.id in i %}
+  <tr class="serial_count"> 
+        {% with sno=request|pdfserialnumber %}
+        <td>{{sno}}</td>{% endwith %}
+          <td class="word-break-class">{{invoice.invoice_number}}<br>{%if invoice.payment_account == 1%}(Allocated to Payment on Account){%endif%}</td>
+          <td>{{invoice.invoice_date|convertinvoicedate:request.company.id}}</td>
+          <td>{{settlement.1.disputed_percentage}}%</td>
+          <td class="am-valu">
+              {% invoiceafterdiscount invoice.invoice_percentage invoicedetails.total_after_otherdetails invoice.invoice_exchange_rate as invdisval %}
+              {% if settlement.0 %}
+                  {% settlement_value invdisval settlement.1.disputed_percentage as invdisval %}
+              {% endif %}
+              {{invdisval}} 
+          </td>
+          <td class="am-valu">
+              {% invoiceexclusivevalue invoice.invoice_percentage invoicedetails.total_exclusive_value invoice.invoice_exchange_rate as invexcval %}
+              {% if settlement.0 %}
+                  {% settlement_value invexcval settlement.1.disputed_percentage as invexcval %}
+              {% endif %}
+              {{invexcval}}
+          </td>
+          <td class="am-valu">
+               {{invdisval|addvalues:invexcval}}
+              {%with total=invdisval|addvalues:invexcval%}{%with dem=total|add:request%}    {%endwith%}    {% endwith %}
+          </td>
+      </tr>
+  {% endif %}
+  {% endfor %}
+  {% endfor %}
+  {%clearpdfserial request%}
+  <tr><td></td><td></td><td></td><td></td><td></td><td class="total-vv">Total Value{% for l in maininvoices %}{% if forloop.first %} {% for k in i %} {% if forloop.first %} {% if pk|get_split_currency:k == 1 %}({{pk|get_curreny:k}}){% else %}({{basecurreccy}}){% endif %}{% endif %}{% endfor %}{% endif %}{% endfor %}</td><td class="total-amt-dol">{%previoussessionvalue%}</td></tr>
+</tbody>
+</table>
+
+{% endfor %}
+  
+{% endif %}
+
+    
+
+
+        <h5 class="from-sub-head1" style="padding-top: 20px !important;">Invoice Supporting Documents</h5>
+        <table class="invoice-info table-heading-font">
+        <tbody>
+        <tr ><th>Work Completion Cert.</th>
+        
+        <td>
+        {% if invoicedetail.wcc_id %}
+            {% getwccvalues invoicedetail.wcc_id as wccvalues %}
+            <div><a target="_blank" >{{wccvalues.wcc_file_name|split_addspaces}}</a></div>
+        {% else %}
+            {% getinvoicesupportfile pk 2 as supportfiles %}
+            {% for file in supportfiles.0 %}
+            <div><a target="_blank" >{{file.file_name|split_addspaces}}</a></div>
+            {% empty %}
+            <div>-</div>
+            {% endfor %}
+        {% endif %}
+        </td>
+        </tr>
+        {% for document in support_documents %}
+    <tr>
+        <th>{{ document.name }}</th>
+        <td style="white-space: nowrap;">
+            {% getwccsupportfile invoicedetail.wcc_id document.data as wccsupportfiles %}
+            {% if wccsupportfiles.0 %}
+                {% for file in wccsupportfiles.0 %}
+                    <div class="call-instr"><a class="call-lin" target="_blank" style="text-decoration: none;">{{ file.wcc_support_file_name|split_addspaces }}</a></div>
+                {% endfor %}
+            {% else %}
+                {% getinvoicesupportfile pk document.data as supportfiles %}
+                {% if supportfiles.0 %}
+                    {% for file in supportfiles.0 %}
+                        {% if document.data == '9' or document.data == '10' %}
+                            <p><a target="_blank" class="link-file" href="{% url 'invoice:view_contractfiles' pk=file.id %}" style="text-decoration: none;">{{ file.original_file_name }}</a></p>
+                        {% else %}
+                            {% if document.data == 'Contracts' or document.data == 'Price Table' %}
+                                <div><a href="{% url 'invoice:invoicefile' id=invoicedetail.id type='others' pk=file.id %}" style="text-decoration: none;">{{ file.original_file_name|cut:"invoicedocuments/" }}
+                                    {% if file.filetype == 'new' %}
+                                        <i class='fa fa-info-circle jqtooltip i-con-clr' title="Updated File" style='color:#000000'></i>
+                                    {% endif %}
+                                </a></div>
+                            {% else %}
+                                <div><a href="{% url 'invoice:invoicefile' id=invoicedetail.id type='others' pk=file.id %}" style="text-decoration: none;">{{ file.file_name }}{{ file.original_file_name|cut:"invoicedocuments/" }}
+                                    {% if file.filetype == 'new' %}
+                                        <i class='fa fa-info-circle jqtooltip i-con-clr' title="Updated File" style='color:#000000'></i>
+                                    {% endif %}
+                                </a></div>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div>-</div>
+                {% endif %}
+            {% endif %}
+        </td>
+    </tr>
+{% endfor %}
+
+        {% if invoicedetail.contracttype != 'original' %}
+        <tr>
+            <th>{{invoicedetail.contracttype|capitalize_letter}} Contract</th>
+            <td>
+                {% getamendmentcontract_price_files contract invoicedetail.contracttype 1 as contract_files %}
+                {% for contract_file in contract_files %}
+                    <p><a target="_blank"  class="link-file" href="{% url 'invoice:view_contractfiles' pk=contract_file.id %}"  style="text-decoration: none;">{{ contract_file.file_name }}</a></p>
+
+                {% endfor %}
+    
+            </td>
+        </tr>
+    {%endif%}
+
+    {% if invoicedetail.contracttype != 'original' %}
+    <tr>
+        <th>{{invoicedetail.contracttype|capitalize_letter}} Price Table</th>
+        <td>
+            {% getamendmentcontract_price_files contract contracttype 2 as price_files %}
+            {% for price_file in price_files %}                       
+                <p><a target="_blank"  class="link-file" href="{% url 'invoice:view_contractfiles' pk=price_file.id %}" style="text-decoration: none;">{{ price_file.file_name }}</a></p>
+            {% endfor %}
+        </td>
+    </tr>
+{%endif%}
+        </tbody>
+        </table>
+        </div>
+    </body>
+    {% endblock %}

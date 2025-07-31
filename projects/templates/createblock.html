@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}f
+{% load static %}
+{% block content %}f
+    <h4 class="from-head">Create Block</h4>
+    <form method="POST" class="form-txt" id="create-block">
+        {% csrf_token %}
+            <div class="row">
+            <div class="col-4 ">
+                <h3 class="head-master">Country</h3>
+                <div class="project_country txt-name">
+                    <input type="hidden" id="project_id" name="project_id" value={{get_project.id}}>
+                    <p >{{get_project.country.name}}</p>
+                </div>
+            </div>
+            <div class="col-4 ">
+                <h3 class="head-master">Project Name</h3>
+                <div class="project_name txt-name">
+                    <p>{{get_project.name}}</p>
+                </div>
+            </div>
+            <div class="col-4 block_name txt-name">
+                <h3 class="head-master">Block Name</h3>
+                   <table class="tbl-center">
+                   <tbody id ="block_table" class="blk-col">
+                    <tr>
+                        <td id="blockrow0"><input type="text" name="block_name" id="block0" class="form-control" placeholder="Block Name"></td>
+                        <td><button id='block-add-row' class='btn btn-clr add-btn' type='button' value='Add'><i class="fa fa-plus"></i></button></td>
+                    </tr>
+                   </tbody>
+                   </table>
+            </div>
+            </div>
+                <div class="text-center">
+                <button type="button" class="btn btn-clr save-draft text-center submit-cls" data-id="2">Save</button>
+                <button type="button" class="btn btn-clr save-draft text-center back-cls" data-id="2">Back</button>
+                </div>
+            </div>
+        <div>
+    </form>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/projects/createmasterproject.js' %}"></script>
+{% endblock %}

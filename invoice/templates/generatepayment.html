@@ -1,0 +1,422 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/generatepayment.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/calculator.css' %}">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf_viewer.css">
+
+<div>
+  <h4 class='from-head'>Payment Generation
+  </h4>
+</div>
+{% include 'invoicedata.html' %}
+<div class="row">
+  <div class="pay-hide-cls" {% if not payment_details  %} style="display:none" {% endif %}>
+    <h5 class="head-inv-pre cen mt-5">Payment Instruction </h5>
+    {% if credit_value %}
+    <div class="table-responsive">
+      <table class="table gen-table"> 
+        <thead>
+            <th>Invoice No.</th>
+            <th>Invoice Net Payable Amount</th>
+            <th>Credit Note Net Amount</th>
+            <th>Revised Net Payable Amount </th>
+            {% if payment_split_count > 1 %}
+            <th>Already Paid Percentage</th>
+            <th>Already Paid Amount</th>
+            {%endif%}
+            <th>Payment Percentage</th>
+            <th>Payable Amount</th>
+            <th>Pending Amount</th>
+            <th>Bank to Debit</th>
+            <th>Vendor Bank Details</th>
+            <th>Generated Instruction</th>
+            <th>Actions</th>
+        </thead>
+        <tbody>
+         
+        {% for payment in payment_details %}
+         
+        <tr>
+            <td class="inv_name">
+                {{payment.invoicecost.invoice_number}}
+            </td>
+             {% getnetpayment_bysplit payment.invoicecost.invoice_id payment.invoicecost.id payment.invoicecost.new_netpayable as netamount %}
+                <td>{{payment.invoicecost.invoice_currency}}   {{ netamount.netamount_separator}}</td>
+                <!-- <td>{% if payment.invoicecost.new_netpayable %} {{payment.invoicecost.invoice_currency}} {{payment.invoicecost.new_netpayable|currency_convert}}{% else %} {{payment.invoicecost.invoice_currency}} {{payment.invoicecost.invoice_total_amount|currency_convert}}{% endif %}</td> -->
+                
+            <td>
+              {% new_credit_investment payment.invoicecost request as total_credit %}
+              ({{payment.invoicecost.invoice_currency}} {{total_credit|default_if_none:"---"}})
+          </td>
+          <td>
+            {% getnetpayment_bysplit payment.invoicecost.invoice_id payment.invoicecost.id payment.invoicecost.new_netpayable as netamount %}
+            {% new_credit_investment payment.invoicecost request as total_credit %}
+            
+            {% if payment.invoicecost.new_netpayable %}
+                {% get_net_payamount netamount total_credit as net_payable %}
+            {% else %}
+                {% get_net_payableamount payment.invoicecost.invoice_total_amount total_credit as net_payable %}
+            {% endif %}
+            
+            {{ payment.invoicecost.invoice_currency }} {{ net_payable }}
+          </td>
+          {% if payment_split_count > 1 %}
+          {% paid_payment_percentage payment.invoicecost.id payment.payment_percentage as paidpercentage %}  
+          {% paid_payment_amount payment.invoicecost.id  payment.payment_percentage net_payable as paidamount %}
+          <td>{{paidpercentage}} %</td>
+          <td>{{ payment.invoicecost.invoice_currency }} {{paidamount}}</td>
+          {%endif%}
+        
+            <td>
+                {{payment.payment_percentage}}%
+            </td>    
+            <td>
+                {{payment.invoicecost.invoice_currency}} 
+                {% if payment.payable_amount == 0.00 %}
+                 0.00
+                {% else %}
+                {{payment.payable_amount|convert_to_thousand_separator }}
+                {% endif %}
+            </td>
+            <td>
+              {{payment.invoicecost.invoice_currency}}  
+                {% if payment.pending_amount == 0.00 %}
+                 0.00
+                {% else %}
+                {{payment.pending_amount|convert_to_thousand_separator }}
+                {% endif %}
+            </td>
+            <td>    
+                {% if payment.companyuserstatus == 3 %}
+                    {{payment.masterbank.id|fetch_bank_details:request}}-{{payment.masterbank.id|fetbankaccountnumber}}
+                {% else %}
+                    {{payment.companybank.bank_name.bank_name}}-{{payment.companybank.account_number.accountno}}
+                {%endif%}
+            </td>
+            <td>
+                {{payment.invoicecost.invoice_bank.bankname}}-{{payment.invoicecost.invoice_bank.accountnumber}}
+            </td>
+            <td>
+                {{payment.pi_number|default_if_none:"---"}}
+            </td>
+            <td>
+              <a class="btn p-0 generate_payment" data-toggle="collapse" href="#collapseExample{{payment.id}}" role="button" aria-expanded="false" aria-controls="collapseExample" data-id="{{payment.id}}">
+                <span class="action-edit align-icons">
+                  <i class="fa fa-eye eyebutton inv_file1 view_for_pdf" title="View" style="font-size:17px; color:#95183a;"></i>
+                </span>
+              </a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    
+    {% else %}
+    <div class="table-responsive">
+      <table class="table gen-table">  <!-- table-bordered -> class removed -->
+        <thead>
+            <th>Invoice No.</th>
+            <th>Net Payable Amount</th>
+            {% if payment_split_count > 1 %}
+             <th>Already Paid Percentage</th>
+             <th>Already Paid Amount</th>
+            {%endif%}
+             <th>Payment Percentage</th>
+            <th>Payable Amount</th>
+            <th>Pending Amount</th>
+            <th>Bank to Debit</th>
+            <th>Vendor Bank Details</th>
+            <th>Generated Instruction</th>
+            <th>Actions</th>
+        </thead>
+        <tbody>
+        {% for payment in payment_details %}
+        <tr>
+            <td class="inv_name">
+                {{payment.invoicecost.invoice_number }}
+                {%if payment.invoicecost.payment_account == 1%}(Allocated to Payment on Account){%endif%}
+            </td>
+            <td>
+              {% getnetpayment_bysplit payment.invoicecost.invoice_id payment.invoicecost.id payment.invoicecost.new_netpayable as netamount %}
+              {{payment.invoicecost.invoice_currency}} {{netamount.netamount_separator}}
+              <!-- {% if payment.invoicecost.new_netpayable %}
+              {{payment.invoicecost.invoice_currency}} {{payment.invoicecost.new_netpayable|currency_convert}}
+              {% else %}
+              {{payment.invoicecost.invoice_currency}} {{payment.invoicecost.invoice_total_amount|currency_convert}}
+              {% endif %} -->
+            </td>
+            <!-- {% comment %} <td>
+              {%if payment.invoicecost.payment_account == 1%}
+             100
+              {%else%}
+                {{payment.payment_percentage}}
+              {%endif%} {% endcomment %} -->
+              {% if payment_split_count > 1 %}
+              <td>{% paid_payment_percentage payment.invoicecost.id payment.payment_percentage as paidpercentage %}  {{  paidpercentage }}%</td>
+              <td  >{% paid_payment_amount payment.invoicecost.id  payment.payment_percentage netamount.netamount_separator as paidamount %}  {{  paidamount }}</td>
+              {%endif%}
+              <td>
+                {%if payment.invoicecost.payment_account == 1%}
+               100
+                {%else%}
+                  {{payment.payment_percentage}}%
+                {%endif%}
+            
+            <td>
+              {%if payment.invoicecost.payment_account == 1%}
+              {{payment.invoicecost.invoice_currency}} 0.00
+              {%else%}
+              {% commoseperator payment.payable_amount as amount %}
+               {{payment.invoicecost.invoice_currency}} {{amount|convert_to_thousand_separator|default_if_none:"0"}}
+              {%endif%}
+            </td>
+            <td>
+              {%if payment.invoicecost.payment_account == 1%}
+              {{payment.invoicecost.invoice_currency}} 0.00
+              {%else%}
+              {% commoseperator payment.pending_amount as amount %}
+              {{payment.invoicecost.invoice_currency}} {% if payment.pending_amount == 0 %} 0.00 {%else%}{{payment.pending_amount|convert_to_thousand_separator|default_if_none:"0"}}{%endif%}
+                
+              {%endif%}
+            </td>
+            <td>  
+              {%if payment.invoicecost.payment_account == 1%}
+                -
+              {%else%}  
+                {% if payment.companyuserstatus == 3 %}
+                    {{payment.masterbank.id|fetch_bank_details:request}}-{{payment.masterbank.id|fetbankaccountnumber}}
+                {% else %}
+                    {{payment.companybank.bank_name.bank_name}}-{{payment.companybank.account_number.accountno}}
+                {%endif%}
+              {%endif%}
+            </td>
+            <td>
+                {{payment.invoicecost.invoice_bank.bankname}}-{{payment.invoicecost.invoice_bank.accountnumber}}
+            </td>
+            <td>
+               {%if payment.invoicecost.payment_account == 1%}
+                  -
+                {%else%}  
+                {{payment.pi_number}}
+                {%endif%}
+            </td>
+            <td>
+              {%if payment.invoicecost.payment_account == 1%}
+              -
+            {%else%}  
+              <a class="btn p-0 generate_payment" data-toggle="collapse" href="#collapseExample{{payment.id}}" role="button" aria-expanded="false" aria-controls="collapseExample" data-id="{{payment.id}}" data-value="{{payment_generate_count}}">
+                <span class="action-edit align-icons">
+                  <i class="fa fa-eye eyebutton inv_file1 view_for_pdf" title="View" style="font-size:17px; color:#95183a;"></i>
+                </span>
+              </a>
+              {%endif%}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+  {% endif %}
+  </div>
+  <div>
+    <iframe class="doc_selinvhidcls first-view" id="payment_instruction" style="display: none;"> 
+
+    </iframe>
+  </div>
+
+
+<form method="POST" id="generatepayment_form" action="{% url 'invoice:generatepayment' pk=pk %}">
+    {% csrf_token %}
+    <input type="hidden" name="confirm_button" class="confirm_action" value="">
+      <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header comment-head">
+              <input type="hidden" name="balance_credit_note" class="bal_cn">
+              <input type="hidden" class="payment_count" value="{{payment_count}}" name="payment_count">
+              {% for payment_id in payment_details %}
+              <input type="hidden" class="payment_id" value="{{payment_id.id}}" name="payment_id">
+              {% endfor %}
+              <h5 class="modal-title" id="exampleModalCenterTitle">Comments</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body comment-body">
+                <textarea name="main_comments" id="main_comments" class="form-control cmnts"></textarea>
+                <span id="comment_error" style="color: red; display: none;">Please fill in the comment box.</span>
+              </div>
+            <div class="modal-footer comment-foot">
+              <button type="button" class="btn btn-secondary save_id" data-dismiss="modal" id="submit_id">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<div>
+      <div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter2" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true"  style="z-index: 1056 !important;">
+        <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+          <div class="modal-content" data-backdrop="static">
+            
+            <div class="modal-header comment-head">
+              <h5 class="modal-title" id="exampleModalCenterTitle">Calculator</h5>
+              <button type="button" class="cal-close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            
+            <div class="modal-body calc-body">
+              <iframe src="{% url 'invoice:calculator' %}" title="description"></iframe>
+            </div>
+
+            <div class="modal-footer comment-foot">
+            </div>
+            </div>
+        </div>
+      </div>
+      </div>
+</form>
+
+<div class="row color-btn justify-content-center my-5">
+  {% check_rolerights 'Confirm Cost Code' get_role_id as checkconfirm_costcode_rights %}
+  {% if checkconfirm_costcode_rights %}
+  <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2"> 
+    <button type="button" class="btn btn-clr status_cls green" value="1" data-toggle="modal" data-target="#confirm_cost_code">Confirm Cost Code</button>
+  </div>
+  {%endif%}
+  <div class="col-2 text-center"> 
+    {%if instuctionscount == 0 %}
+    <button type="button" id="confirm_payment" class="btn btn-clr {%if not invoice_details.is_conform_costcode and checkconfirm_costcode_rights %} notconform_costcode {%else%}swal_confirm{%endif%} ash_confirm">Confirm</button>
+    {%else%}
+    {% if  0 in len_sign %}
+    <button type="button" class="btn btn-clr assign_signatory ash_confirm">Confirm</button>
+    {% else %}
+        {% if not payment_details  %}
+            <button type="button" id="confirm_payment" class="btn btn-clr status_cls ash_confirm conf_btn confirm_btn confirm_generate" value="1" data-id="1">Confirm </button>
+        {% else %}
+            <button type="button" id="confirm_payment" class="btn btn-clr status_cls ash_confirm conf_btn confirm_btn " value="1" data-toggle="modal" data-target="#exampleModalCenter">Confirm </button>
+        {% endif %}
+    {% endif %}
+    {%endif%}
+    
+  </div>
+  {% if credit_count > 0 %}
+  <div class="col-2 text-center"> 
+    <a href="{% url 'invoice:viewcreditnotes' pk=pk %}">
+    <button type="button" class="btn btn-clr gen_blue view_credit_notes">View Credit Notes</button>
+    </a>
+  </div>
+  {% endif %}
+  {% for rights in roles_rights %}
+      {% if rights.right.right_name == "Generate Payment Instructions" %}
+        <div class="col-2 text-center"> 
+          {% if checkconfirm_costcode_rights %}
+            {% if invoice_details.is_conform_costcode %}
+              <button type="button" class="btn btn-clr gen_blue generate_btn" data-toggle="modal" data-target="#exampleModalCenter1">Generate</button>
+            {%else%}
+              <button type="button" class="btn btn-clr gen_blue generate_btn notconform_costcode">Generate</button>`
+            {%endif%}
+          {%else%}
+            <button type="button" class="btn btn-clr gen_blue generate_btn" data-toggle="modal" data-target="#exampleModalCenter1">Generate</button>
+          {%endif%}
+
+          
+        </div>
+      {% endif %}
+  {% endfor %}  
+
+  <div class="col-2 text-center"> 
+      <button type="button" class="btn btn-clr beige calbtn" value="2" data-toggle="modal" data-target="#exampleModalCenter2">Calculator</button>
+  </div>
+
+  {% for rights in roles_rights %}      
+  {% if rights.right.right_name == "View/Comment On Invoice" %}
+    <div class="col-2 text-center"> 
+      <button value="" class="btn btn-clr rose cmt_cls" data-toggle="modal" data-target="#exampleModalCenter">Comment</button>
+    </div>
+  {% endif %}
+{% endfor %}
+</div>
+<form id='payment_instruction_form' method='POST' enctype="multipart/form-data">
+{% csrf_token %}
+<div class="modal v-modal fade payment_instruction_form" id="exampleModalCenter1" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenter1Title" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered large-pop" role="document">
+    <div class="modal-content">
+      <div class="modal-header comment-head">
+        <h5 class="modal-title pig" id="exampleModalCenter1Title">Payment Instruction Generation</h5>
+        <input type="hidden" class="payment_count" value="{{payment_count}}" name="payment_count">
+        <div class="col-2 text-center"> 
+          <button type="button" class="btn btn-clr beige calbtn" value="2" data-toggle="modal" data-target="#exampleModalCenter2">Calculator</button>
+      </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body payment-instruction-data">
+
+          <!-- Body Content Here... -->
+
+      </div>
+      <div class="modal-footer bg-color-foot">
+          <!--  data-dismiss="modal" -->
+        <button type="button" class="btn btn-success gen-confirm-clss con-gr pop-up-generate">Generate</button>
+      </div>
+    </div>
+  </div>
+</div>
+</form>
+{% include 'conform_costcode_popup.html' %}
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script>
+var invoiceid="{{pk}}" 
+var wcc_id="{{wcc_id}}" 
+var scheme="{{request.scheme}}"
+var gethost="{{request.get_host}}"
+var currentdomain=scheme+'://'+gethost
+var csrf_token = "{{ csrf_token }}"
+var package_src = "{% static 'js/web/viewer.html' %}"
+var user_signature="{{sign_data}}"
+let check_majority=0
+var selectedItems = [];
+var module_id='{{get_role_id.module_id}}'
+var payment_count="{{payment_count}}"
+
+$(document).on('click','.calbtn',function(){
+ $('.infield').val('1')
+})
+$(document).ready(function () {
+    $('#submit_id').click(function () {
+        var comments = $('#main_comments').val().trim();
+        if (comments === '') {
+            // Add a CSS class to indicate error
+            $('#main_comments').addClass('error-border');
+            return false; // Prevent form submission
+        } else {
+            // Remove the CSS class if validation passes
+            $('#main_comments').removeClass('error-border');
+        }
+    });
+});
+
+</script>
+<script src="{% static 'js/invoice/invoiceflowprocesstwo.js' %}"></script>
+<script src="{% static 'js/invoice/generatepayment.js' %}"></script>
+<script src="{% static 'js/common/invoiceflow.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf_viewer.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+{% endblock %}

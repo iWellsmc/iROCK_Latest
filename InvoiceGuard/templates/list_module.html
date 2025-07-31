@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_process/modules.css' %}">
+
+<section id="data-list-view" class="data-list-view-header ">
+
+    <!-- DataTable starts -->
+    <div>
+        <h5 class="from-head">Modules</h5>
+        <div class="row">
+            <div class="col-9">
+            </div>
+            <div class="col-3">
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table company-data-list-view creat-head usesr-management-modules irock-table" id="alltaxes_list">
+
+                <thead>
+                    <tr>
+                        <th class="invoice-sn-no-title">S/N</th>
+                        <th>Module Name <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>
+                        </tr>
+                </thead>
+                <tbody class="table-list">
+                    {% for obj in modules %}
+                    <tr>
+                        <td class="sno-center">{{forloop.counter}}</td>
+                        <td class="td-left">{{obj.module_name}}</td>
+                    </tr>
+                    {% endfor %} 
+                </tbody>
+            </table>
+        </div>
+    
+    </div>
+    <!-- DataTable ends-->
+    <!-- add new sidebar ends -->
+</section>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script type="text/javascript" src="{% static 'js/invoiceguard/list_module.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/projects/userslist.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% load cost_code_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/cost_code/create_cost_code_vendor.css' %}">
+
+<div>
+    <div class="row">
+        <div class="col-12 text-end">
+            <button type="button" class="btn btn-clr"><a href="{% url 'cost_code:listcostcodevendor' %}">Back</a></button>
+        </div>
+    </div>
+    
+    <h3 class="from-head">Assign Cost Code</h3>
+
+   
+    <form method="POST" id="vedorcostcodeid">
+        {% csrf_token %}
+    <div class="row">
+        <div class="col-6 cost-code-format">
+            <div class="down-arrow-sig">
+                <img src="../../../static/images/icons/icons8-down-arrow-18s.png" alt="">
+              </div>
+            <label class="pl-0">Vendor Name <span>*</span></label>
+            <select name="vendor" class="form-control ven-cls currency-clss multiselect" id="vendor_id">
+                <option value="">--Select--</option>
+                {% for vendor in vendors_list %}
+                <option value="{{vendor.id}}" data_id="{{vendor.vin}}">{{vendor.vendor_name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-6"></div>
+    </div>
+    <input type="hidden" name="selected_costcode" id="selected_costcode">
+    <input type="hidden" name="contract_id" id="contract_id">
+
+
+    <div class="row">
+        <div class="col-6 head_cls" style="display:none">
+            <!-- <div class="vin-no"><label>VIN :</label><span id="vin_id"></span></div>
+            <div class="ven-name"><label>Vendor Name :</label><span id="ven_id"></span></div> -->
+
+            <table>
+                <tr class="vin-no">
+                    <td><label>VIN</label></td>
+                    <td class="dot-colon">:</td>
+                    <td><span id="vin_id"></span></td>
+                </tr>
+
+                <tr class="ven-name">
+                    <td><label>Vendor Name</label></td>
+                    <td class="dot-colon">:</td>
+                    <td><span id="ven_id"></span></td>
+                    <input type="hidden" name="vendor_name_for_user_log" id="vendor_name_for_user_log" class="vendor_name_for_user_log">
+                    <input type="hidden" name="vendor_ids" id="vendor_ids" class="vendor_ids">
+                    <input type="hidden" name="error_comment" id="error_comment" class="error_comment">
+                </tr>
+            </table>
+        </div>
+
+        <div class="col-6"></div>
+    </div>
+    
+    <div class="row search-field" style="display: none;">
+        <div class="col-10">
+            <div class="search-box">
+            <!-- <input id='search-box' placeholder='Search Category
+            '>
+
+                <img src="/static/images/icons8-search-20.png" alt="" class="lens-icon"> -->
+            <select id="contract" class="form-control">
+                
+            </select>
+            </div>
+        </div>
+        <div class="col-6">
+        </div>
+    </div>
+
+    <div class="row head_cls" style="display:none">
+       <div class="col-12">
+        <div class="table-responsive">
+            <table id="cost_table_id" class="acc-table">
+                <thead>
+                    <tr >
+                        <th></th> 
+                        <th class="assign-cc-width">Cost Code</th>     
+                        <th>Code Category Path</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+       </div>
+    </div>
+    <div class="text-center btn-cls">
+        <button type="submit" class="btn btn-clr final-cls waves-effect waves-float waves-light">Submit</button>
+    </div>
+    </form>
+</div>
+        
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> 
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" ></script> -->
+<script src="{% static 'js/cost_code/vendor_cost_code.js' %}"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+{% endblock %}

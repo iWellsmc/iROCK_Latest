@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_process/process.css' %}">
+
+<div class="row">
+    <div class="col-12 text-end">
+        <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'InvoiceGuard:list-process-form' %}">Back</a></button>
+    </div>
+</div>
+
+<section class="usesr-management-Edit-section">
+<div>
+    <h3 class="from-head">Add Process</h3>
+    
+    <div class="row d-flex justify-content-center">
+    
+
+        <div class="col-6 col-md-9 col-lg-6">
+        <div class="invite-cards">
+            <form  class="form-txt" id="addtaxformid" method="POST" action="">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-12 mb-3 mt-3">
+                        <div>
+                            <select class="form-control form-select main_cls" name="item" style="display:none">
+                                {% for module in modules %}
+                                <option value="{{module.id}}" data-id="{{forloop.counter}}" class="item_{{ forloop.counter }} item_loop">{{module.module_name}}</option>
+                                {% endfor %}
+                            </select>
+                            <label class="vend-appor-hd mar-bot">Process Name<span class="star-clr">*</span></label>
+                        </div >
+                        <div class="bot-pha add-bot-add-process">
+                            <input type="text" autocomplete="off" name="process_name" id="taxnameid0" data-error="1" class="form-control taxnamecls bot-pha mt-3" placeholder="Process Name">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <table id="tax_table_id" class="w-100">
+                            <thead>
+                                <th class="vend-appor-hd pad-bot">Modules<span class="star-clr">*</span></th>
+                            </thead>
+                            <tbody>
+                                <tr class="row mb-3 align-items-baseline">
+                                    <td class="wid-tx col-10">
+                                        <select class="form-control form-select taxtypecls selec_cls" name="module_id" name="item_id[]" id="{{forloop.counter}}">
+                                            <option value="">--- Select ---</option>
+                                            {% for module in modules %}
+                                            <option value="{{module.id}}" data-id="{{forloop.counter}}" class="item_{{ forloop.counter }} item_loop">{{module.module_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td class="same-line-tx col-2 add-process-btn-con"><button id='add' class='btn btn-clr add-btn pha-sebtn mt-3' type='button' value='Add' onclick="add_click()"> <i class="fa fa-plus"></i> </button> 
+                                     </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="text-center phase-vendor" id="btn">
+                    <button type="submit" class="save-cls btn btn-clr text-right">Submit</button>
+                </div>
+
+            </form>
+        </div>
+        </div>
+
+       
+
+    </div>
+
+</div>
+<input type="hidden" class="csrf_token" value="{{csrf_token}}"
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.12.15/dist/sweetalert2.all.min.js"></script>  
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/sweetalert2@7.12.15/dist/sweetalert2.min.css'></link>  
+<script type="text/javascript" src="{% static 'js/invoiceguard/add_process.js' %}"></script>
+<script>
+</script>
+
+{% endblock %}

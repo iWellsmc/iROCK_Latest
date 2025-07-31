@@ -1,0 +1,458 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+
+    <div >
+        <form  method="POST" id="invoiceform1"> 
+            {% csrf_token %}
+            <h3 class="from-head">Standard Information Form</h3>
+            <h3 class="from-head">Invoice Information</h3>
+            <select id="id_contracts" style="display:none">
+                {% for contracts in allcontractlist%}
+                <option value="{{contracts.id}}" data_id="{{contracts.type}}">{{contracts.contractrefnum}}</option>
+                {% endfor %}
+            </select>
+            
+            <input type="hidden" name="dateformat" id="companydateformat" value={{company.dateformat}}>
+            <input type="hidden" name="invoicetype" id="id_debit" value ="debit_note">
+
+            <div class="row maincls">
+
+                <input type="hidden" name="companydateformat" value="{{company.id|currentdate:'key'}}"></div>
+
+                <div class="row de-bottom"><div><label class="contractfilehead Per-til-clr">Period of Service<span class="star-clr">*</span></label></div><div class="col-6"><div><label class="contractfilehead">From</div><input type="text" name="fromdate" autocomplete="off" class="periodformdate-cls form-control" value="{{invoice.fromdate|date:"M-Y"}}"></div><div class="col-6"><div><div><label class="contractfilehead">To</div></div><input type="text" name="todate" autocomplete="off" value="{{invoice.todate|date:"M-Y"}}" class="periodtodate-cls form-control"></div></div>
+
+                <div class="row de-bottom"><div><label class="contractfilehead">A: Relevant Contract/Amendment/Variation Order Number<span class="star-clr">*</span></label></div><div><select name="contract" class="form-control form-select contractcls">       
+                    <option value="" selected>--Select Contract--</option>         
+                    {% for contracts in allcontractlist%}
+                    <option value="{{contracts.id}}" {% if invoice.contractid|add:"0" == contracts.id and invoice.contracttype == contracts.type%} selected {% endif %}   data_id="{{contracts.type}}">{{contracts.contractrefnum}}</option>
+                    {% endfor %}
+                    </select>
+                    <input type="hidden" name="contractid" id="id_hdncontractid" value="{{invoice.contractid}}-{{invoice.contracttype}}"></div></div>
+
+                <div class="row de-bottom"><div><label class="contractfilehead">B: Relevant Contract/Amendment/Variation Order Name<span class="star-clr">*</span></label></div><div><input type="text" name="contractnameservice" class="form-control nameservicecls" readonly value="{{invoice.name_service}}"></div></div>
+
+                <div class="row de-bottom"><div><label class="contractfilehead">Type of Service<span class="star-clr">*</span></label></div><div><input type="text" name="contractservicetype" class="form-control types_service" readonly value="{{invoice.types_service}}"></div></div>
+
+                <div class="row de-bottom"><div><label class="contractfilehead">Brief Description of Service Rendered<span class="star-clr">*</span></label></div><div><input type="text" name="service_rendered" id="id_service_rendered" class="form-control" value="{{invoice.description_service}}"></div></div>
+               
+                <div class="row de-bottom"><div><label class="contractfilehead">Location of Service<span class="star-clr">*</span></label></div><div><input type="text" name="location_service" id="id_location_service" class="form-control" value="{{invoice.location_service}}"></div></div>
+
+                <div class="row de-bottom"><div><label class="contractfilehead">Project Name<span class="star-clr">*</span></label></div><div><input type="text" name="project" id="id_project" class="form-control" data_id="" value="{{invoice.project_name}}" readonly></div></div>
+
+                <input type="hidden" id="hdnblock" value="{{invoice.block.id}}"
+                <div class="row de-bottom"><div><label class="contractfilehead">Block Name<span class="star-clr">*</span></label></div><div><select name="block" id="id_block" class="form-control">
+                    {% comment %} <option value="{{invoice.block}}" selected>--Select Block--</option> {% endcomment %}
+                </select></div></div>
+
+                <input type="hidden" id="hdnfield" value="{{invoice.field.id}}"
+                <div class="row"><div><label class="contractfilehead">Field Name<span class="star-clr">*</span></label></div><div> <select name="field" id="id_field" class="form-control">
+                    {% comment %} <option value="" selected>--Select Field--</option> {% endcomment %}
+                </select></div>
+
+                <input type="hidden" id="hdnwell" value="{{invoice.well.id}}"
+                <div class="row"><div><label class="contractfilehead">Well Name<span class="star-clr">*</span></label></div><div> <select name="well" id="id_well" class="form-control">
+                    {% comment %} <option value="" selected>--Select Well--</option> {% endcomment %}
+                </select></div>
+                <div class="text-center btn-cls">
+                    <button type="submit" id="submit" class="btn btn-clr text-left final-cls">Save and Next</button>
+                </div></div>
+                
+            </div>
+
+
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" ></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" ></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+
+<script>
+
+    $(window).keydown(function(event){
+        if(event.keyCode == 13) {
+        event.preventDefault();
+        return false;
+        }
+    });
+    
+
+    $(document).ready(function(){
+        
+        var projectid="{{getprojectid}}"
+        var blockoption='';
+        var hdnblock=$('#hdnblock').val()
+        var hdnfield=$('#hdnfield').val()
+        var hdnwell=$('#hdnwell').val()
+        console.log(hdnblock)
+        $.ajax({
+            type:"GET",
+            url:'/invoice/getprojectblock',
+            data:{'projectid':projectid},
+            async:false,
+            success: function(data){
+                blockoption +='<option value="" dataid="Not Applicable">Not Applicable</option>'
+                $.each(data.data,function(key,val){
+                    blockoption +='<option dataid='+val.id+' value="'+val.id+'">'+val.blockname+'</option>'
+                })
+                if (hdnblock == ""){
+                    $('#id_block').html(blockoption)
+                    $('#id_block option[value=""]').attr("selected", "selected");
+                }
+                else{
+                    $('#id_block').html(blockoption)
+                    $('#id_block option[value='+hdnblock+']').attr("selected", "selected");  
+                }
+                $.ajax({
+                type:"GET",
+                data:{'blockid':hdnblock},
+                url:'/projects/projectcreationfield',
+                async:false,
+                success: function(data){
+                    var fieldata=''
+                    fieldata +='<option value="" selected>Not Applicable</option>'
+                    $.each(data.field,function(key,val){
+                        fieldata +='<option value="'+val.id+'" dataid="'+val.id+'">'+val.fieldname+'</option> '
+                    })
+                    if (hdnfield == ""){
+                        $('#id_field').html(fieldata)
+                        $('#id_field option[value=""]').attr("selected", "selected");
+                    }
+                    else{
+                        $('#id_field').html(fieldata)
+                        $('#id_field option[value='+hdnfield+']').attr("selected", "selected");  
+                    }
+                        
+                    }
+                })
+                // var block="";
+                    // block +='<option value="" dataid="Not Applicable">Not Applicable</option>'
+                    // $('#id_field').html(block)
+                    // $('#id_field option[value=""]').attr("selected", "selected");
+                    //ar blockid=$("#id_block").find(':selected').attr('dataid')
+                    $.ajax({
+                        type:"GET",
+                        data:{'fieldid':hdnfield,"blockid":hdnblock},
+                        url:'/invoice/getallwell',
+                        async:false,
+                        success: function(data){
+                          console.log(data)
+                          var well="";
+                          well +='<option value="" dataid="Not Applicable">Not Applicable</option>'
+                          if (hdnwell == ""){
+                            $('#id_well').html(well)
+                            $('#id_well option[value=""]').attr("selected", "selected");
+                          }
+                          else{
+                            $.each(data.data,function(key,val){
+                                well +='<option value="'+val.id+'" dataid="'+val.id+'">'+val.wellname+'</option> '
+                              })
+                              $('#id_well').html(well)
+                            $('#id_well option[value='+hdnwell+']').attr("selected", "selected");
+                          }
+                        }
+                      })  
+            }
+        })
+        
+
+    })
+
+    var hdn_dateformat=$('#companydateformat').val()
+    var currentdate;
+    if(hdn_dateformat == ''){
+        defaultdateFormat='dd-M-yy',
+        currentdate=$.datepicker.formatDate(defaultdateFormat, new Date());
+    }
+    else{
+        currentdate=$.datepicker.formatDate(hdn_dateformat, new Date());
+    }
+
+    if (hdn_dateformat ==''){
+        $(document).on('focus',".dateformat-cls", function(){
+            $(this).datepicker({
+                dateFormat: 'dd-M-yy',
+                maxDate:new Date(),
+            });
+          });
+          
+    }
+    else{
+        $(document).on('focus',".dateformat-cls", function(){
+            $(this).datepicker({
+                dateFormat: hdn_dateformat,
+                maxDate:new Date(),
+            });
+          });
+
+    }
+
+    
+    $(document).on('focus',".periodformdate-cls", function(){
+        $('.periodtodate-cls').val('')
+        $(this).datepicker( {
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
+            dateFormat: 'M-yy',
+            yearRange: '1900:' + new Date().getFullYear(),
+            beforeShow: function(input,inst) {
+                $(input).datepicker("widget").addClass('hide-calendar');
+              },
+
+              onChangeMonthYear: function (year,month) {
+                var minusmonth = month-1
+                console.log(minusmonth)
+                $(".periodtodate-cls" ).datepicker( "destroy" );
+
+                $('.periodtodate-cls').datepicker({
+                    dateFormat: 'M-yy',
+                    showButtonPanel: true,
+                    changeMonth: true,
+                    changeYear: true,
+                    minDate: new Date(year, minusmonth, 01),
+                    maxDate: new Date(),
+                    onClose: function(dateText, inst) {
+                        $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
+                        
+                      }
+                });
+            },
+            
+              onClose: function(dateText, inst) {
+                $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
+                //$(input).datepicker('widget').removeClass('hide-calendar');
+              }
+        })
+
+      });
+      
+      /*
+      $(document).on('focus',".periodtodate-cls", function(){
+          
+          var getdata=$('.periodformdate-cls').val()
+          console.log(getdata)
+          var splitdata=getdata.split('-')
+          var formmonth=splitdata[0]
+          var formyear=splitdata[1]
+          var days=formyear+':' + new Date().getFullYear()
+          console.log(formyear)
+            $(this).datepicker( {
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                dateFormat: 'M-yy',
+                monthrange:0,
+                yearRange:days,
+                beforeShow: function(input) {
+                    $(input).datepicker("widget").addClass('hide-calendar');
+                },
+                onClose: function(dateText, inst) {
+                    $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
+                    $(this).datepicker('widget').removeClass('hide-calendar');
+                }
+            })
+      });
+      */
+      
+
+    $(document).on('change','.contractcls',function(){
+       /* Swal.fire({
+            text: 'Data Auto Fill?',
+            showDenyButton: true,
+            confirmButtonText: 'Yes',
+            allowOutsideClick:false,
+            denyButtonText: 'No',
+            confirmButtonColor: '#AF2B50',
+            denyButtonColor:'#AF2B50',
+            customClass: {
+            actions: 'my-actions',
+            confirmButton: 'order-2',
+            denyButton: 'order-3',
+            }
+          }).then((result) => {
+            if (result.isConfirmed) {*/
+
+                var val=$(this).val()
+                var data_id=$(this).find(':selected').attr('data_id')
+                if (val != ''){
+                    $('#id_block').html('<option value="" selected>--Select Block--</option>')
+                    $('#id_field').html('<option value="" selected>--Select Field--</option>')
+                    $('#id_well').html('<option value="" selected>--Select Well--</option>')
+                    $.ajax({
+                        type:"GET",
+                        url:'/invoice/contractdetails',
+                        data:{'contractid':val,'type':data_id},
+                        async:false,
+                        success: function(data){
+                            $('.nameservicecls').val(data.data.contractname)
+                            $('.types_service').val(data.data.contractservice)
+                            $('#id_hdncontractid').val(data.data.contractid+'-'+data_id)
+                        }
+                    })
+                    var hdncontractvalue=$('#id_hdncontractid').val()
+                    var splitval=hdncontractvalue.split("-")
+                    var contractid=splitval[0]
+                    $.ajax({
+                        type:"GET",
+                        url:'/invoice/getproject',
+                        data:{'contractid':contractid},
+                        async:false,
+                        success: function(data){
+                            console.log(data)
+                            $('#id_project').val(data.data.projectname)
+                            $('#id_project').attr('dataid',data.data.id)
+                        }
+                    })
+                    var projectid=$('#id_project').attr('dataid')
+                    var blockoption='';
+                    $.ajax({
+                        type:"GET",
+                        url:'/invoice/getprojectblock',
+                        data:{'projectid':projectid},
+                        success: function(data){
+                            console.log(data)
+                            blockoption +='<option value="" selected>--Select Block--</option>'
+                            $.each(data.data,function(key,val){
+                                blockoption +='<option dataid='+val.id+' value="'+val.id+'">'+val.blockname+'</option>'
+                            })
+                            $('#id_block').html(blockoption)
+                        }
+                    })
+        
+                }
+            //} else if (result.isDenied) {
+            //    document.location.href = url;
+            //}
+        //})
+
+    })
+
+    $(document).on('change','#id_block',function(){
+        $('#id_field').html('<option value=" " selected>--Select Field--</option>')
+        $('#id_well').html('<option value =" " selected>--Select Well--</option>')
+        var blockid=$(this).find(':selected').attr('dataid')
+        var block='';
+        var well="";
+        $.ajax({
+            type:"GET",
+            data:{'blockid':blockid},
+            url:'/projects/projectcreationfield',
+            success: function(data){
+              console.log(data)
+                if (blockid == "Not Applicable"){
+                    $('#id_field').html('<option value="" selected>Not Applicable</option>')
+                    well +='<option value=" " selected>--Select Well--</option>'
+                    well +='<option value="">Not Applicable</option>'
+                    $.each(data.data,function(key,val){
+                        well +='<option value="'+val.id+'" dataid="'+val.id+'">'+val.wellname+'</option> '
+                    })
+                    $('#id_well').html(well)
+                    }
+                else{
+                    block +='<option value=" " selected>--Select Field--</option>'
+                    block +='<option value="" dataid="Not Applicable" >Not Applicable</option>'
+                    $.each(data.data,function(key,val){
+                        block +='<option value="'+val.id+'" dataid="'+val.id+'">'+val.field+'</option> '
+                    })
+                    $('#id_field').html(block)
+                    }
+            }
+          })
+    })
+
+    $(document).on('change','#id_field',function(){
+        $('#id_well').html('<option value="" selected>--Select Well--</option>')
+        var fieldid=$(this).find(':selected').attr('dataid')
+        var blockid=$("#id_block").find(':selected').attr('dataid')
+        var well='';
+        $.ajax({
+            type:"GET",
+            data:{'fieldid':fieldid,'blockid':blockid},
+            url:'/invoice/getallwell',
+            success: function(data){
+                console.log(data)
+                    well +='<option value=" " selected>--Select Well--</option>'
+                    well +='<option value="">Not Applicable</option>'
+                    $.each(data.data,function(key,val){
+                    well +='<option value="'+val.id+'" dataid="'+val.id+'">'+val.wellname+'</option> '
+                    })
+                    $('#id_well').html(well)
+            }
+            })
+
+    })
+
+
+
+    $("#invoiceform1").validate({
+        rules: {
+            fromdate:{
+                required:true,
+            },
+            todate:{
+                required:true,
+            },
+            contract:{
+                required:true,
+            },
+            service_rendered: {
+            required: true,
+            },
+            location_service: {
+              required:true,
+            },
+            block: {
+                required: true,
+            },
+            field:{
+                required:true,
+            },
+            well:{
+                required:true,
+            },
+            
+        },
+        messages: {
+            fromdate:{
+                required:"This Field is Required",
+            },
+            todate:{
+                required:"This Field is Required",
+            },
+            contract:{
+                required:"This Field is Required",
+            },
+            service_rendered:{
+                required:"This Field is Required",
+            },
+            location_service: {
+                required:"This Field is Required",
+            },
+            block: {
+                required:"This Field is Required",
+            },
+            field:{
+                required:"This Field is Required",
+            },
+            well:{
+                required:"This Field is Required",
+            },
+            errorElement : 'span',
+            },
+        submitHandler: function(form) {
+            $('#submit').attr('disabled','disabled');
+            form.submit();
+        }
+    }) 
+
+
+</script>
+{% endblock %}

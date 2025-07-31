@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/invoice_approval.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/calculator.css' %}">
+
+<h5 class="from-head">Invoice Approval</h5>
+
+<div class="row">
+{% comment %} <h5>Reasons for Return: </h5> {% endcomment %}
+          <div>
+            {% split_by_newline checked_messages as checked %}
+            {% for check in checked %}
+              <p>{{check}}</p>
+            {% endfor %}
+          </div>
+    {% include 'invoicedata.html' %}
+    <form method="POST" id="invoiceapproval_form">
+            {% csrf_token %}
+            <div class="row color-btn justify-content-center my-5">
+              {% check_rolerights 'Confirm Cost Code' get_role_id as checkconfirm_costcode_rights %}
+              {% if checkconfirm_costcode_rights %}
+                <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2"> 
+                  <button type="button" class="btn btn-clr status_cls green" value="1" data-toggle="modal" data-target="#confirm_cost_code">Confirm Cost Code</button>
+                </div>
+              {%endif%}
+              {% for rights in roles_rights %}
+                {% if rights.right.right_name == "Approve Invoice" %}
+                {% if checkconfirm_costcode_rights %}
+                  {% if invoice_details.is_conform_costcode == 1 %}
+                  <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2">  
+                    <button type="button" class="btn btn-clr status_cls green" value="1" data-toggle="modal" data-target="#exampleModalCenter">Approve</button>
+                  </div>
+                  {%else%}
+                  <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2">  
+                    <button type="button" class="btn btn-clr status_cls green notconform_costcode" value="1">Approve</button>
+                  </div>
+                  {%endif%}
+                {%else%}
+                <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2">  
+                  <button type="button" class="btn btn-clr status_cls green" value="1" data-toggle="modal" data-target="#exampleModalCenter">Approve</button>
+                </div>
+                {% endif %}
+
+
+               
+                {% endif %}
+              {% endfor %}
+              {% comment %} {% for rights in roles_rights %}
+                {% if rights.right.right_name == "Proceed Invoice" %}
+                  <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2">  <!--  inv_app_btn_cls -> class removed -->
+                    <button type="button" class="btn btn-clr status_cls proceed_blue" value="2" data-toggle="modal" data-target="#exampleModalCenter">Proceed</button>
+                  </div>
+                {% endif %}
+
+              {% endfor %} {% endcomment %}
+              {% for rights in roles_rights %}
+                {% if rights.right.right_name == "Return Invoice" %}
+                {% if check_for_committe == 0 %}
+                {% comment %} {% if dispute_user > 0%}
+                  <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2">  <!--  inv_app_btn_cls -> class removed --> 
+                    <button type="button" class="btn btn-clr status_cls beige" value="3" data-toggle="modal" data-target="#exampleModalCenter">Return for Clarification--{{dispute_user}}</button> <!-- class removed -> violet -->
+                  </div>
+                {% else %} {% endcomment %}
+                <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2">  <!--  inv_app_btn_cls -> class removed --> 
+                  <button type="button" class="btn btn-clr status_cls beige" value="3" data-toggle="modal" data-target="#exampleModalCenter">Return for Clarification</button> <!-- class removed -> violet -->
+                  
+                </div>
+                {% comment %} {% endif %} {% endcomment %}
+                {% endif %}
+                {% endif %}
+              {% endfor %}
+              {% for rights in roles_rights %}
+                {% if rights.right.right_name == "Reject Invoice" %}
+                {% if check_for_committe == 0 %}
+                  <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2">  <!--  inv_app_btn_cls -> class removed -->
+                    <button type="button" class="btn btn-clr status_cls red" value="4" data-toggle="modal" data-target="#exampleModalCenter" >Reject</button>
+                  </div>
+                {% endif %}
+                {% endif %}
+              {% endfor %}
+
+                <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2">  <!--  inv_app_btn_cls -> class removed --> 
+                  <button type="button" class="btn btn-clr beige calbtn" value="2" data-toggle="modal" data-target="#exampleModalCenter2">Calculator</button>
+              </div>
+
+              {% for rights in roles_rights %}
+              {% if rights.right.right_name == "View/Comment On Invoice" %}
+                <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2">  <!--  inv_app_btn_cls -> class removed --> 
+                  <button type="button" class="btn btn-clr cmt_cls" data-toggle="modal" data-target="#exampleModalCenter">Comment</button>
+                </div>
+              {% endif %}
+            {% endfor %}
+            </div>
+            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-backdrop="static" data-keyboard="false" style="background-color: rgba(0, 0, 0, 0.53);">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header comment-head">
+                      <h5 class="modal-title" id="exampleModalCenterTitle">Comments</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body comment-body">
+                        <textarea name="main_comments" id="main_comments" class="form-control cmnts"></textarea>
+                        <div class="excp_content">
+                        </div>
+                      </div>
+                    <div class="modal-footer comment-foot">
+                      <button type="button" class="btn btn-secondary" id="submit_id">Submit</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- <div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter2" data-backdrop="static"  data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" data-backdrop="static"  data-keyboard="false" role="document">
+                  <div class="modal-content" data-backdrop="static" style="height: 700px;width:450px">
+                    <div class="modal-header comment-head">
+                      <h5 class="modal-title" id="exampleModalCenterTitle">Calculator</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+        
+                    <div class="modal-body calc-body" >
+                      <iframe src="{% url 'invoice:calculator' %}" title="description"></iframe>
+                    </div>
+        
+                    <div class="modal-footer comment-foot">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Save & Close</button>
+                    </div>
+                    </div>
+                </div>
+              </div> -->
+
+              <div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter2" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+                  <div class="modal-content" data-backdrop="static">
+                    
+                    <div class="modal-header comment-head">
+                      <h5 class="modal-title" id="exampleModalCenterTitle">Calculator</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+        
+                    <div class="modal-body calc-body">
+                      <iframe src="{% url 'invoice:calculator' %}" title="description"></iframe>
+                    </div>
+        
+                    <div class="modal-footer comment-foot">
+                      <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Save & Close</button> -->
+                    </div>
+                    </div>
+                </div>
+              </div>
+        </form>
+    </div>
+    {% include 'conform_costcode_popup.html' %}
+
+{% endblock %}  
+
+{% block scripts %}
+{{ block.super }}
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.2.228/pdf.min.js"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script>
+  $(function () {
+  
+    $(".calculator-draggable").draggable();
+  });
+  
+var invoiceid="{{pk}}" 
+var wcc_id="{{wcc_id}}"|| ''
+var scheme="{{request.scheme}}"
+var gethost="{{request.get_host}}"
+var user_signature="{{sign_data}}"
+var currentdomain=scheme+'://'+gethost
+var package_src = "{% static 'js/web/viewer.html' %}"
+var module_id='{{get_role_id.module_id}}'
+</script>
+<script src="{% static 'js/invoice/invoiceflowprocesstwo.js' %}"></script>
+<script src="{% static 'js/common/invoiceflow.js' %}"></script>
+
+{% endblock %}

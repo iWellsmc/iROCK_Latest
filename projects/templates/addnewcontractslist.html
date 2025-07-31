@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/missedcontract.css' %}">
+<div>
+    <h4 class="from-head">Missed Contract List</h4>
+    <div class="row">
+        <div class="col-lg-9 col-md-8">
+        </div>
+        {% if vendorid.active_status == 1 %}
+        <div class="col-lg-3 col-md-4 text-end">
+            <button type="button" class="btn btn-clr"><a href="{% url 'projects:addnewcontract' %}">Add Missed Contract</a></button>
+        </div>
+        {% endif %}
+    </div>
+    </div>
+        <div class="row">
+            <div class="vends-invite-lists table-responsive text-nowrap">
+              <table class="table prj-back_clr settings-data-list-view data-list-view project_master vend-thead vend-tt vend-border all-tbl-hd miss_conl missed-contract-list irock-table">
+                  <thead >
+                      <tr >
+                          <th>S/N</th> 
+                          <th>VIN</th>
+                          <th>Contract Type</th>
+                          <th>Name of Service</th>
+                          <th>Contract Ref No</th>
+                          <th>Amendment/Addendum Ref No</th>     
+                          <th>Uploaded Documents</th>
+                          <th>Status</th>
+                          <th>Action</th>
+                      </tr>
+                  </thead>
+                  <tbody class="table-list">
+                      {% if totalcount > 0 %}
+                        {% for newcontract in listnewcontract %}
+                        <tr>
+                        <td class="text-wrap">{{forloop.counter}}</td>
+                        <td class="text-center">{{newcontract.user.cin_number}}</td>
+                        <td class="text-wrap">{{newcontract.contract_type}}</td>
+                        <td class="text-wrap">{{newcontract.name_service}}</td>
+                        <td class="text-wrap">{{newcontract.contract_refnum}}</td>
+                        <td class="text-wrap">{{newcontract.amendment_refnum|default_if_none:'-'}}</td>
+                        <td class="text-wrap">
+                        {% checkfile newcontract.c_file as filecount%}
+                        {% if  filecount > 0%}
+                        <a href="{{newcontract.c_file.url}}" target="_blank">{{newcontract.original_file_name}}</a>
+                        {% endif %}
+                        </td>
+                        <td class="status-nme text-wrap text-center">
+                            {% if newcontract.status == 1 %}
+                                <div class="badge badge-warning sta-war">
+                                    Open
+                                </div>
+                            {% elif newcontract.status == 0 %}
+                                <div class="badge badge-danger sta-dan">
+                                    Closed
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td class="query-act text-wrap">
+                        
+                            <a href="{% url 'projects:newcontracthistory' pk=newcontract.id %}" class="btn his-oty px-1"><i class="fa fa-history" title="History" aria-hidden="true"></i></a>
+                            <!-- {% if newcontract.status == 1 %}
+                            <a href="{% url 'projects:newcontractdenied' pk=newcontract.id %}" class="close-sim"><i class="fa fa-times-circle" title="Close" style="font-size:16px"></i> </a>
+                            {% endif %} -->
+                        </td>
+                        </tr>
+                        {% endfor %}
+                      {% else %}
+                      <tr>
+                          <td colspan="9" class="cls-nil text-center">
+                            ---
+                          </td>
+                        </tr>
+                      {% endif %}
+                  </tbody>
+              </table>
+              </div>
+          
+</div>
+{% endblock %}

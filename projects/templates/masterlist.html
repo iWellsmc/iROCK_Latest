@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_tags %}
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+<style>
+    .sidebar-nav {
+         background-color: #ecf5fc;
+         padding: 0 0 0 20px;
+          /* width: 15%; */
+    
+    }
+     .sidebar-nav h4 {
+         color: #e4173e;
+         font-family: 'Roboto Condensed', sans-serif;
+         text-transform: uppercase;
+         font-size: 20px;
+         text-align: left;
+         line-height: 40px;
+    }
+     .sidebar-nav ul {
+         list-style-type: none;
+         padding-left: 0;
+    }
+     .sidebar-nav ul li {
+         border-top: 1px dotted rgba(0, 0, 0, 0.0980392);
+         position: relative;
+         width: 100%;
+         user-select: none;
+         -webkit-user-select: none;
+    }
+     .sidebar-nav ul li a {
+         color: rgba(0, 0, 0, 0.701961);
+         padding: 7px 0;
+         display: inline-block;
+         width: calc(100% - 50px);
+    }
+     .sidebar-nav ul li a:hover {
+         text-decoration: none;
+         border-bottom: 0;
+    }
+     .sidebar-nav ul li.selected a {
+         color: #004c84;
+         font-weight: bold;
+         display: block;
+         margin-right: 50px;
+    }
+     .sidebar-nav ul li a.menu_tog {
+         position: relative;
+         width: 50px;
+         text-align: center;
+         border-bottom: 0;
+         vertical-align: top;
+    }
+     .sidebar-nav ul li a.menu_tog:after {
+         position: relative;
+         right: 0;
+         text-align: middle;
+         font-family: FontAwesome;
+         font-size: 12px;
+         content: "\f078";
+    }
+     .sidebar-nav ul li a.menu_tog:focus, .sidebar-nav ul li a.menu_tog:hover, .sidebar-nav ul li a.menu_tog:visited, .sidebar-nav ul li a.menu_tog:link {
+         border-bottom: 0;
+         text-decoration: none;
+    }
+     .sidebar-nav ul li a.menu_tog.rotate:after {
+         /* transform: rotate(180deg); */
+         /* right: 1px; */
+         content: "\f106";
+         font-size:17px;
+         font-weight: 600;
+    }
+     .sidebar-nav ul.sub-menu {
+         display: none;
+         font-size: 14px;
+    }
+     .sidebar-nav ul.sub-menu li {
+         padding-left: 20px;
+    }
+
+    .list-nav {
+    display: block;
+}
+     
+            </style>
+            <script>
+    accordionNav = $(function(){
+        $('.menu_tog').click(function(e) {
+            e.preventDefault();
+            var toggleButton = $(this);
+            if (toggleButton.next().hasClass('active')) {
+                toggleButton.next().removeClass('active');
+                toggleButton.next().slideUp(400);
+                toggleButton.removeClass('rotate');
+             } else {
+                toggleButton.parent().parent().find('li .sub-menu').removeClass('active');
+                toggleButton.parent().parent().find('li .sub-menu').slideUp(400);
+                toggleButton.parent().parent().find('.menu_tog').removeClass('rotate');
+                toggleButton.next().toggleClass('active');
+                toggleButton.next().slideToggle(400);
+                toggleButton.toggleClass('rotate');
+            }
+        });
+    });
+            </script>
+
+
+<div class="sidebar-nav"> 
+    <div class="nav list-nav"> 
+{% for country in countries %}
+
+    <ul class="master-lists">
+        <li class="country-name">
+        {{country.country_name}} <a class="menu_tog" href="#"><img src=""></a>
+       {% for project in country.country_id|get_project:"projects" %}
+            <ul class="prj-list sub-menu">
+                <li class="prj-name">
+                    <!-- <div class="menu_tog"> -->
+                    <a class="" href="">{{project.name}}</a>
+                    <a class="" href="https://www.w3schools.com/howto/howto_js_active_element.asp"><span class="action-edit"><i class="fa fa-edit" style="font-size:15px; color:#95183a;"></i></span></a>
+                        <!-- </div> -->
+                    <ul class="blk-list sub-menu"> 
+                    {% for block in project.id|get_block:"block" %}                    
+                        <li class="blk-name">
+                            {{block.block_name}} <a class="menu_tog" href="#"><img src=""><span class="action-edit"><i class="fa fa-edit" style="font-size:15px; color:#95183a;"></i></span></a>
+                            <ul class="fld-list sub-menu">
+                            {% for field in block.id|get_field:"field" %}
+                                <li class="fld-name">
+                                    {{field.field_name}} <a class="menu_tog" href="#"><img src=""><span class="action-edit"><i class="fa fa-edit" style="font-size:15px; color:#95183a;"></i></span></a>
+                                    <ul class="clu-list sub-menu">
+                                      {% for cluster in field.id|get_clusters:"cluster" %}
+                                        <li class="clu-name">
+                                            {{cluster.cluster_name}} <a class="menu_tog" href="#"><img src=""><span class="action-edit"><i class="fa fa-edit" style="font-size:15px; color:#95183a;"></i></span></a>
+                                            <ul class="clu-sublist sub-menu">
+                                            {% for cluster_sub in cluster.id|get_clustersub:"clustersub" %}
+                                                <li class="clu-subname">{{cluster_sub.cluster_subname}} <a class="menu_tog" href="#"><img src=""><span class="action-edit"><i class="fa fa-edit" style="font-size:15px; color:#95183a;"></i></span></a>
+                                                    
+                                                    <ul class="well-list sub-menu">
+                                                     {% for well in cluster_sub.id|get_well:"wells" %}
+                                                        <li class="well-name">{{well.well_name}} <a class="menu_tog" href="#"><img src=""><span class="action-edit"><i class="fa fa-edit" style="font-size:15px; color:#95183a;"></i></span></a>
+                                                            
+                                                            <ul class="well-sublist sub-menu">
+                                                            {% for well_sub in well.id|get_subwell:"subwell" %}
+                                                                <li class="subwell-name">{{well_sub.well_subname}} <a class="menu_tog" href="#"><img src=""><span class="action-edit"><i class="fa fa-edit" style="font-size:15px; color:#95183a;"></i></span></a>
+                                                                    
+
+                                                                </li>
+                                                            {% endfor %}                                                                
+                                                        </ul>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+                </li>     
+            {% endfor %}
+        </ul>
+        </li>
+    </ul> 
+
+   
+
+{% endfor %}
+</div>
+</div>
+{% endblock %}
+

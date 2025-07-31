@@ -1,0 +1,131 @@
+{% load static %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <title>Vendor Master Report</title>
+    <style type="text/css">
+
+        @page land{
+            size:landscape;
+         }
+        .table, .table td, .table th {  
+        border-bottom: 1px solid #ddd;
+        border-top: 1px solid #ddd;
+        border-left:1px solid #ddd;
+        border-right:1px solid #ddd; 
+        }
+
+        .table {
+        border-collapse: collapse;
+        width: 100%; 
+
+        }
+
+        .table th, .table td {
+        padding: 5px; 
+        font-size: 16px;
+        }
+
+        .table th, th { text-align: center !important; }
+
+        .td{
+        word-break: inherit;
+        }
+
+
+
+        .table1 {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 5px;
+            background-color: #fff;
+            border: none;
+            text-align: center;
+        }
+
+        .table1 td {
+            border: none;
+        }
+        .from-head {
+        color: #AF2B50;
+        font-weight: 600;
+        font-size:18px;
+        text-align: center;
+        margin: 0px 150px 0px 0px;
+        width: 100% !important;
+    }
+        .companylogo {
+            width: 50px;
+            height: 50px;
+        }
+     table.head, td.head { border-style: none; border:0px solid; }
+
+     .companyname-text{ 
+         text-align: center!important;    
+         font-size: 22px;   
+         color: #AF2B50; 
+         font-weight: 600;
+         margin-right: 150px;
+        }
+
+    </style>
+    </head>
+    <body>
+        <table>
+            <tr>
+                <th  style="width:15%;">{% if imageurl %}  <img src="{{imageurl}}">  {% endif %}</th>
+                <th style="width:85%;"><h4 class="companyname-text">{{company.company_name}}</h4>
+                    <p style="text-align: center; font-size: 12px; margin-top: -10px; margin-bottom: 10px;">{{company.address|safe}}</p>
+                </th>
+                
+               
+            </tr>
+        </table>
+    
+             
+        <table class="w-100">
+    
+                   <tr>
+                    <td style="width:15%;"></td>
+                    <td class="" style="text-align: center; width:85%;">
+                        <h3 class="from-head">Vendor Master List</h3>
+                     
+                    </td>
+                   </tr>
+               
+             </table>
+
+       <div class="vends-invite-lists">
+  
+                <p style="font-size: 14px; color:#AF2B50;">*VIN-Vendor Identification Number</p>
+                <table  id="vendor-sort" class="table settings-data-list-view data-list-view project_master vend-thead proj-lists master-pro vend-tt vend-border">
+                    <thead >
+                        <tr>
+                            <th style='width:6%;'>S/N</th> 
+                            <th style="width:10%">VIN</th>   
+                            <th style="width:29%">Vendor Name</th>
+                            <th style="width:20%">Contact Person</th>
+                            <th style="width:35%;">Email Address</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-list wid-size-vend" id="myTable">
+                    {% for vendor in vendormaster %}
+                        <tr>
+                        <td style='text-align: center;'>{{forloop.counter}}</td>
+                        <td>{{vendor.vin}}</td>
+                        <td>{{vendor.vendor_name|split_addspaces}}</td>
+                        <td>{{vendor.contactpersonname | split_addspaces}} {{vendor.contactpersonlastname | split_addspaces}}</td>
+                        <td>{{vendor.contactpersonemail}}</td>
+                        </tr>
+                    {% empty %}
+                        <tr style="text-align: center;">
+                            <td colspan="5" id="empty_class">---</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+        </div>
+    </body>
+</html>

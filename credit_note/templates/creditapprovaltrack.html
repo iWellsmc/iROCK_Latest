@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load credit_custom_tags %}
+<!-- {% load custom_tags %} -->
+{% load invoice_custom_tags %}
+{% load static %}
+{% load projectflowtags %}
+
+{% block content %}
+ <link rel="stylesheet" type="text/css" href="{% static 'assets/css/wcc/wcctrack.css' %}"> 
+ <div class="row">
+    <div class="col-12 text-end">
+        <button class="btn btn-clr waves-effect waves-float waves-light" >
+            <a href="#" class="inv_bck_cls">Back</a>
+        </button>
+    </div>
+</div>
+
+<h3 class="from-head">Credit Note Approval Track</h3>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-12 col-lg-12">
+            <div id="tracking">
+                <div class="tracking-list">
+                    {% if pending_invoice_status|length == 0 %}
+                        {%for inv_module in completed_invoice %}
+                            {% get_completed_approved_users pk inv_module.id inv_module.module.id 1 as users_data %}
+                            <div class="tracking-item">
+                                <div class="tracking-icon status-intransit">
+                                    <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                        <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                    </svg>
+                                </div>
+                                <div class="track-font-sze">{{inv_module.module.module_name}}</div>
+                                {%for user in users_data %}
+                                    {% get_user user.user as flow_user%}
+                                    <div class="tracking-content">
+                                        {{flow_user.name}} {{flow_user.lastname}}<span>{{flow_user.designation_role}}</span>
+                                    <span>Date: {{user.created_at|confulldate:inv_module.company.id}} -
+                                        (
+                                        {% if user.status == 1 %}
+                                        Approved
+                                        {% elif user.status == 2 %}
+                                        Proceed
+                                        {% elif user.status == 3 %}
+                                        Returned
+                                        {% elif user.status == 4 %}
+                                        Rejected
+                                        {% endif %}
+                                        )
+                                    </span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        <div class="tracking-item">
+                            <div class="tracking-icon vendor_comp_cls">
+                                <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                    <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="vendor_name">Credit Note {% if get_invoice.credit.approval_status == 2 %}Rejected and Send back to the {% elif get_invoice.credit.approval_status == 3 %}Returned and Sent back to {% else %}Approved and Sent to {% endif %} {{contract.contractvendor.vendor_name}}</div>
+                    {% else %}
+                    {% for level in get_levels %}
+                        <!-- <h5>{{level.process.process.process_name}}</h5> -->
+                            {% get_process_modules level as modules %}
+                            {%for inv_module in modules %}
+                            {% if inv_module.module.module_id < 3 %}
+                                {% get_creditapproved_users pk level.id inv_module.id as users_data %}
+                                {% if users_data.0.status == 1 %}
+                                    {% if users_data.2 %}
+                                        <div class="tracking-item">
+                                            <div class="tracking-icon status-intransit">
+                                                <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                    <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="track-font-sze">{{inv_module.module.module.module_name}}</div>
+                                            {%for user in users_data.1 %}
+                                                {% get_user user.user as flow_user%}
+                                                <div class="tracking-content">
+                                                    {{flow_user.name}} {{flow_user.lastname}}<span>{{flow_user.designation_role}}</span>
+                                                <span>Date: {{user.created_at|confulldate:inv_module.company.id}} -
+                                                    (
+                                                    {% if user.status == 1 %}
+                                                    Approved
+                                                    {% elif user.status == 2 %}
+                                                    Proceed
+                                                    {% elif user.status == 3 %}
+                                                    Returned
+                                                    {% elif user.status == 4 %}
+                                                    Rejected
+                                                    {% endif %}
+                                                    )
+                                                </span>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                       
+                                    {% else %}
+                                        <div class="tracking-item-pending">
+                                            <div class="tracking-icon status-intransit">    
+                                                <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                    <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="pending-cnt">{{inv_module.module.module.module_name}}</div>
+                                            {%for user in users_data.1 %}
+                                            {% get_user user.user as flow_user%}
+                                                {% if user.invoice_override == 0 %}
+                                                    <div class="tracking-content">
+                                                        {{flow_user.name}} {{flow_user.lastname}}<span>{{flow_user.designation_role}}</span></div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="tracking-item-pending">
+                                        <div class="tracking-icon status-intransit">    
+                                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                            </svg>
+                                        </div> 
+                                        <div class="pending-cnt">{{inv_module.module.module.module_name}}</div>
+                                        {% get_flow_users level.id inv_module.id as flow_users%}
+                                        {% for station_user in flow_users %}
+                                            <div class="tracking-content">{{station_user.user.user.name}} {{station_user.user.user.lastname}}<span>{{station_user.user.user.designation_role}}</span></div>
+                                        {% endfor %}
+                                        </div>
+                                {% endif %}
+                              {% endif %}
+                            {% endfor %}
+                    {% endfor %} 
+                    {% if approval_status == True %}
+                        <div class="tracking-item">
+                            <div class="tracking-icon status-intransit">
+                                <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                    <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="tracking-item-pending">
+                            <div class="tracking-icon status-intransit">    
+                                <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                    <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="vendor_name">{% if approval_status %}
+                            <p>Credit Note Approval Process Completed for No {{ credit_note_no }}</p>
+                        {% else %}
+                        <p>Credit Note Approval for No {{ credit_note_no }} in Progress</p>
+                        {% endif %}
+                        </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        
+
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+$('.inv_bck_cls').click(function(){
+    window.history.back();
+})
+</script>
+
+{% endblock %}

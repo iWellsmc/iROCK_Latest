@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/user_Management/users.css' %}">
+<div>
+    <h3 class="from-head">User Project Specific Rights</h3>
+    <button type="button" class="btn btn-clr btn-master chck-tst waves-effect waves-float waves-light mb-4" ><a href="{% url 'projects:userprojectrights' pk=id %}">Back</a></button> 
+
+     <form method="POST">
+        {% csrf_token %}
+    <table class="user-prj-specific" id='usergen_id'>
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col"></th>
+                <th scope="col">View /Comment(Invoices & Reports)</th>
+                <th scope="col">Manage(Invoices & Reports) </th>
+                <th scope="col">Approve/ Reject Invoices</th>
+                <th scope="col">Manage Invoice Payment</th>
+                <th scope="col">Approve/Reject Invoice Payments</th>
+                <th scope="col">Authority to Hold Invoice Payments</th>
+                <th scope="col">Authority to Overrule Approvals</th>
+                <th scope="col">Archive Reports</th>
+                <th scope="col">Modify Reports After Archive</th>
+                <th scope="col">Delete Reports</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th class="module-user-head">Invoice Module</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+            {% for projectright in projectrights %}
+                <tr>
+                    <th class="pro-name-spci">{{projectright.project.projectname.name}}</th>
+                    <td class="select-all-check"><input id="user-spc-proj" type="checkbox" class="user-sel-speci"><label for="user-spc-proj" class="spci-space">Select All</label></td>
+                    <td><input id="user-spc-proj1" type="checkbox" class="user-sel-speci"><label for="user-spc-proj1"></label></td>
+                    <td><input id="user-spc-proj2" type="checkbox" class="user-sel-speci"><label for="user-spc-proj2"></label></td>
+                    <td><input id="user-spc-proj3"  type="checkbox" class="user-sel-speci"><label for="user-spc-proj3"></label></td>
+                    <td><input id="user-spc-proj4" type="checkbox" class="user-sel-speci"><label for="user-spc-proj4"></label></td>
+                    <td><input id="user-spc-proj5" type="checkbox" class="user-sel-speci"><label for="user-spc-proj5"></label></td>
+                    <td><input id="user-spc-proj6" type="checkbox" class="user-sel-speci"><label for="user-spc-proj6"></label></td>
+                    <td><input id="user-spc-proj7" type="checkbox" class="user-sel-speci"><label for="user-spc-proj7"></label></td>
+                    <td><input id="user-spc-proj8" type="checkbox" class="user-sel-speci"><label for="user-spc-proj8"></label></td>
+                    <td><input id="user-spc-proj9" type="checkbox" class="user-sel-speci"><label for="user-spc-proj9"></label></td>
+                    <td><input id="user-spc-proj10" type="checkbox" class="user-sel-speci"><label for="user-spc-proj10"></label></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="text-center spacing-button">
+        <button type="submit" class="btn btn-clr text-center submit-cls" data-id="1">Submit</button>
+    </div>
+    </form>
+</div>
+<!--
+                <tr>
+            </tr>
+-->
+
+{% endblock %}

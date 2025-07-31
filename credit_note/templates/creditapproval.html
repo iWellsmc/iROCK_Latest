@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load credit_custom_tags %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/invoice_approval.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/calculator.css' %}">
+
+<h5 class="from-head">Credit Note Approval</h5>
+
+<form method="POST" id="invoiceapproval_form">
+  {% csrf_token %}
+  <div class="row justify-content-center">
+
+    <div class="row">
+      <div class="col-9"></div>
+      <div class="col-3 text-end pr-0 pb-2">
+
+        <!-- <button type="button" class="btn btn-clr"><a href="{% url 'credit:creditapprovaltrack' pk %}">Track credit
+              Note</a></button> -->
+        <button type="button" class="btn btn-clr" onClick="goback()">Back</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-6 pb-5 bor-rgt center-line">
+        <h5 class="head-inv-pre">Credit Note Summary Details</h5>
+
+        <div class="table-responsive">
+          <table class="inv-pretbl creditnote-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>S/N</th>
+                <th>Credit No</th>
+                <th>Date</th>
+                <th>Ref. Invoice No.</th>
+                <!-- <th>Contract No</th> -->
+                <th>Gross Amount</th>
+                <th>Tax</th>
+                <th>Total</th>
+                {% if exchange_rate == '2' %}
+                <th>Payment Currency</th>   
+                {% endif %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for credit_id in maininvoices %}
+              {% for credits in pk|subcreditnote:credit_id.id %}
+              <tr>
+                <td><i class="fa fa-eye prev-eyee inv_file" value="{{credits.file}}" style="font-size:15px"></i></td>
+                <td>{{forloop.parentloop.counter}}</td>
+                <td class="inv_name" data-id='{{credits.id}}'>{{credits.credit_note_no}}</td>
+                <td>{{credits.date|convert_credit_date:credits.credit.company.id}}</td>
+                <td class="word-break-class">
+                  {% for invoice in credits.credit.id|credit_contract_invoices:"inv" %}
+                  {{invoice}}{% if not forloop.last %},{% endif %}
+                  {% endfor %}
+                </td>
+                {% check_exchage_value invoice_detail.id as exchangetype  %}
+                {% check_exchage_percentage invoice_detail.id credits.vendor_split_invoice.id as exchangepercentage%}
+                {% credit_base_amount credits.credit.total_value credits.percentage as gross_amount%}
+                <td class="">
+                  {% if credits.credit.total_value %}
+                      {% if exchangetype == '1' %}
+                        {% comment %} {{credits.symbol}} {{gross_amount|floatformat:2}} -- {{exchangetype}} --{{exchangepercentage}} {% endcomment %}
+                        {% exchange_grossamount gross_amount credits.exchange_rate  as exchangeNetamount %}
+                        ({{credits.symbol}} {{exchangeNetamount}})
+                      {% else %}
+                        {% comment %} {{credits.symbol}} {{gross_amount|floatformat:2}} -- {{exchangetype}} --{{exchangepercentage}} {% endcomment %}
+                          {% exchange_grossamount gross_amount exchangepercentage  as exchangeNetamount %}
+                          {% if exchangepercentage == 'N/A' %}
+                          ({{basecurrency}} 
+                          {% else %}
+                          ({{credits.symbol}} 
+                          {% endif %}
+                          {{exchangeNetamount}})
+                      {% endif %}
+                      
+                  {% else %}
+                  {{credits.symbol}} 0.00
+                  {% endif %}</td>
+                <td class="">
+                  <!-- {% if credit.credit.total_value %}{{credit.symbol}}{% endif %}  -->
+                  {% if exchangetype == '1' %}
+                      {% comment %} {{credits.symbol}} {{credits.credit.exclusive_value|credit_excluive_tax:credits.percentage}} {% endcomment %}
+                      {% credit_excluive_tax_with_exchangetype credits.credit.exclusive_value credits.percentage credits.exchange_rate as exchangeTax %}
+                      ({{credits.symbol}} {{exchangeTax}})
+                  {% else %}
+                      {% comment %} {{credits.symbol}} {{credits.credit.exclusive_value|credit_excluive_tax:credits.percentage}} {% endcomment %}
+                      {% credit_excluive_tax_with_exchangetype credits.credit.exclusive_value credits.percentage exchangepercentage as exchangeTax %}
+                      {% if exchangepercentage == 'N/A' %}
+                      ({{basecurrency}} 
+                      {% else %}
+                      ( {{credits.symbol}} 
+                      {% endif %}
+                       {{exchangeTax}})
+                  {% endif %}
+                </td>
+                <td class="">
+                  {% if exchangetype == '1' %}
+                      ({{credits.symbol}} {{credits.payment_currency_amount|new_remove_symbol}})
+                      
+                  {% else %}
+                      {% comment %} {{credits.symbol}} {{credits.payment_currency_amount|remove_symbol}} {% endcomment %}
+                      {% exchange_netamount credits.payment_currency_amount exchangepercentage  as exchangeNetamount %}
+                      {% if exchangepercentage == 'N/A' %}
+                      ( {{basecurrency}}  
+                      {% else %}
+                        ( {{credits.symbol}} 
+                      {% endif %}
+                       {{exchangeNetamount}} )
+
+                  {% endif %}
+                </td>
+                {% if exchangetype == '2' %}
+                <td>
+                  {{credits.symbol}}
+                </td>
+                {% endif %}
+              </tr>
+              {% endfor %}
+              {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <div class="col-6 pb-2">
+
+        <div class="btn-space text-end">
+          <div class="row">
+            <div class="col-6">
+              <h5 class="head-inv-pre">Supporting Documents</h5>
+            </div>
+
+            <div class="col-6 pr-0">
+              <button type="button" class="btn btn-clr"><a href="{% url 'credit:creditapprovaltrack' pk %}">Track
+                  credit
+                  Note</a></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row line-left">
+          {% for val in document_list %}
+          {% if val.data == '5' %}
+          <div class="col-md-12 col-lg-4 padd-btn"> 
+            <button type="button" class="invoice_docs commonbtn">{{val.name}}</button>
+        </div>
+          {% else %}
+          <div class="col-md-12 col-lg-4 padd-btn">
+            <button type="button" class="commonbtn" dataid="{{val.data}}">{{val.name}}</button>
+          </div>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="bor-rgt col-xl-6 col-md-6">
+
+      </div>
+
+      <div class="show_file_cls col-xl-6 col-md-6">
+
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="invfilediv bor-rgt col-xl-6 col-md-6">
+        <div>
+          <iframe class="doc_invhidcls" id="file_zoom" width="100%" src="" frameborder="0"></iframe>
+        </div>
+      </div>
+
+      <div class="col-xl-6">
+        <div>
+          <iframe width="100%" class="doc_selinvhidcls" src=""></iframe>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  {% for i in get_invoices_cost %}
+  <input type="hidden" class="invoice_num" value="{{i}}">
+  {% endfor %}
+
+  <div class="row color-btn justify-content-center my-5">
+    {% for rights in roles_rights %}
+    {% if rights.right.right_name == "Approve Invoice" %}
+    <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2"> <!--  inv_app_btn_cls -> class removed -->
+      <button type="button" class="btn btn-clr status_cls green" value="1" data-toggle="modal"
+        data-target="#exampleModalCenter">Approve</button>
+    </div>
+    {% endif %}
+    {% endfor %}
+    {% for rights in roles_rights %}
+    {% if rights.right.right_name == "Return Invoice" %}
+    {% if check_for_committe == 0 %}
+    {% if dispute_user > 0%}
+    {% if dispute_user_check.user.id == request.user.id %}
+    <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2"> <!--  inv_app_btn_cls -> class removed -->
+      <button type="button" class="btn btn-clr return_same_user beige">Return for Clarification</button> <!-- class removed -> violet -->
+    </div>
+    {% else %} 
+    <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2"> <!--  inv_app_btn_cls -> class removed -->
+      <button type="button" class="btn btn-clr status_cls beige" value="3" data-toggle="modal"
+        data-target="#exampleModalCenter">Return for Clarification</button>  <!-- class removed -> violet -->
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2"> <!--  inv_app_btn_cls -> class removed -->
+      <button type="button" class="btn btn-clr status_cls beige" value="3" data-toggle="modal"
+        data-target="#exampleModalCenter">Return for Clarification</button>  <!-- class removed -> violet -->
+
+    </div>
+    {% endif %}
+    {% endif %}
+    {% endif %}
+    {% endfor %}
+    {% for rights in roles_rights %}
+    {% if rights.right.right_name == "Reject Invoice" %}
+    {% if check_for_committe == 0 %}
+    <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2"> <!--  inv_app_btn_cls -> class removed -->
+      <button type="button" class="btn btn-clr status_cls red" value="4" data-toggle="modal"
+        data-target="#exampleModalCenter">Reject</button>
+    </div>
+    {% endif %}
+    {% endif %}
+    {% endfor %}
+
+    <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2"> <!--  inv_app_btn_cls -> class removed -->
+      <button type="button" class="btn btn-clr beige calbtn" value="2" data-toggle="modal"
+        data-target="#exampleModalCenter2">Calculator</button>
+    </div>
+
+    {% for rights in roles_rights %}
+    {% if rights.right.right_name == "View/Comment On Invoice" %}
+    <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2"> <!--  inv_app_btn_cls -> class removed -->
+      <button type="button" class="btn btn-clr cmt_cls" data-toggle="modal"
+        data-target="#exampleModalCenter">Comment</button>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+  <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true" data-backdrop="static" data-keyboard="false" style="background-color: rgba(0, 0, 0, 0.53);">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header comment-head">
+          <h5 class="modal-title" id="exampleModalCenterTitle">Comments</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body comment-body">
+          <textarea name="main_comments" id="main_comments" class="form-control cmnts"></textarea>
+          <div class="excp_content">
+          </div>
+        </div>
+        <div class="modal-footer comment-foot">
+          <button type="button" class="btn btn-secondary" id="submit_id">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter2" data-backdrop="static" tabindex="-1"
+    role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+      <div class="modal-content" data-backdrop="static">
+
+        <div class="modal-header comment-head">
+          <h5 class="modal-title" id="exampleModalCenterTitle">Calculator</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body calc-body">
+          <iframe src="{% url 'invoice:calculator' %}" title="description"></iframe>
+        </div>
+
+        <div class="modal-footer comment-foot">
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script>
+  $(function () {
+    $(".calculator-draggable").draggable();
+  });
+
+  function goback() {
+    window.history.back();
+  }
+
+  var invoiceid = "{{invoice_detail.id}}"
+  var credit_id = "{{pk}}"
+  var scheme = "{{request.scheme}}"
+  var gethost = "{{request.get_host}}"
+  var currentdomain = scheme + '://' + gethost
+  var package_src = "{% static 'js/web/viewer.html' %}"
+  var vendor_name="{{credit_detail.vendor.vendor_name}}"
+
+</script>
+<script src="{% static 'js/credit_note/creditnoteflow.js' %}"></script>
+{% endblock %}

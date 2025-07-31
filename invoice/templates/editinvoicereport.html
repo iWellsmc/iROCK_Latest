@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/projects/createflow.css' %}">
+
+    <button type="button" class="btn btn-clr btn-master chck-tst"><a href="{% url 'invoice:listinvoicereport' %}">Back</a></button>
+
+<section id="data-list-view" class="data-list-view-header">
+    <form  method="POST">
+    {% csrf_token %}
+    <table class="wcc-flow" style="width:85% !important;">
+        <tr>
+            <input name="submitfield" class="submitfield" type="hidden">
+            <input name="id"  type="hidden" value="{{pk}}">
+            <input name="reportname" class="form-control"  type="text" placeholder="Report Name" value="{{reportname}}">
+            <td>
+            <select name="period"  class="form-control date-width" id="period" >
+              <option value="">--Select--</option>
+              <option value="today"{%if period == 'today' %}Selected{%endif%}>Today</option>
+              <option value="lastmonth"{%if period == 'lastmonth' %}Selected{%endif%}>End of Last Month</option>
+              <option value="lastquarter"{%if period == 'lastquarter' %}Selected{%endif%}>End of Last Quarter</option>
+              <option value="financialyear"{%if period == 'financialyear' %}Selected{%endif%}>End of Last Financial Year</option>
+            </select>
+        </td></tr>
+
+        <tr>
+           <td><div>From Date:<input type="text" name="fromdate"  autocomplete="off" class="dateformat-cls form-control date-width fromdate" placeholder="From date" value="{{fromdate}}">To Date:<input type="text" name="todate" value="{{todate}}" autocomplete="off" class="dateformat-cls form-control date-width todate " placeholder="To date"></div></td>
+        </tr>
+        <tr>           
+            <td>
+                <select name="country"  class="currency-clss multiselect"  multiple="multiple" id="country" >
+                    {% for country in countries %}
+                    {%if selectedcountry %}
+                        {% for i in selectedcountry%}
+                            <option value="{{country.id}}"{%if i == country.id%} Selected {%endif%}>{{country.name}}</option>
+                        {%endfor%}
+                    {%else%}
+                    <option value="{{country.id}}">{{country.name}}</option>
+                    {%endif%}
+                    {% endfor %}
+                </select>
+            </td>
+            <td style="width:200px !important;">
+                <select name="project"  class="currency-clss multiselect" multiple="multiple" id="project" >
+                 {% for project in projects %}
+                    {%if selectedproject %}
+                        {% for i in selectedproject%}
+                            <option value="{{project.id}}" {%if i == project.id%} Selected {%endif%}>{{project.projectname.name}}</option>
+                        {%endfor%}
+                    {%else%}
+                    <option value="{{project.id}}">{{project.projectname.name}}</option>
+                    {%endif%}
+
+                {%endfor%}
+                </select>
+                
+            </td>
+            <td>
+                <select name="discipline"  class="currency-clss multiselect" multiple="multiple" id="discipline" >
+                  {% for discipline in discipline_subtype %}
+                    {%if selecteddiscipline%}
+                        {%for i in selecteddiscipline%}
+                            <option value="{{discipline}}" {%if i == discipline %} Selected {%endif%}>{{discipline}}</option>
+                        {%endfor%}
+                    {%else%}
+                    <option value="{{discipline}}">{{discipline}}</option>
+                    {%endif%}
+                  {%endfor%}
+                </select>
+                
+            </td>
+            <td>
+                <select class="currency-clss multiselect"  id="service" multiple="multiple"  name="service" class="form-control gener-hd-input" placeholder="Select Type of Service">
+                 <option value="Service"{%for i in selectedservice %} {%if i == 'Service' %}Selected{%endif%}{%endfor%}>Service</option>
+                 <option value="Supply"{%for i in selectedservice %} {%if i == 'Supply' %}Selected{%endif%}{%endfor%}>Supply</option>
+                 <option value="Service & Supply"{%for i in selectedservice %} {%if i == 'Service & Supply' %}Selected{%endif%}{%endfor%}>service and Supply</option>
+                </select>
+                
+            </td>
+            <td>
+                <select name="vendor" class="currency-clss multiselect" multiple="multiple" id="vendor" placeholder="Select Vendor">
+                   {% for vendors in vendorslist %}
+                        {%if selectedvendor%}
+                            {%for i in selectedvendor%}
+                                <option value="{{vendors.id}}" {%if i == vendors.id  %} Selected {%endif%}>{{vendors.vendor_name}}</option>
+                            {%endfor%}
+                        {%else%}
+                        <option value="{{vendors.id}}">{{vendors.vendor_name}}</option>
+                        {%endif%}
+                    {%endfor%}
+                </select>
+               
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <select name="currency"  class="currency-clss multiselect" multiple="multiple" id="currency" >
+                    {% for currency in companycurrency %}
+                        {%if selectedcurrency%}
+                            {%for i in selectedcurrency%}
+                                <option value="{{currency.id}}" {%if i == currency.id%} Selected {%endif%}>{{currency.currency_symbol}}-{{currency.currency}}</option>
+                            {%endfor%}
+                        {%else%}
+                            <option value="{{currency.id}}">{{currency.currency_symbol}}-{{currency.currency}}</option>
+                        {%endif%}
+                       
+                    {%endfor%}
+                </select>
+              
+            </td>
+            
+            <td>
+                <select name="approvalstatus"  class="currency-clss multiselect" multiple="multiple" id="approval" >
+                    <option value="Approved" {%for i in selectedapprovalstatus %} {%if i == 'Approved' %}Selected{%endif%}{%endfor%}>Approved</option>
+                    <option value="Awaiting Approval" {%for i in selectedapprovalstatus %} {%if i == 'Awaiting Approval' %}Selected{%endif%}{%endfor%}>Awaiting Approval</option>
+                    <option value="Disputed"{%for i in selectedapprovalstatus %} {%if i == 'Disputed' %}Selected{%endif%}{%endfor%}>Disputed</option>
+                    <option value="Returned"{%for i in selectedapprovalstatus %} {%if i == 'Returned' %}Selected{%endif%}{%endfor%}>Returned</option>
+                    <option value="Rejected"{%for i in selectedapprovalstatus %} {%if i == 'Rejected' %}Selected{%endif%}{%endfor%}>Rejected</option>
+                </select>
+                
+            </td>
+            <td>
+                <select name="paymentstatus"  class="currency-clss multiselect" multiple="multiple" id="paymentstatus" >
+                    <option value=2 {%for i in selectedpaymentstatus %} {%if i == 2 %}Selected{%endif%}{%endfor%}>Paid</option>
+                    <option value=1 {%for i in selectedpaymentstatus %} {%if i == 1 %}Selected{%endif%}{%endfor%}>Unpaid</option>
+                </select>
+               
+            </td>
+            <td>    
+                <select name="ageingperiod"  class="currency-clss multiselect"multiple="multiple"  id="ageingperiod">
+                    <option value="1"{%for i in selectedageingperiod %} {%if i == 1 %}Selected{%endif%}{%endfor%}>1 - 30 Days</option>
+                    <option value="2"{%for i in selectedageingperiod %} {%if i == 2 %}Selected{%endif%}{%endfor%}>31 - 60 Days</option>
+                    <option value="3"{%for i in selectedageingperiod %} {%if i == 3 %}Selected{%endif%}{%endfor%}>61 - 90 Days</option>
+                    <option value="4"{%for i in selectedageingperiod %} {%if i == 4 %}Selected{%endif%}{%endfor%}>91 - 120 Days</option>
+                    <option value="5"{%for i in selectedageingperiod %} {%if i == 5 %}Selected{%endif%}{%endfor%}>Above 120 Days</option>
+                </select>
+               
+            </td>
+        </tr>
+    </table>
+    <button type="submit" class="btn btn-clr text-left next-cls com-save">Generate Report</button>
+    <button type="submit" class="btn btn-clr text-left next-cls com-save savebtn">Save</button>
+    <button type="submit" class="btn btn-clr text-left next-cls com-save draftsave">Draft</button>
+    <!-- <button type="button" class="btn btn-clr btn-master"><a target="_blank" href="{% url 'invoice:generateinvoicereport' pk=pk %}">Download</a></button> -->
+</form>
+
+<div class="table-responsive text-nowrap inv-table_wid">
+    <table class="table prj-back_clr settings-data-list-view data-list-view invoicelist tot-in irock-table invoicevendor-table" id="master_project_list">
+        <thead >
+            <tr >
+                <th>S/N</th> 
+                <th>Vendor Name</th>  
+                <th>Invoice No</th>   
+                <th>Country</th>   
+                <th>Project Name</th>  
+                <th>Project Discipline</th>
+                <th>Type of Service</th>  
+                <th>Invoice Date</th>
+                <th>Submitted Date</th>
+                <th>Gross Amount(Inclusive of all Taxes)</th>
+                <th>Taxes</th>
+                <th>Net Amount Payable</th>
+                <th>Approval Status</th>
+                <th>Approval/Disputed Date</th>
+                <th>Payment Status</th>
+                <th>Payment Date</th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="table-list">
+            {% if invoice_count == 0 %}
+            <tr>
+                <td colspan="9" class="cls-nil">
+                  ---
+                </td>
+              </tr>   
+              {%else%}
+            {% for invoice in allinvoices %}
+            <tr>
+                <td class="snocls"></td>
+                <td>{{invoice.vendor.vendor_name}}</td>
+                <td class="t-sub-data">
+                    {%for costinvoice in invoice.id|getinvoices %}
+                    <div class="cos-in-nu">{{costinvoice.invoice_number}}</div>
+                    {% empty %}
+                    <div>---</div>
+                    {% endfor %}
+                </td>
+                {%getcountry invoice.id as country%}
+                <td>{{country|default_if_none:"---"}}</td>
+                <td>{{invoice.project_name}}</td>
+                <td>{%getprojectdiscipline invoice.id as discipline%}{{discipline}}</td>
+                <td>{{invoice.types_service}}</td>
+                <td class="t-sub-data">
+                    {%for costinvoice in invoice.id|getinvoices %}
+                    <div class="cos-in-nu">{{costinvoice.invoice_date}}</div>
+                    {% empty %}
+                    <div>---</div>
+                    {% endfor %}
+                </td>
+                <td class="text-center text-wrap"> 
+                    {%for costinvoice in invoice.id|getinvoices %}
+                    <div>{{costinvoice.invoice_submission_date|confulldate:costinvoice.invoice.company.id|default_if_none:"---"}}</div>
+                    {% empty %}
+                    <div>---</div>
+                    {% endfor %}
+                </td>
+                <td>{%for costinvoice in invoice.id|getinvoices %}
+                     {% invoicegrossamount costinvoice.id as invdisval %}
+                       <div>{{invdisval}}</div>
+                    {% empty %}
+                    <div>---</div>
+                    {% endfor %}
+                </td>
+               
+                <td>{%for costinvoice in invoice.id|getinvoices %}
+                    {% invoicetaxamount costinvoice.id as invdisval %}
+                      <div>{{invdisval}}</div>
+                   {% empty %}
+                   <div>---</div>
+                   {% endfor %}</td>
+                <td>
+                    {%for costinvoice in invoice.id|getinvoices %}
+                     {% invoicegrossamount costinvoice.id as invdisval %}
+                     {% invoicetaxamount costinvoice.id as invdistax %}
+                       <div>{{invdisval|addvalues:invdistax}}
+                        {%with total=invdisval|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}</div>
+                    {% empty %}
+                    <div>---</div>
+                    {% endfor %}
+                </td>
+                <td class="text-left ">
+                            {%for costinvoice in invoice.id|getinvoices %}
+                                <div>{% if costinvoice.approval_status == 0 and invoice.invoice_status == 1 %} Disputed {% elif costinvoice.approval_status == 1 and invoice.invoice_status == 2 %} Awaiting Approval {% elif costinvoice.approval_status == 1 and invoice.invoice_status == 1 %} Not Yet Submitted {% elif costinvoice.approval_status == 4 and invoice.invoice_status == 4 %} Returned {% elif costinvoice.approval_status == 5 and invoice.invoice_status == 5 %} Rejected {% else %} Approved {% endif %}</div>
+                                {% empty %}
+                                <div>---</div>
+                            {% endfor %}
+
+                </td>
+                <td class="text-center text-wrap">
+                    {%for costinvoice in invoice.id|getinvoices %}
+                    <div>{% if costinvoice.approval_date == "" or costinvoice.approval_date == None %} N/A {% else %} {{costinvoice.approval_date|confulldate:costinvoice.invoice.company.id}}{% endif %}</div>
+                    {% empty %}
+                    <div>---</div>
+                    {% endfor %}
+                </td>
+                <td class="vin_left text-wrap">
+                    {%for costinvoice in invoice.id|getinvoices %}
+                    <div>{% if costinvoice.payment_status == 1 %} Unpaid {% else %}  Paid {% endif %}</div>
+                    {% empty %}
+                    <div>---</div>
+                    {% endfor %}
+                </td>
+                <td >
+                    {%for costinvoice in invoice.id|getinvoices %}
+                    <div>{% if costinvoice.payment_date == "" or costinvoice.payment_date == None %} N/A {% else %} {{costinvoice.payment_date|confulldate:costinvoice.invoice.company.id}}{% endif %}</div>
+                    {% empty %}
+                    <div>---</div>
+                    {% endfor %}
+                </td>
+                <td class="eye_test text-wrap">
+
+                    <a class="btn p-0" href="{% url 'invoice:invoiceview' invoice.id %}">
+                          <i class="fa fa-eye" title="View"></i>
+                    </a>
+                        {% if vendor_status == True %}
+                        {% if invoice.invoice_status == 1 %} 
+                        <a class="btn p-0" href="{% url 'invoice:editinvoiceform' invoice.id 1 %}{% if invoice.wcc_id %}?wcc_id={{invoice.wcc_id}}{% endif %}">
+                        
+                            <i class="fa fa-edit" ></i>
+                        </a>
+                        {% endif %}
+                        {% endif %}
+
+                </td>
+            </tr>
+         
+            {% endfor %}
+            {% endif %}
+        </tbody>
+        </table> 
+        </div>
+
+
+{% endblock%}
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" ></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="air-datepicker/js/datepicker.min.js"></script>
+<script src="{% static 'js/invoice/editinvoicereport.js' %}"></script>
+{% endblock %}

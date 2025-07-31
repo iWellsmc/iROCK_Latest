@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/vendorinfo.css' %}">
+
+<div>
+    <h3 class="from-head"> List of Registered Vendors </h3>
+    <div class="row">
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+          {% if request.user.roles_id == 3 %}
+            {%if rights.create == '1' %}
+              <button type="button" class="btn btn-clr btn-master chck-tst"><a href="{% url 'projects:createvendor' %}">Add Vendor</a></button>
+            {% endif %}
+          {% else %}
+
+          <button type="button" class="btn btn-clr btn-master chck-tst"><a href="{% url 'projects:createvendor' %}">Add Vendor</a></button>
+          {% endif %}
+        </div>
+    </div>
+    <table class="table settings-data-list-view data-list-view project_master vend-thead proj-lists master-pro vend-tt vend_view_border">
+        {% csrf_token %}
+        <thead >
+            <tr >
+                <th>S/N</th> 
+                <th>vendor Name</th>     
+                <th>Country of Operation</th>
+                <th>Primary Contact</th>
+                <th>Mobile Number</th>
+                <th>Email id</th>
+                <th>Registered Date</th>
+                <th>Registration Status</th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="table-list">
+          {% if vendor_count > 0 %}
+            {% for vendor in vendors %}
+            <tr>
+            <td>{{forloop.counter|default_if_none:"---"}}</td>
+            <td>{{vendor.vendor_name}}</td>
+            <td>{{vendor.country_of_operation.name}}</td>
+            <td> {{vendor.contact_primary_first_name}} {{vendor.contact_primary_middle_name|default_if_none:"---"}} {{vendor.contact_primary_last_name}}  </td>
+            <td>{{vendor.contact_primary_mobile_code|convertnum}} {{vendor.contact_primary_mobile}} </td>
+            <td>{{vendor.official_primary_email}}</td>
+            <td>{{vendor.created_at|convertcompanytimezone:vendor.company.id}}</td>
+            {% comment %} <td>{{vendor.created}}</td> {% endcomment %}
+            <!--vendor status-->
+            {% if vendor.status == 3%}
+            <td>
+              <div class="badge badge-warning">
+                Awaiting Approval
+              </div>
+            </td>
+            {% endif %}
+
+            <td class="text-center icon-viewlist">
+              {% if request.user.roles_id == 3 %}
+                {%if rights.view == '1' %}
+                  <a class="btn p-0" data-toggle="collapse" href="#collapseExample{{vendor.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                    <span class="action-edit align-icons">
+                      <i class="fa fa-eye" style="font-size:17px; color:#95183a;"></i>
+                    </span>
+                  </a>
+                  {% endif %}
+              {% else %}
+                <a class="btn p-0" data-toggle="collapse" href="#collapseExample{{vendor.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                  <span class="action-edit align-icons">
+                    <i class="fa fa-eye" style="font-size:17px; color:#95183a;"></i>
+                  </span>
+                </a>
+              {% endif %}
+              {% if request.user.roles_id == 3 %}
+                {%if rights.edit == '1' %}
+                  {% if vendor.status == 4 %}
+                    <a href="#">
+                      {% comment %} {% url 'projects:resendemail' pk=vendor.id %} {% endcomment %}
+                      <span class="action-resend align-icons"><i class="fa fa-repeat"  style="font-size:17px; color:#95183a;"></i></span>
+                    </a>
+                  {% elif vendor.status == 3%}
+                    <a href="" >
+                      <span class="action-edit align-icons"><i class="fa fa-pencil"  style="font-size:17px; color:#95183a;"></i></span>
+                    </a>
+                  {% endif %}
+                {% endif %}
+              {% else %}
+                  {% if vendor.status == 4 %}
+                    <a href="#">
+                      {% comment %} {% url 'projects:resendemail' pk=vendor.id %} {% endcomment %}
+                      <span class="action-resend align-icons"><i class="fa fa-repeat"  style="font-size:17px; color:#95183a;"></i></span>
+                    </a>
+                  {% elif vendor.status == 3%}
+                    <a href="" >
+                      <span class="action-edit align-icons"><i class="fa fa-pencil"  style="font-size:17px; color:#95183a;"></i></span>
+                    </a>
+                  {% elif vendor.status == 3%}
+                  {% comment %} <a href="" >
+                    <span class="action-share align-icons"><i class="fa fa-share-square-o"  data-bs-toggle="tooltip" data-bs-placement="left" title="Send to Approve" style="font-size:17px; color:#95183a;"></i></span>
+                  </a> {% endcomment %}
+                  {% endif %}
+              {% endif %}
+              {% if request.user.roles_id == 3 %}
+                {%if rights.delete == '1' %}
+                  <a class="vendorregister_delete" data-id="{{vendor.id}}" vendor_name="{{vendor.vendor_name}}">
+                    <span class="action-delete align-icons"><id class="fa fa-trash-o"  style="font-size:17px; color:#95183a;"></i></span>
+                  </a>
+                {% endif %}
+              {% else %}
+                <a class="vendorregister_delete" data-id="{{vendor.id}}" vendor_name="{{vendor.vendor_name}}">
+                  <span class="action-delete align-icons"><id class="fa fa-trash-o"  style="font-size:17px; color:#95183a;"></i></span>
+                </a>
+              {% endif %}
+            </td>
+            </tr>
+            <tr>
+              <td colspan="12" class="p-0">
+                <div class="collapse" id="collapseExample{{vendor.id}}">
+                  <div class="card card-body shadow-none master-crd">
+                      <ul id="myTabs" class="nav nav-pills nav-justified new-tab" role="tablist" data-tabs="tabs">
+                        <li class="active"><a class="prjlist-menu" href="#vednorlist{{vendor.id}}" data-toggle="tab">Vendor Overview</a></li>
+                        <li><a class="prjlist-menu" href="#vednortypelist{{vendor.id}}" data-toggle="tab">Types of Service</a></li>
+                      </ul>
+                    
+                      <div class="tab-content"> 
+                        <div role="tabpanel" class="tab-pane active" id="vednorlist{{vendor.id}}">
+                          <div class="row">
+                            <div class="col-6">
+                              <br>
+                              <h4 class="from-head">Vendor Company Information</h4>
+                              <table class="prt-viewlist mid-view-tbl head-vend-mas">
+                                <tr><th>Vendor Name:</th><td>{{vendor.vendor_name}}</td></tr>
+                                <tr><th>Country Of Incorporation:</th><td>{{vendor.country_of_incorporation.nicename}}</td></tr>
+                                <tr><th>Register Number in the Country of Incorporation:</th><td>{{vendor.RegisterNumber}}</td></tr>
+                                <tr><th>Vendor Company Website:</th><td>{{vendor.website}}</td></tr>
+                              </table>
+                            </div>
+                            <div class="col-6">
+                              <br>
+                              <h4 class="from-head">Vendor Company Address</h4>
+                              <table class="prt-viewlist mid-view-tbl head-vend-mas">
+                                <tr><th>Country Of Operation:</th><td>{{vendor.country_of_operation.name}}</td></tr>
+                                <tr><th>State in the Country of Operation:</th><td>{{vendor.state.name}}</td></tr>
+                                <tr><th>Vendor Company Official Address:</th><td>{{vendor.Address}}</td></tr>
+                            </table>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-12">
+                              <table class="samll-tbl">
+                                <br>
+                                <h4 class="from-head">Vendor Tax Details</h4>
+                                <tr><th class="text-center">Tax Name</th><th class="text-center">Tax Number</th></tr>
+                                {% for taxes in vendor.id|vendortaxdetails:"tax" %}
+                                  <tr><td>{{taxes.Tax_Name}}</td><td>{{taxes.Tax_Number}}</td></tr>
+                                {% endfor %}
+                            </table>
+                            </div>
+                          </div>
+                          <br>
+                          <div class="row">
+                            <div class="col-6">
+                              
+                              <h4 class="from-head">Primary Contact Details</h4>
+                              <table class="prt-viewlist mid-view-tbl head-vend-mas">
+                                <tr><th>Primary Person Name:</th><td>{{vendor.contact_primary_title}}.{{vendor.contact_primary_first_name}} {{vendor.contact_primary_middle_name|default_if_none:"---"}} {{vendor.contact_primary_last_name}}</td></tr>
+                                <tr><th>Designation:</th><td>{{vendor.primary_designation}}</td></tr>
+                                <tr><th>Email Address:</th><td>{{vendor.official_primary_email}}</td></tr>
+                                <tr><th>Country Code:</th><td>{{vendor.contact_primary_phone_code|convertnum}}</td></tr>
+                                <tr><th>Area Code:</th><td>{{vendor.contact_primary_area_code}}</td></tr>
+                                <tr><th>Phone Number(Land Line):</th><td>{{vendor.contact_primary_phone}}</td></tr>
+                                <tr><th>Country Code:</th><td>{{vendor.contact_primary_mobile_code|convertnum}}</td></tr>
+                                <tr><th>Phone Number(Mobile No.):</th><td>{{vendor.contact_primary_mobile}}</td></tr>
+                              </table>
+                            </div>
+                            <div class="col-6">
+                              <h4 class="from-head" >Secondary Contact Details</h4>
+                              <table class="prt-viewlist mid-view-tbl head-vend-mas">
+                                <tr><th>Secondary Person Name:</th><td>{{vendor.contact_secondary_title}}.{{vendor.contact_secondary_first_name}} {{vendor.contact_secondary_middle_name|default_if_none:"---"}} {{vendor.contact_secondary_last_name}}</td></tr>
+                                <tr><th>Designation:</th><td>{{vendor.secondary_designation}}</td></tr>
+                                <tr><th>Email Address:</th><td>{{vendor.official_secondary_email}}</td></tr>
+                                <tr><th>Country Code:</th><td>{{vendor.contact_secondary_phone_code|convertnum}}</td></tr>
+                                <tr><th>Area Code:</th><td>{{vendor.contact_secondary_area_code}}</td></tr>
+                                <tr><th>Phone Number(Land Line):</th><td>{{vendor.contact_secondary_phone}}</td></tr>
+                                <tr><th>Country Code:</th><td>{{vendor.contact_secondary_mobile_code|convertnum}}</td></tr>
+                                <tr><th>Phone Number(Mobile No.):</th><td>{{vendor.contact_secondary_mobile}}</td></tr>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane fade" id="vednortypelist{{vendor.id}}">
+                          <div class="row">
+                            <div class="col-12">
+                              <br>
+                              
+                             
+                              <!--service starts here-->
+                              {% if vendor.id|checktypesserivcecount:'service' > 0%}
+                              <h3 class="from-head">Services</h3>
+                              <table class="type-last-vend mid-view-tbl tlt-cap ">
+                                <thead>
+                                <tr>
+                                  <th>S/N</th>
+                                  <th>Name of Contract</th>
+                                  <th>Brief Description of Service</th>
+                                  <th>Contract SO Number</th>
+                                  <th>SO Executed Date</th>
+                                  <!--<th>Types of Service</th>-->
+                                  <th>Contract File</th>
+                                </tr>
+                                </thead>
+                                
+                                <tbody>
+                                 
+                                  {% for service in vendor.id|vendorservicedetails:"service" %}
+                                  <tr>
+                                    <td>{{forloop.counter}}</td>
+                                    <td>{{service.nameofcontract}}</td>
+                                    <td>{{service.abrigdge_scope_service}}</td>
+                                    <td>{{service.contract_reference_number}}</td>
+                                    <td>{{service.contract_date|checktime:service.company_id}}</td>
+                                    <!--<td>{{service.type_services|Capwords}}</td>-->
+                                    <td>
+                                      <ul class="file-nme">
+                                      {%for contractfile in service.id|vendorcontractfile:vendor.id  %}
+                                        <li><a href="{{contractfile.files.url}}" download>{{contractfile.files}}</a></li>
+                                      {%endfor %}
+                                      </ul>
+                                    </td>
+                                  <tr>
+                                  {% endfor %}
+                                </tbody>
+                              </table>
+                              {% endif %}
+                              <!--service end here-->
+                              
+                              <!--supply starts-->
+                              {% if vendor.id|checktypesserivcecount:'supply' > 0%}
+                              <h3 class="from-head">Supply</h3>
+                              <table class="type-last-vend mid-view-tbl tlt-cap">
+                                <thead>
+                                <tr>
+                                  <th>S/N</th>
+                                  <th>Name of Contract</th>
+                                  <th>Brief Description of Service</th>
+                                  <th>Contract PO Number</th>
+                                  <th>PO Executed Date</th>
+                                  <!--<th>Types of Service</th>-->
+                                  <th>Contract File</th>
+                                </tr>
+                                </thead>
+                                
+                                <tbody>
+                                 
+                                  {% for service in vendor.id|vendorservicedetails:"supply" %}
+                                  <tr>
+                                    <td>{{forloop.counter}}</td>
+                                    <td>{{service.nameofcontract}}</td>
+                                    <td>{{service.abrigdge_scope_service}}</td>
+                                    <td>{{service.contract_reference_number}}</td>
+                                    <td>{{service.contract_date|checktime:service.company_id}}</td>
+                                    <!--<td>{{service.type_services|Capwords}}</td>-->
+                                    <td>
+                                      <ul class="file-nme">
+                                      {%for contractfile in service.id|vendorcontractfile:vendor.id  %}
+                                        <li><a href="{{contractfile.files.url}}" download>{{contractfile.files}}</a></li>
+                                      {%endfor %}
+                                      </ul>
+                                    </td>
+                                  <tr>
+                                  {% endfor %}
+                                </tbody>
+                              </table>
+                              {% endif %}
+                              <!--supply ends here-->
+
+                               <!--service & supply starts-->
+                               {% if vendor.id|checktypesserivcecount:'service-supply' > 0%}
+                               <h3 class="from-head">Service & Supply</h3>
+                               <table class="type-last-vend mid-view-tbl tlt-cap">
+                                 <thead>
+                                 <tr>
+                                   <th>S/N</th>
+                                   <th>Name of Contract</th>
+                                   <th>Brief Description of Service</th>
+                                   <th>Contract Reference Number</th>
+                                   <th>Contract Executed Date</th>
+                                   <!--<th>Types of Service</th>-->
+                                   <th>Contract File</th>
+                                 </tr>
+                                 </thead>
+                                 
+                                 <tbody>
+                                  
+                                   {% for service in vendor.id|vendorservicedetails:"service-supply" %}
+                                   <tr>
+                                    <td>{{forloop.counter}}</td>
+                                     <td>{{service.nameofcontract}}</td>
+                                     <td>{{service.abrigdge_scope_service}}</td>
+                                     <td>{{service.contract_reference_number}}</td>
+                                     <td>{{service.contract_date|checktime:service.company_id}}</td>
+                                     <!--<td>{{service.type_services|Capwords}}</td>-->
+                                     <td>
+                                       <ul class="file-nme">
+                                       {%for contractfile in service.id|vendorcontractfile:vendor.id  %}
+                                         <li><a href="{{contractfile.files.url}}" download>{{contractfile.files}}</a></li>
+                                       {%endfor %}
+                                       </ul>
+                                     </td>
+                                   <tr>
+                                   {% endfor %}
+                                 </tbody>
+                               </table>
+                               {% endif %}
+                               <!--service & supply ends here-->
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                </div>
+              </div>
+              </td>
+            </tr>
+            {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="8" class="cls-nil text-center">
+                  ---
+                </td>
+              </tr>
+            {% endif %}     
+        </tbody>
+    </table>
+</div>
+
+{%endblock%}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+
+  
+  $('.vendorregister_delete').click(function(){
+    var delete_id=$(this).attr('data-id')
+    var projectname=$(this).attr('vendor_name')
+    Swal.fire({
+      title: 'Are you sure you want to delete '+projectname,
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes,I Confirm',
+      cancelButtonText: 'No',
+    }).then((result) => {
+      if (result.isConfirmed) {
+         $.ajax({
+        type: "GET",
+        url:'/projects/vendordelete',
+        data: {
+          "id":delete_id,
+        },
+        success: function(data)
+        {
+          console.log(data)
+          setTimeout(function(){  
+          location.reload();  
+          },1000);
+        }
+         });
+        Swal.fire(projectname,'Deleted Successfully')
+      }
+    })
+  })
+  
+
+</script>
+
+{%endblock%}

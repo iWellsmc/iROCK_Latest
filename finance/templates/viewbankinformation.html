@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/bankdetails.css' %}">
+<section id="data-list-view" class="data-list-view-header">
+ <div>
+
+  <div class="row">
+    <!-- <div class="col-12 text-end">
+      <a class="btn btn-clr chck-tst" href="{% url 'finance:list_details' %}">Back</a>
+    </div> -->
+    <div class="col-9">
+    </div>
+   
+    <div class="col-3 text-end">
+      <a class="btn btn-clr chck-tst" href="{% url 'finance:list_details' %}">Back</a>
+    </div>
+  </div>
+  
+    <h4 class="from-head">Bank Users</h4>
+    <div class="row justify-content-center">
+        
+      <!-- <div class="row my-4">
+        <div class="col-9"> 
+          <div class="card all-noti-box">
+            <div class="show-noti">
+                <label>Show <select id="datafilters" class="changevalue select-style">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select> entries</label>
+        </div>
+        </div>
+        </div>
+        <div class="col-3 text-end">
+          <form method="get">
+              <input type="text" id="myInput" class="search-f-inf" name="q" placeholder="Search Bank Name" value="{{query}}">
+            
+            </form>
+        </div>
+    </div>
+      </div> -->
+    
+          <div class="table-responsive text-nowrap">
+            <table class="table irock-table viewuser-table" id="master_project_list">
+            <thead class="list-user">
+              <tr>
+              
+                <th>Bank Name</th>
+                <th>Currency</th>
+                <th>Account Number</th>
+                <th>Users</th>
+                <th>Payment Instruction Addressed</th>
+              </tr>
+            </thead>
+            <tbody class="table-list">
+            <tr>
+              <td class="td-left">{{bankinformation.bank_name.bank_name}}</td>
+              <td>
+               <p>{{bankinformation.currency.currency_symbol}}-{{bankinformation.currency.currency}} </p>
+              </td> 
+            <td>
+                <p>{{bankinformation.account_number.accountno}}</p>
+            </td>
+            <td class="td-left">{% getusers bankinformation.id as userlist %}
+              {% for i in userlist %}
+                  <p>{{i.user.Title}} {{i.user.name}} {{i.user.lastname}} - ({{i.user.designation_role}}) </p>
+                  <p>Email - {{i.user.email}}</p>
+              {% endfor %}
+          </td>
+            <td class="td-left">
+              <p>{{bankinformation.instructortitle}} {{bankinformation.instructorfirstname}} {{bankinformation.instructorlastname}}</p>
+            </td>
+            </tr>
+            </tbody>
+              </table>
+          </div>
+           
+</section>
+{% endblock%}
+{% block scripts %}
+{{ block.super }}
+{% endblock %}
+

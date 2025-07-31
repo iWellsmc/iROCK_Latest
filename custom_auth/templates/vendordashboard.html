@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load dashboard_tags %}
+
+{% load static %}
+{% load tz %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/dashboard/vendordashboard.css' %}">
+
+<div class="row g-3 m-0 mb-4">
+    <div>
+      <h5 class="from-head m-0" style="text-transform:capitalize; text-align: left;">Welcome {{request.user.name|default_if_none:"---"}} {{request.user.lastname|default_if_none:"---"}}{% if request.user.loginstatus != 1 %},{% endif %}</h5>
+    </div>
+    <div>
+        <h4>Your last login : <span class="local_time" login_date="{{request.user.login_date}}"></span> {{ request.user.login_date.tzname }}  </h4>
+    </div> 
+    <div>
+      {% comment %} <h5 >Vendor Name: <span>{{request.user.name|default_if_none:"---"}} {{request.user.lastname|default_if_none:"---"}}</span></h5> {% endcomment %}
+      <h5 >Vendor Name: <span>{{vendor.vendor_name}} </span></h5>
+    </div>
+    <div>
+        <h5 >Vendor Identification Number : <span>{{ request.user.cin_number}}</span></h5>
+      </div>
+</div>
+<div class="row dashboard-filters g-3 justify-content-end  align-items-end">
+    <div class="col-2 col-md-4 col-lg-2 col-xl-2">
+        <select name="country" class="form-control" id="countries" multiple="multiple">
+            <option>Country</option>
+            {% for allcountry in data.allcountries %}
+                <option value="{{allcountry.id}}">{{allcountry.name}}</option>
+            {%endfor%}
+        </select>
+    </div>
+    <div class="col-2 col-md-4 col-lg-2 col-xl-2">
+        <select name="projects" class="form-control" id="projects" multiple="multiple">
+            <option>Projects</option>
+            {% for allproject in data.allprojects %}
+                <option value="{{allproject.id}}">{{allproject.name}}</option>
+            {%endfor%}
+        </select>
+    </div>
+    <div class="col-2 col-md-4 col-lg-2 col-xl-2">
+        <select name="services" class="form-control" id="services" multiple="multiple">
+            <option>Services</option>
+            <option value="service">Services</option>
+            <option value="supply">Supply</option>
+            <option value="service_supply">Services and Supply</option>
+        </select>
+    </div>
+    <div class="col-2 col-md-4 col-lg-2 col-xl-2">
+        <select name="currency" class="form-control" id="currencies" multiple="multiple">
+            <option>Currency</option>
+            {% for currency in data.allcurrencies %}
+                <option value="{{currency.name}}">{{currency.name}}</option>
+            {%endfor%}
+        </select>
+    </div>
+    <div class="col-2 col-md-4 col-lg-2 col-xl-2">
+        <select name="tax" class="form-control" id="tax" multiple="multiple">
+            <option>Tax</option>
+            <option value="Exclusive">Gross Amount - Excl. Taxes</option>
+            <option value="Inclusive">Gross Amount - Incl. Taxes</option>
+        </select>
+    </div>
+   
+
+</div>
+<ul class="vendor-tab nav nav-pills m-4 d-flex justify-content-start" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#project_summary" type="button" role="tab" aria-controls="pills-home" aria-selected="true"><img class="new-svg menu-svg" src="/static/images/sidebarIcon/Projects.png">Projects</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#invoice_credit_note_summary" type="button" role="tab" aria-controls="pills-profile" aria-selected="false"><img class="new-svg menu-svg" src="/static/images/sidebarIcon/invoice.png">View Invoice/Credit Note Summary Details</button>
+    </li>
+    {% if getvendordetails.active_status == 1 %}
+    {% if request.user.contactpersonstatus == 1%}
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#raisequery" type="button" role="tab" aria-controls="pills-contact" aria-selected="false"><img class="new-svg menu-svg" src="/static/images/sidebarIcon/raise.png">Raise a Query</button>
+    </li>
+    {% endif %}
+    {% endif %}
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#country_wise" type="button" role="tab" aria-controls="pills-contact" aria-selected="false"><img class="new-svg menu-svg" src="/static/images/sidebarIcon/country.png">Country-Wise Overview</button>
+    </li>
+</ul>
+<div class="tab-content m-4" id="pills-tabContent">
+<div class="tab-pane fade show active" id="project_summary" role="tabpanel" aria-labelledby="projects-tab">
+    <div class="projectoverview_div row gap-5 mx-1">
+        <div class="project_div row col-xl-4 col-lg-4">
+            <div class="col-12 body-dash">
+            <div class="row p-0 mb-1">
+                <h4 class="from-side-head mb-3 text-left">Total Projects</h4>
+            </div>
+            <div class="row p-0  topics">
+                <div class="col-4"><h4>Total</h4>
+                    <div class="total_projects">{{data.total_project}}</div>
+                </div>
+                <div class="col-4">
+                    <h4>Active</h4>
+                    <div class="active_projects">{{data.active_project}}</div>
+                </div>
+                <div class="col-4"><h4>Inactive</h4>
+                    <div class="inactive_projects">{{data.inactive_project}}</div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="contracts_div col-xl-4 col-lg-4 row">
+            <div class="col-12 body-dash">
+            <div class="row p-0 mb-1">
+                <h5 class="from-side-head mb-3 text-left">Total Awarded Contracts</h5>
+            </div>
+            <div class="row p-0 topics">
+                <div class="col-4"><h4>Total</h4><div class="">{{data.total_contracts}}</div></div>
+                <div class="col-4"><h4>Active</h4> <div class="">{{data.active_contracts}}</div></div>
+                <div class="col-4"><h4>Inactive</h4><div class="">{{data.inactive_contracts}}</div></div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+</div>
+<div class="tab-pane fade" id="invoice_credit_note_summary" role="tabpanel" aria-labelledby="invoice_credit_note_summary-tab">
+    <div class="d-flex align-items-start">
+        <div class="nav flex-column nav-pills me-3 col-3 left-tab gap-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <button class="nav-link active" id="invoicesummary-tab" data-bs-toggle="pill" data-bs-target="#invoice_summary" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true"><img class="menu-svg new-svgs me-2" src="/static/images/sidebarIcon/invoice.png">View Invoice Summary Details</button>
+            
+            <button class="nav-link" id="creditnote-tab" data-bs-toggle="pill" data-bs-target="#creditnote_summary" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false"><img class="menu-svg new-svgs me-2" src="/static/images/sidebarIcon/note.png">View Credit Note Summary Details</button>
+            
+            <button class="nav-link" id="invoicesummary_chart-tab" data-bs-toggle="pill" data-bs-target="#invoicesummary_chart" type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false"><img class="menu-svg new-svgs me-2" src="/static/images/sidebarIcon/chart.png">View Invoice Summary Chart</button>
+            
+            <button class="nav-link" id="unpaid_overdue_invoice-tab" data-bs-toggle="pill" data-bs-target="#unpaid_overdue_invoice" type="button" role="tab" aria-controls="v-pills-settings" aria-selected="false"><img class="menu-svg new-svgs me-2" src="/static/images/sidebarIcon/chart.png">View Unpaid Invoices Vs Days Overdue</button>
+        </div>
+        <div class="tab-content col-9" id="v-pills-tabContent">
+            <div class="tab-pane fade show active" id="invoice_summary" role="tabpanel" aria-labelledby="invoicesummary-tab">
+            <table class="table invoice_summary_table irock-table new-vendor-table">
+                <thead>
+                    <tr>
+                        <th colspan="4">Total Amount of all Invoices Submitted</th>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Approved Invoices</th>
+                        <th rowspan="2" class="rowspan">Invoices Awaiting Approval</th>
+                        <th rowspan="2" class="rowspan">Disputed Invoices</th>
+                    </tr>
+                    <tr>
+                        <th>Paid</th>
+                        <th>Unpaid</th>
+                    </tr>
+                
+                </thead>
+                <tbody>
+                    {% for currency in data.default_currency_list %}
+                        {% getinvoiceamount_by_currency currency data.invoice_summary data.awaitedinvoice_summary data.disputedinvoice_summary as invoice_amounts %}
+                        <tr>
+                            <td class="vin-center">
+                                {% if invoice_amounts.approved_invoice_paid %}
+                                    {{currency}} {{invoice_amounts.approved_invoice_paid}}
+                                {%else%}
+                                    -
+                                {%endif%}
+                            </td>
+                            <td class="vin-center">
+                                {% if invoice_amounts.approved_invoice_unpaid %}
+                                    {{currency}} {{invoice_amounts.approved_invoice_unpaid}}
+                                {%else%}
+                                    -
+                                {%endif%}
+                            </td>
+                            <td class="vin-center">
+                                {% if invoice_amounts.awaited_invoice %}
+                                    {{currency}} {{invoice_amounts.awaited_invoice}}
+                                {%else%}
+                                    -
+                                {%endif%}
+                            </td>
+                            <td class="vin-center">
+                                {% if invoice_amounts.disputed_invoice %}
+                                    {{currency}} {{invoice_amounts.disputed_invoice}}
+                                {%else%}
+                                    -
+                                {%endif%}
+                            </td>
+                        </tr>
+
+                        
+                    {% endfor %}
+                </tbody>
+            </table>
+                
+            </div>
+            <div class="tab-pane fade" id="creditnote_summary" role="tabpanel" aria-labelledby="creditnote-tab">
+                <table class="table invoice_summary_table irock-table new-vendor-table">
+                    <thead>
+                        <tr>
+                            <th colspan="4">Total Amount of all Credit Notes Submitted</th>
+                        </tr>
+                        <tr>
+                            <th>Approved Credit Note</th>
+                            <th>Credit Note Awaiting
+                                Approval</th>
+                            <th>Disputed Credit Note</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="vin-center">{{data.default_currency}} {{data.credit_note_details.approved_creditnote_amount}}</td>
+                            <td class="vin-center">{{data.default_currency}} {{data.credit_note_details.unapproved_creditnote_amount}}</td>
+                            <td class="vin-center">{{data.default_currency}} {{data.credit_note_details.returned_rejected_credit_note_amount}}</td>
+                        </tr>
+
+                    </tbody>
+                    
+               
+                </table>
+            </div>
+            <div class="tab-pane fade" id="invoicesummary_chart" role="tabpanel" aria-labelledby="invoicesummary_chart-tab">
+                <div class="card invoice_summary_bar_chart_card">
+                    <div class="card_body">
+                        <div id="invoice_summary_bar_chart"  class="invoice_summary_bar_chart_div"></div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="tab-pane fade" id="unpaid_overdue_invoice" role="tabpanel" aria-labelledby="unpaid_overdue_invoice-tab">
+                <div class="card unpaid_overdue_box_chart_card">
+                    <div class="card_body">
+                        <div id="unpaid_overdue_box_chart"  class="unpaid_overdue_box_chart_div"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="tab-pane fade" id="raisequery" role="tabpanel" aria-labelledby="raisequery-tab">
+    <button type="button" class="btn btn-clr pe-5 me-3"><a href="{% url 'projects:vendorcontracchecklist' %}"><img class="menu-svg me-2" src="/static/images/sidebarIcon/raise.png">Query</a></button>
+    <button type="button" class="btn btn-clr"><a href="{% url 'projects:newcontractlist' %}"><img class="menu-svg me-2" src="/static/images/sidebarIcon/missed.png">Missed Contracts</a></button>
+</div>
+<div class="tab-pane fade" id="country_wise" role="tabpanel" aria-labelledby="country_wise-tab">
+    <div class="card country_wise_projects_card">
+        <div class="card_body">
+            <div id="country_wise_projects"  class="country_wise_projects_div"></div>
+
+        </div>
+    </div>
+
+</div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    var vendor_id='{{ data.vendor_id }}';
+</script>
+
+<script src="{% static 'js/dashboard/vendordashboard.js' %}"></script>
+<script src="{% static 'js/common/commondate.js' %}"></script>
+
+{% endblock %}
+
+

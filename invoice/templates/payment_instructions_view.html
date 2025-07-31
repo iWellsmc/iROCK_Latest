@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load credit_custom_tags %}
+{% load static %}
+{% block content %}
+{% load cost_code_tags %}
+{% load wcc_custom_tags %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/invoice.css' %}">
+
+<div class="row">
+    <div class="col-lg-6 col-md-3">
+    </div>
+<div class="col-lg-6 col-md-9 text-end">
+<button type="button" class="btn btn-clr"><a href="{% url 'invoice:getinvoicesplit' pk %}">Back</a></button>
+</div> 
+
+{% check_vendor request.user.cin_number as vendor %}
+{% if vendor %}
+<h5 class="from-sub-head">View Payment Instructions</h5>
+<div class="table-responsive">
+
+  <div class="head-inv-pre mt-5">Payment</div>  
+  <table class="invoice-summary-table-width inv-pretbl">
+  <thead>
+      <th>Invoice Number</th>
+      <th>Payment Percentage</th>
+      <th>Vendor Bank Details</th>
+      <th>Generated Instruction</th>
+      <th>Actions</th>
+  </thead>
+  <tbody>
+   {% for invoice in contractcostinvoice %}
+  {% find_payment_percentage paycount  invoice.id as payment_percentage %}
+  {% if payment_percentage.payment_percentage != 0 and payment_percentage.payment_percentage != None %}
+<tr>
+  <td>
+      {{payment_percentage.invoicecost.invoice_number}}
+  </td>
+  <td>
+    {{payment_percentage.payment_percentage}}%
+
+  </td>
+  <td>
+      {{payment_percentage.invoicecost.invoice_bank.bankname}}-{{payment_percentage.invoicecost.invoice_bank.accountnumber}}
+  </td>
+  <td>
+      {% if payment_percentage.invoicecost.payment_account == 1 %}
+         -
+      {% else %}  
+       {{payment_percentage.pi_number}}
+      {% endif %}
+   </td>
+  <td> 
+      <a class="btn p-0 generate_payment" data-toggle="collapse" href="#collapseExample{{payment_percentage.id}}" role="button" aria-expanded="false" aria-controls="collapseExample" data-id="{{payment_percentage.id}}"  data-value="{{paycount}}">
+      <span class="action-edit align-icons">
+        <i class="fa fa-eye eyebutton inv_file1 view_for_pdf" title="View" style="font-size:17px; color:#95183a;"></i>
+      </span>
+    </a>
+  </td>
+</tr>
+{% endif %}
+{% endfor %}
+  </tbody>
+  </table>
+
+
+</div>
+{% endif %}
+
+
+{% payment_receipt_file pk paycount   as payment_percentage %}
+{% if payment_percentage.1 > 0 %}
+
+<h5 class="from-sub-head re2">View Payment Receipt</h5>
+<div class="table-responsive">
+
+   
+  <table class="invoice-summary-table-width inv-pretbl">
+  <thead>
+      <th>S.No</th>
+      <th>Invoice Number</th>
+      <th>Payment Percentage</th>
+      <th>Payment Date</th>
+      <th>Payment Receipt File</th>
+  </thead>
+  <tbody>
+    
+   {% for invoice in payment_percentage.0 %}
+<tr>
+  <td>
+      {{forloop.counter}}
+  </td>
+  
+  <td>
+      {{invoice.payment_receipt.invoice_cost.invoice_number}}
+  </td>
+  <td>
+    {{invoice.payment_percentage}}
+  </td>
+  <td>
+    {{invoice.created_at|confulldate:request.company.id }}
+  </td>
+  <td>
+    {% payment_receipt_file_values pk paycount invoice.payment_receipt.id as files %}
+    <ul>
+      {% for file in files %}
+        <li><a target="_blank" href="{{ file.payment_receipt_file.url }}">
+          {% if file.original_file_name %}
+            {{ file.original_file_name|cut:"payment_receipt/" }}
+          {%else%}
+            {{ file.payment_receipt_file|cut:"payment_receipt/" }}
+          {%endif%}
+        </a></li>
+
+      {% endfor %}
+
+    </ul>
+      
+      
+   </td>
+  
+</tr>
+
+{% endfor %}
+  </tbody>
+  </table>
+
+
+</div>
+
+{% endif %}
+
+  <!--<div class="invoice-info">
+  <iframe class="doc_selinvhidcls first-view" id="payment_instruction" style="display: none;"> 
+  
+      </iframe>
+  </div>-->
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+  <script>
+    var invoiceid="{{pk}}"
+    var csrf_token="{{ csrf_token }}"
+    var package_src = "{% static 'js/web/viewer.html' %}"
+    </script>
+    <script src="{% static 'js/invoice/invoiceflowprocesstwo.js' %}"></script>
+
+
+  {% endblock %}

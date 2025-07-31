@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+<section>
+    <div class="row">
+        <div class="col-12 text-end">
+            <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'projects:listmaster' %}">Back</a></button>
+        </div>
+        </div>
+    <h3 class="from-head">Edit Block</h3>
+    <form method="POST" class="form-txt" id="edit-masterblock">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-4 col-md-3 col-lg-4">
+                <label class="txt-name">Country</label>
+                <p class="txt-detail">{{project_details.country.nicename}}</p>
+            </div>
+            <div class="col-4 col-md-4 col-lg-4">
+                <label  class="txt-name">Project Name</label>
+                <p class="txt-detail">{{project_details.name}}</p>
+            </div>
+            <div class="col-4 col-md-5 col-lg-4">
+                <label  class="txt-name">Block Name <span id="block-add-row"><i class="fa fa-plus-circle"></i></span></label>
+                <table>
+                    <tbody id="block_table">
+                        {% for block in project_block%}
+                        <tr>
+                            <td>
+                                <input type="hidden" name="blockid" value="{{block.id}}" class="blockid">
+                                <input list="browsers"  autocomplete="off" type="text" name="blockname" value="{{block.block_name}}" class="form-control block-class">
+                                <datalist id="browsers"><option value="Not Applicable"></datalist>
+                            </td>
+                            <td>
+                                <button id="block-delete-row" data-id="{{block.id}}" class="btn btn-clr add-btn waves-effect waves-float waves-light" type="button" value="Add"><i class="fa fa-minus"></i></button>
+                            </td>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+           
+              
+            </div>
+        </div>
+        <div class="text-center spacing-button">
+            <button type="button" class="btn btn-clr text-center prev-btn" project-id={{project_details.id}}>Prev</button>
+            <button type="button" class="btn btn-clr text-center submit-cls" data-id='1'>Save & Exit</button>
+            <button type="button" class="btn btn-clr text-center submit-cls" data-id='2'>Save & Next</button>
+
+        </div>
+    
+    </form>
+
+</section>
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+var is_filled=true;
+var lenfilled=true;
+var project_id="{{project_details.id}}"
+$(document).on("click","#block-add-row", function(){
+    if (is_filled==true && lenfilled==true){
+    var new_row='<tr><td><input type="hidden" name="blockid" value="" class="blockid"><input list="browsers" autocomplete="off" name="blockname" type="text" class="form-control block-class"><datalist id="browsers"><option value="Not Applicable"></datalist></td><td><button id="block-delete-row" class="btn-clr block-delete-row btn add-btn" type="button" value="delete"><i class="fa fa-minus"></i></button></td>'
+    $("#block_table").append(new_row);
+    }
+    else{
+
+    }
+})
+$(document).on("click", "#block-delete-row", function () {
+    console.log(is_filled)
+    console.log(lenfilled)
+    var current_element=$(this)
+    if (is_filled == true && lenfilled == true){
+    var block_ids=$(this).closest('td').prev('td').find('.block-class').val()
+    var block_id=$(this).closest('td').prev('td').find('.blockid').val()
+        if(block_id !='')
+        {
+        //  $.ajax({
+        //     type :"GET",
+        //     data:{'block_id':block_id},
+        //     url:'/projects/checkeditmasterblock',
+        //     success:function(data){
+        //         console.log(data)
+        //         if (data.data == 'exists'){
+        //             // alert('block already exists')
+        //             Swal.fire({
+        //                     icon:'warning',
+        //                     title: 'There is already data associated with this '+block_ids+'',
+        //                     confirmButtonColor: '#3085d6',
+        //                     cancelButtonColor: '#d33',
+        //             })
+        //         }
+        //         else{
+                    $.ajax({
+                            type:"GET",
+                            data:{'block_id':block_id},
+                            url:'/projects/checkblock',
+                            success: function(data){
+                            if (data.data == 'exists'){
+                                // alert(123)
+                                Swal.fire({
+                                    icon:'warning',
+                                    title: 'There is already data associated with this '+block_ids+', Do you want to delete this '+block_ids+' anyway?',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#3085d6',
+                                    cancelButtonColor: '#d33',
+                                    confirmButtonText: 'Yes, I Confirm',
+                                    cancelButtonText: 'No',
+                                    }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        current_element.closest('tr').remove()
+                                        Swal.fire(''+block_ids+' Block Deleted Successfully')
+                                    }
+                                    })
+                                }
+                                else if (data.data=="no_fields") {
+                                    Swal.fire({
+                                        icon:'warning',
+                                        title: 'There is no data associated with this '+block_ids+',Do you want to delete this '+block_ids+'?',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#3085d6',
+                                        cancelButtonColor: '#d33',
+                                        confirmButtonText: 'Yes, I Confirm',
+                                        cancelButtonText: 'No',
+                                        }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            current_element.closest('tr').remove()
+                                            Swal.fire(''+block_ids+' Block Deleted Successfully')
+                                        }
+                                        })
+                                    }
+                               }
+                    })
+        //         }
+        //     }
+        //  })
+        
+
+
+
+
+        }
+        else{
+            $(this).closest('tr').remove()
+            is_filled=true;
+        }
+    }
+})
+
+$(document).ready(function(){
+
+    $(document).on("keyup",".block-class",function(){
+        var x=$(this).val().toLowerCase();
+        var spanid=$(this).closest('tr').index()
+        if (x.length <= 14){
+            lenfilled = true;
+            $('#block'+spanid+'').remove()
+        }
+        else {
+            lenfilled = false;
+            $('#block'+spanid+'').remove()
+            $(this).closest('tr').after('<span class="waring-err" id=block'+spanid+'>Maximum 14 Characters only</span>')
+        }
+        var z=0;
+        $("input").each(function(){
+            if (x != 'not applicable'){
+                if (x !='' && y !=''){
+                var y=$(this).val().toLowerCase();
+                if(x==y){
+                    z=z+1;
+                }
+            }
+        }
+        });
+        if(z>1){
+            var spanid=$(this).closest('tr').index()
+            $(this).addClass("error")
+            is_filled = false;
+            console.log(is_filled)
+            $(this).closest('tr').after('<span class="waring-err" id=block'+spanid+'>Block name already exists</span>')
+        }
+        else{
+            $(this).removeClass("error")
+            is_filled = true;
+            $('block'+spanid+'').remove()
+        }
+    })
+
+    var empty_filled=true;
+$(document).on('click','.submit-cls',function(e){
+    $('.block-class').each(function(){
+        if ($(this).val()=='') {
+            empty_filled = false;
+            Swal.fire({
+                icon: 'error',
+                title: 'Error...',
+                text: 'The Block is required',
+                })
+        }
+        else{
+            empty_filled = true;
+        }
+        e.preventDefault()
+
+    })
+ 
+    console.log(is_filled)
+    console.log(lenfilled)
+    if(is_filled == false || lenfilled == false || empty_filled == false){
+        console.log('not create')
+    }
+    else{
+        $(this).prop('disabled', true);
+    btn_id=$(this).attr('data-id');
+    var form=$("#edit-masterblock");
+        $.ajax({
+          type:"POST",
+          container:"#edit-masterblock",
+          url:'/projects/editmasterblock/'+project_id,
+          data:form.serialize(),
+          success: function(data){
+              if (btn_id == '1' ){
+                var current_url=$(location).attr("href")
+                var replace_url=current_url.replace("editmasterblock/"+project_id+"","listmaster")
+                window.location.href = replace_url;
+
+              }
+              else{
+                var url = "{% url 'projects:editmasterfield' 123 %}";
+                document.location.href = url.replace('123', project_id);
+              }
+            }
+        })
+    }
+})
+})
+ /*$(document).on("click", ".next-btn", function () {
+    var url = "{% url 'projects:editmasterfield' 123 %}";
+    document.location.href = url.replace('123', project_id); 
+})*/
+
+$(document).on("click", ".prev-btn", function () {
+    var project_id=$(this).attr('project-id');
+    var current_url=$(location).attr("href")
+    var replace_url=current_url.replace("editmasterblock/"+project_id+"","editmasterproject/"+project_id+"")
+    window.location.href = replace_url;
+    
+})
+</script>
+{% endblock %}

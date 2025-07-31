@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li  {% if message.tags %} class="{{ message.tags }} msg-cls"{% endif %} style="display:none;"> {{ message }} </li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<div>
+    <div class="row">
+        <div class="col-12 text-end">
+            <button type="button" class="btn btn-clr"> <a href="{% url 'cost_code:costcodelist' %}">Back</a> </button>
+        </div>
+    </div>
+
+    <h3 class="from-head">Generate Specific Report</h3>
+
+    <div class="row">
+        <div class="col-6">
+        </div>
+
+        <div class="col-6 text-end">
+            {%if listcount == 0 %}
+            <button type="button" class="btn btn-clr btn-master generatebtn">Generate Cost Code</a></button>
+            {%else%}
+            {% if company_image > 0 %}
+
+            <button type="button" class="btn btn-clr generate"><a href="{% url 'cost_code:generatecostcode_excel' %}"
+                    target="_blank">Generate All Report</a></button>
+
+            {%else%}
+            <button type="button" class="btn btn-clr"><a href="{% url 'cost_code:generatecostcode_excel' %}"
+                target="_blank">Generate All Report</a></button>
+                   
+            {% endif %}         
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row d-flex justify-content-center">
+        <div class="col-6 col-md-9 col-lg-6">
+            <div class="invite-cards">
+                <form method="POST" class="bot-sp-sea" id="specific_contract">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12 spa-ce-bottom">
+                            <label class="g-s-report">Level 1 Category</label>
+                            <select name="level_1" class="form-control form-select typecls in-put-gen" id="level1_category" required>
+                                <option value="" selected>--Select--</option>
+                                {% for discipline in alldiscipline %}
+                                {% for development in alldevelopment %}
+                                <option value="{{discipline.id}}_{{development.id}}">
+                                    {{discipline.name}}({{development.development_type}})</option>
+                                {% endfor %}
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-12 spa-ce-bottom">
+                            <label class="g-s-report">Level 2 Category</label>
+                            <select name="level_2" class="form-control form-select name_contractcls in-put-gen" id="level2_category" required>
+                               
+                            </select>
+                        </div>
+
+
+                        <div class="text-center">   <!--class => spacing-button -->
+                            <button type="submit" class="btn btn-clr text-center">Submit</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+{{ block.super }}
+
+<script src="{% static 'js/cost_code/cost_code_list.js' %}"></script>
+
+
+{% endblock %}

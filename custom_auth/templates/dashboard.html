@@ -1,0 +1,497 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+{% load tz %}
+{% block content %}
+
+
+
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/dashboard/clentadmindashboard.css' %}">
+{% if request.user.roles.id == 2 %}
+<div id="comp-data" data-id={{ request.user.company.cin_number }}>
+
+<div class="row g-3 m-0 mb-4">
+  <div>
+    <h1 class="from-head mb-0" style="text-transform:capitalize; text-align: center;">{{request.user.company}}</h1>
+  </div>
+  <div>
+    <h5 class="from-head mb-0" style="text-transform:capitalize; text-align: left;">Welcome
+      {{request.user.name|default_if_none:"---"}} {{request.user.lastname|default_if_none:"---"}}
+      {% if request.user.loginstatus != 1 %},{% endif %}</h5>
+  </div>
+  <div>
+    <h4>Your last login : <span class="local_time" login_date="{{request.user.login_date}}"></span> 
+      {{ request.user.login_date.tzname }} </h4>
+  </div>
+  <div>
+    <h4>Client Identification Number : <span>{{ request.company.cin_number}}</span></h4>
+  </div>
+</div>
+
+<div>
+  <ul class="client-tab nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#lp_information"
+        type="button" role="tab" aria-controls="pills-home" aria-selected="true"><img class="new-svg menu-svg" src="/static/images/sidebarIcon/country.png">Country-Wise Overview</button>
+    </li>
+    
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#Projects" type="button"
+        role="tab" aria-controls="pills-contact" aria-selected="false"><img class="menu-svg new-svg" src="/static/images/sidebarIcon/Projects.png">Projects</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#manage_user" type="button"
+        role="tab" aria-controls="pills-profile" aria-selected="false"><img class="menu-svg new-svg" src="/static/images/sidebarIcon/muser.png">Manage Users</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#st_request" type="button"
+        role="tab" aria-controls="pills-contact" aria-selected="false"><img class="menu-svg new-svg" src="/static/images/sidebarIcon/sticket.png">Service Ticket Request</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#Notices" type="button"
+        role="tab" aria-controls="pills-contact" aria-selected="false"><img class="menu-svg new-svg" src="/static/images/sidebarIcon/notify.png">Notices and Announcements</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#country_wise" type="button"
+        role="tab" aria-controls="pills-contact" aria-selected="false"><img class="menu-svg new-svg" src="/static/images/sidebarIcon/license.png">License Package Information</button>
+    </li>
+  </ul>
+</div>
+
+<div class="tab-content" id="pills-tabContent">
+  <div class="tab-pane fade show active" id="lp_information" role="tabpanel" aria-labelledby="lp_information">
+    <div class="highcharts-figure">
+      <div class="card country_wise_projects_card">
+        <div class="card_body p-3">
+      <div id="containerss" style="overflow: scroll;" ></div>
+    </div>
+  </div>
+    </div>
+    
+    
+    
+  </div>
+
+  <div class="tab-pane fade" id="manage_user" role="tabpanel" aria-labelledby="manage_user">
+    <div class="row gap-4">
+      <div class="col-4">
+        <div class="body-dash">
+        <h3 class="from-side-head mb-3 text-left"><img src="/static/images/sidebarIcon/tuser.png" class="left-icon-small">User Overview</h3>
+        <div class="row mb-2">
+          <div class="col-4">
+        <h4>Total Users</h4><span>{{ request.user.company.number_of_users}}</span>
+      </div>
+      <div class="col-4">
+        <h4>Active Users</h4><span>{{ request.user.company.number_of_users}}</span>
+      </div>
+      <div class="col-4">
+        <h4>Inactive Users</h4><span>0</span>
+      </div>
+      </div>
+    </div>
+      </div>
+      <div class="col-7 p-3">
+        <h3 class="from-side-head mb-4 text-left"><img src="/static/images/sidebarIcon/manage.png" class="left-icon-big">Manage Users</h3>
+        <div class="d-flex gap-3 flex-wrap">
+        <ul class="manage-ul">
+          <a href="{% url 'projects:usercreate' %}">
+            <li><img src="/static/images/sidebarIcon/auser.png" class="left-icon-small">Create User</li>
+          </a>
+
+        </ul>
+        <ul class="manage-ul">
+          <a href="{% url 'projects:userlist' %}">
+            <li><img src="/static/images/sidebarIcon/manage.png" class="left-icon-small">Users</li>
+          </a>
+        </ul>
+
+        <ul class="manage-ul">
+          <a href="{% url 'custom_auth:list-userdepartment-form' %}">
+            <li><img src="/static/images/sidebarIcon/user-department.png" class="left-icon-small">User Departments</li>
+          </a>
+        </ul>
+
+        <ul class="manage-ul">
+          <a href="{% url 'custom_auth:list-usergroup-form' %}">
+            <li><img src="/static/images/sidebarIcon/user-group.png" class="left-icon-small">User Group</li>
+          </a>
+        </ul>
+
+        <ul class="manage-ul">
+          <a href="{% url 'InvoiceGuard:list-rolesandrights-form' %}">
+            <li><img src="/static/images/sidebarIcon/user-role-rights.png" class="left-icon-small">User Roles & Rights</li>
+          </a>
+        </ul>
+      </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="tab-pane fade" id="Projects" role="tabpanel" aria-labelledby="Projects">
+    <div class="row mx-1 my-4 justify-content-end">
+      <div class="col-2">
+        <select name="country_filter" id="country_filter" class="form-control form-select list-control">
+          <option value=" ">--Select Country--</option>
+          {% with countries=request|get_country_by_pro %}
+          {% for country in countries.country_names %}
+          <option value="{{ country.id }}">{{ country.name }}</option>
+          {% endfor %}
+          {% endwith %}
+        </select>
+      </div>
+      <div class="col-2">
+        <select name="project_fillter" id="project_id" class="form-control form-select list-control">
+
+          <option value=" ">--Select Project--</option>
+
+        </select>
+
+
+      </div>
+    </div>
+    <div class="row mx-1">
+
+      
+      <div class="col-4">
+      <a href="{% url 'projects:projectlist' %}">
+        <div class="body-dash">
+        <h3 class="from-side-head mb-3 text-left">Project Overview</h3>
+        <div class="row mb-2">
+        {% with request|get_project_by_pro as project_counts %}
+        <div class="col-4">
+        <h4>Total</h4><span id ="total_project" >{{ project_counts.total_project }}</span>
+      </div>
+      <div class="col-4">
+        <h4>Active </h4>  <span id="active_project" >{{ project_counts.active_project }}</span>
+      </div>
+      <div class="col-4">
+        <h4>Inactive </h4> <span id= "inactive_project" >{{ project_counts.inactive_project }}</span>
+      </div>
+        {% endwith %}
+      </div>
+      </div>
+    </a>
+    </div>
+
+      <div class="col-4">
+        <a href="{% url 'projects:vendormasterlist' %}">
+        <div class="body-dash">
+        <h3 class="from-side-head mb-3 text-left">Vendors Overview</h3>
+        <div class="row mb-2">
+        {% with request|get_vendors as vendors_counts %}
+        <div class="col-4">
+        <h4>Total</h4> <span>{{ vendors_counts.total_vendor }}</span>
+        </div>
+        <div class="col-4">
+        <h4>Active</h4> <span>{{ vendors_counts.active_vendor }}</span>
+        </div>
+        <div class="col-4">
+        <h4>Inactive</h4> <span>{{ vendors_counts.Inactive_vendor }}</span>
+        </div>
+        {% endwith %}
+      </div>
+      </div>
+      </a>
+      </div>
+
+      <div class="col-4">
+        <a href="{% url 'projects:contractmasterlist' %}">
+         <div class="body-dash">
+        <h3 class="from-side-head mb-3 text-left">Awarded Contracts</h3>
+        <div class="row mb-2">
+        {% with request|awar_contracts as awar_contracts %}
+        <div class="col-4">
+        <h4>Total</h4><span id="total_contract" >{{ awar_contracts.total_contract }}</span>
+      </div>
+      <div class="col-4">
+        <h4>Active</h4><span id="active_contract" >{{ awar_contracts.active_contract }}</span>
+      </div>
+      <div class="col-4">
+        <h4>Inactive</h4><span id="Inactive_contract" >{{ awar_contracts.Inactive_contract }}</span>
+      </div>
+        {% endwith %}
+      </div>
+      </div>
+      </a>
+      </div>
+    </div>
+
+  </div>
+  <div class="tab-pane fade" id="st_request" role="tabpanel" aria-labelledby="country_wise-tab">
+    <ul class="manage-ul new-ul d-flex gap-5">
+    <li>
+      <a href="#"><img src="/static/images/sidebarIcon/requestt.png" class="left-icon-small">Request Service Tickets</a>
+    </li>
+    <li>
+      <a href="#"><img src="/static/images/sidebarIcon/opent.png" class="left-icon-small">Open Service Tickets</a>
+    </li>
+    <li>
+      <a href="#"><img src="/static/images/sidebarIcon/closet.png" class="left-icon-small">Closed Service Tickets</a>
+    </li>
+  </ul>
+  </div>
+  <div class="tab-pane fade" id="Notices" role="tabpanel" aria-labelledby="Notices">
+    <div class="d-flex gap-5">
+      <div>
+        <h3 class="from-side-head mb-3 text-left">Available Software Versions</h3>
+        <ul class="manage-ul new-ul d-flex gap-5">
+          <li>
+            <img src="/static/images/sidebarIcon/freeupgrade.png" class="left-icon-small">
+Free Upgrades
+          </li>
+          <li>
+            <img src="/static/images/sidebarIcon/PaidUpgrades.png" class="left-icon-small">
+Paid Upgrades
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="from-side-head mb-3 text-left">Other Notices and Announcements</h3>
+        <ul  class="manage-ul new-ul d-flex gap-5">
+          <li>
+            <img src="/static/images/sidebarIcon/UpcomingPayments.png" class="left-icon-small">
+Upcoming Payments
+          </li>
+          <li>
+            <img src="/static/images/sidebarIcon/notices.png" class="left-icon-small">
+Other Notices and Announcements
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane fade" id="country_wise" role="tabpanel" aria-labelledby="country_wise">
+    <!-- Create a container for the chart -->
+    <div class="col-6">
+      
+      <fieldset class="Lpi_button">
+        <legend class="w-auto"><img src="/static/images/sidebarIcon/license.png" class="left-icon-small">License Package Overview</legend>
+        <div class="row">
+          <div class="col-12">
+            <div>
+              <p><strong>License Type :</strong>
+                {% if request.user.company.type_of_license == '1' %}
+                Perpetual
+                {% else %}
+                Corporate Yearly
+                {% endif %}</p>
+            </div>
+            <div>
+              <p><strong>License Start Date :</strong>
+                <span> {{ request.user.company.invoicedate }}</span>
+              </p>
+            </div>
+            <div>
+              <p><strong>License End Date :</strong>
+                {{ request.user.company.type_of_license|renival_date:request }}
+              </p>
+            </div>
+            <div>
+              <p><strong>Package :</strong>
+
+                {% if data.package == '1'%}
+                I-R
+                {%elif data.package == '2'%}
+                I-R-O
+                {%elif data.package == '3'%}
+                I-R-C
+                {%elif data.package == '4'%}
+                I-R-O-C
+                {%else%}
+                I-R-O-C-K
+                {%endif%}
+              </p>
+            </div>
+            <div>
+              <p><strong>Number of Users :</strong> {{ request.user.company.number_of_users}}</p>
+            </div>
+            <div>
+              <p><strong>Concurrent Users :</strong> {{ request.user.company.concurent_users }}</p>
+              <div>
+                <p><strong>Software Version:</strong> 0.1</p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+   
+</div>
+{% endif %}
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+{{ block.super }}
+
+
+<script src="{% static 'js/common/commondate.js' %}"></script>
+<script>
+  $('#country_filter').change(function () {
+    // alert('1');
+    var country_id = $(this).val();
+    var projects = '';
+    if (country_id != ' ') {
+      $.ajax({
+        type: "GET",
+        url: '/projects/getprojectcreation',
+        data: { 'country_id': country_id },
+        success: function (data) {
+          console.log(data)
+          
+          projects += '<option value=" " selected>--Select Project--</option>'
+          $.each(data.data, function (key, val) {
+            projects += '<option value=' + val.id + '>' + val.name + '</option>'
+          })
+          $('#project_id').html(projects);
+          $('#total_project').text(data.project_count.total_project)
+          $('#active_project').text(data.project_count.active_project)
+          $('#Inactive_project').text(data.project_count.Inactive_project)
+
+
+        },error: function(xhr, status, error) {
+
+          $('#project_id').html('<option value=" " selected>--Select Project--</option>')
+          
+          
+        }
+        
+      })
+
+    }
+    else {
+      $('#project_id').html('<option value=" " selected>--Select Project--</option>')
+
+    }
+  });
+  $('#project_id').change(function () {
+    
+    var project_id = $(this).val();
+    var projects = '';
+    if (project_id != ' ') {
+
+      $.ajax({
+        type: "GET",
+        url: '/projects/getprojectvendorls',
+        data: { 'project_id': project_id },
+        success: function (data) {
+          console.log(data.contract_count.total_contracts)
+          $('#total_contract').text(data.contract_count.total_contracts)
+          $('#active_contract').text(data.contract_count.active_contracts)
+          $('#Inactive_contract').text(data.contract_count.Inactive_contracts)
+
+        },error: function(xhr, status, error) {
+
+        }
+        
+      })
+
+    }
+    else {
+      
+      $('#total_contract').text(0)
+      $('#active_contract').text(0)
+      $('#Inactive_contract').text(0)
+
+    }
+  })
+
+
+
+
+
+
+
+
+</script>
+<script type="text/javascript" src="{% static 'js/custom_auth/dashboard.js' %}"></script>
+
+
+<script>
+  $(document).ready(function() {
+
+    let element = document.getElementById('comp-data');
+    let cin_number = element.getAttribute('data-id');
+    var scheme="{{request.scheme}}"
+    var gethost="{{request.get_host}}"
+    var currentdomain=scheme+'://'+gethost
+    console.log("currentdomain",currentdomain)
+     
+    
+    $.ajax({
+        
+        url: currentdomain+"/dashbord/dash_country_view", 
+       // URL to your server-side script
+        type: "GET", // HTTP method
+        dataType: "json",
+        data: {
+          cin_number: cin_number
+          
+          // Add more parameters as needed
+      }, // Data type expected from the server
+        success: function(data) {
+          console.log(data.data)
+          Highcharts.chart('containerss', {
+
+            chart: {
+                height: '100%'
+            },
+
+            // Let the center circle be transparent
+            colors: ['#AF2B50'].concat(Highcharts.getOptions().colors),
+
+            title: {
+                text: 'Country-Wise Overview'
+            },
+            series: [{
+                type: 'sunburst',
+                data: data.data,
+                name: 'Root',
+                allowDrillToNode: true,
+                borderRadius: 3,
+                cursor: 'pointer',
+                dataLabels: {
+                    format: '{point.name}',
+                    filter: {
+                        property: 'innerArcLength',
+                        operator: '>',
+                        value: 16
+                    }
+                },
+                levels: [{
+                    level: 1,
+                    levelIsConstant: false,
+                    dataLabels: {
+                        filter: {
+                            property: 'outerArcLength',
+                            operator: '>',
+                            value: 64
+                        }
+                    }
+                }]
+
+            }],
+
+            tooltip: {
+                headerFormat: '',
+                pointFormat: '{point.name}</b>  <b> {point.value}</b>'
+            }
+          });
+        },
+        error: function(xhr, status, error) {
+            // This function will be called if the request fails
+            console.error("Error:", error);
+        }
+    });
+});
+</script>
+
+
+{% endblock %}

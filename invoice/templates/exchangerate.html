@@ -1,0 +1,392 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/exchangerate.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/calculator.css' %}">   
+<link rel="stylesheet" href="path/to/bootstrap.min.css">
+
+<!-- Include Bootstrap JavaScript -->
+
+<h4 class='from-head'>Tax Confirmation</h4> 
+
+<div class="row">
+        {% include 'invoicedata.html' %}
+        <form method="POST" id="exchangerate_form">
+            {% csrf_token %}
+            <div class="row color-btn justify-content-center my-5">
+              
+              {% for rights in roles_rights %}
+              {% if rights.right.right_name == "View/Comment On Invoice" %}
+                  <div class="col-2 text-center"> 
+                    <button type="button" class="btn btn-clr rose cmt_cls" data-toggle="modal" data-target="#exampleModalCenter">Comment</button>
+                  </div>
+                {% endif %}
+              {% endfor %}
+              
+                {% for rights in roles_rights %}
+                {% if rights.right.right_name == "Tax Confirmation" %}
+                  <!-- <div class="col-2 text-center">  
+                    <button type="button" class="btn btn-clr dark_blue exchangeratenextab" data-toggle="modal" data-target="#myModal">Exchange Rate Calculation</button>
+                  </div> -->
+                  {% check_rolerights 'Confirm Cost Code' get_role_id as checkconfirm_costcode_rights %}
+                  {% if checkconfirm_costcode_rights %}
+                  <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2"> 
+                    <button type="button" class="btn btn-clr status_cls green" value="1" data-toggle="modal" data-target="#confirm_cost_code">Confirm Cost Code</button>
+                  </div>
+                  {%endif%}
+                  <div class="col-2 text-center">
+                    {% if invoiceflow_modules.exchangerate_confirm_status == 2 and invoiceflow_modules.tax_confirm_status == 1 %}
+                    <button type="button" class="btn btn-clr status_cls dark_green" value="1" data-toggle="modal" data-target="#exampleModalCenter">Confirm</button>
+                    {% else %}
+          
+                    <button type="button" class="btn btn-clr {% if checkconfirm_costcode_rights and not Invoice_details.is_conform_costcode %}notconform_costcode 
+                    {% else %}
+                        {% if invoiceflow_modules.exchangerate_confirm_status == 0 and invoiceflow_modules.tax_confirm_status == 0 or invoiceflow_modules.exchangerate_confirm_status == 3 %}
+                            nothing_confirmed 
+                        {% elif invoiceflow_modules.exchangerate_confirm_status == 1 and invoiceflow_modules.tax_confirm_status == 0 %}
+                            confirm_tax
+                        {% endif %}
+                    {% endif %}
+                    dark_green confirm_btn">Confirm</button>
+                    {% endif %}
+                  </div>
+                  <div class="col-2 text-center">
+                      {% if checkconfirm_costcode_rights %}
+                        {% if Invoice_details.is_conform_costcode %}
+                          <button type="button" class="btn btn-clr dark_blue exchangeratecal" data-toggle="modal" data-target="#exchangeratecal">Exchange Rate</button>
+                        {%else%}
+                          <button type="button" class="btn btn-clr dark_blue exchangeratecal notconform_costcode">Exchange Rate</button>
+                        {%endif%}
+                      {%else%}
+                        <button type="button" class="btn btn-clr dark_blue exchangeratecal" data-toggle="modal" data-target="#exchangeratecal">Exchange Rate</button>
+                      {%endif%}
+                        
+                </div>
+                {% if invoiceflow_modules.exchangerate_confirm_status == 1 and invoiceflow_modules.tax_confirm_status == 0 %}
+                <div class="col-2 text-center">
+                  {% if checkconfirm_costcode_rights %}
+                    {% if Invoice_details.is_conform_costcode %}
+                      <button type="button" class="btn btn-clr chocolate_color"><a href="{% url 'invoice:taxconfirmcheck' pk %}">Tax Confirmation</a></button>
+                    {%else%}
+                      <button type="button" class="btn btn-clr dark_blue exchangeratecal notconform_costcode">Tax Confirmation</button>
+                    {%endif%}
+                  {%else%}
+                    <button type="button" class="btn btn-clr chocolate_color"><a href="{% url 'invoice:taxconfirmcheck' pk %}">Tax Confirmation</a></button>
+                  {%endif%}
+                </div>
+                {% elif invoiceflow_modules.exchangerate_confirm_status == 2 and invoiceflow_modules.tax_confirm_status == 1 %}
+                <div class="col-2 text-center">
+                  {% if checkconfirm_costcode_rights %}
+                    {% if Invoice_details.is_conform_costcode %}
+                      <button type="button" class="btn btn-clr chocolate_color"><a href="{% url 'invoice:taxconfirmcheck' pk %}">Tax Confirmation</a></button>
+                    {%else%}
+                      <button type="button" class="btn btn-clr dark_blue exchangeratecal notconform_costcode">Tax Confirmation</button>
+                    {%endif%}
+                  {%else%}
+                    <button type="button" class="btn btn-clr chocolate_color"><a href="{% url 'invoice:taxconfirmcheck' pk %}">Tax Confirmation</a></button>
+                  {%endif%}
+                </div>
+                {% else %}
+                <div class="col-2 text-center">
+                  <button type="button" class="btn btn-clr chocolate_color nothing_confirmed">Tax Confirmation</button>
+                </div>
+                {% endif %}
+                {% endif %}
+              {% endfor %}
+                <!-- <div class="col-2 text-center"> 
+                    <button type="button" class="btn btn-clr dark_blue exchangerate" data-toggle="modal" data-target="#myModal">Exchange Rate</button>
+                </div> -->
+
+
+                <div class="col-2 text-center"> 
+                  <button type="button" class="btn btn-clr beige calbtn" value="2" data-toggle="modal" data-target="#exampleModalCenter2">Calculator</button>
+              </div>
+
+              
+
+            
+
+            
+            </div>
+
+            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header comment-head">
+                      <h5 class="modal-title" id="exampleModalCenterTitle">Comments</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body comment-body">
+                        <textarea name="main_comments" id="main_comments" class="form-control cmnts"></textarea>
+                      </div>
+                    <div class="modal-footer comment-foot">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal" id="submit_id">Submit</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal fade" id="exchangeratecal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exchangeratecalTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered large-pop" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header comment-head">
+                      <h5 class="modal-title pig" id="exchangeratecalTitle">Exchange Rate Confirmation</h5>
+                      <button type="button" class="close_Confirmation close" data-dismiss="modal" >
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="captions-head">
+
+                    <div class="mb-4">
+                      <h6 class=""><b>Exchange Rate Terms -</b> {% if submit_type == 1 %}At the Time of Invoice Submission{% else%}At the Time of Payment{% endif %}</h6>
+                    </div>
+                    <div class="comment-head exchan-flex mb-3">
+                      <h6 class=" pig mb-0"><b>Currency as Per Contract -</b> {{contract.currency}}</h6>
+                      <button type="button" class="btn btn-clr beige calci curr_btn" value="2" data-toggle="modal" data-target="#calci">Calculator</button>
+                      <div class="modal fade calculator-draggable calc-wid" id="calci" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="newcal" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+                          <div class="modal-content" data-backdrop="static">
+                            
+                            <div class="modal-header comment-head">
+                              <h5 class="modal-title" id="newcal">Calculator</h5>
+                                  <button type="button" class="closeChild calc_close ">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                            </div>
+                
+                            <div class="modal-body calc-body">
+                              <iframe src="{% url 'invoice:calculator' %}" title="description"></iframe>
+                            </div>
+                
+                            <div class="modal-footer comment-foot">
+                              <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Save & Close</button> -->
+                            </div>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="btn-flex mb-3">
+                      <h6 class=""><b>Total Value Of Invoice -</b> {{invoicedetail.total_after_otherdetails}}</h6>               
+                        <button type="button" class="btn btn-clr dark_blue exchangeratenextab curr_btn" data-toggle="modal" data-target="#myModal"> Exchange Rate Link</button>
+                    </div>
+                    {% if check_settlement > 0 %}
+                    <div class="btn-flex mb-3">
+                      <h6 class=""><b>Approved Percentage -</b> {{invoice_percentage.accepted_percentage}}%, {% for approved_inv in settlement_invoice %}({{basecurreccy}} {{approved_inv.invoicevalue_accepted}}){% if not forloop.last %}, {% endif %} {% endfor %} </h6>               
+                    </div>
+                    <div class="btn-flex mb-3">
+                      <h6 class=""><b>Disputed Percentage -</b> {{invoice_percentage.disputed_percentage}}%, {% for approved_inv in settlement_invoice %}({{basecurreccy}} {{approved_inv.invoicevalue_declined}}){% if not forloop.last %}, {% endif %} {% endfor %}</h6>               
+                    </div>
+                    {% endif %}
+                    </div>
+                    <div class="modal-body exchange-rate-data ">
+              
+                        <!-- Body Content Here... -->
+              
+                    </div>
+                    {% comment %} <div class="modal-footer bg-color-foot">
+                      <h5 class=" pig">Select to Confirm Okay</h5>
+                    </div> {% endcomment %}
+                    <div class="modal-footer bg-color-foot justify-content-center">
+                      {% if submit_type == 1 %}
+                      {% if invoiceflow_modules.exchangerate_confirm_status  < 3 %}
+                      <div class="cofirmselect" >
+                        <div class="">
+                          <h5 class="Okay-red">Select to Confirm Okay</h5>
+                        </div>
+                        <div class="cofirmselect yes-no-btns">
+                            <button type="button" class="btn btn-success confirmation_cls con-gr" value="1">Yes</button>
+                            {% if basecurrency_check == 1 %}
+                            <button type="button" class="btn btn-danger confirmation_cls con-gr" value="2">No</button>
+                            {% endif %}
+                        </div>
+                      </div>
+                      <div class="row exchangerate_update" style="display:none" >
+                        <div class="col-md-12">
+                          <!--  data-dismiss="modal" -->
+                        {% comment %}<button type="button" class="btn btn-clr gen-cls">Generate</button>{% endcomment %}
+                        {% comment %} <button type="button" class="btn btn-success gen-confirm-cls con-gr">Confirm</button> {% endcomment %}
+                        <button type="button" class="btn btn-success gen-confirm-cls con-gr" value="3">submit</button>
+                        </div>
+                      </div>
+                      {% endif %}
+                    {% if invoiceflow_modules.exchangerate_confirm_status  == 3 %}
+                    <div class="row" >
+                      <div class="col-md-12">
+                        <!--  data-dismiss="modal" -->
+                      {% comment %}<button type="button" class="btn btn-clr gen-cls">Generate</button>{% endcomment %}
+                      {% comment %} <button type="button" class="btn btn-success gen-confirm-cls con-gr">Confirm</button> {% endcomment %}
+                      <button type="button" class="btn btn-success gen-confirm-cls con-gr" value="3">submit</button>
+                      </div>
+                    </div>
+                    {% endif %}
+                    {% elif submit_type == 2 %}
+                    <div class="cofirmselect" >
+                        <h5 class="pig Okay-red">Select to Confirm Okay</h5>
+                      <div class="cofirmselect yes-no-btns">
+                          <button type="button" class="btn btn-success gen-confirm-cls con-gr" value="2">Yes</button>
+                      </div>
+                    </div>
+                    {% comment %} {% if invoicedetail.exchangerate_confirm_status  == 3 %} {% endcomment %}
+                    {% comment %} {% endif %} {% endcomment %}
+                    {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- <div class="modal fade exchange-draggable" data-backdrop="false" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog modal-dialog-centered large-pop" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header comment-head">
+                      <h5 class="modal-title" id="exampleModalCenterTitle">Exchange Rate Url</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      <h4 class="modal-title" id="myModalLabel"></h4>
+                    </div>
+                    <div class="modal-body gen-body" id="iframe">
+                    </div>
+                    <div class="modal-footer comment-foot">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Save & Close</button>
+                      <button class="btn btn-clr dy-close-cls " onclick="history.back()">Close</button>
+
+                    </div>
+                  </div>
+                </div>
+              </div> -->
+              
+              <!-- <div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter2" tabindex="-1" role="dialog"  data-backdrop="static" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" data-backdrop="static" role="document">
+                  <div class="modal-content"  data-backdrop="static"style="height: 700px;width:450px">
+                    <div class="modal-header comment-head">
+                      <h5 class="modal-title" id="exampleModalCenterTitle">Calculator</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+        
+                    <div class="modal-body calc-body" >
+                      <iframe src="{% url 'invoice:calculator' %}" title="description" style="height: 700px; width: 700px;"></iframe>
+                  </div>
+        
+                    <div class="modal-footer comment-foot">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Save & Close</button>
+                    </div>
+                    </div>
+                </div>
+              </div> -->
+
+              <div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter2" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+                  <div class="modal-content" data-backdrop="static">
+                    
+                    <div class="modal-header comment-head">
+                      <h5 class="modal-title" id="exampleModalCenterTitle">Calculator</h5>
+                      <button type="button" class="close close_individual_calcultor" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+        
+                    <div class="modal-body calc-body">
+                      <iframe src="{% url 'invoice:calculator' %}" title="description"></iframe>
+                    </div>
+        
+                    <div class="modal-footer comment-foot">
+                      <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Save & Close</button> -->
+                    </div>
+                    </div>
+                </div>
+              </div>
+              {% include 'conform_costcode_popup.html' %}
+
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<!-- Include Font Awesome CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="path/to/bootstrap.min.js"></script>
+
+<script>
+var invoiceid="{{pk}}" 
+var wcc_id="{{wcc_id}}"|| ''  
+var scheme="{{request.scheme}}"
+var csrf_token = "{{ csrf_token }}"
+var gethost="{{request.get_host}}"
+var user_signature="{{sign_data}}"
+var module_id='{{get_role_id.module_id}}'
+
+var currentdomain=scheme+'://'+gethost
+var package_src = "{% static 'js/web/viewer.html' %}"
+var Invoice_flow_id='{{invoiceflow_modules.id}}'
+
+$(function () {
+    $(".exchange-draggable").draggable();
+    $(".calculator-draggable").draggable();
+  });
+
+
+
+$(document).on("click", "button.closeChild", function (e) {
+    e.stopPropagation();
+    $('#calci').modal('hide');
+});
+$(document).on('click',"button.close_Confirmation",function(){
+  // $('#exchangeratecal').modal('hide');
+  window.location.reload();
+}) 
+$(document).on('click', "button.close_individual_calcultor", function(){
+  $('#exampleModalCenter2').css({
+            'display': 'none',
+            // add more properties as needed
+        });
+}) 
+
+$(document).on('click','.calci',function(){
+  $('#calci').modal('show');
+})
+
+// $(document).on('click','.exchangeratenextab',function(){
+//     let urlfield = '{{general.urlfield|safe}}'
+//     let myurl = `https://${urlfield}`
+//     window.open(myurl, '_blank');
+//    }) 
+  
+ $(document).on('click','.exchangeratenextab',function(){
+  
+  let urlfield = '{{general.urlfield|safe}}'
+  let role='{{request.user.roles_id}}'
+  console.log('role',role)
+  let url_len=urlfield.length
+  if(url_len == 0){
+    if (role == 2 ){
+      swal.fire('Please add an Exchange Rate URL in General Setting')
+    }
+    if(role == 3){
+      swal.fire('Please Contact Client Administrator for adding an Exchange rate URL')
+    }
+    
+  }
+  else{
+    let myurl = `https://${urlfield}`
+    window.open(myurl, '_blank');
+  }  
+ })
+</script>
+<script src="{% static 'js/invoice/invoiceflowprocesstwo.js' %}"></script>
+<script src="{% static 'js/common/invoiceflow.js' %}"></script>
+
+{% endblock %}
+  

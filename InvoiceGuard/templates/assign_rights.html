@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+{% load InvoiceGuardTags %}
+{% block content %}
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/user_Management/userroles.css' %}">
+<!-- <script type="text/javascript" src="{% static 'js/invoiceguard/assign_rights.js' %}"></script> -->
+<div>
+    <h3 class="from-head">Rights for User Roles</h3>
+    <div class="row mb-4">
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+            {% if not request.session.createview %}
+            <!-- <button type="button" class="btn btn-clr btn-master"><a href="{{request.META.HTTP_REFERER}}">Back</a></button> -->
+            <a class="btn btn-clr btn-master" href="{{request.META.HTTP_REFERER}}">Back</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-11">
+        </div>
+    </div>
+    <form id="user_rights_id" method="POST">
+        {% csrf_token %}
+    <div class="row">
+        <div class="usercls-box usercls-box-scroll">
+        <table class="usercls mb-3" id='usergen_id'>
+            <thead>
+            <tr>
+                <th>Roles</th>
+                <th></th>
+                {% for right in getRight %}
+                <th >{{right.right_name}}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+                <tbody>
+                    {% for role in getRole %}
+                    <tr class="table-row">  
+                      <td>{{ role.role_name }}</td>
+                      <input type="hidden" name="role_id" value="{{ role.id }}">
+                      <td class="text-nowrap">
+                        
+                          <input type="checkbox"  id="styled-checkbox-pp-{{ role.id }}"  value="{{ role.id }}" name="check_all" class="chk-cls-project chk-all-box {% if role.module.id == 1 or role.module.id == 2 %}selec_invrec_app{% else %}selec_field{% endif %}">
+                          <label class="s-all pb-0" for="styled-checkbox-pp-{{ role.id }}">Select All</label>
+
+                        <!-- <input type="checkbox" name="check_all" value="{{ role.id }}" class="select-all-checkbox" >
+                        <label class="s-all pb-0" for="styled-checkbox-pp">Select All</label> -->
+
+                        </td>
+
+
+                      {% for right in getRight %}
+                        <td>
+                          <input type="checkbox" id="styled-checkbox-pp-{{ role.id }}-{{right.id}}" name="right_id{{ role.id }}" value="{{ right.id }}" class="sub-cls chk-cls-project {{role.id}}{% if role.module.id == 1 or role.module.id == 2 %}{% if right.slug == 'invoice-proceed' or right.slug == 'invoice-approve' %} pro_app_cls{% endif %}{% endif %}" {% RightStatus right.id role.id as value %}{% if value is True %} checked=checked {% endif %}>
+                          <label for="styled-checkbox-pp-{{ role.id }}-{{right.id}}"></label>
+                        </td>
+                      {% endfor %}
+                    </tr>
+                  {% endfor %}
+            </tbody>
+        </table>
+         </div>
+        </div>
+        <div class="text-center spacing-button">
+            <button type="submit" class="btn btn-clr text-center" >Submit</button>
+        </div>
+    </form>
+</div>
+{% endblock%}
+
+{% block scripts %}
+{{ block.super }}
+<script type="text/javascript" src="{% static 'js/invoiceguard/assign_rights.js' %}"></script>
+{%endblock%}

@@ -1,0 +1,788 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+html {
+    font-family: "Montserrat", sans-serif;
+}
+section {
+    border-radius: 10px;
+    background-color: rgb(18, 26, 31);
+    padding-top: 20px;
+    min-height: 50%;
+    width: 60%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.container {
+    width: 90%;
+    max-width: 400px;
+    background-color: rgb(39, 55, 59);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.display {
+    background-color: rgb(182, 182, 182);
+    height: 100px;
+    width: 100%;
+    text-align: right;
+    padding: 20px;
+    font-size: 30px;
+    position: relative;
+}
+.display-1 {
+    opacity: 0.4;
+    font-size: 20px;
+    height: 20px;
+    overflow: hidden;
+}
+.temp-result {
+    position: absolute;
+    bottom: 0;
+    left: 10;
+    font-size: 20px;
+    opacity: 0.3;
+}
+.all_button {
+    color: whitesmoke;
+    display: grid;
+    grid-template: repeat(4, 1fr) / repeat(4, 1fr);
+}
+.button,.back {
+    border: 0.5px solid rgba(92, 92, 92, 0.137);
+    display: inline-block;
+    height: 100px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    cursor: pointer;
+}
+.button:hover {
+    background-color: rgb(30, 43, 46);
+}
+
+.btn-0 {
+    grid-column: 1/3;
+}
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+.equalbtn{
+    border-radius: 10px;
+    background-color: #e35d02;
+  
+}
+.number{
+    border-radius: 10px;
+    background-color: #949496;
+}
+html {
+    font-family: "Montserrat", sans-serif;
+}
+    </style>
+</head>
+<body>
+    <section>
+        <div class="container">
+            <div class="calculator">
+                <div class="display">
+                    <div class="display-1">0</div>
+                    <div class="display-2">0</div>
+                    <div class="temp-result"></div>
+                </div>
+                <div class="all_button">
+                    <div class="button all-clear">C</div>
+                    <div class="button last-entity-clear">CE</div>
+                    <div class="button operation">%</div>
+                    <div class="button operation">/</div>
+                    <div class="button number">7</div>
+                    <div class="button number">8</div>
+                    <div class="button number">9</div>
+                    <div class="button operation">x</div>
+                    <div class="button number">4</div>
+                    <div class="button number">5</div>
+                    <div class="button number">6</div>
+                    <div class="button operation">-</div>
+                    <div class="button number">1</div>
+                    <div class="button number">2</div>
+                    <div class="button number">3</div>
+                    <div class="button operation">+</div>
+                    <div class="button number">0</div>
+                    <div class="button number dot">.</div>
+                    <div class="back">&#9003;</div>
+                    <div class="button equal equalbtn">=</div>
+                   
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<script>
+    const display1El = document.querySelector(".display-1");
+const display2El = document.querySelector(".display-2");
+const tempResultEl = document.querySelector(".temp-result");
+const numbersEl = document.querySelectorAll(".number");
+const operationEl = document.querySelectorAll(".operation");
+const equalEl = document.querySelector(".equal");
+const clearAllEl = document.querySelector(".all-clear");
+const clearLastEl = document.querySelector(".last-entity-clear");
+let dis1Num = "";
+let dis2Num = "";
+let result = null;
+let lastOperation = "";
+let haveDot = false;
+numbersEl.forEach((number) => {
+    number.addEventListener("click", (e) => {
+        if (e.target.innerText === "." && !haveDot) {
+            haveDot = true;
+        } else if (e.target.innerText === "." && haveDot) {
+            return;
+        }
+        dis2Num += e.target.innerText;
+        display2El.innerText = dis2Num;
+    });
+});
+operationEl.forEach((operation) => {
+    operation.addEventListener("click", (e) => {
+        if (!dis2Num) return;
+        haveDot = false;
+        const operationName = e.target.innerText;
+        if (dis1Num && dis2Num && lastOperation) {
+            mathOperation();
+        } else {
+            result = parseFloat(dis2Num);
+        }
+        clearVar(operationName);
+        lastOperation = operationName;
+        console.log('result',result);
+    });
+});
+function clearVar(name = "") {
+    dis1Num += dis2Num + " " + name + " ";
+    display1El.innerText = dis1Num;
+    display2El.innerText = "";
+    dis2Num = "";
+    tempResultEl.innerText = result;
+}
+function mathOperation() {
+    if (lastOperation === "x") {
+        result = parseFloat(result) * parseFloat(dis2Num);
+    } else if (lastOperation === "+") {
+        result = parseFloat(result) + parseFloat(dis2Num);
+    } else if (lastOperation === "-") {
+        result = parseFloat(result) - parseFloat(dis2Num);
+    } else if (lastOperation === "/") {
+        result = parseFloat(result) / parseFloat(dis2Num);
+    } else if (lastOperation === "%") {
+        result = parseFloat(result) % parseFloat(dis2Num);
+    }
+}
+equalEl.addEventListener("click", () => {
+    if (!dis2Num || !dis1Num) return;
+    haveDot = false;
+    mathOperation();
+    clearVar();
+    display2El.innerText = result;
+    tempResultEl.innerText = "";
+    dis2Num = result;
+    dis1Num = "";
+});
+clearAllEl.addEventListener("click", () => {
+    dis1Num = "";
+    dis2Num = "";
+    display1El.innerText = "";
+    display2El.innerText = "";
+    result = "";
+    tempResultEl.innerText = "";
+});
+clearLastEl.addEventListener("click", () => {
+    display2El.innerText = "";
+    dis2Num = "";
+});
+window.addEventListener("keydown", (e) => {
+    if (
+        e.key === "0" ||
+        e.key === "1" ||
+        e.key === "2" ||
+        e.key === "3" ||
+        e.key === "4" ||
+        e.key === "5" ||
+        e.key === "6" ||
+        e.key === "7" ||
+        e.key === "8" ||
+        e.key === "9" ||
+        e.key === "."
+    ) {
+        clickButtonEl(e.key);
+    } else if (
+        e.key === "+" ||
+        e.key === "-" ||
+        e.key === "/" ||
+        e.key === "%"
+    ) {
+        clickOperation(e.key);
+    } else if (e.key === "*") {
+        clickOperation("x");
+    } else if (e.key == "Enter" || e.key === "=") {
+        clickEqual();
+    }
+    else if(e.key == "Backspace"){
+       backspace();
+    }
+});
+function clickButtonEl(key) {
+    numbersEl.forEach((button) => {
+        if (button.innerText === key) {
+            button.click();
+        }
+    });
+}
+function clickOperation(key) {
+    operationEl.forEach((operation) => {
+        if (operation.innerText === key) {
+            operation.click();
+        }
+    });
+}
+function clickEqual() {
+    equalEl.click();
+}
+$(document).on('click','.back',function(){
+  let data =  $('.display-2').html()
+  newdata = data.slice(0, -1)
+
+  display2El.innerText = newdata;
+  dis2Num = newdata
+
+})
+function backspace() {
+    let data =  $('.display-2').html()
+  newdata = data.slice(0, -1)
+
+  display2El.innerText = newdata;
+  dis2Num = newdata
+}
+</script>
+</html> -->
+
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/calculator.css' %}">
+   
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+
+<body>
+    <script>
+        let numBtn = document.querySelector(".cal_btn");
+
+        numBtn.addEventListener("click", (event) => {
+        let numberBtn = document.querySelector(".cal_btn").style.backgroundColor = "blue";
+})
+   
+    console.log(numBtn);
+    </script>
+    <div id="calculator">
+        <!-- <h1 class="h1_tag">Calculator</h1> -->
+        <p id="last_operation_history"></p>
+        <p id="box" class="box">0</p>
+        <table id="table">
+            <tr>
+                <td><button class="cal_btn operator-black" onclick="clear_entry()">C</button></td>
+                <td><button class="cal_btn operator-black" onclick="button_clear()">CE</button></td>
+                <td><button class="cal_btn operator-black" id="backspace_btn" onclick="backspace_remove()">&#9003;</button></td>
+                <td><button class="cal_btn operator-black" id="plusOp" value="+" class="operator" onclick="button_number('+')">+</button></td>
+            </tr>
+            <tr>
+                <td><button class="cal_btn operator-black" onclick="calculate_percentage()">%</button></td>
+                <td><button class="cal_btn operator-black" onclick="power_of()">𝑥²</button></td>
+                <td><button class="cal_btn operator-black" onclick="square_root()">√𝑥</button></td>
+                <td><button class="cal_btn operator-black" id="subOp" value="-" class="operator" onclick="button_number('-')">-</button></td>
+            </tr>
+            <tr>
+                <td><button class="cal_btn" onclick="button_number(7)">7</button></td>
+                <td><button class="cal_btn" onclick="button_number(8)">8</button></td>
+                <td><button class="cal_btn" onclick="button_number(9)">9</button></td>
+                <td><button class="cal_btn operator-black" id="multiOp" value="*" class="operator" onclick="button_number('*')">×</button></td>
+            </tr>
+            <tr>
+                <td><button class="cal_btn" onclick="button_number(4)">4</button></td>
+                <td><button class="cal_btn" onclick="button_number(5)">5</button></td>
+                <td><button class="cal_btn" onclick="button_number(6)">6</button></td>
+                <td><button class="cal_btn operator-black" id="divOp" value="/" class="operator" onclick="button_number('/')">÷</button></td>
+            </tr>
+            <tr>
+                <td><button class="cal_btn" onclick="button_number(1)">1</button></td>
+                <td><button class="cal_btn" onclick="button_number(2)">2</button></td>
+                <td><button class="cal_btn" onclick="button_number(3)">3</button></td>            
+                <td rowspan="4"><button value="="class="operator operator-orange equalcal" id="equal_sign" onclick="button_number('=')">=</button></td>
+
+                <!-- <td colspan="4"><button value="="class="operator operator-orange equalcal" id="equal_sign" onclick="button_number('=')"></button></td> -->
+            </tr>
+            <tr>
+                <td><button class="cal_btn operator-black" onclick="plus_minus()">±</button></td>
+                <td><button class="cal_btn" onclick="button_number(0)">0</button></td>
+                <td><button class="cal_btn" id="dot" value="." onclick="button_number('.')">.</button></td>
+                <!-- <td colspan="4"><button value="="class="operator operator-orange equalcal" id="equal_sign" onclick="button_number('=')">=</button></td> -->
+            </tr>
+        </table>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+   <script>
+    var operators = ["+", "-", "/", "*"];
+
+var box = null;
+var last_operation_history = null;
+var operator = null;
+var equal = null;
+var dot = null;
+
+var firstNum = true;
+
+var numbers = [];
+var operator_value;
+var last_button;
+var calc_operator;
+
+var total;
+
+var key_combination = []
+function button_number(button) {
+  //event.preventDefault();
+    operator = document.getElementsByClassName("operator");
+    box = document.getElementById("box");
+    last_operation_history = document.getElementById("last_operation_history");
+    equal = document.getElementById("equal_sign").value;
+    dot = document.getElementById("dot").value;
+    
+    last_button = button;
+
+    // if button is not an operator or = sign
+    if (!operators.includes(button) && button!=equal){
+        // if it is the first button clicked
+        if (firstNum){
+            // and it's a dot, show 0.
+            if (button == dot){
+                box.innerText = "0"+dot;
+            }
+            // else clear box and show the number
+            else {
+                box.innerText = button;
+            }
+            firstNum = false;
+        }
+        else {
+
+            // return if the box value is 0
+            if (box.innerText.length == 1 && box.innerText == 0){
+
+                if (button == dot){
+                    box.innerText += button;
+                }
+                return;
+            }
+            // return if the box already has a dot and clicked button is a dot
+            if (box.innerText.includes(dot) && button == dot){
+                return;
+            }
+            // maximum allowed numbers inputted are 20
+            if (box.innerText.length == 20){
+                return;
+            }
+
+            // if pressed dot and box already has a - sign, show -0.
+            if (button == dot && box.innerText == "-"){
+                box.innerText = "-0"+dot;
+            }
+            // else append number
+            else {
+                box.innerText += button;
+            }  
+        }
+    }
+    // if it's an operator or = sign
+    else {
+
+        // return if operator is already pressed
+        if (operator_value != null && button == operator_value){
+            return
+        }
+
+        // show minus sign if it's the first value selected and finally return
+        if (button == "-" && box.innerText == 0){
+            box.innerText = button;
+            firstNum = false;
+            operator_value = button
+            showSelectedOperator()
+            return;
+        }
+        // return if minus operator pressed and it's already printed on screen 
+        else if (operators.includes(button) && box.innerText == "-"){
+            return
+        }
+        // return if minus operator pressed and history already has equal sign
+        else if (button == "-" && operator_value == "-" && last_operation_history.innerText.includes("=")){
+            return
+        }
+
+        // set value of operator if it's one
+        if (operators.includes(button)){
+            if (typeof last_operator != "undefined" && last_operator != null){
+                calc_operator = last_operator
+            }
+            else {
+                calc_operator = button
+            }
+            if (button == "*"){
+                last_operator = "×"
+            }
+            else if (button == "/"){
+                last_operator = "÷"
+            }
+            else {
+                last_operator = button
+            }
+            operator_value = button
+            firstNum = true
+            showSelectedOperator()
+        }
+
+        // add first number to numbers array and show it on history
+        if (numbers.length == 0){
+            numbers.push(box.innerText)
+            if (typeof last_operator != "undefined" && last_operator != null){
+                last_operation_history.innerText = box.innerText + " " + last_operator
+            }
+        }
+        // rest of calculations
+        else {   
+            if (numbers.length == 1){
+                numbers[1] = box.innerText
+            }
+            var temp_num = box.innerText
+
+            // calculate total
+            if (button==equal && calc_operator != null){
+                var total = calculate(numbers[0], numbers[1], calc_operator)
+                box.innerText = total;
+
+                // append second number to history
+                if (!last_operation_history.innerText.includes("=")){
+                    last_operation_history.innerText += " " + numbers[1] + " ="
+                }
+
+                temp_num = numbers[0]
+
+                numbers[0] = total
+                operator_value = null
+                showSelectedOperator()
+
+                // replace first number of history with the value of total
+                var history_arr = last_operation_history.innerText.split(" ")
+                history_arr[0] = temp_num
+                last_operation_history.innerText = history_arr.join(" ")
+            }
+            // update history with the value on screen and the pressed operator
+            else if (calc_operator != null) {
+                 last_operation_history.innerText = temp_num + " " + last_operator
+                 calc_operator = button
+                 numbers = []
+                 numbers.push(box.innerText)
+            }
+        }
+    }
+
+}
+ // highlight operator button when selected
+function showSelectedOperator(){
+    event. preventDefault()
+    var elements = document.getElementsByClassName("operator");
+
+    for (var i=0; i<elements.length; i++){
+        elements[i].style.backgroundColor  = "#e68a00";
+    }
+
+    // if (operator_value == "+"){
+    //     document.getElementById("plusOp").style.backgroundColor  = "#ffd11a";
+    // }
+    // else if (operator_value == "-"){
+    //     document.getElementById("subOp").style.backgroundColor  = "#ffd11a";
+    // }
+    // else if (operator_value == "*"){
+    //     document.getElementById("multiOp").style.backgroundColor  = "#ffd11a";
+    // }
+    // else if (operator_value == "/"){
+    //     document.getElementById("divOp").style.backgroundColor  = "#ffd11a";
+    // }
+}
+
+// function to calculate the result using two number and an operator
+function calculate(num1, num2, operator){
+    event.preventDefault()
+    if (operator === "+"){
+        total = (parseFloat)(num1)+(parseFloat)(num2)
+    }
+    else if (operator === "-"){
+        total = (parseFloat)(num1)-(parseFloat)(num2)
+    }
+    else if (operator === "*"){
+        total = (parseFloat)(num1)*(parseFloat)(num2)
+    }
+    else if (operator === "/"){
+        total = (parseFloat)(num1)/(parseFloat)(num2)
+    }
+    else {
+        if (total == box.innerText){
+            return total
+        }
+        else {
+            return box.innerText
+        }
+    }
+    // if total is not integer, show maximum 12 decimal places
+    if (!Number.isInteger(total)){
+        total = total.toPrecision(12);
+    }
+    return parseFloat(total);
+}
+
+// function to clear box and reset everything
+function button_clear(){
+    //e.preventDefault()
+    $('.box').html('')
+    // window.location.reload()
+}
+
+function backspace_remove(){
+    //event.preventDefault()
+    box = document.getElementById("box");
+    var elements = document.getElementsByClassName("operator");
+
+    for (var i=0; i<elements.length; i++){
+        elements[i].style.backgroundColor  = "#e68a00";
+    }
+
+    var last_num = box.innerText;
+    last_num = last_num.slice(0, -1)
+    
+    box.innerText = last_num
+
+    // show 0 zero if all characters on screen are removed
+    if (box.innerText.length == 0){
+        box.innerText = 0
+        firstNum = true
+    }
+
+}
+
+
+// function to change the sign of the number currently on screen
+function plus_minus(){
+    event.preventDefault()
+    box = document.getElementById("box");
+    
+    // if any operator is already pressed
+    if (typeof last_operator != "undefined"){
+        if (numbers.length>0){
+            // if last button pressed is an operator
+            if (operators.includes(last_button)){
+                // if the displayed text is just a negative sign, replace it with a 0
+                if (box.innerText == "-"){
+                    box.innerText = 0
+                    firstNum = true
+                    return
+                }
+                // if the displayed text is not a just a negative sign, replace it with a negative sign
+                else {
+                    box.innerText = "-"
+                    firstNum = false
+                }
+            }
+            // if last button pressed is not an operator, change its sign
+            else {
+                box.innerText = -box.innerText
+
+                if (numbers.length==1){
+                    numbers[0] = box.innerText
+                }
+                else {
+                    numbers[1] = box.innerText
+                }
+            }
+        }
+        return
+    }
+
+    // if displayed text is 0, replace it with a negative sign
+    if (box.innerText == 0){
+        box.innerText = "-"
+        firstNum = false
+        return
+    }
+    box.innerText = -box.innerText
+}
+
+// function to calculate square root of the number currently on screen
+function square_root(){
+    event.preventDefault()
+    box = document.getElementById("box");
+    var square_num = Math.sqrt(box.innerText)
+    box.innerText = square_num
+    numbers.push(square_num)
+}
+
+// function to calculate the division of 1 with the number currently on screen
+function division_one(){
+    event.preventDefault()
+    box = document.getElementById("box");
+    var square_num = 1/box.innerText
+    box.innerText = square_num
+    numbers.push(square_num)
+}
+
+// function to calculate the power of the number currently on screen
+function power_of(){
+    event.preventDefault()
+    box = document.getElementById("box");
+    var square_num =Math.pow(box.innerText, 2)
+    box.innerText = square_num
+    numbers.push(square_num)
+}
+
+// function to calculate the percentage of a number
+function calculate_percentage(){
+    event.preventDefault()
+    var elements = document.getElementsByClassName("operator");
+    box = document.getElementById("box");
+
+    if (numbers.length > 0 && typeof last_operator != "undefined"){
+        if (last_operator == "+" || last_operator == "-"){
+            box.innerText = numbers*box.innerText/100
+        }
+        else {
+            box.innerText = box.innerText/100
+        }
+    }
+    else {
+        box.innerText = box.innerText/100
+    }
+    numbers = []
+    numbers.push(box.innerText)
+
+    // deselect operator if any selected
+    for (var i=0; i<elements.length; i++){
+        elements[i].style.backgroundColor  = "#e68a00";
+    }
+}
+
+// function to clear last number typed into the display
+function clear_entry(){
+    event.preventDefault()
+    box = document.getElementById("box");
+    $('#last_operation_history').html('')
+    if (numbers.length > 0 && typeof last_operator != "undefined"){
+        box.innerText = 0
+        var temp = numbers[0]
+        numbers = []
+        numbers.push(temp)
+        firstNum = true;
+    }
+}
+
+document.addEventListener('keydown', keyPressed);
+document.addEventListener('keyup', keyReleased);
+
+// function to capture keydown events
+function keyPressed(e) {
+    //e.preventDefault()
+    var equal = document.getElementById("equal_sign").value;
+    var dot = document.getElementById("dot").value;
+
+    if (e.key == "Delete"){
+        button_clear();
+        return;
+    }
+
+    var isNumber = isFinite(e.key);
+    var enterPress;
+    var dotPress;
+    var commaPress = false;
+
+    if (e.key == "Enter"){
+        enterPress = equal;
+    }
+    if (e.key == "."){
+        dotPress = dot;
+    }
+    if (e.key == ","){
+        commaPress = true;
+    }
+    
+    if (isNumber || operators.includes(e.key) || e.key == "Enter" || e.key == dotPress || 
+        commaPress || e.key == "Backspace"){
+        if (e.key == "Enter"){
+            button_number(enterPress)
+        }
+        else if (e.key == "Backspace"){
+            document.getElementById("backspace_btn").style.backgroundColor  = "#999999";
+            backspace_remove()
+        }
+        else if (commaPress){
+            button_number(dot)
+        }
+        else {
+            button_number(e.key) 
+        }   
+    }
+    if (e.key) {
+        key_combination[e.code] = e.key;
+    }
+}
+
+// function to capture keyup events
+function keyReleased(e){
+    //e.preventDefault()
+    if (key_combination['ControlLeft'] && key_combination['KeyV']) {
+        navigator.clipboard.readText().then(text => {
+            box = document.getElementById("box");
+            var isNumber = isFinite(text);
+            if (isNumber){
+                var copy_number = text
+                firstNum = true
+                button_number(copy_number)
+            }
+        }).catch(err => {
+            console.error('Failed to read clipboard contents: ', err);
+        });
+    }
+    if (key_combination['ControlLeft'] && key_combination['KeyC']) {
+        box = document.getElementById("box");
+        navigator.clipboard.writeText( box.innerText)
+    }
+    key_combination = []
+    //e.preventDefault()
+    // set the color of the backspace button back to its original
+    if (e.key == "Backspace"){
+        document.getElementById("backspace_btn").style.backgroundColor  = "#666666";
+    }
+}
+   </script>
+</body>
+</html>

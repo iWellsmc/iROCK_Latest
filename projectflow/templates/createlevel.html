@@ -1,0 +1,173 @@
+
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_tags %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/projects/createlevel.css' %}">
+
+<head>
+</head>
+<div class="table-bck invoice-appo-work top-btn-arrow">
+    <div class="row">
+        <div class="col-12 text-end">
+            <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'projectflow:createprocessflow' project.id %}">Back</a></button>
+        </div>
+    </div>
+    
+    <h3 class="from-head">Invoice Approval Workflow</h3>
+    
+    <form autocomplete="off" method="post" novalidate class="form-txt" id="wccflowid">
+        <div>
+            {% csrf_token %}
+            {% comment %} <input type="hidden" name="csrf_name" value="{% csrf_token %}"> {% endcomment %}
+            <!-- <div class="row">
+                <div class="col-4"><p>Project {{project.projectname.name}}</p></div>
+                <div class="col-4"><p>Flow Name {{project.flow.flow_name}}</p></div>
+                <div class="col-4"><p>Level {{project.flow_level}}</p></div>
+            </div> -->
+            <div class="row">
+                <div class="col-4">
+                    <div class="d-flex">
+                        <table class="wcc-name">
+                            <tbody>
+                                <tr>
+                                    <td>Project</td>
+                                    <td> : </td>
+                                    <td>{{project.projectname.name}}</td>
+                                    <input type="hidden" value="{{project.projectname.name}}" name="project_name_user_log" class="project_name_user_log">
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="d-flex">
+                        <table class="wcc-name">
+                            <tbody>
+                                <tr>
+                                    <td>Flow Name</td>
+                                    <td> : </td>
+                                    <td>{{project.flow.flow_name}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="d-flex">
+                        <table class="wcc-name">
+                            <tbody>
+                                <tr>
+                                    <td>Level</td>
+                                    <td> : </td>
+                                    <td>{{project.flow_level|title}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="invoice-app">
+            <div class="row all-left tabl">
+                <div class="row mt-3 p-0">
+                    <div class="col-2 heading-title">{{project.flow_level|title}}</div>
+                    <div class="col-2 heading-title bor-xnone">Process Name</div>
+                    <div class="col-2 heading-title">No. of Stations</div>
+                    <div class="col-2 heading-title bor-xnone">Modules</div>
+                    <div class="col-1 heading-title">No. of Users</div>
+                    <div class="col-1 heading-title bor-xnone">Roles</div>
+                    <div class="col-2 heading-title">Station Users</div>
+                </div>
+                <div class="row"> <!-- class removed -> p-0 -->
+                    <div class="col-12 p-0">
+                    {% if project.flow_level == 'clusters' %}
+                    {% for cluster in leveltypes.clusters %}
+                        <div class="row data-border">
+                            <div class="col-2">
+                                <input type="checkbox" name="level_type_id" value="{{cluster.id}}" class="level_type_id" data_level="clusters" data_id="{{cluster.id}}">&emsp;<label class="pt-type">{{cluster.clustersubname.cluster_subname}}</label><br>
+                            </div>
+                            <div class="col-10 process_clusters_{{cluster.id}}">
+                            </div>
+                        </div>
+                        {%empty%}
+                        <div class="border-empty-data">---</div>
+                    {% endfor %}
+                    {% elif project.flow_level == 'discipline' %}
+                        {% for discipline in leveltypes.discipline%}
+                        
+
+                            <div class="row data-border">
+                                <div class="col-2 discipline-name">
+                                    <input type="checkbox" name="level_type_id" value="{{discipline.id}}" class="level_type_id" data_level="discipline" data_id="{{discipline.id}}">&emsp;<label class="pt-type" >{{discipline.discipline_subtype__discipline_subtype}}-{% if discipline.project_discipline__project_discipline == "1"%}Green Field Development{% elif discipline.project_discipline__project_discipline == "2"%}Brown Field Development{% else%}Others{% endif %}-{{discipline.project_discipline__cluster__clustersubname__cluster_subname}}</label><br>
+                                </div>
+                                <div class="col-10 process_discipline_{{discipline.id}}">
+                                </div>
+                                
+                            </div>
+                        {%empty%}
+                        <div class="border-empty-data">---</div>
+                        {% endfor %}
+
+                    {% else %}
+                    {% for well in leveltypes.well%}
+                    <div class="row data-border">
+                        <div class="col-2 discipline-name">
+                            <input type="checkbox" name="wellbased_type_id" value="{{well.discipline_id}}"  class="level_type_id check_val{{well.discipline_id}} well_discipline_cls" data_level="well" sub_level="discipline" data_id="{{well.discipline_id}}">&emsp;<label class="pt-type">{{well.discipline_name}}-{{well.project_discipline}}-{{well.cluster}}</label><br>
+                        </div>
+                        <div class="col-10 wellbased_type_process_well_{{well.discipline_id}}">
+                        </div>
+                    </div>
+                        {% for discipline_well in well.well_datas%}
+                        <div class="row data-border">
+                            <div class="col-2 discipline-name">
+                                <input type="checkbox" name="level_type_id" value="{{discipline_well.id}}" check_val="{{well.discipline_id}}" class="level_type_id check_well_dis well_dis_id{{well.discipline_id}}" data_level="well" data_id="{{discipline_well.id}}">&emsp;<label class="pt-type">{{discipline_well.wellname__well_subname}}</label><br>
+                            </div>
+                            <div class="col-10 process_well_{{discipline_well.id}}">
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {%empty%}
+                        <div class="border-empty-data">---</div>
+                    {% endfor %}
+     
+                    {% endif %}
+
+                </div>
+                </div> 
+            </div>
+        </div>
+               
+            </div>
+            <div class="row mt-3">
+                <div class="col-12 text-center">
+                    <button type="submit" id="draft_id" class="btn btn-clr text-left draft-cls com-save" name="submit_type" value="0">Save as Draft</button>
+                    <button type="submit" id="save_id" value="1" class="btn btn-clr text-left save-cls com-save Sav1" name="submit_type" value="1">Submit</button>
+                  
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+    
+    var flow="{{project.flow_id}}"
+    var project_id="{{project.id}}"
+    var projectname="{{project.projectname.id}}"
+    
+
+</script>
+<script src="{% static 'js/projects/flow.js' %}"></script>
+
+{% endblock %}
+
+

@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/invoice.css' %}">
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li  {% if message.tags %} class="{{ message.tags }} msg-cls"{% endif %} style="display:none;"> {{ message }} </li>
+    {% endfor %}
+</ul>
+{% endif %}
+    <div>
+        <h3 class="from-head">Total Invoices Submitted to Date</h3>
+        <input type="hidden" id="user_sign" value="{{sign_data}}">
+        <div class="row">
+            <div class="col-9">
+            </div>
+            <div class="col-3">
+            </div>
+        </div>
+        <div class="table-responsive text-nowrap">
+            <div class="row">   
+                <!-- <div class="col-lg-3 col-md-4 " id="invoicess">
+                    <select name="vendorvin" id="vendorvin" class="form-control currency-clss multiselect  form-select list-control" >
+                        <option value="">vin</option>
+                        {% for invoice in Vendor %}  
+                        <option value="{% get_vendor_vin invoice.vendor as vendor_vin %}{{ vendor_vin|default:"N/A" }}">{% get_vendor_vin invoice.vendor as vendor_vin %}{{ vendor_vin|default:"N/A" }}</option>
+                        {% endfor %}
+                    </select>
+                </div> -->
+                <div class="col-lg-3 col-md-4 " id="invoicess">
+                    <select name="vendorname" id="vendorname" class="form-control currency-clss multiselect  form-select list-control" >
+                        <option value="">vendorname</option>
+                        {% for invoice in Vendor %} 
+                        <option value="{% get_vendor_name invoice.vendor as vendor_vin %}{{ vendor_vin|default:"N/A" }}">{% get_vendor_name invoice.vendor as vendor_vin %}{{ vendor_vin|default:"N/A" }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-4 " id="invoicess">
+                    <select name="servicetype" id="servicetype" class="form-control currency-clss multiselect  form-select list-control" >
+                        <option value="">service</option>
+                        {% for invoice in invoice_service_type %} 
+                        <option value="{{invoice.name_service}}">{{invoice.name_service}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-4 " id="invoicess">
+                    <select name="paid" id="paid" class="form-control currency-clss multiselect  form-select list-control" >
+                        <option value="">---paid---</option>
+                        <option value="Unpaid">Unpaid</option>
+                    </select>
+                </div>
+                
+            </div>
+            <div id="loader" class="loader"></div>
+            <table class="table settings-data-list-view data-list-view invoicelist tot-in irock-table tab-heading" id="comp_ven_invoice">
+            <thead >
+                <tr >
+                    
+                    <th>S/N</th>
+                    <th>VIN <button class="filter-btn" data-filter="vin-number"> <i class="fas fa-sort"></i></button></th>
+                    <th>Vendor Name <button class="filter-btn" data-filter="vendor"> <i class="fas fa-sort"></i></button></th>
+                    <th>Service Name <button class="filter-btn" data-filter="services"> <i class="fas fa-sort"></i></button></th>
+                    <th>Invoice No <button class="filter-btn" data-filter="invoice-number"> <i class="fas fa-sort"></i></button></th>
+                    <th>Submitted Date <button class="filter-btn" data-filter="submitted-date"> <i class="fas fa-sort"></i></button></th>
+                    <th>Approval Status <button class="filter-btn" data-filter="approval-status"><i class="fas fa-sort"></i></button></th>
+                    <th>Payment Status <button class="filter-btn" data-filter="approval-status"><i class="fas fa-sort"></i></button></th> 
+                    <th>Actions</th>
+                    
+                </tr>
+            </thead>
+            <tbody class="table-list" id="tabledata">
+                
+            </tbody>
+            </table>
+        </div>
+    </div>
+    <form method="POST" id="queryform" enctype="multipart/form-data">
+        {% csrf_token %}
+    <div class="my-modal">
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content ">
+                <div class="modal-header comment-head">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Payment Receipt Upload</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                    <div class="modal-body">
+                        <table class="upload-choose-file">
+                            <tbody class="val_details">
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer comment-foot">
+                        <button class="btn btn-secondary submit_cls">Submit</button>
+                    </div>
+            </div>
+            </div>
+        </div>  
+    </div>
+    </form>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script>
+    var payment_type="{{payment_type}}"    
+    var user_id="{{userid}}"
+</script>
+
+<script type="text/javascript" src="{% static 'js/invoice/unpaidinvoice.js' %}"></script>
+
+ <!-- <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>  -->
+{% comment %} <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> {% endcomment %}
+{% comment %} <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script> {% endcomment %}
+{% comment %} <script src="https://jqueryvalidation.org/files/dist/jquery.validate.min.js"></script> {% endcomment %}
+{% comment %} <script src="https://jqueryvalidation.org/files/dist/additional-methods.min.js"></script>  {% endcomment %}
+{% comment %} <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> {% endcomment %}
+{% comment %} <script type="text/javascript" src="{% static 'js/invoice/companyinvoicelist.js' %}"></script> {% endcomment %}
+{% comment %} <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> {% endcomment %}
+{% comment %} <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> {% endcomment %}
+
+{% endblock %}

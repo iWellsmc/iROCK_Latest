@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+{% load static %}
+
+<!DOCTYPE html>
+<html class="loading" lang="en" data-textdirection="ltr">
+<!-- BEGIN: Head-->
+
+<head>
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <title>Sign In -IROCK</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600" rel="stylesheet">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/logo/irock.png' %}">
+
+    <!-- BEGIN: Vendor CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'vendors/css/vendors.min.css' %}">
+    <!-- END: Vendor CSS-->
+
+    <!-- BEGIN: Theme CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-extended.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/colors.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/themes/dark-layout.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/themes/semi-dark-layout.css' %}">
+
+    <!-- BEGIN: Page CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/core/menu/menu-types/vertical-menu.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/core/colors/palette-gradient.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/pages/authentication.css' %}">
+    <!-- END: Page CSS-->
+
+    <!-- BEGIN: Custom CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+    <!-- END: Custom CSS-->
+       
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+</head>
+<!-- END: Head-->
+    <!--eye icon password cdn and style-->
+
+    
+<!-- BEGIN: Body-->
+
+<body class="vertical-layout vertical-menu-modern 1-column  navbar-floating footer-static bg-full-screen-image  menu-collapsed blank-page blank-page" data-open="click" data-menu="vertical-menu-modern" data-col="1-column">
+    <!-- BEGIN: Content-->
+    <div class="app-content content">
+        <div class="content-overlay"></div>
+        <div class="header-navbar-shadow"></div>
+        <div class="content-wrapper">
+            <div class="content-header row">
+            </div>
+            <div class="content-body">
+                <section>
+                <div class="row">
+                    <div class="col-8 lg-office img-res">
+                        <div class="lg-logo">
+                            <img class="lg-mainlogo" src="{% static 'images/logo/irock.png' %}" alt="irock-logo" alt="">
+                        </div>
+                     <img class="login-img" src="{% static 'images/logo/loginbk.jpg' %}" alt="">
+                    </div>
+                    <div class="col-4 lg-field log-res">
+                        <div class="card lg-card">
+                            <div class="row">
+                                <div class="col-12">
+                                    <a href="{% url 'custom_auth:login' %}" class="client-login-btn-link"><button type="submit" class="btn  float-right btn-inline vend-lg-sign">Client Login</button></a> 
+                                </div>
+                            </div>
+                            <!-- <div class="row m-0"> -->
+                                
+                                     <!-- <div class="card">  -->
+                                        <!-- <img class="rounded mx-auto d-block " style="width: 120px;" src="{% static 'images/logo/irock.png' %}" alt="irock-logo"> -->
+                                        <div class="form-card">
+                                        <div class="card-header">
+                                            <div class="card-title">
+                                                <h4 class="text-center lg-head">Vendor Login</h4>
+                                            </div>
+                                        </div>
+                                        {% if messages %}
+                                        <ul class="messages">
+                                            {% for message in messages %}
+                                            <p class="singup-error">{{ message }}</p>
+                                            {% endfor %}
+                                        </ul>
+                                      {% endif %}
+                                        <div class="card-content">
+                                            <div class="card-body pt-1">
+                                                <form action="" method="post" id="loginform">
+                                                  {% csrf_token %}
+
+                                                  <fieldset class="form-label-group form-group position-relative has-icon-left lo-giner">
+                                                    <label for="user-vinname" class="lg-name">VIN<span class="star-clr-signin">*</span></label>
+                                                    <input type="text" class="form-control lg-input" name="vin" id="id_vin" placeholder="VIN Number" autocomplete="off" >
+                                                    <div class="form-control-position">
+                                                        <i class="feather icon-user"></i>
+                                                    </div>
+                                    
+                                                </fieldset>
+
+                                                    <fieldset class="form-label-group form-group position-relative has-icon-left lo-giner">
+                                                        <label for="user-name" class="lg-name">Email<span class="star-clr-signin">*</span></label>
+                                                        <input type="email" class="form-control lg-input" name="email" id="id_email" autocomplete="off" placeholder="Email" >
+                                                        <div class="form-control-position">
+                                                            <i class="feather icon-user"></i>
+                                                        </div>
+                                        
+                                                    </fieldset>
+
+                                                    <fieldset class="form-label-group position-relative has-icon-left lo-giner">
+                                                        <label for="user-password" class="lg-name">Password<span class="star-clr-signin">*</span></label>
+                                                        <input type="password" class="form-control passwordfield lg-input" name="password" id="id_Password" placeholder="Password" >
+                                                        <span id="toggle_pwd" class="fa fa-fw fa-eye field_icon eye-space"></span>
+
+                                                    </fieldset>
+                                                    <!--forget password-->
+                                                    <div class="form-group d-flex justify-content-between align-items-center">
+                                                        <div class="text-right"><a href="" class="card-link"></a></div>
+                                                    </div>
+                                                    <span class="psw"><a style="color: white;" href=" {{request.scheme}}://{{request.get_host}}/forgotpasscodevin">Forgot password?</a></span>                                                  
+                                                    <div class="lg-logup">
+                                                 <button type="submit" class="btn  float-right btn-inline lg-sign">Sign In</button> 
+                                                 </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        </div>
+
+                                        <div class="login-footer" style="visibility: hidden;">
+                                            <div class="divider">
+                                                <div class="divider-text">OR</div>
+                                            </div>
+                                            <div class="footer-btn d-inline">
+                                                <a href="#" class="btn btn-facebook"><span class="fa fa-facebook"></span></a>
+                                                <a href="#" class="btn btn-twitter white"><span class="fa fa-twitter"></span></a>
+                                                <a href="#" class="btn btn-google"><span class="fa fa-google"></span></a>
+                                            </div>
+                                        </div>
+                                
+                                <!-- </div> -->
+                            <!-- </div> -->
+                        </div>
+                    </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </div>
+    <!-- END: Content-->
+
+
+    <!-- BEGIN: Vendor JS-->
+    <script src="{% static 'vendors/js/vendors.min.js' %}"></script>
+    <!-- BEGIN Vendor JS-->
+
+    <!-- BEGIN: Page Vendor JS-->
+    <!-- END: Page Vendor JS-->
+    <script src="{% static 'vendors/js/forms/validation/jquery.validate.min.js' %}"></script>
+
+    <!-- BEGIN: Theme JS-->
+    <script src="{% static 'js/core/app-menu.js' %}"></script>
+    <script src="{% static 'js/core/app.js' %}"></script>
+    <script src="{% static 'js/custom.js' %}"></script>
+
+    <script src="{% static 'js/scripts/components.js' %}"></script>
+    <!-- END: Theme JS-->
+
+    <!-- BEGIN: Page JS-->
+    <!-- END: Page JS-->
+
+</body>
+<!-- END: Body-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+<script>
+
+
+$(function(){
+        //$('.singup-error').fadeOut(10000);
+        setTimeout(function(){
+            $('.singup-error').remove();
+          }, 10000);
+          
+    })
+
+        $(function () {
+            $("#toggle_pwd").click(function () {
+                $(this).toggleClass("fa-eye fa-eye-slash");
+               var type = $(this).hasClass("fa-eye-slash") ? "text" : "password";
+                $("#id_Password").attr("type", type);
+            });
+        });
+
+function addDash(element){
+    ele = element.split('-').join(''); // Remove dash (-) if mistakenly entered.
+    var finalVal;
+    var a = ele
+    var b = "-";
+    var position = 3;
+    if (ele.length >3 ){
+        var output = [a.slice(0, position), b, a.slice(position)].join('');
+    }
+    else{
+        var output = ele
+    }
+
+    // console.log(output);
+    // finalVal = ele.match(/.{1,3}/g).join('-');
+    return output
+}
+
+    $(document).on('keyup','#id_vin',function(){
+        var val=$(this).val()
+        if (val.length > 9){
+            $(this).val(val.slice(0,-1))
+        }
+        if ($(this).val() != ''){
+            $(this).val($(this).val().toUpperCase());
+            var val=$(this).val()
+            var value=addDash(val)
+            $(this).val(value)
+        }
+        var val=$(this).val()
+        var regex = /^[a-zA-Z0-9-]+$/;
+        if(!regex.test(val)){
+            // alert()
+            console.log('invalid')
+            $(this).val('')
+        }
+    })
+
+// $.validator.addMethod("checkcin", function(value, element) {
+//     console.log(element.value)
+//     if(/^[a-zA-Z0-9- ]*$/.test(element.value) == false) {
+//         return false    
+//     }
+//     else{
+//         return  true
+//     }
+// })
+
+        $.validator.addMethod(
+    "regex",
+    function(value, element, regexp) {
+        return this.optional(element) || regexp.test(value);
+    },
+    "Please check your input."
+);
+
+$(document).on('keyup','#id_email',function(){
+var inputvalue = $('input[name="email"]').val();
+
+inputvalue = inputvalue.trim();
+
+$('input[name="email"]').val(inputvalue);
+})
+$.validator.addMethod("customFormat", function(value, element) {
+      // Your desired format: "JEG-xxx" where "xxx" represents numbers
+      return this.optional(element) || /^\d{3}-[A-Z]\d{4}$/.test(value);
+    }, "Please enter a valid format (e.g., 000-X0000)");
+
+
+
+
+    $("#loginform").validate({
+      // Specify validation rules
+      rules: {
+        vin:{
+            required:true,
+            customFormat:true,
+            // checkcin:true,
+        },
+        email: {
+          required: true,
+          email: true,
+          regex:/^[.-\w]+@[\w\-]{3,}((.)\w{2,})+$/
+        },
+
+        password: {
+          required:true,
+        //   minlength: 8,
+        //   regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+,.\\\/;':"-]).{8,}$/
+        }
+    },
+      messages: {
+        vin:{
+            required:"Please Provide a VIN Number",
+            // checkcin:'Please Provide a Valid vin number',
+        },
+        password: {
+          required: "Please Provide a Password",
+        //   minlength: "Your password must be at least 5 characters long",
+        //   regex: "Password should have minimum 8 letters consisting atleast one from A-Z, a-z, 0-9 and special characters",
+
+        },
+        email:{
+          required: "Please Provide an Email ID",
+          email: "Please Provide a Valid Email ID",
+          regex:"Please Provide a Valid Email ID",
+        }
+      },
+      errorElement : 'span',
+
+      submitHandler: function(form) {
+        form.submit();
+      }
+
+    });
+</script>
+<style>
+    .lg-input {
+    /* background: transparent !important; */
+    height:45px !important;
+}
+
+.lg-input:focus{
+    border-color:#fff !important;
+}
+     /* body {
+    background-image: url("{% static 'images/iwells-map.jpg' %}");
+    background-size: cover;
+    background-position: center;
+}    */
+    </style>
+</html>

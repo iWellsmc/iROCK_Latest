@@ -1,0 +1,935 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+<!-- {% load custom_tags %} -->
+{% load invoice_custom_tags %}
+{% load static %}
+{% load projectflowtags %}
+
+{% block content %}
+ <link rel="stylesheet" type="text/css" href="{% static 'assets/css/wcc/wcctrack.css' %}"> 
+ <div class="row">
+    <div class="col-12 text-end">
+        <button class="btn btn-clr waves-effect waves-float waves-light" >
+            <a href="#" class="inv_bck_cls">Back</a>
+        </button>
+    </div>
+</div>
+
+<h3 class="from-head">Invoice Approval and Payment Process Track </h3>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-12 col-lg-12">
+            <div id="tracking">
+                <div class="tracking-list">
+
+                
+                    {% if pending_invoice_status|length == 0 %}
+                        {%if module_split_count > 0 %}
+                        {% for split in module_split_value %}
+
+                        <h4 class="module-head">Payment {% if module_split_count > 1%} - {{forloop.counter}} {% endif %}
+                            <a class="btn p-0 showtoggle" data-toggle="collapse" href="#collapseExample{{split}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                <span class="action-edit align-icons">
+                                    <i class="fa fa-eye eyebutton" title="View"></i>
+                                </span>
+                            </a>
+                        </h4>  
+
+                        <div class="collapse" id="collapseExample{{split}}">
+                        {% complete_module_track pk split as completed_invoices %}
+                        {% for inv_module in completed_invoices %}
+                            {% get_completed_approved_users pk inv_module.id inv_module.module.id split as users_data %}
+                            <div class="tracking-item">
+                                <div class="tracking-icon status-intransit">
+                                    <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                        <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                    </svg>
+                                </div>
+                                     <div class="pending-cnt">{{inv_module.module}}</div>
+
+                                {% for user in users_data %}
+                                    {% get_user user.user as flow_user%}
+                                    <div class="tracking-content">
+                                        {% if check_for_dispute > 0 %}
+                                            {% for cost_info in invoice_cost %}
+                                            {% check_for_settlement cost_info as settlement %}
+                                            {% if settlement.1.module.id == inv_module.module.module.id %}
+                                            (Invoice: {{cost_info.invoice_number}} Approved {{settlement.1.accepted_percentage}}%  Disputed {{settlement.1.disputed_percentage}}%)<br>
+                                            {% endif %}
+                                            {% endfor %}
+                                        {% endif %} 
+                                        {{flow_user.name}} {{flow_user.lastname}}<span>{{flow_user.designation_role}}</span>
+                                    <span>Date: {{user.created_at|confulldate:inv_module.company.id}} -
+                                        {% if inv_module.module.module.id == 5%}
+                                            (
+                                            {% if user.user_status == 1 %}
+                                            Approved
+                                            {% elif user.user_status == 2 %}
+                                            Proceed
+                                            {% elif user.user_status == 3 %}
+                                            Returned
+                                            {% elif user.user_status == 4 %}    
+                                            Rejected
+                                            {% endif %}
+                                            )
+                                        {%else%}
+                                            (
+                                            {% if user.status == 1 %}
+                                            Approved
+                                            {% elif user.status == 2 %}
+                                            Proceed
+                                            {% elif user.status == 3 %}
+                                            Returned
+                                            {% elif user.status == 4 %}
+                                            Rejected
+                                            {% endif %}
+                                            )
+                                        {%endif%}
+                                    </span>
+                                    
+                                    {% if user.payment_instruction %}<span>Invoice Number: ({{user.payment_instruction.invoicecost.invoice_number}})</span>{% endif %}
+                                    {% if inv_module.module.id == 7 %}
+                                        <span>Invoice Number: (
+                                            {% get_payment_receipt_data pk flow_user.id split as receipt_data %}
+                                            {% for receipt in receipt_data%}
+                                                {{receipt.invoice_cost.invoice_number}}{% if not forloop.last %} ,{% endif %}
+                                            {% endfor %}
+                                        )
+                                        </span>
+                                    {% endif %}
+                                    </div>
+                                {% endfor %}
+
+                                
+
+                            </div>
+                            {% if inv_module.module.id == 6 %}
+                                    {% if bank_user_status.bank_user == 1%}
+
+                                    {% check_bankuser_status pk split as bank_verify%}
+                                    {% if bank_verify %}
+                                    <div class="tracking-item">
+                                        <div class="bank-tracking">
+                                        <div class="tracking-icon status-intransit">    
+                                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                            </svg>
+                                        </div> 
+                                            <h4 class="to_bankuser">To the Bank User</h4>
+                                        </div>  
+                                    </div>
+                                    {% else %}
+                                    <div class="little-test">
+                                            <div class="bank-tracking">
+                                            <div class="tracking-icon status-intransit">    
+                                                <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                    <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                </svg>
+                                            </div> 
+                                                <h4 class="to_bankuser">To the Bank User</h4>
+                                            </div>  
+                                    </div>
+                                    {% endif %}
+                                    {% endif %}
+                                    {% endif %}
+                        {% endfor %}
+                        <div class="tracking-item">
+                            <div class="tracking-icon vendor_comp_cls">
+                                <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                    <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        {% if invoice_detail.invoice_status == 5 or invoice_detail.invoice_status == 4    %}
+                        <div class="vendor_name">Invoice {% if invoice_detail.invoice_status == 5 %}Rejected{% elif invoice_detail.invoice_status == 4 %}Returned{% else %}Approved{% endif %} and Sent to {{contract.contractvendor.vendor_name}}</div>
+                        {% else %}
+
+                        <div class="vendor_name">Invoice
+                            {% check_payment_track_status pk 1  as payment_status %}
+                            {% if payment_status %}
+                                {% for  cost_invoice in  invoice_cost  %}
+                                No. {{cost_invoice.invoice_number}} {% if not forloop.last %} and {% endif %}
+                                {% endfor %}
+                                Approved, Paid Sent to {{contract.contractvendor.vendor_name}}
+                            {% else %}
+                                 
+                                {% for  cost_invoice in  invoice_cost  %}
+                                {% get_payment_percentage pk cost_invoice.id split as payment_percentage %}
+
+                                    {% if payment_percentage == None %}
+                                    {% else %}
+                                    No. {{cost_invoice.invoice_number}} {{payment_percentage}}  % - {% track_payment_status cost_invoice.id split as paid_status %}{% if paid_status == 100 %} Paid {% else %}Partial paid {% endif %} {% if not forloop.last %} and {% endif %}
+                                    {% endif %}
+                                
+                                {% empty %}
+                        
+                                {% endfor %}
+                            {% endif %}
+                        </div></div>
+
+                        {% endif %}
+
+
+                    </div>
+                    {% endfor %}
+                {% else %}             
+                    
+                    {% complete_module_track pk 1 as completed_invoices %}
+                    {%for inv_module in completed_invoices %}
+                    {% get_completed_approved_users pk inv_module.id inv_module.module.id 1 as users_data %}
+                    <div class="tracking-item">
+                        <div class="tracking-icon status-intransit">
+                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                            </svg>
+                        </div>
+                             <div class="pending-cnt">{{inv_module.module}}</div>
+
+                        {%for user in users_data %}
+                            {% get_user user.user as flow_user%}
+                            <div class="tracking-content">
+                                {% if check_for_dispute > 0 %}
+                                    {% for cost_info in invoice_cost %}
+                                    {% check_for_settlement cost_info as settlement %}
+                                    {% if settlement.1.module.id == inv_module.module.module.id %}
+                                    (Invoice: {{cost_info.invoice_number}} Approved {{settlement.1.accepted_percentage}}%  Disputed {{settlement.1.disputed_percentage}}%)<br>
+                                    {% endif %}
+                                    {% endfor %}
+                                {% endif %} 
+                                {{flow_user.name}} {{flow_user.lastname}}<span>{{flow_user.designation_role}}</span>
+                            <span>Date: {{user.created_at|confulldate:inv_module.company.id}} -
+                                {% if inv_module.module.module.id == 5%}
+                                    (
+                                    {% if user.user_status == 1 %}
+                                    Approved
+                                    {% elif user.user_status == 2 %}
+                                    Proceed
+                                    {% elif user.user_status == 3 %}
+                                    Returned
+                                    {% elif user.user_status == 4 %}
+                                    Rejected
+                                    {% endif %}
+                                    )
+                                {%else%}
+                                    (
+                                    {% if user.status == 1 %}
+                                    Approved
+                                    {% elif user.status == 2 %}
+                                    Proceed
+                                    {% elif user.status == 3 %}
+                                    Returned
+                                    {% elif user.status == 4 %}
+                                    Rejected
+                                    {% endif %}
+                                    )
+                                {%endif%}
+                            </span>
+                            {% if user.payment_instruction %}<span>Invoice Number: ({{user.payment_instruction.invoicecost.invoice_number}})</span>{% endif %}
+                            {% if inv_module.module.id == 7 %}
+                                <span>Invoice Number: (
+                                    {% get_payment_receipt_data pk flow_user.id 1 as receipt_data %}
+                                    {% for receipt in receipt_data%}
+                                        {{receipt.invoice_cost.invoice_number}}{% if not forloop.last %} ,{% endif %}
+                                    {% endfor %}
+                                )
+                                </span>
+                            {% endif %}
+                            </div>
+                        {% endfor %}
+
+
+                    </div>
+                {% endfor %}
+                <div class="tracking-item">
+                    <div class="tracking-icon vendor_comp_cls">
+                        <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                            <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                        </svg>
+                    </div>
+                </div>
+                {% if invoice_detail.invoice_status == 5   or invoice_detail.invoice_status == 4 or invoice_detail.invoice_status == 6    %}
+                <div class="vendor_name">Invoice {% if invoice_detail.invoice_status == 5 %}Rejected{% elif invoice_detail.invoice_status == 4 %}Returned{% elif invoice_detail.invoice_status == 6 %}Disputed {% else %}Approved{% endif %} and Sent back to {{contract.contractvendor.vendor_name}}</div>
+                {% else %}
+
+                <div class="vendor_name">Invoice
+                    {% check_payment_track_status pk 1 as payment_status %}
+                    {% if payment_status %}
+                        Approved and Sent to {{contract.contractvendor.vendor_name}}
+                    {% else %}
+                         
+                        {% for  cost_invoice in  invoice_cost  %}
+                            No. {{cost_invoice.invoice_number}}
+                      
+                            {% get_payment_percentage pk cost_invoice.id as payment_percentage %} {{payment_percentage}} % - paid {% if not forloop.last %} and {% endif %} 
+                        
+                        {% empty %}
+                
+                        {% endfor %}
+                    {% endif %}
+                </div></div>
+
+                {% endif %}
+
+                    {% endif%}
+
+
+                    {% else %}                          
+                            {% if module_split_count > 1 %}         
+                                {% for split in module_split_value %}
+                                        <h4 class="module-head">Payment -{{forloop.counter}}
+                                            <a class="btn p-0 showtoggle" data-toggle="collapse" href="#collapseExample{{split}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                                <span class="action-edit align-icons">
+                                                    <i class="fa fa-eye eyebutton" title="View"></i>
+                                                </span>
+                                            </a>
+                                        </h4>    
+                                                
+                            <!-- <h5>{{level.process.process.process_name}}</h5> -->
+                                    <div class="collapse" id="collapseExample{{split}}">
+                                    {% for level in get_levels%}
+                                        {% get_process_modules level as modules %}
+                                        {% for inv_module in modules %}                           
+                                            {% get_approved_users pk level.id inv_module.id inv_module.module.module.id split as users_data %}
+                                            {% if users_data.0.status == 1 %}
+                                                {% if users_data.2 %}
+                                                    <div class="tracking-item">
+                                                        <div class="tracking-icon status-intransit">
+                                                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                            </svg>
+                                                        </div>
+                                                    <div class="pending-cnt">{{inv_module.module.module.module_name}}</div>
+                                                        {% for user in users_data.1 %}
+                                                            {% get_user user.user as flow_user%}
+                                                            <div class="tracking-content">
+                                                                {% if check_for_dispute > 0 %}
+                                                                    {% for cost_info in invoice_cost %}
+                                                                    {% check_for_settlement cost_info as settlement %}
+                                                                    {% if settlement.1.module.id == inv_module.module.module.id %}
+                                                                    (Invoice: {{cost_info.invoice_number}} Approved {{settlement.1.accepted_percentage}}%  Disputed {{settlement.1.disputed_percentage}}%)<br>
+                                                                    {% endif %}
+                                                                    {% endfor %}
+                                                                {% endif %} 
+                                                                {{flow_user.name}} {{flow_user.lastname}}<span>{{flow_user.designation_role}}</span>
+                                                            <span>Date: {{user.created_at|confulldate:inv_module.company.id}} -
+                                                                {% if inv_module.module.module.id == 5%}
+                                                                    (
+                                                                    {% if user.user_status == 1 %}
+                                                                    Approved
+                                                                    {% elif user.user_status == 2 %}
+                                                                    Proceed
+                                                                    {% elif user.user_status == 3 %}
+                                                                    Returned
+                                                                    {% elif user.user_status == 4 %}
+                                                                    Rejected
+                                                                    {% endif %}
+                                                                    )
+                                                                {%else%}
+                                                                    (
+                                                                    {% if user.status == 1 %}
+                                                                    Approved
+                                                                    {% elif user.status == 2 %}
+                                                                    Proceed
+                                                                    {% elif user.status == 3 %}
+                                                                    Returned
+                                                                    {% elif user.status == 4 %}
+                                                                    Rejected
+                                                                    {% endif %}
+                                                                    )
+                                                                {%endif%}
+                                                            </span>
+                                                            <span {% if user.payment_instruction.invoicecost.invoice_number == null %} style="display: none;" {% endif %}>Invoice Number: ({{user.payment_instruction.invoicecost.invoice_number}})</span>
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% check_next_flow_module pk inv_module as invoice_flow %}
+                                                    {% if invoice_flow.module.module.id == 7 %}
+                                                    {% if bank_user_status.bank_user == 1%}
+
+                                                    {% check_bankuser_status pk split as bank_verify%}
+                                                    {% if bank_verify %}
+                                                    <div class="tracking-item">
+                                                        <div class="bank-tracking">
+                                                        <div class="tracking-icon status-intransit">    
+                                                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                            </svg>
+                                                        </div> 
+                                                            <h4 class="to_bankuser">To the Bank User</h4>
+                                                        </div>  
+                                                    </div>
+                                                    {% else %}
+                                                    <div class="little-test">
+                                                            <div class="bank-tracking">
+                                                            <div class="tracking-icon status-intransit">    
+                                                                <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                                    <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                                </svg>
+                                                            </div> 
+                                                                <h4 class="to_bankuser">To the Bank User</h4>
+                                                            </div>  
+                                                    </div>
+                                                    {% endif %}
+                                                    {% endif %}
+                                                    {% endif %}
+                                                {% else %}
+                                                    <div class="tracking-item-pending">
+                                                        <div class="tracking-icon status-intransit">    
+                                                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                            </svg>
+                                                        </div>
+                                                            <div class="pending-cnt">{{inv_module.module.module.module_name}}</div>
+                                                        {% for user in users_data.1 %}
+                                                        {% get_user user.user as flow_user%}
+                                                            {% if user.invoice_override == 0 %}
+                                                                <div class="tracking-content">
+                                                                    {% if check_for_dispute > 0 %}
+                                                                    {% for cost_info in invoice_cost %}
+                                                                    {% check_for_settlement cost_info as settlement %}
+                                                                    {% if settlement.1.module.id == inv_module.module.module.id %}
+                                                                    (Invoice: {{cost_info.invoice_number}} Approved {{settlement.1.accepted_percentage}}%  Disputed {{settlement.1.disputed_percentage}}%)<br>
+                                                                    {% endif %}
+                                                                    {% endfor %}
+                                                                    {% endif %} 
+                                                                    {{flow_user.name}} {{flow_user.lastname}}<span>{{flow_user.designation_role}}</span></div>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                        {% check_next_flow_module pk inv_module as invoice_flow %}
+                                                        {% if invoice_flow.module.module.id == 7 %}
+                                                            {% if bank_user_status.bank_user == 1%}
+                                                                <h4 class="to_bankuser">To the Bank User</h4>
+                                                            {% endif %}
+                                                    {% endif %}
+                                                    </div>
+                                                {% endif %}
+                                            {% else %}
+                                                <div class="tracking-item-pending">
+                                                    <div class="tracking-icon status-intransit">    
+                                                        <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                            <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                        </svg>
+                                                    </div> 
+                                                    <div class="pending-cnt">{{inv_module.module.module.module_name}}</div>
+
+                                                    <!-- <div class="pending-cnt">{{inv_module.module.module.module_name}}--{{invoice_flow.module.module.id}}</div> -->
+                                                    {% if inv_module.module.module.id == 5 %}
+                                                        {% show_signatories_track pk project_id.projectname_id request as sign_users %}
+                                                        {% for user_data in sign_users %}
+                                                            <div class="tracking-content">{{user_data.user.name}} {{user_data.user.lastname}}
+                                                                <span>{{user_data.user.designation_role}} - {{user_data.signatory.currency.currency_symbol}}</span>
+                                                            </div>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                    {% get_flow_users level.id inv_module.id as flow_users%}
+                                                    {% for station_user in flow_users %}
+                                                        <div class="tracking-content">{{station_user.user.user.name}} {{station_user.user.user.lastname}}<span>{{station_user.user.user.designation_role}}</span></div>
+                                                    {% endfor %}
+                                                    {% endif %}
+                                                    </div>
+                                                        {% check_next_flow_module pk inv_module as invoice_flow %}
+                                                            {% if invoice_flow.module.module.id == 7 %}
+                                                            {% if bank_user_status.bank_user == 1%}
+
+                                                            {% check_bankuser_status pk split as bank_verify%}
+                                                            {% if bank_verify %}
+                                                            <div class="tracking-item">
+                                                                <div class="bank-tracking">
+                                                                <div class="tracking-icon status-intransit">    
+                                                                    <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                                        <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                                    </svg>
+                                                                </div> 
+                                                                    <h4 class="to_bankuser">To the Bank User</h4>
+                                                                </div>  
+                                                            </div>
+                                                            {% else %}
+                                                            <div class="little-test">
+                                                                    <div class="bank-tracking">
+                                                                    <div class="tracking-icon status-intransit">    
+                                                                        <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                                            <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                                        </svg>
+                                                                    </div> 
+                                                                        <h4 class="to_bankuser">To the Bank User</h4>
+                                                                    </div>  
+                                                            </div>
+                                                            {% endif %}
+                                                                {% endif %}
+                                                        {% endif %}                                                      
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+
+
+
+                                        
+                                            {% if approval_status == True %}
+                                            <div class="tracking-item">
+                                                <div class="tracking-icon status-intransit">
+                                                    <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                        <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            {% trackpaidstatus pk split as paid_status %}
+                                            {% if paid_status == 1  %}
+                                            
+                                            <div class="vendor_name">Invoice 
+                                                    {% check_payment_track_status pk split as payment_status %}
+                                                    {% if payment_status %}
+                                                        Approved and Sent to {{contract.contractvendor.vendor_name}}
+                                                    {% else %}                                 
+                                                        {% for  cost_invoice in  invoice_cost  %}
+                                                            No. {{cost_invoice.invoice_number}}                            
+                                                            {% get_payment_percentage pk cost_invoice.id split as payment_percentage %} {{payment_percentage}} % - paid {% if not forloop.last %} and {% endif %}                
+                                                        {% empty %}
+                                                
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </div>
+                                            {% elif paid_status == 2 %}
+                                            <div class="vendor_name">
+                                                {% if module_flowes.module_id == 1 or module_flowes.module_id == 2   %}
+                                                Invoice 
+                                                {% else %}
+                                                Payment
+                                                {% endif %}
+                                                Approval for No 
+                                                {% for  cost_invoice in  invoice_cost  %}
+                                                {{cost_invoice.invoice_number}}   {% if not forloop.last %} , {% endif %}
+                                                {% empty %}                        
+                                                {% endfor %}
+                                                in Progress
+                                            </div>    
+                                            {% else %}                        
+                                                <div class="vendor_name">Invoice 
+                                                {% check_payment_track_status pk split as payment_status %}
+                                                {% if payment_status %}
+                                                    Approved and Sent to {{contract.contractvendor.vendor_name}}
+                                                {% else %}
+                                                    
+                                                    {% for  cost_invoice in  invoice_cost  %}
+                                                        No. {{cost_invoice.invoice_number}}
+                                                
+                                                        {% get_payment_percentage pk cost_invoice.id  split as payment_percentage %} {{payment_percentage}} % - paid {% if not forloop.last %} and {% endif %} 
+                                                    
+                                                    {% empty %}
+                                            
+                                                    {% endfor %}
+                                                {% endif %}
+                                                </div>
+                
+                                            {% endif %}
+                                    {% else %}
+                                        <div class="tracking-item-pending">
+                                            <div class="tracking-icon status-intransit">    
+                                                <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                    <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        {% trackpaidstatus pk split as paid_status %}
+                                        {% if paid_status == 1  %}
+                                            <div class="vendor_name">Invoice 
+                                                {% check_payment_track_status pk split as payment_status %}
+                                                {% if payment_status %}
+                                                    Approved and Sent to {{contract.contractvendor.vendor_name}}
+                                                {% else %}
+                                                    {% for  cost_invoice in  invoice_cost  %}
+                                                        No. {{cost_invoice.invoice_number}} 
+                                                        {% get_payment_percentage pk cost_invoice.id split as payment_percentage %} {{payment_percentage}} % - paid {% if not forloop.last %} and {% endif %} 
+                                                    {% empty %}
+                                            
+                                                    {% endfor %}
+                                                {% endif %}
+                                                </div>
+                                        {% elif paid_status == 2 %}
+                                        <div class="vendor_name">
+                                            {% if module_flowes.module_id == 1 or module_flowes.module_id == 2   %}
+                                            Invoice 
+                                            {% else %}
+                                            Payment
+                                            {% endif %}
+                                            Approval for No 
+                                            {% for  cost_invoice in  invoice_cost  %}
+                                            {{cost_invoice.invoice_number}}   {% if not forloop.last %} , {% endif %}
+                                            {% empty %}
+                                        
+                                            {% endfor %}
+                                            in Progress
+                                            </div>
+                                            {% else %}
+                                                    <div class="vendor_name">Invoice
+                                                    {% check_payment_track_status pk split as payment_status %}
+                                                    {% if payment_status %}
+                                                        Approved and Sent to {{contract.contractvendor.vendor_name}}
+                                                    {% else %}
+                                                        {% for  cost_invoice in  invoice_cost  %}
+                                                            {% get_payment_percentage pk cost_invoice.id split as payment_percentage %}
+                                                            
+                                                             {% if payment_percentage == None %}
+                                                             {% else  %}
+                                                                No. {{cost_invoice.invoice_number}} {{payment_percentage}} % - paid {% if not forloop.last %} and {% endif %}
+                                                            {% endif %}
+
+                                                        {% empty %}
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                    </div>
+                                            {% endif %}
+                                        {% endif %}
+
+                                        </div>  
+                                    
+                                {% endfor %}
+                        
+                        
+                        
+                            {% else %}
+                                {% for level in get_levels%}
+                                    {% get_process_modules level as modules %}
+                                        {%for inv_module in modules %}                           
+                                            {% get_approved_users pk level.id inv_module.id  inv_module.module.module.id  as users_data %}
+                                            {% if users_data.0.status == 1 %}
+                                                {% if users_data.2 %}
+                                                    <div class="tracking-item">
+                                                        <div class="tracking-icon status-intransit">
+                                                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                            </svg>
+                                                        </div>
+                                                        <div class="pending-cnt">{{inv_module.module.module.module_name}} </div>
+                                                        {%for user in users_data.1 %}
+                                                            {% get_user user.user as flow_user%}
+                                                            <div class="tracking-content">
+                                                                {% if check_for_dispute > 0 %}
+                                                                    {% for cost_info in invoice_cost %}
+                                                                    {% check_for_settlement cost_info as settlement %}
+                                                                    {% if settlement.1.module.id == inv_module.module.module.id %}
+                                                                    (Invoice: {{cost_info.invoice_number}} Approved {{settlement.1.accepted_percentage}}%  Disputed {{settlement.1.disputed_percentage}}%)<br>
+                                                                    {% endif %}
+                                                                    {% endfor %}
+                                                                {% endif %} 
+                                                                {{flow_user.name}} {{flow_user.lastname}}<span>{{flow_user.designation_role}}</span>
+                                                            <span>Date: {{user.created_at|confulldate:inv_module.company.id}} -
+                                                                    (
+                                                                    {% if user.status == 1 %}
+                                                                    Approved
+                                                                    {% elif user.status == 2 %}
+                                                                    Proceed
+                                                                    {% elif user.status == 3 %}
+                                                                    Returned
+                                                                    {% elif user.status == 4 %}
+                                                                    Rejected
+                                                                    {% endif %}
+                                                                    )
+                                                            </span>
+                                                            
+                                                            <span {% if user.payment_instruction.invoicecost.invoice_number == null %} style="display: none;" {% endif %}> Invoice Number: ({{user.payment_instruction.invoicecost.invoice_number}})</span>
+                                                            </div>
+                                                        {% endfor %}
+                                                       
+                                                    </div>
+                                                    
+                                                    {% check_next_flow_module pk inv_module as invoice_flow %}
+                                                            {% if invoice_flow.module.module.id == 7 %}
+                                                            {% if bank_user_status.bank_user == 1%}
+
+                                                            {% check_bankuser_status pk 1 as bank_verify%}
+                                                            {% if bank_verify %}
+                                                            <div class="tracking-item">
+                                                                <div class="bank-tracking">
+                                                                <div class="tracking-icon status-intransit">    
+                                                                    <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                                        <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                                    </svg>
+                                                                </div> 
+                                                                    <h4 class="to_bankuser">To the Bank User</h4>
+                                                                </div>  
+                                                            </div>
+                                                            {% else %}
+                                                            <div class="little-test">
+                                                                    <div class="bank-tracking">
+                                                                    <div class="tracking-icon status-intransit">    
+                                                                        <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                                            <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                                        </svg>
+                                                                    </div> 
+                                                                        <h4 class="to_bankuser">To the Bank User</h4>
+                                                                    </div>  
+                                                            </div>
+                                                            {% endif %}
+                                                                {% endif %}
+                                                        {% endif %}
+
+
+                                                {% else %}
+                                                    <div class="tracking-item-pending">
+                                                        <div class="tracking-icon status-intransit">    
+                                                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                            </svg>
+                                                        </div>
+                                                            <div class="pending-cnt">{{inv_module.module.module.module_name}}</div>
+                                                        {%for user in users_data.1 %}
+                                                        {% get_user user.user as flow_user%}
+                                                            {% if user.invoice_override == 0 %}
+                                                                <div class="tracking-content">
+                                                                    {% if check_for_dispute > 0 %}
+                                                                    {% for cost_info in invoice_cost %}
+                                                                    {% check_for_settlement cost_info as settlement %}
+                                                                    {% if settlement.1.module.id == inv_module.module.module.id %}
+                                                                    (Invoice: {{cost_info.invoice_number}} Approved {{settlement.1.accepted_percentage}}%  Disputed {{settlement.1.disputed_percentage}}%)<br>
+                                                                    {% endif %}
+                                                                    {% endfor %}
+                                                                    {% endif %} 
+                                                                    {{flow_user.name}} {{flow_user.lastname}}<span>{{flow_user.designation_role}}</span></div>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                       
+                                                    </div>
+                                                    {% check_next_flow_module pk inv_module as invoice_flow %}
+                                                            {% if invoice_flow.module.module.id == 7 %}
+                                                            {% if bank_user_status.bank_user == 1%}
+
+                                                            {% check_bankuser_status pk 1 as bank_verify%}
+                                                            {% if bank_verify %}
+                                                            <div class="tracking-item">
+                                                                <div class="bank-tracking">
+                                                                <div class="tracking-icon status-intransit">    
+                                                                    <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                                        <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                                    </svg>
+                                                                </div> 
+                                                                    <h4 class="to_bankuser">To the Bank User</h4>
+                                                                </div>  
+                                                            </div>
+                                                            {% else %}
+                                                            <div class="little-test">
+                                                                    <div class="bank-tracking">
+                                                                    <div class="tracking-icon status-intransit">    
+                                                                        <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                                            <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                                        </svg>
+                                                                    </div> 
+                                                                        <h4 class="to_bankuser">To the Bank User</h4>
+                                                                    </div>  
+                                                            </div>
+                                                            {% endif %}
+                                                                {% endif %}
+                                                        {% endif %}
+                                                {% endif %}
+                                            {% else %}
+                                                <div class="tracking-item-pending">
+                                                    <div class="tracking-icon status-intransit">    
+                                                        <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                            <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                        </svg>
+                                                    </div> 
+                                                    <div class="pending-cnt">{{inv_module.module.module.module_name}}</div>
+
+                                                    
+                                                    {% if inv_module.module.module.id == 5 %}
+                                                        {% show_signatories_track pk project_id.projectname_id request as sign_users %}
+                                                        {% for user_data in sign_users %}
+                                                            <div class="tracking-content">{{user_data.user.name}} {{user_data.user.lastname}}
+                                                                <span>{{user_data.user.designation_role}} - {{user_data.signatory.currency.currency_symbol}}</span>
+                                                            </div>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                    {% get_flow_users level.id inv_module.id as flow_users%}
+                                                    {% for station_user in flow_users %}
+                                                        <div class="tracking-content">{{station_user.user.user.name}} {{station_user.user.user.lastname}}<span>{{station_user.user.user.designation_role}}</span></div>
+                                                    {% endfor %}
+                                                    {% endif %}
+                                                        
+                                                    </div>
+                                                    {% check_next_flow_module pk inv_module as invoice_flow %}
+                                                            {% if invoice_flow.module.module.id == 7 %}
+                                                            {% if bank_user_status.bank_user == 1%}
+                                                            {% if module_split_count == 0 %}
+                                                            <div class="little-test">
+                                                                <div class="bank-tracking">
+                                                                <div class="tracking-icon status-intransit">    
+                                                                    <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                                        <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                                    </svg>
+                                                                </div> 
+                                                                    <h4 class="to_bankuser">To the Bank User</h4>
+                                                                </div>  
+                                                            </div>
+                                                            {% else %}
+                                                            
+
+                                                                    {% check_bankuser_status pk 1 as bank_verify%}
+                                                                    {% if bank_verify %}
+                                                                    <div class="tracking-item">
+                                                                        <div class="bank-tracking">
+                                                                        <div class="tracking-icon status-intransit">    
+                                                                            <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                                                <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                                            </svg>
+                                                                        </div> 
+                                                                            <h4 class="to_bankuser">To the Bank User</h4>
+                                                                        </div>  
+                                                                    </div>
+                                                                    {% else %}
+                                                                    <div class="little-test">
+                                                                            <div class="bank-tracking">
+                                                                            <div class="tracking-icon status-intransit">    
+                                                                                <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                                                    <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                                                </svg>
+                                                                            </div> 
+                                                                                <h4 class="to_bankuser">To the Bank User</h4>
+                                                                            </div>  
+                                                                    </div>
+                                                                    {% endif %}
+                                                                        {% endif %}
+                                                                {% endif %}
+                                                            {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+
+                                        {% if approval_status == True %}
+                                        <div class="tracking-item">
+                                            <div class="tracking-icon status-intransit">
+                                                <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                    <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                </svg>
+                                            </div>
+                                        </div>   
+                                        {% trackpaidstatus pk 1 as paid_status %}
+                                        {% if paid_status == 1  %}                            
+                                            <div class="vendor_name">Invoice 
+                                            {% check_payment_track_status pk 1 as payment_status %}
+                                            {% if payment_status %}
+                                                Approved and Sent to {{contract.contractvendor.vendor_name}}
+                                            {% else %}
+                                                {% for  cost_invoice in  invoice_cost  %}
+                                                    No. {{cost_invoice.invoice_number}}
+                                                    {% get_payment_percentage pk cost_invoice.id 1 as payment_percentage %} {{payment_percentage}} % - paid {% if not forloop.last %} and {% endif %}            
+                                                {% empty %}                            
+                                                {% endfor %}
+                                            {% endif %}
+                                                </div>
+                                        {% elif paid_status == 2 %}
+                                        <div class="vendor_name">
+                                            {% if module_flowes.module_id == 1 or module_flowes.module_id == 2   %}
+                                            Invoice 
+                                            {% else %}
+                                            Payment
+                                            {% endif %}
+                                            Approval for No 
+                                            {% for  cost_invoice in  invoice_cost  %}
+                                            {{cost_invoice.invoice_number}}   {% if not forloop.last %} , {% endif %}
+                                            {% empty %}                           
+                                            {% endfor %}
+                                            in Progress
+                                        </div>
+                                        {% else %}  
+                                            <div class="vendor_name">Invoice 
+                                            {% check_payment_track_status pk 1  as payment_status %}
+                                            {% if payment_status %}
+                                                Approved and Sent to {{contract.contractvendor.vendor_name}}
+                                            {% else %}   
+                                                {% for  cost_invoice in  invoice_cost  %}
+                                                    No. {{cost_invoice.invoice_number}}
+                                                    {% get_payment_percentage pk cost_invoice.id 1 as payment_percentage %} {{payment_percentage}} % - paid {% if not forloop.last %} and {% endif %} 
+                                                {% empty %}
+                                                {% endfor %}
+                                            {% endif %}
+                                            </div>
+                                        {% endif %}
+                                {% else %}
+                                        <div class="tracking-item-pending">
+                                            <div class="tracking-icon status-intransit">    
+                                                <svg class="svg-inline--fa fa-circle fa-w-16" aria-hidden="true" data-prefix="fas" data-icon="circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
+                                                    <path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8z"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        {% trackpaidstatus pk 1 as paid_status %}
+                                        {% if paid_status == 1  %}
+                                            <div class="vendor_name">Invoice 
+                                                {% check_payment_track_status pk 1 as payment_status %}
+                                                {% if payment_status %}
+                                                    Approved and Sent to {{contract.contractvendor.vendor_name}}
+                                                {% else %}
+                                                    {% for  cost_invoice in  invoice_cost  %}
+                                                        No. {{cost_invoice.invoice_number}}
+                                                        {% get_payment_percentage pk cost_invoice.id 1 as payment_percentage %} {{payment_percentage}} % - {% track_payment_status cost_invoice.id 1 as paid_status %}{% if paid_status == 100 %} Paid {% else %}Partial paid {% endif %} {% if not forloop.last %} and {% endif %} 
+                                                    {% empty %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                                </div>
+                                        {% elif paid_status == 2 %}
+                                        <div class="vendor_name">
+                                            {% if module_flowes.module_id == 1 or module_flowes.module_id == 2   %}
+                                            Invoice 
+                                            {% else %}
+                                            Payment
+                                            {% endif %}
+                                            Approval for No 
+                                            {% for  cost_invoice in  invoice_cost  %}
+                                            {{cost_invoice.invoice_number}}   {% if not forloop.last %} , {% endif %}
+                                            {% empty %}
+                                        
+                                            {% endfor %}
+                                            in Progress
+                                        </div>
+                                        {% else %}
+                                            <div class="vendor_name">Invoice 
+                                            {% check_payment_track_status pk 1 as payment_status %}
+                                            {% if payment_status %}
+                                                Approved and Sent to {{contract.contractvendor.vendor_name}}
+                                            {% else %}   
+                                                {% for  cost_invoice in  invoice_cost  %}
+                                                    No. {{cost_invoice.invoice_number}}
+                                                    {% get_payment_percentage pk cost_invoice.id 1 as payment_percentage %} {{payment_percentage}} % - {% track_payment_status cost_invoice.id 1 as paid_status %}{% if paid_status == 100 %} Paid {% else %}Partial paid {% endif %} {% if not forloop.last %} and {% endif %}
+                                                {% empty %}
+                                                {% endfor %}
+                                            {% endif %}
+                                            </div>
+                                        {% endif %}
+                                   
+                                    {% endif %}         
+                            {% endif %}
+                    {% endif %}
+           
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        
+
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+$(document).ready(function() {
+    $('.inv_bck_cls').click(function(e) {
+        e.preventDefault(); // Prevent default anchor behavior
+        console.log("Back button clicked");
+        window.history.back();
+    });
+});
+
+
+
+$(document).ready(function() {
+
+    $(".showtoggle").on('click', function() {
+    let nxttr = $(this).closest('tr').next('tr');
+    $(this).closest('table tbody').find('.collapse').not(nxttr.find('.collapse')).removeClass('show');
+   });
+
+   });  
+</script>
+
+{% endblock %} 

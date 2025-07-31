@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load credit_custom_tags %}
+{% load wcc_custom_tags %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/invoice_approval.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/calculator.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/invoicedata.css' %}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="{% static 'js/wcc/wccpreview.js' %}"></script>
+<script src="{% static 'js/wcc/wccapprove.js' %}"></script>
+
+
+
+<h3 class="from-head">WCC Approval</h3>
+
+    <div class="row">
+        <div class="col-12 text-end">
+            <button class="btn btn-clr waves-effect waves-float waves-light" >
+                <a href="{% url 'wcc:wccapprovaltrack' pk=pk%}">Track</a>
+            </button>
+            <button class="btn btn-clr waves-effect waves-float waves-light" >
+              <a href="{% url 'wcc:approvalwcclist' %}">Back</a>
+          </button>
+        </div>
+        <div class="col-6 pb-2 bor-rgt">
+            <h5 class="head-inv-pre">WCC Summary Details</h5>
+            <div class="table-responsive">
+              <table class="inv-pretbl inv-prev_width wcc-preview-summery">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>S.No</th>
+                        <th>WCC No</th>
+                        <th>WCC Date</th>
+                        <th>Period of Service</th>
+                        <th>WCC Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                   
+                    {% for wcc in wccworkvalues %}
+                    <tr>
+                        <td>
+                            <i class="fa fa-eye prev-eyee inv_file" value="{{wcc.wcc_file}}" style="font-size:15px;"></i>
+                        </td>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{wcc.wcc_number}}</td>
+                        <td>{{wcc.wcc_date|convert_credit_date:request.company.id}}</td>
+                        <td>{{wcc.wcc.fromdate|date:"d-M-Y"}} to {{wcc.wcc.todate|date:"d-M-Y"}}</td>
+                        <td>{{currency_symbol}} {{wcc.wcc_amount}}</td>
+                        <input type="hidden" name="wcc_userlog" id="wcc_userlog" class="wcc_userlog" value="{{wcc.wcc_number}}"/>
+                    </tr>
+                    {% endfor %}
+                    
+                </tbody>
+            </table>
+            </div>
+        
+        </div>
+        <div class="col-6 pb-2">
+            <h5 class="head-inv-pre">Supporting Documents</h5>
+
+            <div class="row">
+                {% for doc_detail in supports_docs %}
+                <div class="col-md-12 col-lg-4 padd-btn"> 
+                    <button type="button" class="commonbtn m-commonbtn" dataid="{{doc_detail.id}}" {% if doc_detail.id == 5 %}id="material_delivery"{% endif %} >{{doc_detail.name}}</button>
+                </div> 
+            {% endfor %}
+            <div class="col-md-12 col-lg-4 padd-btn">
+                <button type="button" class="commonbtn" dataid="9">Contracts</button>
+            </div>
+            <div class="col-md-12 col-lg-4 padd-btn">
+                <button type="button" class="commonbtn" dataid="10">Price Table</button>
+            </div>
+            </div>
+
+        </div>
+        <div class="col-6 bor-rgt">
+
+        </div>
+
+        <div class="show_file_cls col-6">
+        </div>
+
+        <div class="invfilediv bor-rgt col-6">
+          <div><iframe class="doc_invhidcls" width="100%" src="" frameborder="0"></iframe></div>
+      </div>
+
+      <div class="selectedfilecls col-6">
+          <div><iframe width="100%" class="doc_selinvhidcls" src=""></iframe></div>
+      </div>
+      {% checkapproveaccess pk request.user.id as check_data %}
+      {% if check_data.0 == 0 %}
+        <form method="POST" id="wccapprovalid">
+            {% csrf_token %}
+        <div class="row color-btn justify-content-center my-5">
+          {% for wcc_right in wcc_rights %}
+            {% if wcc_right.right.slug == "wcc-approve" %}
+              <div class="col-2 text-center"> 
+                <button type="submit" class="btn btn-clr status_cls green" value="1" data-toggle="modal" data-target="#exampleModalCenter">Approve</button>
+              </div>
+            {% endif %}
+          {% endfor %}
+          {% for wcc_right in wcc_rights %}
+            {% if wcc_right.right.slug == "wcc-return" %}
+              <div class="col-2 text-center"> 
+                <button type="submit" class="btn btn-clr status_cls beige" value="2" data-toggle="modal" data-target="#exampleModalCenter">Return</button>
+              </div>
+            {% endif %}
+          {% endfor %}
+          {% for wcc_right in wcc_rights %}
+            {% if wcc_right.right.slug == "wcc-reject" %}
+              <div class="col-2 text-center"> 
+                <button type="submit" class="btn btn-clr status_cls red" value="3" data-toggle="modal" data-target="#exampleModalCenter">Reject</button>
+              </div>
+            {% endif %}
+          {% endfor %}
+          {% for wcc_right in wcc_rights %}
+            {% if wcc_right.right.slug == "wcc-view" %}
+                  <div class="col-2 text-center"> 
+                    <button type="button" class="btn btn-clr cmt_cls" data-toggle="modal" data-target="#exampleModalCenter">Comments</button>
+                  </div>
+              {% endif %}
+          {% endfor %}
+            <div class="col-2 text-center"> 
+              <button type="button" class="btn btn-clr beige calbtn" data-toggle="modal" data-target="#exampleModalCenter2">Calculator</button>
+            </div>
+            
+        </div>
+        
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header comment-head">
+                  <h5 class="modal-title" id="exampleModalCenterTitle">Comments</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body comment-body">
+                    <textarea name="main_comments" id="main_comments" class="form-control"></textarea>
+                    <div class="excp_content">
+
+                    </div>
+                  </div>
+                <div class="modal-footer comment-foot">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal" id="submit_id">Submit</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter2" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+              <div class="modal-content" data-backdrop="static">
+                
+                <div class="modal-header comment-head">
+                  <h5 class="modal-title" id="exampleModalCenterTitle">Calculator</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body calc-body">
+                  <iframe src="{% url 'invoice:calculator' %}" title="description"></iframe>
+                </div>
+               
+    
+                <div class="modal-footer comment-foot">
+                  <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Save & Close</button> -->
+                </div>
+                </div>
+            </div>
+          </div>
+          {% for wcc in wccworkvalues %}
+          <input type="hidden" name="wcc_userlog" id="wcc_userlog" class="wcc_userlog" value="{{wcc.wcc_number}}"/>
+          {% endfor %}
+        </form>
+      {% endif %}
+    </div>
+
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script> 
+<script>
+
+$(document).ready(function() {
+    // Make the modal draggable only by its header
+    $('#exampleModalCenter2').draggable({
+        handle: ".modal-header",
+        containment: "#container", // Limit dragging within the element with id="container"
+    });
+});
+var wcc_id="{{pk}}" 
+// var vendor_id="{{vendor_id}}"
+// var contract_id="{{contract_id}}"
+// var contract_type="{{contract_type}}" 
+var user_signature="{{sign_data}}"
+var scheme="{{request.scheme}}"
+var gethost="{{request.get_host}}"
+var currentdomain=scheme+'://'+gethost
+var package_src = "{% static 'js/web/viewer.html' %}"
+</script>
+<script>
+
+
+$(document).ready(function () {
+    
+    $('#submit_id').click(function () {
+        
+        var comments = $('#main_comments').val().trim();
+        if (comments === '') {
+            // Add a CSS class to indicate error
+            $('#main_comments').addClass('error-border');
+            return false; // Prevent form submission
+        } else {
+            // Remove the CSS class if validation passes
+            $('#main_comments').removeClass('error-border');
+        }
+    });
+});
+
+
+
+</script>
+<!-- <script></script> -->
+
+{% endblock %}

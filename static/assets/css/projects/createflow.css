@@ -1,0 +1,70 @@
+.wcc-name td {
+    padding: 5px 5px;
+}
+
+.wcc-name td:nth-child(1){
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+    width: 100px;
+}
+
+.wcc-name td:nth-child(2){
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.wcc-name td:nth-child(3){
+    color: #017474;
+    font-size: 15px;
+    font-weight: 600;
+    /* width: 250px; */
+    /* padding-left: 25px; */
+}
+
+.invite-cards-invoice {
+    box-shadow: 0px 0px 5px;
+    border-radius: 5px;
+    padding: 20px 80px;
+    margin: 30px 0px;
+}
+
+.wcc-flow {
+    /* width: 35%; */
+    width: 100% !important;
+}
+
+.wcc-flow td {
+    padding: 5px 5px;
+}
+
+.wcc-flow td:nth-child(1){
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+    width: 100px;
+}
+.wcc-flow td:nth-child(2){
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+    width: 1px;
+}
+
+.wcc-flow td:nth-child(3){
+    position: relative;
+}
+
+.down-arrow-sig img {
+    position: absolute;
+    right: 10px;
+    top: 15px;
+    transform: translateX(-50%);
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1023px) {
+    .invoice-appo-work{
+    overflow-y: unset !important;
+    }
+    }

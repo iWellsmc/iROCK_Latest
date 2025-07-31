@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% load cost_code_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/cost_code/edit_cost_code.css' %}">
+
+<div>
+    <div class="text-end">
+        <button type="button" class="btn btn-clr"><a href="{% url 'cost_code:costcodelist' %}">Back</a></button>
+    </div>
+
+    <h3 class="from-head">Edit Cost Code</h3>
+    <div class="row">
+    </div>
+    <form method="POST" id="edit_costcode_form">
+    {% csrf_token %}
+
+    <div class="row">
+        <div class="col-3 edit_cost_code">
+            <input type="hidden" name="costcode_type" class="costcode_type" id="costcode_type" value="{{costcode_type}}">
+            <input type="hidden" name="total_rows" class="total_rows" id="total_rows">
+
+
+            <label for="staticEmail" class="col-form-label">Select Root Category<span
+                class="star-clr">*</span></label>
+            <input type="hidden" name="level1_costcode" class="level1_costcode" id="level1_costcode" value="{{costcodemain.level1_cost_code}}">
+            <input type='hidden' value='' name='level_1_type' class="level_1_type">
+            <select id="level1_category" name="level1_category" class="form-control" disabled>
+                <option value="" selected="selected">---Select ---</option>
+                {% for discipline in alldiscipline%}
+                    {% for development in alldevelopment%}
+                        <option value="{{discipline.id}}_{{development.id}}" {% if costcodemain.level1_discipline_id == discipline.id and costcodemain.level1_developmenttype_id == development.id %} selected {% endif %}>{{discipline.name}}({{development.development_type}})</option>
+                    {% endfor %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-3 edit_cost_code">
+            <label for="staticEmail" class="col-form-label">Select Sub Category<span
+                class="star-clr">*</span></label>
+            <input type="hidden" name="level2_costcode" class="level2_costcode" id="level2_costcode" value="{{costcodemain.level2_cost_code}}">
+            <input type='hidden' value='' name='level_2_type' class="level_2_type">
+            <select id="level2_category" name="level2_category" class="form-control" disabled>
+                {% for level2 in level2_discipline%}
+                    <option value="{{level2.id}}" {% if level2.id == costcodemain.level2_discipline_id %} selected {% endif %}>{{level2.discipline_subtype}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-12">
+            <label for="staticEmail" class="col-form-label">Select Cost Category Path<span class="star-clr">*</span></label>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table id="cost_code_table" class="cost-category-path">
+            <tbody>
+                <tr>
+                    {% for get_remaining_level in get_remaining_levels%}
+                    <td>
+                        {% getcost_type_by_masterid get_remaining_level as cost_types %}
+                        {% getoldcostcode order costcodemain.id forloop.counter0 as oldcostcode %}
+                        <input type="hidden" name="costcode" class="costcode" value="{{oldcostcode.cost_code}}">
+                        <input type="hidden" name="oldcostcode" class="oldcostcode" value="{{ oldcostcode.cost_type_id}}">
+                        <input type="hidden" name="costcodesubid" class="costcodesubid" value="{{ oldcostcode.id}}">
+                        <input type="text" id="remaining_levels" name="remaining_levels" class="form-control remaining_levels" data-index="0" value="{{oldcostcode.cost_type.component_name}}">
+    
+                        <!-- <select id="remaining_levels" name="remaining_levels" class="form-control form-select remaining_levels" data-index="0">
+                            <option value="">Select</option>
+                            {% for cost_type in cost_types  %}
+                                <option value="{{cost_type.id}}" cost_code="{{cost_type.component_cost_code}}" {% if cost_type.id == oldcostcode.cost_type_id %} selected {% endif %}>{{cost_type.component_name}}</option>
+                            {% endfor %}
+                        </select> -->
+                    </td>
+                    {% endfor %}
+                    <td class="text-center">
+                        <label>Code Preview</label>
+                        {% getcostcode_preview costcodemain order company as preview %}
+                        <div class="cost_code_preview">
+                            {{preview}}
+                            </div>
+                        <input type="hidden" name="costcodepreview" class="costcodepreview" value="{{preview}}">
+    
+                    </td>
+                 
+                </tr>
+            </tbody>
+        </table>
+    </div>
+   
+    <div class="text-center btn-cls">
+        <button type="submit" class="btn btn-clr text-left final-cls waves-effect waves-float waves-light">Submit</button>
+    </div>
+    </form>
+   
+</div>
+        
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script src="{% static 'js/cost_code/edit_cost_code.js' %}"></script>
+
+{% endblock %}

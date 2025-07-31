@@ -1,0 +1,560 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load credit_custom_tags %}
+{% load cost_code_tags %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/taxconfirmation.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/exchangerate.css' %}">
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/coversheet.css' %}"> -->
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/calculator.css' %}">   
+
+<div class="row">
+  <!-- <div class="col-12 text-end">
+      <button class="btn btn-clr waves-effect waves-float waves-light" onclick="goBack()">
+          Back
+      </button>
+     
+  </div> -->
+  <div class="col-12 text-end">
+    <a class="btn btn-clr onClass" href="{% url 'invoice:exchangerate' pk=pk %}">
+      <!-- <button class="btn btn-clr waves-effect waves-float waves-light" >
+          Back
+      </button> -->
+      Back
+    </a>
+  </div>
+</div>
+
+<h4 class='from-head'>Tax Confirmation</h4> 
+
+<div class="modal fade" id="exchangeratecal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exchangeratecalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered large-pop" role="document">
+    <div class="modal-content">
+      <div class="modal-header comment-head">
+        <h5 class="modal-title pig" id="exchangeratecalTitle">Exchange Rate Confirmation</h5>
+        <button type="button" class="close_Confirmation close" data-dismiss="modal" >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="captions-head">
+
+      <div class="mb-4">
+        <h6 class=""><b>Exchange Rate Terms -</b> {% if submit_type == 1 %}At the Time of Invoice Submission{% else%}At the Time of Payment{% endif %}</h6>
+      </div>
+      <div class="comment-head exchan-flex mb-3">
+        <h6 class=" pig mb-0"><b>Currency as Per Contract -</b> {{contract.currency}}</h6>
+        <!-- <button type="button" class="btn btn-clr beige calci curr_btn" value="2" data-toggle="modal" data-target="#calci">Calculator</button> -->
+        <div class="modal fade calculator-draggable calc-wid" id="calci" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="newcal" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+            <div class="modal-content" data-backdrop="static">
+              
+              <div class="modal-header comment-head">
+                <h5 class="modal-title" id="newcal">Calculator</h5>
+                    <button type="button" class="closeChild calc_close ">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+              </div>
+  
+              <div class="modal-body calc-body">
+                <iframe src="{% url 'invoice:calculator' %}" title="description"></iframe>
+              </div>
+  
+              <div class="modal-footer comment-foot">
+                <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Save & Close</button> -->
+              </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="btn-flex mb-3">
+        <h6 class=""><b>Total Value Of Invoice -</b> {{invoicedetail.total_after_otherdetails}}</h6>               
+          <button type="button" class="btn btn-clr dark_blue exchangeratenextab curr_btn" data-toggle="modal" data-target="#myModal"> Exchange Rate Link</button>
+      </div>
+      {% if settlement_count > 0 %}
+        <div class="btn-flex mb-3">
+          <h6 class=""><b>Approved Percentage -</b> {{invoice_percentage.accepted_percentage}}%, {% for approved_inv in settlement_invoice %}({{basecurreccy}} {{approved_inv.invoicevalue_accepted}}){% if not forloop.last %}, {% endif %} {% endfor %} </h6>               
+        </div>
+        <div class="btn-flex mb-3">
+          <h6 class=""><b>Disputed Percentage -</b> {{invoice_percentage.disputed_percentage}}%, {% for approved_inv in settlement_invoice %}({{basecurreccy}} {{approved_inv.invoicevalue_declined}}){% if not forloop.last %}, {% endif %} {% endfor %}</h6>               
+        </div>
+      {% endif %}
+
+      </div>
+      <div class="modal-body exchange-rate-data ">
+
+          <!-- Body Content Here... -->
+
+      </div>
+      <!-- {% comment %} <div class="modal-footer bg-color-foot">
+        <h5 class=" pig">Select to Confirm Okay</h5>
+      </div> {% endcomment %} -->
+      <div class="modal-footer bg-color-foot justify-content-center">
+        {% if submit_type == 1 %}
+        {% if invoicedetail.exchangerate_confirm_status  < 1 %}
+        <div class="cofirmselect" >
+          <div class="">
+            <h5 class="Okay-red">Select to Confirm Okay</h5>
+          </div>
+          <div class="cofirmselect yes-no-btns">
+              <button type="button" class="btn btn-success confirmation_cls con-gr" value="1">Yes</button>
+              <button type="button" class="btn btn-danger confirmation_cls con-gr" value="2">No</button>
+          </div>
+        </div>
+        {% endif %}
+      {% if invoicedetail.exchangerate_confirm_status  == 3 %}
+      <div class="row" >
+        <div class="col-md-12">
+          <!--  data-dismiss="modal" -->
+        <!-- {% comment %}<button type="button" class="btn btn-clr gen-cls">Generate</button>{% endcomment %}
+        {% comment %} <button type="button" class="btn btn-success gen-confirm-cls con-gr">Confirm</button> {% endcomment %} -->
+        <button type="button" class="btn btn-success gen-confirm-cls con-gr" value="3">submit</button>
+        </div>
+      </div>
+      {% endif %}
+      {% elif submit_type == 2 %}
+      {% if invoicedetail.exchangerate_confirm_status  == 0 %}
+      <div class="row cofirmselect" >
+        <div class="col-md-12">
+          <h5 class=" pig">Select to Confirm Okay</h5><br>
+        </div>
+        <div class="row cofirmselect" >
+          <div class="col-md-12">
+            <button type="button" class="btn btn-success gen-confirm-cls con-gr" value="2">Ok</button>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      <!-- {% comment %} {% if invoicedetail.exchangerate_confirm_status  == 3 %} {% endcomment %}
+      {% comment %} {% endif %} {% endcomment %} -->
+      {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="row align-items-center mb-3">
+  
+  <div class="row pr-0 mb-2">
+    <div class="col-12 text-end pr-0">
+      <button type="button" class="btn btn-clr dark_blue exchangeratecal calbtn" data-toggle="modal" data-target="#exchangeratecal">Exchange Rate</button>
+    </div>
+  </div>
+
+  <div class="col-12 text-end"> 
+        <button type="button" class="btn btn-clr beige calbtn" value="2" data-toggle="modal" data-target="#exampleModalCenter2">Calculator</button>
+  
+    <div class="check-deductions">
+      {% if invoiceflow_modules.exchangerate_confirm_status > 0 %}
+        <input type="checkbox" id="deductions" name="deductions" value="1" {% if invoice_cost.deductions == 1%}checked{% endif %} {% if invoiceflow_modules.exchangerate_confirm_status == 2 %}disabled{% endif %}>
+        <label for="deductions">Other Deductions</label>
+      {% endif %}
+    </div>
+    <div class="check-additions">
+      {% if invoiceflow_modules.exchangerate_confirm_status > 0 %}
+        <input type="checkbox" id="additions" name="additions" value="1" {% if invoice_cost.additions == 1%}checked{% endif %} {% if invoiceflow_modules.exchangerate_confirm_status == 2 %}disabled{% endif %}>
+        <label for="additions">Other Additions</label>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter2" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+      <div class="modal-content" data-backdrop="static">
+
+
+        
+        <div class="modal-header comment-head">
+          <h5 class="modal-title" id="exampleModalCenterTitle">Calculator</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body calc-body">
+          <iframe src="{% url 'invoice:calculator' %}" title="description"></iframe>
+        </div>
+
+        <div class="modal-footer comment-foot">
+          <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Save & Close</button> -->
+        </div>
+        </div>
+    </div>
+  </div>
+
+<!-- <div class="row">
+  <div class="col-12 text-end">
+    <a class="btn btn-clr onClass" href="{% url 'invoice:exchangerate' pk=pk %}">
+      <button class="btn btn-clr waves-effect waves-float waves-light" >
+          Back
+      </button>
+    </a>
+  </div>
+</div> -->
+<form id="taxconfirm"  method='POST' enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="hidden" name="deduction_check" class="deduction_check" value="{% if invoice_cost.deductions == 1 %}1{% else %}0{% endif %}">
+    <input type="hidden" name="additions_check" class="additions_check" value="{% if invoice_cost.additions == 1 %}1{% else %}0{% endif %}">
+
+    <div class="table-responsive br-none">
+  <table class="coversheet-approval-table {% for split in split_invoices %}{% if split.invoice_currency != basecurreccy %}{% for past_data in split.id|get_past_exchange_rate %}{% if forloop.counter > 1 %}set_width_cls{% endif %}{% endfor %}{% endif %}{% endfor %}">
+      <div class="details">
+          <h4 class="head-inv-pre-black">{{request.company.company_name}}</h4>
+          <p class="approval-head">Date: {{get_date.created_at.date|confulldate:request.company.id}}</p>
+          <p class="approval-head pb-1">INVOICE PAYMENT APPROVAL</p>
+      </div>
+
+      <thead>
+        <tr>
+          <th style="width: 25%;"></th>
+          {% for split in split_invoices %}
+            <th>
+              {{split.invoice_number}}
+              {%  get_split_percentage invoice_cost.total_after_otherdetails split.invoice_payment split.invoice_exchange_rate as final_val %}
+
+              {% invoiceexclusivevalue split.invoice_percentage invoice_cost.total_exclusive_value split.invoice_exchange_rate as invexcval %}
+              {% invoiceafterdiscount split.invoice_percentage invoice_cost.total_after_otherdetails split.invoice_exchange_rate as invdisval %}
+              {% get_inclusive_with_exclusive invoice|inclusivetaxes:'Inclusive' final_val split  as total_inclusive %}
+              {% delvalues final_val|addvalues:invexcval total_inclusive|addvalues:invexcval  as detailed %}
+            </th>
+          {% endfor %}
+        </tr>
+        <tr>
+            <th style="width: 25%;"></th>
+            {% for split in split_invoices %}
+            <th>
+                {%  get_split_percentage invoice_cost.total_invoice_value split.invoice_payment split.invoice_exchange_rate as final_val %}
+                {{split.invoice_payment}} Invoice {% if split_invoices|length > 1 %}Split {% endif %}Payable in {{split.currency.currency}}
+            </th>
+            {% endfor %}
+        </tr>
+        </thead>
+          <tbody>
+            <tr class="table-black">
+              <td class="coversheet-approval-table-bold">Gross Amount:</td>
+              {% for split in split_invoices %}
+              {% check_for_settlement split as settlement %}
+              {% get_split_percentage invoice_cost.total_after_otherdetails split.invoice_payment split.invoice_exchange_rate as final_val %}
+              {% invoiceexclusivevalue split.invoice_percentage invoice_cost.total_exclusive_value split.invoice_exchange_rate as invexcval %}
+              {% invoiceafterdiscount split.invoice_percentage invoice_cost.total_after_otherdetails split.invoice_exchange_rate as invdisval %}
+              {% get_inclusive_with_exclusive invoice|inclusivetaxes:'Inclusive' final_val split  as total_inclusive %}
+              {% delvalues final_val|addvalues:invexcval 0|addvalues:invexcval  as detailed %}
+              {% get_deduction_amount split.id pk as deduct %}
+              {% get_additions_amount split.id pk as include %}
+
+              {% if settlement.0 %}
+                {% settlement_value final_val settlement.1.accepted_percentage as final_val %}
+              {% endif %}
+              <td data-id="{{split.id}}" currency_symbol="{{split.currency.currency_symbol}}" >
+                {% if deduction_count > 0 %}
+                    {% delvalues final_val 0  0 as deletion %}
+                    <input type="hidden" value="0" name="new_net_payable">
+                    {{split.currency.currency_symbol}} {{deletion}}
+                {% else %}
+                    <input type="hidden" value="{{final_val}}" name="new_net_payable">
+                    {{split.currency.currency_symbol}} {{final_val}} 
+                {% endif %}
+              </td>
+              {% endfor %}
+
+            </tr>
+
+            <tr>
+              <td class="coversheet-approval-table-bold">Inclusive Taxes :</td>
+              <td></td>
+              {% for split in split_invoices %}
+              {% endfor %}
+            </tr>
+            {% if invoice|inclusivetaxes:'Inclusive'|count_total_text == 0 %}
+              <tr>
+                  <td colspan="12">---</td>
+              </tr>
+            {% else %}
+              {% for tax in invoice|inclusivetaxes:'Inclusive' %}
+                <tr class="table-red">
+                    <td class="text-black">
+                    {{tax.vendortax.tax.Tax_Name}} : {{tax.taxpercentage}}%  
+                    </td>
+                    {% for split in split_invoices %}
+                    {% check_for_settlement split as settlement %}
+                    {%  get_split_percentage invoice_cost.total_after_otherdetails split.invoice_payment split.invoice_exchange_rate as final_val %}
+                    {%  get_tax_by_type final_val tax.taxpercentage as mid_val %}
+                    {% if settlement.0 %}
+                      {% settlement_value final_val settlement.1.accepted_percentage as final_val %}
+                      {%  get_tax_by_type final_val tax.taxpercentage as mid_val %}
+
+                      {% comment %} {% settlement_value mid_val settlement.1.accepted_percentage as mid_val %} {% endcomment %}
+                    {% endif %}
+                    <td>
+                        ({{split.currency.currency_symbol}} {{mid_val|convert_to_thousand_separator|default_if_none:"0"}})
+                    </td>
+                    {% endfor %}
+                    
+                </tr>
+              {% endfor %}
+            {% endif %}
+            <tr class="table-black">
+              <td class="coversheet-approval-table-bold">Gross Amount without Inclusive Taxes:</td>
+              {% for split in split_invoices %}
+              {% check_for_settlement split as settlement %}
+              {% get_split_percentage invoice_cost.total_after_otherdetails split.invoice_payment split.invoice_exchange_rate as final_val %}
+              {% invoiceexclusivevalue split.invoice_percentage invoice_cost.total_exclusive_value split.invoice_exchange_rate as invexcval %}
+              {% invoiceafterdiscount split.invoice_percentage invoice_cost.total_after_otherdetails split.invoice_exchange_rate as invdisval %}
+              {% get_inclusive_with_exclusive invoice|inclusivetaxes:'Inclusive' final_val split  as total_inclusive %}
+              {% newdelvalues final_val|addvalues:invexcval total_inclusive|addvalues:invexcval  as detailed %}
+              {% get_deduction_amount split.id pk as deduct %}
+              {% get_additions_amount split.id pk as include %}
+  
+              {% if settlement.0 %}
+                {% settlement_value final_val settlement.1.accepted_percentage as final_val %}
+                {% settlement_value invexcval settlement.1.accepted_percentage as invexcval %}
+                {% get_inclusive_with_exclusive invoice|inclusivetaxes:'Inclusive' final_val split  as total_inclusive %}
+
+                {% newdelvalues final_val|addvalues:invexcval total_inclusive|addvalues:invexcval  as detailed %}
+
+                {% comment %} {% settlement_value detailed settlement.1.accepted_percentage as detailed %} {% endcomment %}
+              {% endif %}
+              <td>
+              
+                {{split.currency.currency_symbol}}  {{detailed}}
+              </td>
+              {% endfor %}
+            </tr>
+          
+            <tr>
+              <td class="coversheet-approval-table-bold">Exclusive Taxes :</td>
+              <td></td>
+              {% for split in split_invoices %}
+              {% endfor %}
+            </tr>
+            {% if invoice_exclusive_type == 0 %}
+              <tr>
+                  <td colspan="12">---</td>
+              </tr>
+            {% else %}
+              {% for tax in exclusive_values %}
+                <tr class="table-table-black">
+                    <td class="text-black">
+                      {{tax.exclusive.vendortax.tax.Tax_Name}} : {{tax.exclusive.taxpercentage}}%
+                    </td>
+                    {% for split in split_invoices %}
+                      {% check_for_settlement split as settlement %}
+                      {% get_split_percentage invoice_cost.total_invoice_value split.invoice_payment split.invoice_exchange_rate as final_val %}
+                      {% get_exclusive_value tax.exclusive_calculated_value split.invoice_exchange_rate split.invoice_percentage as exclusives %}
+                      {% new_exclusive_value final_val tax.exclusive.taxpercentage  as newexclusives %}
+
+                      
+                      {% if settlement.0 %}
+                        <!-- {% settlement_value exclusives settlement.1.accepted_percentage as exclusives %} -->
+                        {% settlement_value newexclusives settlement.1.accepted_percentage as newexclusives %}
+                      {% endif %}
+                      <!-- <td>{{split.currency.currency_symbol}} {{exclusives}} --{{newexclusives}}</td> // 23-09-24 exclusive value wrong  --> 
+                      <td>{{split.currency.currency_symbol}} {{newexclusives}}</td>
+                      {% endfor %}
+                </tr>
+              {% endfor %}
+            {% endif %}
+            <tr  {% if invoice_cost.deductions == 0 %}style="display:none" {% endif %}>
+              <td class="coversheet-approval-table-bold other_deduction" >Other Deductions :</td>
+              <td></td>
+          </tr>
+          <tr class="other_deduction" {% if invoice_cost.deductions == 0 %}style="display:none" {% endif %}>
+              
+
+            <td>
+                <input type="text" name="deduction_name" class="form-control text-black deduct" value="{% if deduction_count > 0 %}{{deduction.description}}{% endif %}" {% if invoiceflow_modules.exchangerate_confirm_status == 2 %}readonly{% endif %}>
+            </td>
+            {% for split in split_invoices %}
+            {% check_for_settlement split as settlement %}
+            <input type="hidden" value="{{split.id}}" name="split_id">
+            <td>
+                {%  get_split_percentage invoice_cost.total_after_otherdetails split.invoice_payment split.invoice_exchange_rate as final_val %}
+
+                {% invoiceexclusivevalue split.invoice_percentage invoice_cost.total_exclusive_value split.invoice_exchange_rate as invexcval %}
+                {% newinvoiceexclusivevalues pk final_val as newinvexcval %}
+                    {% invoiceafterdiscount split.invoice_percentage invoice_cost.total_after_otherdetails split.invoice_exchange_rate as invdisval %}  
+                    {% get_inclusive_with_exclusive invoice|inclusivetaxes:'Inclusive' final_val split  as total_inclusive %}
+                    {% delvalues final_val|addvalues:newinvexcval total_inclusive|addvalues:newinvexcval  as detailed %}
+                    {% get_deduction_amount split.id pk as deduct %}
+              {% if settlement.0 %}
+                {% settlement_value detailed settlement.1.accepted_percentage as detailed %}
+                {% settlement_value final_val settlement.1.accepted_percentage as final_val %}
+                {% settlement_value total_inclusive settlement.1.accepted_percentage as total_inclusive %}
+                {% settlement_value newinvexcval settlement.1.accepted_percentage as newinvexcval %}
+              {% endif %}
+              
+              {% newdelvalues final_val total_inclusive newinvexcval as final_output%}
+                <input type="hidden" value="{{final_output}}" class="final_value">
+                <input type="text" name="deduction_amount" class="form-control deduction_amount" data-id="{{split.id}}" data-symbol="{{split.currency.currency_symbol}}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');" value="({{split.currency.currency_symbol}} {{deduct}})" {% if invoiceflow_modules.exchangerate_confirm_status == 2 %}readonly{% endif %}>
+            </td>
+            {% endfor %}
+
+          </tr>
+          <tr  {% if invoice_cost.additions == 0 %}style="display:none" {% endif %}>
+            <td class="coversheet-approval-table-bold other_additions" >Other Additions :</td>
+            <td></td>
+            {% for split in split_invoices %}
+            {% endfor %}
+          </tr>
+          <tr>
+            {% comment %} <td class="coversheet-approval-table-bold other_deduction" style="display:none" >Other Deductions :</td> {% endcomment %}
+          </tr>
+          <tr class="other_additions" {% if invoice_cost.additions == 0 %}style="display:none" {% endif %}>
+            
+
+            <td>
+                <input type="text" name="additions_name" class="form-control text-black include" value="{% if additions_count > 0 %}  {{addition.description}}{% endif %}" {% if invoiceflow_modules.exchangerate_confirm_status == 2 %}readonly{% endif %}>
+            </td>
+            {% for split in split_invoices %}
+            {% check_for_settlement split as settlement %}
+            <input type="hidden" value="{{split.id}}" name="split_id">
+            <td>
+                {%  get_split_percentage invoice_cost.total_after_otherdetails split.invoice_payment split.invoice_exchange_rate as final_val %}
+
+                {% invoiceexclusivevalue split.invoice_percentage invoice_cost.total_exclusive_value split.invoice_exchange_rate as invexcval %}
+                {% newinvoiceexclusivevalues pk final_val as newinvexcval %}
+                    {% invoiceafterdiscount split.invoice_percentage invoice_cost.total_after_otherdetails split.invoice_exchange_rate as invdisval %}  
+                    {% get_inclusive_with_exclusive invoice|inclusivetaxes:'Inclusive' final_val split  as total_inclusive %}
+                    {% delvalues final_val|addvalues:invexcval total_inclusive|addvalues:invexcval  as detailed %}
+                    {% get_additions_amount split.id pk as include %}
+              {% if settlement.0 %}
+                {% settlement_value detailed settlement.1.accepted_percentage as detailed %}
+                {% settlement_value final_val settlement.1.accepted_percentage as final_val %}
+                {% settlement_value total_inclusive settlement.1.accepted_percentage as total_inclusive %}
+                {% settlement_value newinvexcval settlement.1.accepted_percentage as newinvexcval %}
+              {% endif %}
+              {% newdelvalues final_val total_inclusive newinvexcval as final_output%}
+
+                    <input type="hidden" value="{{final_output}}" class="final_value">
+                <input type="text" name="addition_amount" class="form-control addition_amount" data-id="{{split.id}}" data-symbol="{{split.currency.currency_symbol}}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');" value="{{split.currency.currency_symbol}} {{include}}" {% if invoiceflow_modules.exchangerate_confirm_status == 2 %}readonly{% endif %}>
+            </td>
+            {% endfor %}
+
+          </tr>
+       
+          <tr class="table-black">
+            <td class="coversheet-approval-table-bold" >Net Payable Amount :</td>
+            {% for split in split_invoices %}
+            {% check_for_settlement split as settlement %}
+            {% get_split_percentage invoice_cost.total_after_otherdetails split.invoice_payment split.invoice_exchange_rate as final_val %}
+            {% invoiceexclusivevalue split.invoice_percentage invoice_cost.total_exclusive_value split.invoice_exchange_rate as invexcval %}
+            {% newinvoiceexclusivevalues pk final_val as newinvexcval %}
+            {% if settlement.0 %}
+              {% settlement_value final_val settlement.1.accepted_percentage as final_val %}
+              {% settlement_value newinvexcval settlement.1.accepted_percentage as newinvexcval %}
+            {% endif %}
+            {% get_inclusive_with_exclusive invoice|inclusivetaxes:'Inclusive' final_val split  as total_inclusive %}
+            {% get_deduction_amount split.id pk as deduct %}
+            {% get_additions_amount split.id pk as include %}
+
+            <!-- {% newdelvalues final_val total_inclusive invexcval as final_output%} -->
+            {% newdelvalues final_val total_inclusive newinvexcval as final_output%}
+            <input type="hidden" name="balance_value" class="balance_value" value="{{split.currency.currency_symbol}} {{final_output}}">
+            <td  data-id="{{split.id}}" class="total_value net_pay" currency_symbol="{{split.currency.currency_symbol}}" org_val="{{final_output}}">
+              {% if deduction_count > 0 %}
+                  {% newdelvalues final_output deduct  include as deletion %}
+                  {{ deletion }} 
+              {% elif additions_count > 0 %}
+                  {% newdelvalues final_output  deduct include as deletion %}
+                  {{ deletion }}
+              {% else %}
+                
+                {{split.currency.currency_symbol}} {{final_output}}
+               
+              {% endif %}
+
+            </td>
+            {% endfor %}
+
+            {% comment %} {% for split in split_invoices %}
+                {% getnetpayment_bysplit split.invoice_id split.id split.new_netpayable as netamount %}
+                <td>{{split.invoice_currency}} {{netamount.netamount_separator}}</td>
+            {% endfor %} {% endcomment %}
+
+
+            
+          </tr><!--last tr-->
+          
+      </tbody>
+  </table>
+</div>
+<br>
+
+{% if invoiceflow_modules.exchangerate_confirm_status == 1 %}
+<div class="row">
+  <div class="col-md-12 text-center">
+    <h5 class="Okay-red">Select to Confirm Okay</h5>
+    <button class="btn btn-clr waves-effect waves-float waves-light payment_confirm " value="payment_confirm">
+      Yes
+  </button>
+  </div>
+</div>
+
+</form>
+
+{% endif %}
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+
+<script src="{% static 'js/invoice/coversheet.js' %}"></script>
+<script src="{% static 'js/invoice/invoiceflowprocesstwo.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<script>
+    var invoiceid="{{pk}}" 
+    var scheme="{{request.scheme}}"
+    var csrf_token = "{{ csrf_token }}"
+    var gethost="{{request.get_host}}"
+    var currentdomain=scheme+'://'+gethost
+    var package_src = "{% static 'js/web/viewer.html' %}"
+    var Invoice_flow_id='{{invoiceflow_modules.id}}'
+//  function goBack() {
+//         window.history.back();
+//     } 
+
+//      $(document).on('click','.exchangeratenextab',function(){
+//     let urlfield = '{{general.urlfield|safe}}'
+//     let myurl = `https://${urlfield}`
+//     window.open(myurl, '_blank');
+//    }) 
+
+ $(document).ready(function(){
+
+ 
+ $(document).on('click','.exchangeratenextab',function(){
+  
+  let urlfield = '{{general.urlfield|safe}}'
+  let role='{{request.user.roles_id}}'
+  console.log('urlfieldprd',urlfield);
+  console.log('role',role);
+  let url_len=urlfield.length
+  if(url_len == 0){
+    if (role == 2 ){
+      swal.fire('Please add an Exchange Rate URL in General Setting')
+    }
+    if(role == 3){
+      swal.fire('Please Contact Client Administrator for adding an Exchange rate URL')
+    }
+    
+  }
+  else{
+    let myurl = `https://${urlfield}`
+    window.open(myurl, '_blank');
+  }  
+ })
+});
+</script>
+
+{% endblock %}

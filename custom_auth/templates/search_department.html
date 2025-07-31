@@ -1,0 +1,191 @@
+{% load custom_tags %}
+{% load custom_auth_tags %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/user_Management/userdepartment.css' %}">
+
+<section id="data-list-view" class="data-list-view-header">
+
+    <h5 class="from-head">User Departments</h5>
+        <!-- DataTable starts -->
+    <div>
+        <div class="row">
+            <div class="col-12 text-end">
+                {% if request.user.roles_id == 3 %}
+                    {% if rights.create == '1' %}
+                        <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'custom_auth:add-userdepartment-form' %}">Add User Department</a></button>
+                    {% endif %}
+                {% else %}
+                    <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'custom_auth:add-userdepartment-form' %}">Add User Department</a></button>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row my-4">
+            <div class="col-9"> 
+              <div class="card all-noti-box">
+                <div class="show-noti p-0">
+                    <label class="mb-0">Show <select id="datafilters" class="changevalue select-style">
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                </select> entries</label>
+            </div>
+            </div>
+            </div>
+            <div class="col-3 text-end">
+              <form method="get">
+                <input type="text" id="myInput" class="search-f-inf" name="q" placeholder="Search User Department" value="{{query}}">
+              </form>          
+            </div>
+        </div>
+        <div class="table-responsive text-nowrap">
+            <table class="table company-data-list-view creat-head usesr-management-section irock-table" id="alltaxes_list">
+
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>Department Name</th>
+                        {% if request.user.roles_id == 3 %}
+                            {% if rights.delete == '1' or rights.edit == '1' %}
+                                <th>Actions</th>
+                            {% endif %}
+                        {% else %}
+                            <th>Actions</th>
+                        {% endif %}
+                        </tr>
+                </thead>
+                <tbody>
+                    {% for obj in dep_list %}
+                    <tr>
+                        <td class="sno-center">{{dep_list.start_index|add:forloop.counter0 }}</td>
+                        <td class="td-left">{{obj.department}}</td>
+                        {% if obj.company is not None %}
+                            {% if request.user.roles_id == 3 %}
+                                {% if rights.delete == '1' or rights.edit == '1' %}
+                                    <td  class="actions-center icc-pd">
+                                        {% if request.user.roles_id == 3 %}
+                                            {%if rights.edit == '1' %} 
+                                                <a class="text-decoration-none" href="{% url 'custom_auth:edit-userdepartment-form' pk=obj.id %}">
+                                                    <span class="action-edit"><i class="fa fa-edit" title="Edit"></i></span>
+                                                </a>
+                                            {% endif %}
+                                        {% else %}
+                                            <a class="text-decoration-none" href="{% url 'custom_auth:edit-userdepartment-form' pk=obj.id %}">
+                                                <span class="action-edit"><i class="fa fa-edit" title="Edit"></i></span>
+                                            </a>
+                                        {% endif %}
+                                        {% if request.user.roles_id == 3 %}
+                                            {%if rights.delete == '1' %} 
+                                                {% UserDepartment obj.id as value %}
+                                                    {% if value is False %} 
+                                                        <a class="delete_tax" data-id="{{obj.id}}" data-name="{{obj.department}}">
+                                                            <!-- href="{% url 'projects:deletecompanytax' pk=obj.id %}" -->
+                                                            <span class="action-delete"><i class="fa fa-trash" title="Delete"></i></span>
+                                                        </a>
+                                                    {% endif %}
+                                            {% endif %}
+                                        {% else %}
+                                            {% UserDepartment obj.id as value %}
+                                                {% if value is False %} 
+                                                <a class="delete_tax" data-id="{{obj.id}}" data-name="{{obj.department}}">
+                                                    <!-- href="{% url 'projects:deletecompanytax' pk=obj.id %}" -->
+                                                    <span class="action-delete"><i class="fa fa-trash" title="Delete"></i></span>
+                                                </a>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
+                                    </td>
+                            {% endif %}
+                            {% endif %}
+                            {% if obj.company is not None %}
+                                {% if not request.user.roles_id == 3 %}
+                            
+                                        <td class="actions-center icc-pd">
+                                                <a class="text-decoration-none" href="{% url 'custom_auth:edit-userdepartment-form' pk=obj.id %}">
+                                                    <span class="action-edit"><i class="fa fa-edit" title="Edit"></i></span>
+                                                </a>
+                                                {% UserDepartment obj.id as value %}
+                                                    {% if value is False %} 
+                                                    <a class="delete_tax" data-id="{{obj.id}}" data-name="{{obj.department}}">
+                                                        <span class="action-delete"><i class="fa fa-trash" title="Delete"></i></span>
+                                                    </a>
+                                                {% endif %}
+                                        </td>
+                                    {% endif %}
+                                {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="9" id="empty_class">---</td>
+                    </tr>
+                    {% endfor %} 
+                    <input type="hidden" class="scheme" value="{{scheme}}">
+                    <input type="hidden" class="gethost" value="{{gethost}}">
+                    <input type="hidden" class="csrf_token" value="{{csrf_token}}">
+                    <input type="hidden" class="entries" value="{{pageper_data}}">
+                </tbody>
+            </table>
+        </div>
+        <br>
+          <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+        {% if dep_list.has_previous %}
+            <li class="page-item">
+            <a class="btn-clr page-link" href="{{ request.META.HTTP_REFERER }}">Previous</a>
+          </li>
+        {% else %}
+            <li class="page-item disabled">
+            <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Previous</a>
+          </li>
+        {% endif %}
+
+        {% if dep_list.number|add:'-4' > 1 %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ dep_list.number|add:'-5' }}">&hellip;</a></li>
+        {% endif %}
+
+        {% for i in dep_list.paginator.page_range %}
+            {% if dep_list.number == i %}
+                <li class="page-item pg-count active" aria-current="page">
+              <span class="btn-clr pg-circle page-link">
+                {{ i }}
+                <span class="sr-only">(current)</span>
+              </span>
+            </li>
+            {% elif i > dep_list.number|add:'-5' and i < dep_list.number|add:'5' %}
+
+              {% if request.GET.vendor %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&page={{ i }}">{{ i }}</a></li>
+              {% elif request.GET.vendor and request.GET.sortname %}
+              <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+              {% elif request.GET.vendor and request.GET.sortvendorname %}
+              <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+              {% elif request.GET.sortname %}
+              <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+              {% elif request.GET.sortvendorname %}
+              <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+              {% else %}
+                <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?page={{ i }}">{{ i }}</a></li>
+              {% endif %}
+            {% endif %}
+      {% endfor %}
+        {% if dep_list.paginator.num_pages > dep_list.number|add:'4' %}
+          <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ dep_list.number|add:'5' }}">&hellip;</a></li>
+        {% endif %}
+
+        {% if dep_list.has_next %}
+            <li class="page-item pg-count">
+            <a class="btn-clr page-link" href="?page={{ dep_list.next_page_number }}">Next</a>
+          </li>
+        {% else %}
+            <li class="page-item disabled">
+            <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Next</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    
+    </div>
+    <!-- DataTable ends-->
+    <!-- add new sidebar ends -->
+</section>

@@ -1,0 +1,52 @@
+.import-table {
+    max-width: 100%;
+    width: 700px !important;
+    margin: auto;
+}
+
+.import-table th {
+    background-color: #fff !important;
+    border: 1px solid var(--tableborder-color) !important;
+    border-bottom: 2px solid var(--tableborder-color) !important;
+    padding: 10px 10px !important;
+}
+
+.import-table td {
+    text-align:  var(--centertext-align);
+    border: 1px solid var(--tableborder-color) !important;
+    padding: 10px 10px !important;
+}
+
+.import-table td:nth-child(2) {
+    text-align: var(--lefttext-align) !important;
+}
+
+.search-f-inf {
+    border: 1px solid #96183a;
+    border-radius: 3px;
+    padding: 5px;
+}
+
+.choose-file-error {
+    color: red;
+    margin: 10px auto 0px;
+}
+
+
+/********** cost code list pagination **********/
+#costcodetype_list_info {
+    color: #96183a;
+    font-weight: 600;
+}
+
+#costcodetype_list_paginate a {
+    margin-top: 10px !important;
+    color: #96183a !important;
+    font-weight: 600 !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: linear-gradient(to bottom, white 0%, #dcdcdc 100%) !important;
+    border: 1px solid #979797 !important;
+}
+/********** cost code list pagination **********/

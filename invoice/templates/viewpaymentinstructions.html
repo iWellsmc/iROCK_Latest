@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/payment_instruction.css' %}">
+
+
+<div class="row">
+        <div class="col-9">
+        </div>
+        <div class="col-3 d-flex align-items-center justify-content-end">
+          <!-- <button type="button" class="btn btn-clr me-3"><a href="{% url 'invoice:coversheet' pk %}" target="_blank">Cover Sheet</a></button> -->
+            <button class="btn btn-clr btn-master waves-effect waves-float waves-light pc-bk-cls m-0">
+    <a href="{% url 'invoice:bankuserapprovalview' pk=pk pay_id=pay_id %}">Back</a>
+</button>
+
+        </div>
+    <div class="col-12 bor-rgt">
+    <h5 class="head-inv-pre">Payment Instructions</h5>
+    {% if check_settlement > 0 %}
+    {% if request|check_bank_users %}
+        {% for payment in payment_details %}
+        {% if payment.invoicecost.currency_id in request|check_bank_user_currencies %}
+            {% check_for_settlement payment.invoicecost as settlement %}
+            {% invoiceafterdiscount payment.invoicecost.invoice_percentage invoicedetail.total_after_otherdetails payment.invoicecost.invoice_exchange_rate as invdisval %}
+            {% invoiceexclusivevalue payment.invoicecost.invoice_percentage invoicedetail.total_exclusive_value payment.invoicecost.invoice_exchange_rate as invexcval %}
+            {% settlement_value invdisval settlement.1.accepted_percentage as inv_val %}
+            {% settlement_value invexcval settlement.1.accepted_percentage as inv_excval %}
+            {% settlement_value invdisval settlement.1.disputed_percentage as disinv_val %}
+            {% settlement_value invexcval settlement.1.disputed_percentage as disinv_excval %}
+            Invoice Number: {{payment.invoicecost.invoice_number}} <br>
+            (Approved percentage - {{settlement.1.accepted_percentage}}%    Approved Amount - {% if payment.invoicecost.invoice_exchange_rate == 'N/A' or  payment.invoicecost.invoice_exchange_rate == '' %} {{basecurreccy}}{% else %}{{payment.invoicecost.currency.currency_symbol}}{% endif %} {{inv_val|addvalues:inv_excval}})<br>
+            (Disputed percentage - {{settlement.1.disputed_percentage}}%    Disputed Amount - {% if payment.invoicecost.invoice_exchange_rate == 'N/A' or  payment.invoicecost.invoice_exchange_rate == '' %} {{basecurreccy}}{% else %}{{payment.invoicecost.currency.currency_symbol}}{% endif %} {{disinv_val|addvalues:disinv_excval}})<br>
+        {% endif %}
+        {% endfor %}
+
+    {% else %}
+        <div class=""> 
+            {% for inv in maininvoices %}
+            {% for invoice in pk|subinvoice:inv.id %}
+            {% check_for_settlement invoice as settlement %}
+            {% invoiceafterdiscount invoice.invoice_percentage invoicedetail.total_after_otherdetails invoice.invoice_exchange_rate as invdisval %}
+            {% invoiceexclusivevalue invoice.invoice_percentage invoicedetail.total_exclusive_value invoice.invoice_exchange_rate as invexcval %}
+            {% settlement_value invdisval settlement.1.accepted_percentage as inv_val %}
+            {% settlement_value invexcval settlement.1.accepted_percentage as inv_excval %}
+            {% settlement_value invdisval settlement.1.disputed_percentage as disinv_val %}
+            {% settlement_value invexcval settlement.1.disputed_percentage as disinv_excval %}
+            Invoice Number: {{invoice.invoice_number}} <br>
+            (Approved percentage - {{settlement.1.accepted_percentage}}%    Approved Amount - {% if invoice.invoice_exchange_rate == 'N/A' or  invoice.invoice_exchange_rate == '' %} {{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}}{% endif %} {{inv_val|addvalues:inv_excval}})<br>
+            (Disputed percentage - {{settlement.1.disputed_percentage}}%    Disputed Amount - {% if invoice.invoice_exchange_rate == 'N/A' or  invoice.invoice_exchange_rate == '' %} {{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}}{% endif %} {{disinv_val|addvalues:disinv_excval}})<br>
+            {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endif %}
+
+      <div class="table-responsive left-pdf-bank-viewer">
+        <table class="table table-bordered tab-styling" id="view-payment">
+            <thead>
+                <th>Invoice No.</th>
+                <th>Payer’s Bank Details</th>
+                <th>Net Payable Amount</th>
+                <th>Payable Percentage</th>
+                <th>Payable Amount</th>
+                <th>Vendor Bank Details</th>
+                <th>Payment Instruction</th>
+                <th></th>
+            </thead>
+            <tbody>
+
+            {% if request|check_bank_users %}
+                {% for payment in payment_details %}
+                    {% if payment.invoicecost.currency_id in request|check_bank_user_currencies %}
+                        <tr>
+                            <td class="inv_name">
+                                {{payment.invoicecost.invoice_number}}
+                            </td>
+                            <td>    
+                              {{payment.companybank.bank_name.bank_name}}, Account No. {{payment.companybank.account_number.accountno}}
+                          </td>
+                            <td>
+                                {% getnetpayment_bysplit payment.invoicecost.invoice_id payment.invoicecost.id payment.invoicecost.new_netpayable as netamount %}
+                                {{payment.invoicecost.currency.currency_symbol}} {{netamount.netamount_separator}}
+                                <!-- {% if payment.invoicecost.new_netpayable %}
+                                {{payment.invoicecost.currency.currency_symbol}} {{payment.invoicecost.new_netpayable}}
+                                {% else %}
+                                {{payment.invoicecost.invoice_total_amount}}
+                                {% endif %} -->
+                            </td>
+                            <td>
+                                {{payment.payment_percentage}}% 
+                            </td>
+                            <td>{{payment.invoicecost.invoice_currency}} {{payment.payable_amount|convert_to_thousand_separator}}</td>
+                            <td>
+                                {{payment.invoicecost.invoice_bank.bankname}}, Account No. {{payment.invoicecost.invoice_bank.accountnumber}}
+                            </td>
+                            <td>
+                              {{payment.pi_number}}
+                            </td>
+                            <td>
+                                <a class="btn p-0 view_file" data_id="{{payment.pi_file}}">
+                                <span class="action-edit align-icons">
+                                    <i class="fa fa-eye eyebutton inv_file1" title="View" style="font-size:17px; color:#95183a;"></i>
+                                </span>
+                                </a>
+                            </td>
+
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                     
+                {% for payment in payment_details %}
+                <tr>
+                    <td class="inv_name">
+                        {{payment.invoicecost.invoice_number}}
+                    </td>
+                    <td>    
+                      {{payment.companybank.bank_name.bank_name}}, Account No. {{payment.companybank.account_number.accountno}}
+                  </td>
+                    <td>
+                        {% if payment.invoicecost.new_netpayable %}
+                        {{payment.invoicecost.currency.currency_symbol}} {{payment.invoicecost.new_netpayable}}
+                        {% else %}
+                        {{payment.invoicecost.invoice_total_amount}}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{payment.payment_percentage}}% 
+                    </td>
+                    <td>{{payment.invoicecost.invoice_currency}} {{payment.payable_amount|convert_to_thousand_separator}}</td>
+                    <td>
+                        {{payment.invoicecost.invoice_bank.bankname}}, Account No. {{payment.invoicecost.invoice_bank.accountnumber}}
+                    </td>
+                    <td>
+                      {{payment.pi_number}}
+                    </td>
+                    <td>
+                        <!-- <a class="btn p-0" data-toggle="collapse" href="#collapseExample{{payment.id}}" role="button" aria-expanded="false" aria-controls="collapseExample" data-id="{{payment.id}}"> -->
+                        <a class="btn p-0 view_file" data_id="{{payment.pi_file}}">
+                        <span class="action-edit align-icons">
+                            <i class="fa fa-eye eyebutton inv_file1" title="View" style="font-size:17px; color:#95183a;"></i>
+                        </span>
+                        </a>
+                    </td>
+
+                </tr>
+                {% endfor %}
+            {% endif %}
+                
+            </tbody>
+        </table>
+      </div>
+      <div class="">
+        <div><iframe class="doc_pay_ins_cls" width="100%" src="" frameborder="0"></iframe></div>
+    </div>
+    </div>
+    <!-- <div class="col-6">
+        <h5 class="head-inv-pre">Invoice and Supporting Documents</h5>
+
+        <div class="row right-pdf-bank-viewer">
+            <div class="col-6">
+                <button class="btn btn-clr commonbtn" value="invoice">
+                    {% for inv in maininvoices %}
+                        {% for invoice in pk|subinvoice:inv.id %}
+                            {{invoice.invoice_number}}
+                        {% endfor %}
+                        {% if not forloop.last %}
+                        ,
+                        {% endif %}
+                    {% endfor %}
+                </button>
+
+            </div>
+            <div class="col-6">
+                <button class="btn btn-clr commonbtn otherdocuments" value="document">Supporting Documents</button>
+            </div>
+        </div>
+        <div class="tab-bottom not-tab-bottom">
+            <div class="show_file_cls right-height-manage"></div>
+            <div><iframe class="doc_invhidcls" width="100%" src="" frameborder="0"></iframe></div>
+        </div>
+    </div> -->
+</div> 
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+
+<script>
+var invoice_id="{{pk}}" 
+var scheme="{{request.scheme}}"
+var gethost="{{request.get_host}}"
+var currentdomain=scheme+'://'+gethost
+var package_src = "{% static 'js/web/viewer.html' %}"
+</script>
+<script src="{% static 'js/invoice/paymentinstructiondata.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf_viewer.js"></script>
+<script>
+// $('.view_file').click(function(){
+//     let val=$(this).attr('data_id')
+//     let setfullurl=currentdomain+'/media/'+filename+''
+//     $('.doc_pay_ins_cls').attr({'src':setfullurl,height:'590px !important'})    
+// })
+
+// $('.commonbtn').click(function(){
+//     $('.commonbtn').removeClass('selected_btn')
+//     $(this).addClass('selected_btn')
+//     let val=$(this).val()
+//     $('.show_file_cls').html('')
+//     $('.doc_invhidcls').attr('src','')
+//     $.ajax({
+//             type:"GET",
+//             data:{'file_type':val,'invoice_id':invoice_id},
+//             url:'/invoice/getallfiles',
+//             success: function(data){
+//                 let html='';
+//                 $.each(data.files, function(index, value) {
+//                     let remove_name=(value.support_file).replace("invoicedocuments/","")
+//                     html +='<p class="fil-cls file-style" data_id='+value.support_file+'>'+remove_name+'</p>'
+//                 })
+//                 $('.show_file_cls').html(html)
+//             },})
+//     })
+
+//     $(document).on('click','.fil-cls',function(){
+//         $('.doc_invhidcls').attr('src','')
+//         $('.fil-cls').removeClass('selected-cls')
+//         $(this).addClass('selected-cls')
+//         let filename=$(this).attr('data_id');
+//         let setfullurl=currentdomain+'/media/'+filename+''
+//         $('.doc_invhidcls').attr({'src':setfullurl,height:'590px !important'})  
+//     })
+</script>
+
+{% endblock %}

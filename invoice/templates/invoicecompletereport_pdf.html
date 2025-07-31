@@ -1,0 +1,654 @@
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+<title>{{reportname.reportname}}</title>
+<div class="row parent">
+    <header>
+        <div class="row row_border_header d-flex align-items-center">
+            <div class="logo">     
+            </div>
+        <div class="company-details">
+                <h4 class="head-inv-pre">{{request.company.company_name|safe}}</h4>
+                <p>{{request.company.address|safe}}</p>  
+            </div>
+        </div>
+    </header>
+
+    <footer style="width: 100%;">
+        <div style="border: 1px solid #e3e3e3; height: 0px; margin-bottom: 5px;"></div>
+    </footer>
+
+<div class="">
+   <table class="report-invoice-table">
+    {%if reportname == 'invoice_register' or reportname == 'ageing_report' %}
+    <thead>
+        <tr >
+            <th>S/N</th> 
+            <th>Vendor Name</th>  
+            <th>Invoice No</th>   
+            <th>Country</th>   
+            <th>Project Name</th>  
+          
+            
+            {%if ageing_report == 'sheet' and reportname == 'ageing_report'%}
+            <th>1 - 30 Days</th>
+            <th>31 - 60 Days</th>
+            <th>61 - 90 Days</th>
+            <th>91 - 120 Days</th>
+            <th>Above 120 Days</th>
+            <th>Total</th>
+            {%else%}
+            <th>Invoice Date</th>
+            <th>Submitted Date</th>
+            {%if reportname == 'ageing_report' %}
+            <th>Due Date</th>
+            <th>Days Overdue</th>
+            <th>Aging period</th>
+            {%endif%}
+            {%if amountfilter %}
+            
+                {%for i in amountfilter%}
+                    {%if i == 'grossamount'%}
+                        <th>Gross Amount(without Excl.Taxes)</th>
+                    {%elif i == 'taxes'%}
+                        <th>Taxes</th>
+                    {%elif i == 'netamount'%}
+                        <th>Net Amount Payable</th>
+                    {%endif%}
+                {%endfor%}
+            {%else%}
+            
+            <th>Gross Amount(without Excl.Taxes)</th>
+            <th>Taxes</th>
+            <th>Net Amount Payable</th>
+            {%endif%}
+            {% comment %} <th>Approval Status</th>
+            <th>Approval/Disputed Date</th>
+            <th>Payment Status</th>
+            <th>Payment Date</th> {% endcomment %}
+            {% comment %} <th class="text-center">Actions</th> {% endcomment %}
+            {%endif%}
+        </tr>
+    </thead>
+    <tbody class="table-list">
+        {% if invoice_count == 0 %}
+        <tr>
+            <td colspan="9" class="cls-nil">
+              ---
+            </td>
+          </tr>   
+          {%else%}
+        {% for invoice in invoicecurrencylist %}
+      
+        <tr>
+            {% with sno=request|pdfserialnumber %}
+                <td style="text-align: center;">{{sno}}</td>{% endwith %}
+            <td>{{invoice.invoice.vendor.vendor_name}}</td>
+            <td style="text-align: center;">{{invoice.invoice_number}}</td>
+            {%getcountry invoice.invoice_id as country%}
+            <td>{{country|default_if_none:"---"}}</td>
+            <td>{{invoice.invoice.project_name}}</td>
+            
+            {%if ageing_report == 'sheet'%}
+            {%getagingperiod invoice.invoice.id invoice.invoice.contractid invoice.invoice.company_id as days_difference%}
+            {% invoicegrossamount invoice.id as invdisval %}
+            {% invoicetaxamount invoice.id as invdistax %}
+            
+            {%if days_difference >= 1 and days_difference <= 30%}
+            <td>  <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                </div></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            {%elif days_difference >= 31 and days_difference <= 60%}
+            <td></td>
+            <td>  <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                </div></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            {%elif days_difference >= 61 and days_difference <= 90%}
+            <td></td>
+            <td></td>
+            <td>  <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                </div></td>
+            <td></td>
+            <td></td>
+            {%elif days_difference >= 91 and days_difference <= 1200%}
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>  <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                </div></td>
+            <td></td>
+            {%else%}
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>  <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                </div></td>
+            {%endif%}
+            <td><div> {{selectedcurrencysymbol.currency_symbol}}      {{invdisval|addvalues:invdistax}}
+                {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                </div></td>
+            {%else%}
+            <td class="t-sub-data">
+                <div class="cos-in-nu">{{invoice.invoice_date}}</div>
+            </td>
+            <td class="text-center text-wrap"> 
+                <div>{{invoice.invoice_submission_date|confulldate:invoice.invoice.company.id|default_if_none:"---"}}</div>
+            </td>
+            
+            {%if reportname == 'ageing_report' %}
+            <td>{%getduedate invoice.invoice.id invoice.invoice.contractid invoice.invoice.company_id as date%}{{date}}</td>
+            {%getagingperiod invoice.invoice.id invoice.invoice.contractid invoice.invoice.company_id as days_difference%}
+            <td>{{days_difference}}</td>
+            <td>
+                {%if days_difference >= 1 and days_difference <= 30%}1 - 30 Days
+                {%elif days_difference >= 31 and days_difference <= 60%}31 - 60 Days
+                {%elif days_difference >= 61 and days_difference <= 90%}61 - 90 Days
+                {%elif days_difference >= 91 and days_difference <= 1200%}91 - 120 Days
+                {%else%}Above 120 Days{%endif%}
+            </td>
+
+            {%endif%}
+            {%if amountfilter %}
+                {%for i in amountfilter%}
+
+                    {%if i == 'grossamount'%}
+                    <td>{% invoicegrossamount invoice.id as invdisval %}
+                        <div>{{selectedcurrencysymbol.currency_symbol}}   {{invdisval}}</div>
+                    </td>
+                    {%elif i == 'taxes'%}
+                    <td>{% invoicetaxamount invoice.id as invdisval %}
+                        <div>{{selectedcurrencysymbol.currency_symbol}} {{invdisval}}</div>
+                    </td>
+                    {%elif i == 'netamount'%}
+                    <td>{% invoicegrossamount invoice.id as invdisval %}
+                        {% invoicetaxamount invoice.id as invdistax %}
+                        <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                        {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                        </div>
+                    </td>
+                    {%endif%}
+                {%endfor%}
+            {%else%}
+            <td>{% invoicegrossamount invoice.id as invdisval %}
+                  <div>{{selectedcurrencysymbol.currency_symbol}}   {{invdisval}}</div>
+            </td>
+            <td>{% invoicetaxamount invoice.id as invdisval %}
+                  <div>{{selectedcurrencysymbol.currency_symbol}} {{invdisval}}</div>
+            </td>
+            <td>{% invoicegrossamount invoice.id as invdisval %}
+                {% invoicetaxamount invoice.id as invdistax %}
+                <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                </div>
+            </td>
+            {%endif%}
+          
+          
+        </tr>
+        {% if forloop.last %}
+        <tr>
+        {%if reportname == 'ageing_report' %}
+            <td></td>
+            <td></td>
+            <td></td>
+           
+        {%endif%}
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>Total</td>
+            {%if amountfilter %}
+            {%for i in amountfilter%}
+                {%if i == 'grossamount'%}
+                    <td>{% gettotalgrossamount invoicecurrencylist as sumgrossamount %}{{selectedcurrencysymbol.currency_symbol}} {{sumgrossamount}}</td>
+                {%elif i == 'taxes'%}
+                    <td>{% gettotaltaxamount invoicecurrencylist as totaltaxamount %}{{selectedcurrencysymbol.currency_symbol}} {{totaltaxamount}}</td>
+                {%elif i == 'netamount'%}
+                <td> {% gettotalgrossamount invoicecurrencylist as invdisval %}
+                    {% gettotaltaxamount invoicecurrencylist as invdistax %}{{selectedcurrencysymbol.currency_symbol}} 
+                    <div>{{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}</div></td>
+                {%endif%}
+            {%endfor%}
+            {%else%}
+                <td>{% gettotalgrossamount invoicecurrencylist as sumgrossamount %}{{selectedcurrencysymbol.currency_symbol}} {{sumgrossamount}}</td>
+                <td>{% gettotaltaxamount invoicecurrencylist as totaltaxamount %}{{selectedcurrencysymbol.currency_symbol}} {{totaltaxamount}}</td>
+                <td> {% gettotalgrossamount invoicecurrencylist as invdisval %}
+                    {% gettotaltaxamount invoicecurrencylist as invdistax %}{{selectedcurrencysymbol.currency_symbol}} 
+                    <div>{{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}</div></td>
+            {%endif%}
+            
+       </tr>
+       {%endif%}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+     
+        {%elif reportname == 'payment_status' and ageing_report == 'report'%}
+        <thead>
+            <tr>
+                <th>S/N</th> 
+                <th>Country</th>
+                <th>Project</th>
+                <th>Paid Amount</th>
+                <th>Unpaid Amount</th>
+                <th>Total</th>
+            </tr>
+            {%for i in projectlist %}
+            <tr>
+                {% with sno=request|pdfserialnumber %}
+                <td>{{sno}}</td>{% endwith %}
+                {%getprojectname i as name%}
+                <td>{{name.country.name}}</td>
+                <td>{{name}}</td>
+                {% getpaidamount i invoicecurrencylist as val %}
+                <td>{{val.0}}</td>
+                <td>{{val.1}}</td>
+                <td>{%sumoftwono val.0 val.1 as amount %} {{amount}}</td>
+            </tr>
+            {%endfor%}
+            {%elif reportname == 'payment_status' or ageing_report == 'sheet'%}
+           
+            <thead>
+                <tr >
+                    <th>S/N</th> 
+                    <th>Vendor Name</th>  
+                    <th>Invoice No</th>   
+                    <th>Country</th>   
+                    <th>Project Name</th>  
+                    <th>Project Discipline</th>  
+                    <th>Type of Service</th> 
+                    <th>Submitted Date</th>
+                    <th>Payment Status</th>
+
+                    {%if amountfilter %}
+                    {%for i in amountfilter%}
+                    {%if i == 'grossamount'%}
+                        <th>Gross Amount(without Excl.Taxes)</th>
+                    {%elif i == 'taxes'%}
+                        <th>Taxes</th>
+                    {%elif i == 'netamount'%}
+                        <th>Net Amount Payable</th>
+                    {%endif%}
+                {%endfor%}
+                    {%else%}
+                        <th>Gross Amount(without Excl.Taxes)</th>
+                        <th>Taxes</th>
+                        <th>Net Amount Payable</th>
+                    {%endif%}
+                </tr>
+            </thead>
+            {% for invoice in invoicecurrencylist %}
+            <tr>
+                {% with sno=request|pdfserialnumber %}
+                <td>{{sno}}</td>{% endwith %}
+                <td>{{invoice.invoice.vendor.vendor_name}}</td>
+                <td>{{invoice.invoice_number}}</td>
+                {%getcountry invoice.invoice_id as country%}
+                <td>{{country|default_if_none:"---"}}</td>
+                <td>{{invoice.invoice.project_name}}</td>
+                <td>{%getprojectdiscipline invoice.invoice_id as discipline%}{{discipline}}</td>
+                <td>{{invoice.invoice.types_service}}</td>
+                <td class="text-center text-wrap"> 
+                    <div>{{invoice.invoice_submission_date|confulldate:invoice.invoice.company.id|default_if_none:"---"}}</div>
+                </td>
+                <td class="vin_left text-wrap">
+                    <div>{% if invoice.payment_status == 1 %} Unpaid {% else %}  Paid {% endif %}</div>
+                </td>
+                {%if amountfilter %}
+                {%for i in amountfilter%}
+                {%if i == 'grossamount'%}
+                <td>{% invoicegrossamount invoice.id as invdisval %}
+                    <div>{{selectedcurrencysymbol.currency_symbol}}   {{invdisval}}</div>
+                {%elif i == 'taxes'%}
+                <td>{% invoicetaxamount invoice.id as invdisval %}
+                    <div>{{selectedcurrencysymbol.currency_symbol}} {{invdisval}}</div>
+              </td>
+                {%elif i == 'netamount'%}
+                <td>{% invoicegrossamount invoice.id as invdisval %}
+                    {% invoicetaxamount invoice.id as invdistax %}
+                    <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                    </div>
+                </td>
+                {%endif%}
+            {%endfor%}
+                {%else%}
+                   
+              
+                <td>{% invoicegrossamount invoice.id as invdisval %}
+                    <div>{{selectedcurrencysymbol.currency_symbol}}   {{invdisval}}</div>
+              </td>
+              <td>{% invoicetaxamount invoice.id as invdisval %}
+                    <div>{{selectedcurrencysymbol.currency_symbol}} {{invdisval}}</div>
+              </td>
+              <td>{% invoicegrossamount invoice.id as invdisval %}
+                  {% invoicetaxamount invoice.id as invdistax %}
+                  <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                  {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                  </div>
+              </td>
+              {%endif%}
+            </tr>
+            {%if forloop.last %}
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>Total</td>
+            {%if amountfilter %}
+            {%for i in amountfilter%}
+                {%if i == 'grossamount'%}
+                    <td>{% gettotalgrossamount invoicecurrencylist as sumgrossamount %}{{selectedcurrencysymbol.currency_symbol}} {{sumgrossamount}}</td>
+                {%elif i == 'taxes'%}
+                    <td>{% gettotaltaxamount invoicecurrencylist as totaltaxamount %}{{selectedcurrencysymbol.currency_symbol}} {{totaltaxamount}}</td>
+                {%elif i == 'netamount'%}
+                <td> {% gettotalgrossamount invoicecurrencylist as invdisval %}
+                    {% gettotaltaxamount invoicecurrencylist as invdistax %}{{selectedcurrencysymbol.currency_symbol}} 
+                    <div>{{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}</div></td>
+                {%endif%}
+            {%endfor%}
+            {%else%}
+                <td>{% gettotalgrossamount invoicecurrencylist as sumgrossamount %}{{selectedcurrencysymbol.currency_symbol}} {{sumgrossamount}}</td>
+                <td>{% gettotaltaxamount invoicecurrencylist as totaltaxamount %}{{selectedcurrencysymbol.currency_symbol}} {{totaltaxamount}}</td>
+                <td> {% gettotalgrossamount invoicecurrencylist as invdisval %}
+                    {% gettotaltaxamount invoicecurrencylist as invdistax %}{{selectedcurrencysymbol.currency_symbol}} 
+                    <div>{{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}</div></td>
+            {%endif%}
+            {%endif%}
+            {%endfor%}
+            {%elif reportname == 'submission_count' %}
+            <thead>
+                    <tr>
+                        <th>S/N</th> 
+                        <th>Month</th>
+                        <th>Invoice Count</th>
+                    </tr>
+                    {%getinvoicecount invoicecurrencylist months_data as invoicelist%}
+                    {%for i in invoicelist%}
+                    <tr>
+                        {% with sno=request|pdfserialnumber %}
+                        <td>{{sno}}</td>{% endwith %}
+                        <td>{{i.0}} {{i.1}}</td>
+                        <td>{{i.2}}</td>
+                    </tr>
+            </thead>
+                    {%endfor%}
+            {%elif reportname == 'vendors_ranking'%}
+            <thead>
+                <tr>
+                    <th>S/N</th>
+                    <th>Vendor</th>
+                    <th>Total Net Payable Amount</th>
+                    <th>% of Total Net Payable Amount</th>
+                </tr>
+                {%for id,amount in rankinglist%}
+                    {%getobjectinvoice id as i%%}
+                    <tr>
+                        {% with sno=request|pdfserialnumber %}
+                        <td>{{sno}}</td>{% endwith %}
+                        <td>{{i.vendor_name}}</td>
+                        <td>{{ amount|commoseperatorfilter|safe }}</td>
+                        <td>{% getamountpercentage amount rankinglist as percentage %}{{ percentage|floatformat:0 }} %</td>
+                    </tr>
+                    {% if forloop.last %}
+                    <tr>
+                        <td></td>
+                        <td>Total</td>
+                        <td>{{ rankinglist|rankinglisttotalamount|safe }}</td>
+                    </tr>
+                    {%endif%}
+                {%endfor%}
+            </thead>   
+            {%elif reportname == 'approval_status'%}   
+           <thead>  
+                <tr>
+                    <th>S/N</th>
+                    <th>Country</th>
+                    <th>Project Name</th>
+                    {%for i in selectedapprovalstatus%}
+                    <th>{{i}}</th>
+                    {%endfor%}
+                    <th>Grand Total</th>
+                </tr>  
+            </thead>  
+         
+            {%for i in projectlist %}
+            <tr>
+                {% with sno=request|pdfserialnumber %}
+                <td>{{sno}}</td>{% endwith %}
+                {%getprojectname i as name%}
+                <td>{{name.country.name}}</td>
+                <td>{{name}}</td>
+                {%for j in selectedapprovalstatus %}
+                {%statusvalue i j aprrovalstatus_invoicelist as finalamount%}
+                <td>{{selectedcurrencysymbol.currency_symbol}} {{finalamount}}</td>
+                {%endfor%}
+                {%grandtotalproject i selectedapprovalstatus aprrovalstatus_invoicelist as grandtotal%}
+                <th>{{selectedcurrencysymbol.currency_symbol}} {{grandtotal}}</th>
+            </tr>
+            {%endfor%}
+            <tr>
+                <td></td>
+                <td></td>
+                <th>Grand Total</th>
+                {%for j in selectedapprovalstatus %}
+                {%grandtotal projectlist j aprrovalstatus_invoicelist as grandtotal%}
+                <th>{{selectedcurrencysymbol.currency_symbol}} {{grandtotal}}</th>
+                {%endfor%}
+                {%grandtotalapprovalstatus projectlist selectedapprovalstatus aprrovalstatus_invoicelist as grandtotal%}
+                <!-- <th>{{selectedcurrencysymbol.currency_symbol}} {{grandtotal}}</th> -->
+            </tr>
+
+        {%elif reportname == 'partially_paid'%}
+        <thead>
+            <tr>
+                <th>S/N</th> 
+                <th>Vendor Name</th>  
+                <th>Invoice No</th>   
+                <th>Country</th>   
+                <th>Project Name</th>  
+                <th>Project Discipline</th>  
+                <th>Type of Service</th>
+                <th>Total Amount</th>
+                <th>Amount Paid</th>
+                <th>Amount Pending</th>
+            </tr> 
+            {% for invoice in partialypaid_invoicelist %}
+            <tr>
+                {% with sno=request|pdfserialnumber %}
+                <td>{{sno}}</td>{% endwith %}
+                <td>{{invoice.invoice.vendor.vendor_name}}</td>
+                <td>{{invoice.invoice_number}}</td>
+                {%getcountry invoice.invoice_id as country%}
+                <td>{{country|default_if_none:"---"}}</td>
+                <td>{{invoice.invoice.project_name}}</td>
+                <td>{%getprojectdiscipline invoice.invoice_id as discipline%}{{discipline}}</td>
+                <td>{{invoice.invoice.types_service}}</td>
+                <td>{% invoicegrossamount invoice.id as invdisval %}
+                    {% invoicetaxamount invoice.id as invdistax %}
+                    <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                    </div>
+                </td>
+                {%getpartialypaidamount invoice.id invoice.invoice.company.id as amount%}
+                <td>{{selectedcurrencysymbol.currency_symbol}} {{amount.0}}</td>
+                <td>{{selectedcurrencysymbol.currency_symbol}} {{amount.1}}</td>
+            </tr>
+            {%if forloop.last%}
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <th>Grand Total</th>
+                <th> {% gettotalgrossamount partialypaid_invoicelist as invdisval %}
+                    {% gettotaltaxamount partialypaid_invoicelist as invdistax %}{{selectedcurrencysymbol.currency_symbol}} 
+                    <div>{{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}</div></th>
+                {%gettotalparialypaidinvoice partialypaid_invoicelist invoice.invoice.company.id as totalamount%}
+                <th>{{selectedcurrencysymbol.currency_symbol}} {{totalamount.0}}</th>
+                <th>{{selectedcurrencysymbol.currency_symbol}} {{totalamount.1}}</th>
+            {%endif%}
+            {%endfor%}
+            {%elif reportname == 'paidinvoice_paymentdays' or reportname == 'unpaidinvoice_overdue' %}
+            <thead>
+                <tr>
+                    <th>S/N</th> 
+                    <th>Vendor Name</th>  
+                    <th>Invoice No</th>
+                    <th>Submitted Date</th> 
+                    {%if reportname == 'paidinvoice_paymentdays'%}
+                    <th>Payment Date</th>  
+                    {%endif%}
+                    {%if reportname == 'paidinvoice_paymentdays'%}
+                    <th>No Days For Payment</th>
+                    {%else%}
+                    <th>Days Due</th>
+                    {%endif%}
+                    <th>Days For Payment</th>
+                    <th>Net Payable Amount</th>
+                </tr>
+            </thead>
+            {% for invoice in invoicecurrencylist %}
+      
+            <tr>
+                {% with sno=request|pdfserialnumber %}
+                <td>{{sno}}</td>{% endwith %}
+                <td>{{invoice.invoice.vendor.vendor_name}}</td>
+                <td>{{invoice.invoice_number}}</td>
+                <td class="text-center text-wrap"> 
+                    <div>{{invoice.invoice_submission_date|confulldate:invoice.invoice.company.id|default_if_none:"---"}}</div>
+                </td>
+                {%if reportname == 'paidinvoice_paymentdays'%}
+                <td>
+                    <div>{% if invoice.payment_date == "" or invoice.payment_date == None %} N/A {% else %} {{invoice.payment_date|confulldate:invoice.invoice.company.id}}{% endif %}</div>
+                 </td>
+                {%endif%}
+                {%if reportname == 'unpaidinvoice_overdue' %}
+                {%getdaysforunpaid invoice.invoice.id invoice.invoice.contractid invoice.invoice.company_id as days_difference%}
+                {%else%}
+                {%getdaysforpayment invoice.invoice.id invoice.invoice.contractid invoice.invoice.company_id as days_difference%}
+                {%endif%}
+                <td>{{days_difference}}</td>
+                <td>
+                    {%if days_difference >= 1 and days_difference <= 30%}1 - 30 Days
+                    {%elif days_difference >= 31 and days_difference <= 60%}31 - 60 Days
+                    {%elif days_difference >= 61 and days_difference <= 90%}61 - 90 Days
+                    {%elif days_difference >= 91 and days_difference <= 1200%}91 - 120 Days
+                    {%else%}Above 120 Days{%endif%}
+                </td>
+                <td>{% invoicegrossamount invoice.id as invdisval %}
+                    {% invoicetaxamount invoice.id as invdistax %}
+                    <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                    </div>
+                </td>
+            <tr>
+               
+            {%endfor%}
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                {%if reportname == 'paidinvoice_paymentdays'%}
+                <td></td>
+                {%endif%}
+                <th>Gross Net Payable Amount</th>
+                <th> {% gettotalgrossamount invoicecurrencylist as invdisval %}
+                    {% gettotaltaxamount invoicecurrencylist as invdistax %}{{selectedcurrencysymbol.currency_symbol}} 
+                    <div>{{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}</div></th>
+            </tr>
+            {%elif reportname == 'exception_report'%}
+            <thead>
+                <tr>
+                    <th>S/N</th> 
+                    <th>Vendor Name</th>  
+                    <th>Invoice No</th>
+                    <th>Submitted Date</th> 
+                    <th>Approval Status</th>
+                    <th>Exceptions</th>
+                    
+                </tr>
+            </thead>
+            
+            {% for invoice in exceptionlist %}
+            <tr>
+                
+                {% with sno=request|pdfserialnumber %}
+                <td>{{sno}}</td>{% endwith %}
+                <td><div {%for j,count in exceptionrankinglist %} {%if j.id == invoice.invoice.vendor.id %} style="color: red;  font-weight: bold;" {%endif%} {%endfor%}>{{invoice.invoice.vendor.vendor_name}}</div></td>
+                <td>{{invoice.invoice_number}}</td>
+                <td class="text-center text-wrap"> 
+                    <div>{{invoice.invoice_submission_date|confulldate:invoice.invoice.company.id|default_if_none:"---"}}</div>
+                </td>
+                <td class="text-left ">
+                    <div>{% if invoice.approval_status == 0 and invoice.invoice.invoice_status == 1 %} Disputed {% elif invoice.approval_status == 1 and invoice.invoice.invoice_status == 2 %} Awaiting Approval {% elif invoice.approval_status == 1 and invoice.invoice.invoice_status == 1 %} Not Yet Submitted {% elif invoice.approval_status == 4 and invoice.invoice.invoice_status == 4 %} Returned {% elif invoice.approval_status == 5 and invoice.invoice.invoice_status == 5 %} Rejected {% else %} Approved {% endif %}</div>
+                  </td>
+                  {%getexceptions invoice.invoice.id invoice.invoice.company.id invoice.approval_status invoice.invoice.invoice_status as exceptions_reasons%}
+                  <td>{%for i in exceptions_reasons %}
+                   
+                   <ul>
+                    {%if i.exceptional_type == 1  %}{%for j,k in exceptionreasonlist%}<div {%if j == '1' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Changes in Supporting document </div>{%endif%}
+                    {%if i.exceptional_type == 2  %}{%for j,k in exceptionreasonlist%}<div {%if j == '2' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%}  Work Completion Certificate or Timesheet mismatch with Invoice billing details{%endif%}
+                    {%if i.exceptional_type == 3  %}{%for j,k in exceptionreasonlist%}<div {%if j == '3' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Material Delivery Ticket or Certificate Mismatch with Invoice Billing details{%endif%}
+                    {%if i.exceptional_type == 4  %}{%for j,k in exceptionreasonlist%}<div {%if j == '4' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Mismatch between price quoted on invoice and selected contract{%endif%}
+                    {%if i.exceptional_type == 5  %}{%for j,k in exceptionreasonlist%}<div {%if j == '5' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%}  Asking for Credit Note{%endif%}
+
+                    {%if i.exceptional_type == 7  %}{%for j,k in exceptionreasonlist%}<div {%if j == '7' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%}  Supporting Documents Missing{%endif%}
+                    {%if i.exceptional_type == 8  %} {%for j,k in exceptionreasonlist%}<div {%if j == '8' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Wrong Supporting Documents{%endif%}
+                    {%if i.exceptional_type == 9  %} {%for j,k in exceptionreasonlist%}<div {%if j == '9' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Irrelevant Invoice </div>{%endif%}
+                    {%if i.exceptional_type == 10  %} {%for j,k in exceptionreasonlist%}<div {%if j == '10' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Relevant Contract not selected for invoice{%endif%}
+                    {%if i.exceptional_type == 11  %} {%for j,k in exceptionreasonlist%}<div {%if j == '11' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Work Done previously Invoiced{%endif%}
+
+                    {%if i.exceptional_type == 13  %} {%for j,k in exceptionreasonlist%}<div {%if j == '13' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Invoice details interpretation issues{%endif%}
+                    {%if i.exceptional_type == 14  %} {%for j,k in exceptionreasonlist%}<div {%if j == '14' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Supporting document issues{%endif%}
+                    {%if i.exceptional_type == 15  %} {%for j,k in exceptionreasonlist%}<div {%if j == '15' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Issues due to Verbal communication for work invoiced{%endif%}
+                    {%if i.exceptional_type == 16  %} {%for j,k in exceptionreasonlist%}<div {%if j == '16' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Work done outside of approval limits{%endif%}
+                    {%if i.exceptional_type == 17  %} {%for j,k in exceptionreasonlist%}<div {%if j == '17' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Dispute on contract execution{%endif%}
+                    {%if i.exceptional_type == 18  %} {%for j,k in exceptionreasonlist%}<div {%if j == '18' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Dispute coming out of Audit findings{%endif%}
+                    {%if i.exceptional_type == 19  %} {%for j,k in exceptionreasonlist%}<div {%if j == '19' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Inability to clarify through normal methods'{%endif%}
+                    {%if i.exceptional_type == 20 or i.exceptional_type == 12 or i.exceptional_type == 6  %}{%for j,k in exceptionreasonlist%}<div {%if j == '6' or j == '12' or j == '20' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%}  Other Reasons{%endif%}
+                   </ul>
+                   
+                    {%endfor%}</td>
+                    {% comment %} {%getcomments invoice.invoice.id invoice.invoice.company.id as comments%}
+                  <td>{{comments}}</td> {% endcomment %}
+                 
+              
+            </tr>
+            {%endfor%}
+        {%endif%}
+        </tbody>
+        {%clearpdfserial request%}
+        </table>
+    </div>
+</section>
+
+

@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load invoice_custom_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/vendorinfo.css' %}">
+<div>
+    <div class="row">
+        <div class="col-12 text-end"> 
+            <button type="button" class="btn btn-clr">
+                <a href="{% url 'projects:vendordetailpage' %}">Back</a></button>
+        </div>
+    </div>
+    <form  class="form-txt vendorRegistration" id="vendorRegistration" method="POST">
+        {% csrf_token %}
+        
+        <select name="companycurrenices" id="id_companycurrenices" class="comp_currency form-select">
+            {% for country in companycurrency%}
+            <option value="{{country.id}}">{{country.currency_symbol}}-{{country.currency}} ({{country.name}})</option>
+            {% endfor %}
+        </select>
+
+    <div class="row">
+        <div class="col-sm-6"> 
+            <h3 class="from-head">Vendor Company Information</h3>
+        </div>
+        <div class="col-sm-6"> 
+            <h3 class="from-head">Vendor Company Address</h3>
+        </div>
+    </div>
+    <select id="id_tax" class="comp_currency form-select">
+        {% for companytax in companytaxlist %}
+            <option value="{{companytax.id}}">{{companytax.Tax_Name}}</option>
+        {% endfor %}
+    </select>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <input type="hidden" name="vendorid" id="idvendor" value="{{vendorform.id}}" >
+            <label for="staticEmail" class="col-form-label">Vendor Name<span class="star-clr">*</span></label>
+            <input type="text" id="vendorname" name="vendorname" class="form-control vendor-inp-cls" placeholder="Vendor Name" value="{{vendorform.vendor_name}}" readonly="readonly"><br>
+            <label for="staticEmail" class="col-form-label">Country Of Incorporation<span class="star-clr">*</span></label>
+            <select id="Incorporationcountryid" name="vendor_country_list_incorporation" class="form-control form-select bot-tom-space" placeholder="Country Of Incorporation">
+                <option value='' selected>---Select Country---</option>
+                {% for country in maincountry%}
+                <option {% if vendorform.country_of_incorporation_id == country.id %} selected {% endif %} value="{{country.id}}">{{country.nicename}}</option>
+                {% endfor %}
+            </select><br>
+            <label for="staticEmail" class="col-form-label">Registered Number in the Country of Incorporation<span class="star-clr">*</span></label>
+            <input type="text" id="Registernumber" name="Registernumber" oninput="validateInput(this)" class="form-control bot-tom-space vendor-inp-cls" placeholder="Registered Number in the Country of Incorporation" value="{{vendorform.RegisterNumber|default_if_none:''}}" ><br>
+            <label for="staticEmail" class="col-form-label">Vendor Company Website</label>
+            <input type="text" id="website" name="website" class="form-control bot-tom-space" placeholder="Vendor Company Website" value="{{vendorform.website|default_if_none:''}}">
+        </div>
+
+        <div class="col-sm-6">
+            
+            <label for="staticEmail" class="col-form-label">Country Of Operation<span class="star-clr">*</span></label>
+            <select id="Operation_country_id" name="vendor_country_list" class="form-control form-select ">
+                <option value='' selected>---Select Country---</option>
+                {% for country in countries%}
+                <option {% if vendorform.country_of_operation_id == country.id%} selected {% endif %} value="{{country.id}}">{{country.name}}</option>
+                {% endfor %}
+            </select><br>
+            <label for="staticEmail" class="col-form-label">State in the  Country of Operation<span class="star-clr">*</span></label>
+            <select id="Operation_state_id" name="vendor_state_list" class="form-control form-select bot-tom-space">
+                <option  value="" selected="selected">---Select state---</option>
+                {% for state in states%}
+                <option {% if vendorform.state_id == state.id%} selected {% endif %} value="{{state.id}}">{{state.name}}</option>
+                {% endfor %}
+            </select><br>
+            <label for="staticEmail" class="col-form-label">Vendor Company Official Address<span class="star-clr">*</span></label>
+            <textarea rows="3" cols="50" name="address"  id="inputaddress" class="form-control address-cls bot-tom-space">{{vendorform.Address|default_if_none:''}}</textarea>
+
+        </div>
+    </div>
+
+     <div class="">
+       <h3 class="vend-tax-head">Vendor Tax Details</h3>
+        <table id="tax" class="vendor-inv">
+            <thead>
+                <tr>
+                    <th class="col-form-label">Tax Name<span class="star-clr">*</span></th>
+                    <th class="col-form-label">Tax Number<span class="star-clr">*</span></th>
+                </tr>
+           </thead>
+           {% if taxcount > 0 %}
+           {% for vendortax  in vendortaxdetails %}
+            <tr class="same-line-err">
+                <td>
+                    <input type="hidden" name="taxnamehdid" value="{{vendortax.id}}" >
+                    <textarea rows="4" cols="40" name="taxname"  oninput="validateInput(this)" class="form-control taxname-cls" placeholder="Tax Name">{{vendortax.Tax_Name|default_if_none:"---"}}</textarea></td>
+                <td>
+                    <textarea rows="4" cols="40" name="taxnumber"  id="taxnum" class="form-control taxnumber-cls" placeholder="Tax Number">{{vendortax.Tax_Number|default_if_none:"---"}}</textarea>
+                </td>
+                <td><button id='add' class='btn btn-clr add-btn' type='button' row="{{ forloop.counter0 }}" value='Add'> <i class="fa fa-plus"></i> </button> <button id='delete' row="{{ forloop.counter0 }}" class='btn btn-clr delete-btn' type='button' value='delete'> <i class="fa fa-minus"></i> </button></td>
+            </tr>
+           {% endfor %}
+           {% else %}
+           <td>
+            <input type="hidden" name="taxnamehdid" value="" >
+            <textarea rows="4" cols="40" name="taxname"  oninput="validateInput(this)" class="form-control taxname-cls" placeholder="Tax Name"></textarea></td>
+            <td>
+                <textarea rows="4" cols="40" name="taxnumber"  id="taxnum" class="form-control taxnumber-cls" placeholder="Tax Number"></textarea>
+            </td>
+            <td><button id='add' class='btn btn-clr add-btn' type='button' value='Add'> <i class="fa fa-plus"></i> </button> 
+                <button id='delete' class='btn btn-clr delete-btn' type='button' value='delete'> <i class="fa fa-minus"></i> </button>
+            </td>
+           {% endif %}
+        </table>
+    </div>
+
+    <!-- {% comment %} <div class="">
+        <h3 class="vend-tax-head">Tax/Levy Selection</h3>
+        <div class="row">
+            <div class="col-6">
+                <h6 class="inc-clr">Inclusive Taxes/Levies <i class='fa fa-info-circle jqtooltip i-con-clr inc_fa_fa' title = "Select Taxes/Levies Included in Prices Quoted in Contract(s)"></i></h6>
+                <div class="row">
+                    <div class="col-12">
+                        <label class="col-form-label">Tax Name<span class="star-clr">*</span></label>
+                        <select name="inclusivetax" class="form-control form-select inclusive-cls" id="idinclusive">
+                            <option value="">--Select--</option>
+                            {% for companytax in companytaxlist %}
+                            {% checknotapplicable vendorform.id vendorform.company.id 'Inclusive' as selectcount %}
+                            <option value="{{companytax.id}}" {% if selectcount == companytax.id%} selected {% endif %}>{{companytax.Tax_Name}}</option>
+                            {% endfor %}
+                        </select>
+                        {%for inclusivetax in getinclusivetax %}
+                            {% if inclusivetax.applicable == "Not Applicable" %}
+                                <div class="hdnsubdivinclusive"><input type="hidden" name="inclusivecompanytax" value="{{inclusivetax.applicable}}"><input type="hidden" name="inclusivetaxnumber" placeholder="Add Tax Number" class="" ></div>
+                            {% else %}
+                                <div><input type="text" name="" class="" dataid="{{inclusivetax.tax.id}}" value="{{inclusivetax.tax.Tax_Name}}" readonly=""> <input type="text" name="inclusivetaxnumber" placeholder="Add Tax Number" class="" value="{{inclusivetax.taxnumber|default_if_none:"---"}}"> <i class="fa fa-times inclusiveclosecls clo-se" aria-hidden="true"></i><input type="hidden" name="inclusivecompanytax" value="{{inclusivetax.tax.id}}"> <input type="hidden" name="hdninclusive"  value="{{inclusivetax.id}}">  </div>
+                            {% endif %}
+
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <h6 class="inc-clr">Exclusive Taxes/Levies <i class='fa fa-info-circle jqtooltip i-con-clr inc_fa_fa' title = "Select Taxes/Levies Excluded in Prices Quoted in Contract(s)"></i></h6> 
+                <div class="row">
+                    <div class="col-12">
+                        <label class="col-form-label">Tax Name<span class="star-clr">*</span></label>
+                        <select name="exclusivetax" id="idexclusive" class="form-control form-select exclusive-cls">
+                            <option value="">--Select--</option>
+                            {% checknotapplicable vendorform.id vendorform.company.id 'Exclusive' as selectcount %}
+                            {% for companytax in companytaxlist %}
+                            <option value="{{companytax.id}}" {% if selectcount == companytax.id%} selected {% endif %}>{{companytax.Tax_Name}}</option>
+                            {% endfor %}
+                        </select>
+                        {%for exclusivetax in getexclusivetax %}
+                            {% if exclusivetax.applicable == "Not Applicable" %}
+                                <div class="hdnsubdivexclusive"><input type="hidden" name="exclusivecompanytax" value="{{exclusivetax.applicable}}"><input type="hidden" name="exclusivetaxnumber" placeholder="Add Tax Number" class="" ></div>
+                            {% else %}
+                                <div><input type="text" name="" class="" dataid="{{exclusivetax.tax.id}}" value="{{exclusivetax.tax.Tax_Name}}" readonly=""> <input type="text" name="exclusivetaxnumber" placeholder="Add Tax Number" class="" value="{{exclusivetax.taxnumber|default_if_none:"---"}}"> <i class="fa fa-times exclusiveclosecls clo-se" aria-hidden="true"></i><input type="hidden" name="exclusivecompanytax" value="{{exclusivetax.tax.id}}"> <input type="hidden" name="hdnexclusive"  value="{{exclusivetax.id}}"></div>
+                            {% endif %}
+                    {% endfor %}
+                    </div>  
+                </div>
+            </div>
+        </div>
+     </div> {% endcomment %} -->
+
+    <div class="">
+        <h3 class="vend-tax-head">Bank Information</h3>
+        <!-- <div class="table-responsive text-nowrap"> -->
+         <table id="bank_information" class="vendor-inv-bank">
+             <thead>
+                 <tr>
+                    <th class="col-form-label">Currency<span class="star-clr">*</span></th>
+                    <th class="col-form-label">Bank Name<span class="star-clr">*</span></th>
+                    <th class="col-form-label">Account No<span class="star-clr">*</span></th>
+                    <th class="col-form-label">Other Bank Details<span class="star-clr"></span></th>
+                 </tr>
+            </thead>
+            {% if bankcount > 0 %}
+            {% for vendortax  in vendorbankdetails %}
+             <tr class="same-line-err">
+                 <td><select name="currency_bank" class="form-control form-select currency_bank_cls" id=""><option value="">--Select--</option>
+                    {% for country in companycurrency%}
+                    <option value="{{country.id}}" {% if vendortax.bankcurrency.id == country.id %} selected {% endif %} >{{country.currency_symbol}}-{{country.currency}} ({{country.name}})</option>
+                    {% endfor %}</select></td>
+                 <td><input type="text" name="bankname" class="form-control banknamecls" id="" value="{{vendortax.bankname|default_if_none:'---'}}" oninput="validateInput(this)" placeholder="Bank Name"></td>
+                 <td><input type="text" name="accno" class="form-control accnocls"  id="" value="{{vendortax.accountnumber|default_if_none:'---'}}" oninput="validateInput(this)" placeholder="Account No"></td>
+                 <td class="width-td-bank"><input type="hidden" name="bankhdid" value="{{vendortax.id}}">
+                     <textarea rows="4" cols="40" name="bankdetails"  id="bankid{{forloop.counter0}}" class="form-control bank-cls"  placeholder="Add Bank Details">{{vendortax.bankdetails|default_if_none:"---"}}</textarea></td>
+                 <td class="btn-top-bank btn-flex"><button id='add_bank_details' class='btn btn-clr add-btn' type='button' row="{{ forloop.counter0 }}" value='Add'> <i class="fa fa-plus"></i> </button> <button id='delete_bank_details' row="{{ forloop.counter0 }}" class='btn btn-clr delete-btn' type='button' value='delete'> <i class="fa fa-minus"></i> </button></td>
+             </tr>
+            {% endfor %}
+            {% else %}
+            <td><select name="currency_bank" class="form-control form-select currency_bank_cls" id=""><option value="">--Select--</option>
+                {% for country in companycurrency%}
+                <option value="{{country.id}}">{{country.currency_symbol}}-{{country.currency}} ({{country.name}})</option>
+                {% endfor %}</select></td>
+             <td><input type="text" name="bankname" class="form-control banknamecls" oninput="validateInput(this)" id="" placeholder="Bank Name"></td>
+             <!-- <td><input type="text" name="accno" class="form-control accnocls" id=""oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" placeholder="Account No"></td> -->
+             <td><input type="text" name="accno" class="form-control accnocls" id="" oninput="validateInput(this)" placeholder="Account No"></td>
+             <td class="width-td-bank"><input type="hidden" name="bankhdid" value="" >
+                <textarea rows="4" cols="40" name="bankdetails"  id="bankid0"  class="form-control bank-cls" placeholder="Add Bank Details"></textarea>
+            </td>
+             <td class="btn-top-bank btn-flex"><button id='add_bank_details' class='btn btn-clr add-btn' type='button' value='Add'> <i class="fa fa-plus"></i> </button> 
+                 <button id='delete_bank_details' class='btn btn-clr delete-btn' type='button' value='delete'> <i class="fa fa-minus"></i> </button>
+             </td>
+            {% endif %}
+         </table>
+        <!-- </div> -->
+     </div>
+
+     <div class="row">
+        <div class="text-center btn-cls">
+            <button type="submit" class="btn btn-clr text-left draft-cls" name="submit_type" value="0">Save As Draft</button>
+            <button type="submit" class="btn btn-clr text-left submit-cls" name="submit_type" value="1">Save & Next</button>
+        </div>
+    </div>
+
+</div>
+
+</form>
+
+{%endblock%}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>  
+{% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.1/select2.min.js"></script> {% endcomment %}
+<script src="{% static 'js/vendor/editvendor.js' %}"></script>
+<script>
+    function validateInput(input) {
+        input.value = input.value.replace(/[^a-zA-Z0-9\s]/g, '');
+        }
+</script>
+{% endblock %}

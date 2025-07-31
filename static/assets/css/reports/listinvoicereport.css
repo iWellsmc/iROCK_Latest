@@ -1,0 +1,29 @@
+.star {
+    visibility:hidden;
+    font-size:30px;
+    cursor:pointer;
+}
+
+.star:before {
+   content: "\2606";
+   color: #AF2B50;
+   position: absolute;
+   visibility:visible;
+   transform: translate(0px, -15px);
+   -webkit-transform: translate(0px, -15px);
+}
+
+.star:checked:before {
+   content: "\2605";
+   position: absolute;
+}
+
+.reports-chk-box td {
+   padding: 10px 10px !important;
+}
+
+.reports-chk-box td:nth-child(1) {
+   padding: 10px 10px !important;
+   text-align: var(--centertext-align);
+   width: 20%;
+}

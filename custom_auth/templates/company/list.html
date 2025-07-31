@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/poa_login/companies.css' %}">
+
+<section id="data-list-view" class="data-list-view-header">
+  <h1 class="from-head">{{title}}</h1>
+
+  <div class="modal fade" id="payment_checking" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Confirmation Alert</h5>
+          <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+        </div>
+        <div class="modal-body">
+          Payment process to be completed to approve the Company.
+        </div>
+        <div class="modal-footer">
+          <input type="hidden" name="proposal_id" id="proposal_id">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+         
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- DataTable starts -->
+    <div class="table-responsive text-nowrap">
+        <table class="table company-data-list-view creat-head irock-table tab-head" id="company_list">
+
+            <thead>
+                <tr>
+                    <th>S/N</th>
+                    <th>CIN</th>
+                    <th class="tab-com">Company Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                    </tr>
+            </thead>
+            <tbody class="table-list reg-company reg-comlist">
+                {% for obj in companies %}
+
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{obj.cin_number}}</td>
+                    <td>{{obj.company_name}}</td>
+                    <td>{{obj.email}}</td>
+                    <td>{{obj.mobile_countrycode}} {{obj.mobile}}</td>
+                    <td>
+                     {% if obj.status == 0 %}
+                    
+                    <div class="chip chip-warning">
+                        <div class="chip-body">
+                            <div class="chip-text app-ro"><span class="bck-appo-p">Pending</span></div>
+                        </div>
+                    </div>
+                    {% elif obj.status == 1 %}
+                    
+                    <div class="chip chip-success">
+                        <div class="chip-body">
+                            <div class="chip-text app-ro"><span class="bck-appo">Approved</span></div>
+                        </div>
+                    </div>
+                    {% elif obj.status == 2 %}
+                    
+                    <div class="chip chip-danger">
+                        <div class="chip-body">
+                            <div class="chip-text app-ro"><span class="bck-appo-r">Rejected</span></div>
+                        </div>
+                    </div>
+                    {% endif %}
+                 </td>
+                    <td  class="reg-act-icc action">
+                    <a class="Registered-Companies-eyeIcons" href="{% url 'custom_auth:companyview' id=obj.id %}">
+                        <span class="action-edit"><i class="fa fa-eye" title="View"></i></span>
+                    </a>
+                    {% comment %} {% if perms.custom_auth.change_companies %}
+                    {% if obj.status == 0  or  obj.status == 2  %}
+
+                    <a href="{% url 'custom_auth:companyapprove' id=obj.id %}" data-id="{{obj.amount}}" class="approve" >
+                        <span class="action-edit"><i class="fa fa-thumbs-up"></i></i></span>
+                    </a>
+
+                    <a href="{% url 'custom_auth:companyapprove' id=obj.id %}" data-id="{{obj.amount}}" class="approve" >
+                      <span class="action-edit"><i class="fa fa-thumbs-up"></i></i></span>
+                    </a>
+
+
+                    {% endif %}
+                    {% if obj.status == 0 or obj.status == 1 %}
+                   
+                    <button type="button" onclick="deleteconfirmation(this)" href="{% url 'custom_auth:companyreject' id=obj.id%}" class="btn btn-link fa fa-thumbs-down c-los-e  px-0">
+                    </button>
+                    {% endif %}
+                    {% endif %} {% endcomment %}
+                    {% if perms.custom_auth.change_companies %}
+                    
+                    {% if obj.status == 0 %}
+
+                    <a  href="{% url 'custom_auth:companyreject' id=obj.id%}" ><span class="action-edit "><i class=" fa fa-thumbs-down  px-0 thump-up-down" title="Reject"></i></i></span></a>
+                    {% endif %}
+                    {% if obj.status == 0 %}
+                    <a  href="{% url 'custom_auth:companyapprove' id=obj.id %}" data-id="{{obj.amount}}" class="approve"><span class="action-edit "><i class="fa fa-thumbs-up thump-up-down" title="Approve"></i></i></span></a>
+                    {% endif %}
+                    {% endif %}
+                    {% comment %}
+                    <span class="deletebutton" href="{% url 'custom_auth:companydelete' pk=obj.id %}"><i class="feather icon-trash"></i></span>
+
+                    </td>
+                  </tr>{% endcomment %}
+
+                  {% endfor %} 
+            </tbody>
+        </table>
+    </div>
+    <!-- DataTable ends-->
+    <!-- add new sidebar ends -->
+</section>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+    $(document).ready( function () {
+      $('#company_list').DataTable();
+    });
+
+    $(document).on('click','.approve',function(e){
+    var payment=$('.approve').attr('data-id')
+        if(payment=='None')
+        {
+        $("#payment_checking").modal('show');
+        e.preventDefault()
+        }
+    })
+    </script>
+{% endblock %}

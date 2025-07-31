@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block content %}
+{% load custom_tags %}
+{% load static %}
+
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/user_Management/users.css' %}">
+
+<section id="data-list-view" class="data-list-view-header">
+<div>
+  <h4 class="from-head"> List of Users</h4>
+  <div class="row">
+     <div class="col-12 text-end">
+        <button type="button" class="btn btn-clr onClass">Create User</button>
+      <!-- <a href="{% url 'projects:usercreate' %}">Create User</a> -->
+    </div>
+  </div>
+  <div class="row my-4">
+    <div class="col-8"> 
+      <div class="all-noti-box">
+        <div class="show-noti p-0">
+            <label class="mb-0">Show <select id="datafilters" class="changevalue select-style">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+        </select> entries</label>
+    </div>
+    </div>
+    </div>
+    <div class="col-4 text-end">
+      <form method="get">
+        <input type="text" id="myInput" class="search-f-inf" name="q" placeholder="Search User Name" value="{{query}}" autocomplete="off">
+      </form>          
+    </div>
+</div>
+  <div class="row">
+    <div class="col-12">
+      <div class="table-responsive text-nowrap">
+        <table class="table settings-data-list-view data-list-view project_master all-tbl-hd list-user-table-width tab-res irock-table"
+        id="master_project_list">
+        <thead class="list-user">
+          <tr>
+            <th>S/N</th>
+            <th class="wid-iin">First Name <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>
+            <th class="wid-iin">Last Name <button class="filter-btn" data-filter="last-name"> <i class="fas fa-sort"></i></button></th>
+            <th>Designation <button class="filter-btn" data-filter="designation"> <i class="fas fa-sort"></i></button></th>
+            <th>Department <button class="filter-btn" data-filter="dept"> <i class="fas fa-sort"></i></button></th>
+            <th>Group <button class="filter-btn" data-filter="group"> <i class="fas fa-sort"></i></button></th>
+            <th class="wid-email">Email <button class="filter-btn" data-filter="email"> <i class="fas fa-sort"></i></button></th>
+            <th class="wid-mob">Mobile No <button class="filter-btn" data-filter="mobile"> <i class="fas fa-sort"></i></button></th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody class=" table-list">
+          {% if usercount == 0 %}
+          <tr>
+            <td colspan="9" class="cls-nil">
+              ---
+            </td>
+          </tr>
+          {%else%}
+          {%for user in process_list %}
+          <tr>
+            <td>{{forloop.counter}}</td>
+            <td class="td-left">{{user.name}}</td>
+            <td class="td-left">{{user.lastname}}</td>
+            <td class="td-left">
+              <p class="txt-word-break">{{user.designation_role|default_if_none:"---"}}</p>
+            </td>
+            <td class="td-left">
+              <p class="txt-word-break">{{user.user_department|default_if_none:"---"}}</p>
+            </td>
+            <td class="td-left">
+              <p class="txt-word-break">{{user.user_group|default_if_none:"---"}}</p>
+            </td>
+            <td class="td-left" >{{user.email}}</td>
+            <td>{% get_phone_number user.mobile_countrycode %}-{{user.mobile|default_if_none:"---"}}</td>
+            <td>
+              <div class="ic-onsm">
+                <a class="btn px-1" href="{% url 'projects:userview' pk=user.id|replacecommaid %}">
+                  <span class="action-edit">  <!-- Class Removed ->  align-icons -->
+                    <i class="fa fa-eye" title="View"></i>
+                  </span>
+                </a>
+                <a class="btn px-1" href="{% url 'projects:userrights' pk=user.id|replacecommaid %}">
+                  <span class="action-edit">  <!-- Class Removed ->  align-icons -->
+                    <i title="General Rights" class="fa fa-check-square-o"></i>
+
+                  </span>
+                </a>
+                <a class="btn px-1" href="{% url 'projects:userprojectrights' pk=user.id|replacecommaid %}">
+                  <span class="action-edit">  <!-- Class Removed ->  align-icons -->
+                    <i title='Project Specific Rights' class="fa-solid fa-list-check"></i>
+
+                  </span>
+                </a>
+                <a class="btn px-1" href="{% url 'projects:useredit' pk=user.id|replacecommaid %}">
+                  <span class="action-edit">  <!-- Class Removed ->  align-icons -->
+                    <i class="fa fa-pencil-square-o" title="Edit"></i>
+                  </span>
+                </a>
+                <a class="btn px-1 user_delete_cls" userid="{{user.id|replacecommaid}}" username="{{user.name}} {{user.lastname|default_if_none:''}}">
+                  <span class="action-edit">  <!-- Class Removed ->  align-icons -->
+                    <i class="fa fa-trash" title="Delete"></i>
+                  </span>
+                </a>
+              </div>
+            </td>
+
+          </tr>
+          {% endfor %}
+          {% endif %}
+      </table>
+
+      </div>
+          </div>
+  </div>
+</div>
+<nav aria-label="Page navigation example">
+  <ul class="pagination justify-content-center">
+  {% if process_list.has_previous %}
+      <li class="page-item">
+      <a class="btn-clr page-link" href="{{ request.META.HTTP_REFERER }}">Previous</a>
+    </li>
+  {% else %}
+      <li class="page-item disabled">
+      <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Previous</a>
+    </li>
+  {% endif %}
+
+  {% if process_list.number|add:'-4' > 1 %}
+      <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ process_list.number|add:'-5' }}">&hellip;</a></li>
+  {% endif %}
+
+  {% for i in process_list.paginator.page_range %}
+      {% if process_list.number == i %}
+          <li class="page-item pg-count active" aria-current="page">
+        <span class="btn-clr pg-circle page-link">
+          {{ i }}
+          <span class="sr-only">(current)</span>
+        </span>
+      </li>
+      {% elif i > process_list.number|add:'-5' and i < process_list.number|add:'5' %}
+
+        {% if request.GET.vendor %}
+      <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&page={{ i }}">{{ i }}</a></li>
+        {% elif request.GET.vendor and request.GET.sortname %}
+        <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+        {% elif request.GET.vendor and request.GET.sortvendorname %}
+        <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+        {% elif request.GET.sortname %}
+        <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+        {% elif request.GET.sortvendorname %}
+        <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+        {% else %}
+          <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+      {% endif %}
+{% endfor %}
+  {% if process_list.paginator.num_pages > process_list.number|add:'4' %}
+    <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ process_list.number|add:'5' }}">&hellip;</a></li>
+  {% endif %}
+
+  {% if process_list.has_next %}
+      <li class="page-item pg-count">
+      <a class="btn-clr page-link" href="?page={{ process_list.next_page_number }}">Next</a>
+    </li>
+  {% else %}
+      <li class="page-item disabled">
+      <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Next</a>
+    </li>
+  {% endif %}
+</ul>
+</nav>
+</div>
+
+</div>
+</section>
+{% endblock%}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js" integrity="sha512-BkpSL20WETFylMrcirBahHfSnY++H2O1W+UnEEO4yNIl+jI2+zowyoGJpbtk6bx97fBXf++WJHSSK2MV4ghPcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+  var scheme = '{{scheme}}'
+  var gethost = '{{gethost}}'
+  var csrf_token = '{{csrf_token}}'
+</script>
+<script type="text/javascript" src="{% static 'js/projects/userslist.js' %}"></script>
+<script>
+
+// var table = $('#master_project_list').DataTable({ 
+//   "autoWidth": false,  
+//   ordering: false,
+//   language: {
+//       search: "",
+//       searchPlaceholder:"Search User",
+//     },
+// },
+
+// );
+
+  // $("#generalid").tooltip();
+  // $("#specificprojectid").tooltip();
+  $(document).on('click','.user_delete_cls',function () { 
+    var delete_id = $(this).attr('userid')
+    var username = $(this).attr('username')
+
+    $.ajax({
+      type: "POST",
+      headers: { "X-CSRFToken": "{{ csrf_token }}"},
+      url: '{% url "projects:checkuserhasproject" %}',
+      data: {
+        "user_id": delete_id,
+      },
+      success: function (data) {
+        if (data.status){
+          Swal.fire({
+            title: 'Please Re-Assign Projects to Other Users Before Deleting User',
+            showCancelButton: false,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Migrate',
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href =`/projects/migrateuser/${delete_id}`
+            }
+          })
+        }
+      }
+    });
+
+
+    Swal.fire({
+      title: 'Are you sure you want to delete ' + username,
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, I Confirm',
+      cancelButtonText: 'No',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          type: "GET",
+          url: '/projects/userdelete',
+          data: {
+            "id": delete_id,
+          },
+          success: function (data) {
+            console.log(data)
+            setTimeout(function () {
+              location.reload();
+            }, 1000);
+          }
+        });
+        Swal.fire(username, 'Deleted Successfully')
+      }
+    })
+  })
+
+  $(document).on("click", ".onClass", function () {
+
+    if (1 > parseInt('{{department_count}}')) {
+      showSweetAlert('Update User Department before Adding User', "{% url 'custom_auth:list-userdepartment-form' %}");
+    }
+    else if(2 > parseInt('{{group_count}}')){
+      showSweetAlert('Update User Group before Adding User. There should be Minimum of 2 Groups', "{% url 'custom_auth:list-usergroup-form' %}");
+    }
+    else{
+      window.location.href = "{% url 'projects:usercreate' %}";
+    }
+  });
+    function showSweetAlert (title, url) {
+    Swal.fire({
+      title: title,
+      showCancelButton: false,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Ok',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = url;
+      }
+    })
+  }
+
+  
+</script>
+
+{%endblock%}

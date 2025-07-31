@@ -1,0 +1,145 @@
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}  
+{% load static %}
+{% block content %}
+
+<form id="exchangerate"  method='POST' enctype="multipart/form-data">
+<div class="row justify-content-center">
+    <div class="row">
+      <input type='hidden' value="{{pk}}" name="pk">
+        <div class="table-responsive">
+        <table class="inv-pretbl exchan_table">
+            <thead>
+                <tr>
+                    <th>S/N</th>
+                    <th>Invoice Cost Split</th>
+                    <th>Inv No</th>
+                    <th>Inv Date</th>
+                    <th>Period of Service</th>   
+                    <th>Payment Currency</th> 
+                    <th>Gross Amount without Excl. taxes({{contract.currency}} - Base
+                      Currency)</th>
+                    <th>Taxes</th>               
+                    <th>Total Gross Amount Inclusive of all taxes ({{contract.currency}} - Base
+                      Currency)</th>
+                    <th>Exchange Rate</th>
+                    <th>Gross Amount Inclusive of all taxes (Payment Currency)</th>
+                    <th class='if_not_satisfied' style="display:none">Updated Exchange Rate</th>
+                    <th class='if_not_satisfied' style="display:none">Updated Gross Amount Inclusive of all taxes (Payment Currency)</th>
+                    {% if submit_type == 1 %}
+                    {% if invoice_module.exchangerate_confirm_status  == 3 %}
+                    <th class='if_not_satisfied'>Updated Exchange Rate</th>
+                    <th class='if_not_satisfied'>Updated Gross Amount Inclusive of all taxes (Payment Currency)</th>
+                    {% endif %}
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for inv in maininvoices %}
+                {% for invoice in pk|subinvoice:inv.id %}
+                {% check_for_settlement invoice as settlement %}
+                <tr>
+                  <input type="hidden"  value="{{invoice.id}}" name="hidden_vendor_id">
+                  <input type="hidden" value="{{inv.exchange_rate}}" name="check_exchange_rate">
+                    <td>{{forloop.parentloop.counter}}</td>
+                    <td>{{ invoice.invoice_percentage|floatformat:"2" }} % Split</td>
+                    <td class="inv_name">{{invoice.invoice_number}}</td>
+                    <td>{{invoice.invoice_date|convertinvoicedate:request.company.id}}</td>
+                    <td>{{invoice.invoice.fromdate|date:"M-Y"}} to {{invoice.invoice.todate|date:"M-Y"}}</td>
+                    <td>{{invoice.currency.currency}} - {{invoice.currency.currency_name}}</td>
+                    {% invoiceafterdiscount invoice.invoice_percentage invoicedetail.total_discount_value invoice.invoice_exchange_rate as invdisval %}
+                    {% invoicebaseexclusivevalue invoice.invoice_percentage invoicedetail.total_exclusive_value as invexcval %}
+                    {% newdelvalues invoice.invoice_base_amount|amount_convertion invexcval as without_exclusive %}
+                    <input type="hidden" data-id="{{invdisval|addvalues:invexcval}}" class="added_exchange">
+                    {% if settlement.0 %}
+                    {% settlement_value invdisval settlement.1.accepted_percentage as invdisval %}
+                    {% settlement_value invexcval settlement.1.accepted_percentage as invexcval %}
+                    {% settlement_value without_exclusive settlement.1.accepted_percentage as without_exclusive %}
+                    {% endif %}
+                    <td>{{basecurreccy}} {{without_exclusive}}</td>
+                    <td class="invexcval" data-id='{{invexcval}}'>{{basecurreccy}} {{invexcval}}</td>
+                    <input type="hidden" value="{% if settlement.0 %}{{settlement.1.invoicevalue_accepted}}{% else %}{{invoice.invoice_base_amount}}{% endif %}" class="settlement_amount">
+                    <td class="invdisval" data-id='{{invoice.invoice_base_amount}}'>{{basecurreccy}} {% if settlement.0 %}{{settlement.1.invoicevalue_accepted}}{% else %}{{invoice.invoice_base_amount|amount_convertion}}{% endif %}</td>
+                    {% if submit_type == 1 %}
+                    <td>
+                      {% if inv.exchange_rate == '1' %}
+                      <input type="text"  id="id_exchangerate" value= "{{invoice.invoice_exchange_rate}}" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1')" index='{{inv.exchange_rate}}' class="exchangeratecls form-control in-bor-clr" readonly>
+                      {% endif %}
+                      {% if inv.exchange_rate == '2' %}
+                      <input type="text"  id="id_exchangerate"  index='{{inv.exchange_rate}}'  class="exchangeratecls form-control in-bor-clr" {% if invoice.currency.currency_symbol == basecurreccy %}{% if invoice.invoice_exchange_rate == "N/A" %}  value= "{{invoice.invoice_exchange_rate}}"{% endif %}{% else %}{% if invoice.invoice_exchange_rate == "N/A" %}{% else %} value= "{{invoice.invoice_exchange_rate}}" {% endif %} {% endif %} readonly>
+                      {% endif %} 
+                    </td>
+                    <input type="hidden" class="invoice_total_amount" name="invoice_total_amount" value="{{invoice.invoice_total_amount}}">
+                    <td>{% if inv.exchange_rate == '2' %}{{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}}{% endif %} 
+                      {% invoiceafterdiscount invoice.invoice_percentage invoicedetail.total_after_otherdetails invoice.invoice_exchange_rate as invdisval %}
+                      {% invoiceexclusivevalue invoice.invoice_percentage invoicedetail.total_exclusive_value invoice.invoice_exchange_rate as invexcval %}
+                      {% if settlement.0 %}
+                      {% settlement_value invdisval settlement.1.accepted_percentage as invdisval %}
+                      {% settlement_value invexcval settlement.1.accepted_percentage as invexcval %}
+                      {% endif %}
+                       {{invdisval|addpreviewvalues:invexcval}}</td>
+                    {% elif submit_type == 2 %}
+                    <td> 
+                      {% if inv.exchange_rate == '1' %}
+                      <input type="text" name="exchangerate" id="id_exchangerate" value= "{{invoice.invoice_exchange_rate}}" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1')" index='{{inv.exchange_rate}}' class="exchangeratecls form-control in-bor-clr if_not_satisfied" {% if invoice.invoice_exchange_rate == "N/A" %}readonly {% endif %}>
+                      {% endif %}
+                      {% if inv.exchange_rate == '2' %}
+                      <input type="hidden" class="invoice_total_amount" name="invoice_total_amount" value="{{invoice.invoice_total_amount}}">
+                      <input type="text" name="exchangerate" id="id_exchangerate"  index='{{inv.exchange_rate}}'  class="exchangeratecls if_not_satisfied form-control in-bor-clr" {% if invoice.currency.currency_symbol == basecurreccy %}{% if invoice.invoice_exchange_rate == "N/A" %} readonly value= "{{invoice.invoice_exchange_rate}}"{% endif %}{% else %}{% if invoice.invoice_exchange_rate == "N/A" %}{% else %} value= "{{invoice.invoice_exchange_rate}}" {% endif %} {% endif %} >
+                      {% endif %} </td>
+                      <td data-id="{{invoice.invoice_total_amount}}" class="final_amount if_not_satisfied" data="{% if inv.exchange_rate == '2' %}{% if forloop.parentloop.counter == 1 %}{{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}}{% endif %}{% else %}{{invoice.currency.currency_symbol}}{% endif %}"> 
+                        {% invoiceafterdiscount invoice.invoice_percentage invoicedetail.total_after_otherdetails invoice.invoice_exchange_rate as invdisval %}
+                        {% invoiceexclusivevalue invoice.invoice_percentage invoicedetail.total_exclusive_value invoice.invoice_exchange_rate as invexcval %}
+                        {% if settlement.0 %}
+                        {% settlement_value invdisval settlement.1.accepted_percentage as invdisval %}
+                        {% settlement_value invexcval settlement.1.accepted_percentage as invexcval %}
+                        {% endif %}
+                         {% if invoice.invoice_exchange_rate == "N/A" %} {% if invoice.currency.currency_symbol == basecurreccy %}{% if inv.exchange_rate == '2' %}{{invoice.currency.currency_symbol}}{% else %}{{invoice.currency.currency_symbol}}{% endif %}  {{invdisval|addpreviewvalues:invexcval}} {% endif %} {% else %}{% if inv.exchange_rate == '2' %}{{invoice.currency.currency_symbol}}{% else %}{{invoice.currency.currency_symbol}}{% endif %} {{invdisval|addpreviewvalues:invexcval}} {% endif %}</td>
+
+                    {% endif %}
+                    {% if submit_type == 1 %}
+                    {% if invoice_module.exchangerate_confirm_status  == 3 %}
+                    <td> {% if inv.exchange_rate == '1' %}
+                      <input type="text" name="exchangerate" id="id_exchangerate" value= "{{invoice.invoice_exchange_rate}}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')" index='{{inv.exchange_rate}}' class="exchangeratecls form-control in-bor-clr if_not_satisfied" {% if invoice.invoice_exchange_rate == "N/A" %}readonly {% endif %}>
+                      {% endif %}
+                      {% if inv.exchange_rate == '2' %}
+                      <input type="text" name="exchangerate" id="id_exchangerate"  index='{{inv.exchange_rate}}'  class="exchangeratecls if_not_satisfied form-control in-bor-clr" {% if invoice.currency.currency_symbol == basecurreccy %}{% if invoice.invoice_exchange_rate == "N/A" %} readonly value= "{{invoice.invoice_exchange_rate}}"{% endif %}{% else %}{% if invoice.invoice_exchange_rate == "N/A" %}{% else %} value= "{{invoice.invoice_exchange_rate}}" {% endif %} {% endif %}>
+                      {% endif %} 
+                    </td>
+                      <td data-id="{{invoice.invoice_total_amount}}" class="final_amount if_not_satisfied" data="{% if inv.exchange_rate == '2' %}{% if forloop.parentloop.counter == 1 %}{{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}}{% endif %}{% else %}{{invoice.currency.currency_symbol}}{% endif %}">{% if inv.exchange_rate == '2' %}{{invoice.currency.currency_symbol}}{% else %}{{invoice.currency.currency_symbol}}{% endif %} 
+                        {% invoiceafterdiscount invoice.invoice_percentage invoicedetail.total_after_otherdetails invoice.invoice_exchange_rate as invdisval %}
+                        {% invoiceexclusivevalue invoice.invoice_percentage invoicedetail.total_exclusive_value invoice.invoice_exchange_rate as invexcval %}
+                        {% if settlement.0 %}
+                        {% settlement_value invdisval settlement.1.accepted_percentage as invdisval %}
+                        {% settlement_value invexcval settlement.1.accepted_percentage as invexcval %}
+                        {% endif %}
+                         {{invdisval|addpreviewvalues:invexcval}}</td>
+                    {% endif %}
+                    {% if invoice_module.exchangerate_confirm_status != 3 %}
+                    <td class="not_satisfied" style="display:none"> {% if inv.exchange_rate == '1' %}
+                      <input type="text" name="exchangerate" id="id_exchangerate" value= "{{invoice.invoice_exchange_rate}}" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')" index='{{inv.exchange_rate}}' class="exchangeratecls form-control in-bor-clr if_not_satisfied" {% if invoice.invoice_exchange_rate == "N/A" %}readonly {% endif %}>
+                      {% endif %}
+                      {% if inv.exchange_rate == '2' %}
+                      <input type="text" name="exchangerate" id="id_exchangerate"  index='{{inv.exchange_rate}}'  class="exchangeratecls if_not_satisfied form-control in-bor-clr" {% if invoice.currency.currency_symbol == basecurreccy %}{% if invoice.invoice_exchange_rate == "N/A" %} readonly value= "{{invoice.invoice_exchange_rate}}"{% endif %}{% else %}{% if invoice.invoice_exchange_rate == "N/A" %}{% else %} value= "{{invoice.invoice_exchange_rate}}" {% endif %} {% endif %}>
+                      {% endif %} </td>
+                      <td data-id="{{invoice.invoice_total_amount}}" class="final_amount not_satisfied"  style="display:none" data="{% if inv.exchange_rate == '2' %}{% if forloop.parentloop.counter == 1 %}{{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}}{% endif %}{% else %}{{invoice.currency.currency_symbol}}{% endif %}">{% if inv.exchange_rate == '2' %}{{invoice.currency.currency_symbol}}{% else %}{{invoice.currency.currency_symbol}}{% endif %} 
+                        {% invoiceafterdiscount invoice.invoice_percentage invoicedetail.total_after_otherdetails invoice.invoice_exchange_rate as invdisval %}
+                        {% invoiceexclusivevalue invoice.invoice_percentage invoicedetail.total_exclusive_value invoice.invoice_exchange_rate as invexcval %}
+                        {% if settlement.0 %}
+                        {% settlement_value invdisval settlement.1.accepted_percentage as invdisval %}
+                        {% settlement_value invexcval settlement.1.accepted_percentage as invexcval %}
+                        {% endif %}
+                         {{invdisval|addpreviewvalues:invexcval}}</td>
+                        {% endif %}
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                {% endfor %}
+                
+            </tbody>
+        </table>
+    </div>
+</div>
+</form>
+{% endblock %}

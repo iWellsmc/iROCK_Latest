@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/vendorcontract.css' %}">
+<div class="text-end">
+    <button class="btn btn-clr chck-tst waves-effect waves-float waves-light" ><a href="{% url 'projects:contractmasterlist'%}">Back</a></button>
+</div>
+
+<h3 class="from-head">Vendor Contract Details</h3>
+
+<div class="row justify-content-center">
+   
+    <div class="row">
+        <div class="col-3 col-md-1 col-lg-3"></div>
+        <div class="col-6 col-md-10 col-lg-6">
+            <h4 class="con-new-heading">Inclusive Tax</h4>
+            <!-- <div class="row">
+                {% for inclusive in inclusive_tax %}
+                    <div class="col-6">
+                        <div>{% if inclusive.tax_id == None%}Not Applicable{% else %}{{inclusive.tax.Tax_Name}}{% endif %}</div>
+                    </div>
+                    <div class="col-6">
+                        <div>
+                            {% for percentage in inclusive.id|taxwithpercentage %}
+                                {{percentage.taxpercentage}}%{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div> -->
+            
+                <table class="inc-tax">
+                    
+                {% for inclusive in inclusive_tax %}
+                <tr>
+                       
+                        <td class="clr-heading">{% if inclusive.tax_id == None%}Not Applicable{% else %}{{inclusive.tax.Tax_Name}}{% endif %}</td>
+                
+                
+                        
+                            {% for percentage in inclusive.id|taxwithpercentage %}
+                               <td> {% if percentage.taxpercentage %}{{percentage.taxpercentage}}%{% if not forloop.last %},{% endif %}{% else %}-{% endif %}</td>
+                            {% endfor %}
+                        </tr>  
+                {% endfor %}
+           
+                   
+            </table>
+            </div>
+            <div class="col-3 col-md-1 col-lg-3"></div>
+            </div>
+            <div class="row">
+        <div class="col-3 col-md-1 col-lg-3"></div>
+        <div class="col-6 col-md-10 col-lg-6">
+            <h4 class="con-new-heading">Exclusive Tax</h4>
+                    <table class="inc-tax">
+                {% for exclusive in exclusive_tax %}
+                    
+                            <tr>
+
+                        <td class="clr-heading">{% if exclusive.tax_id == None%}Not Applicable{% else %}{{exclusive.tax.Tax_Name}}{% endif %}</td>
+                    
+                    
+                        
+                            {% for percentage in exclusive.id|taxwithpercentage %}
+                               <td>{% if percentage.taxpercentage %}{{percentage.taxpercentage}}%{% if not forloop.last %},{% endif %}{% else %}-{% endif %}</td>
+                            {% endfor %}
+                        
+                    </tr>
+                {% endfor %}
+                        </table>
+            
+            <!-- <div class="row">
+                {% for exclusive in exclusive_tax %}
+                    <div class="col-6">
+                        <div>{% if exclusive.tax_id == None%}Not Applicable{% else %}{{exclusive.tax.Tax_Name}}{% endif %}</div>
+                    </div>
+                    <div class="col-6">
+                        <div>
+                            {% for percentage in exclusive.id|taxwithpercentage %}
+                                {{percentage.taxpercentage}}%{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div> -->
+        </div>
+        <div class="col-3 col-md-1 col-lg-3"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-3 col-md-1 col-lg-3"></div>
+        <div class="col-6 col-md-10 col-lg-6">
+            <h4 class="con-new-heading">Currency Split</h4>
+            <table class="view-vct-tbl">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Currency</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice_split in invoice_splits %}
+                        <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{invoice_split.currency.currency_symbol}}</td>
+                            <td>{{invoice_split.percentage}}%</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td></td>
+                            <td>---</td>
+                            <td>---</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>    
+        </div>
+        <div class="col-3 col-md-1 col-lg-3"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-3 col-md-1 col-lg-3"></div>
+        <div class="col-6 col-md-10 col-lg-6">
+            <h4 class="con-new-heading">Exchange Rate Term:<span class="time-of-clr">
+                {% if invoice_splits|length > 1%}
+                    {% for invoice_split in invoice_splits %}
+                        {% if forloop.last %}
+                            {% if invoice_split.exchange_rate == '1' %}
+                                At the Time of Invoice Submission
+                            {% else %}
+                                At the Time of Invoice Payment
+                            {% endif%}
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                Not Applicable
+                {% endif %}
+                </span></h4>
+        </div>
+        <div class="col-3 col-md-1 col-lg-3"></div>
+    </div>
+
+    <div class="row">
+        <div class="col-3 col-md-1 col-lg-3"></div>
+        <div class="col-6 col-md-10 col-lg-6">
+            <h4 class="con-new-heading">Payment Terms</h4>
+            <table class="view-vct-tbl">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Payment Type</th>
+                        <th>Days for Payment</th>
+                        <th>Payment Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment_term in vendor_payment_terms %}
+                        <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{payment_term.payment_name}}</td>
+                            <td>{{payment_term.payment_day}}</td>
+                            <td>{{payment_term.payment_percentage}}%</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td></td>
+                            <td>---</td>
+                            <td>---</td>
+                            <td>---</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>    
+        </div>
+        <div class="col-3 col-md-1 col-lg-3"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+{{ block.super }}
+
+<script>
+
+</script>
+
+{% endblock %}

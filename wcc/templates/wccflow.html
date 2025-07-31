@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+{% load static %}
+{% load wcc_custom_tags %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/WCC/wccflow.css' %}">
+ 
+<div>
+    <div class="row">
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+            <button type="button" class="btn btn-clr btn-master mr-0"><a href="{% url 'projects:projectwcc'%}">Back</a></button>
+        </div>
+    </div>
+
+    <h3 class="from-head">WCC Approval Workflow</h3>
+    
+
+
+    <form method="POST" name="wcc_flow_form" id="wccflowid">
+        {% csrf_token %}
+
+        <div class="d-flex mb-5">
+            <table class="wcc-name">
+                <tr>
+                    <td>Project</td>
+                    <td>:</td>
+                    <td>
+                        <input type="hidden" id="wcc_check" value="{{wcc_completion_data}}">
+                        <input type="hidden" name="project_userlog" value="{{project.projectname.name}}" id="project_user_log"/>
+                        {{project.projectname.name}}
+                    </td>
+                </tr>
+            </table>
+    
+            <table class="wcc-name">
+                <tr>
+                    <td>Level</td>
+                    <td>:</td>
+                    <td>
+                       
+                        <select name="level_type" class="form-control form-select level_cls">
+                            <option value="">--Select--</option>
+                            {% if wcc_data %}
+                                {% for level_type in level_types %}
+                                    <option value="{{level_type}}" {% if wcc_data.level_type == level_type %} selected {% endif %}>{{level_type|capfirst }}</option>
+                                {% endfor %}
+                            {% else %}
+                                {% for level_type in level_types %}
+                                    <option value="{{level_type}}">{{level_type|capfirst}}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </td>
+                </tr>
+            </table>
+    
+        </div>
+        <input type="hidden" id="project_hdn" value="{{project.id}}">
+        <select id="users_id" style="display: none;">
+            {% for user in users_list %}
+                <option value="{{user.user_uid}}">{{user.user_name}} {{user.user_lastname}}-{{user.user_designation_role}}</option>
+            {% endfor %}
+        </select>
+        <select id="wccroles_id" style="display: none;">
+            {% for wcc_role in wcc_roles %}
+                <option value="{{wcc_role.id}}">{{wcc_role.role_name}}</option>
+            {% endfor %}
+        </select>
+        <!-- Edit Starts Here-->
+        {% if wcc_data %}
+            <input type="hidden" id="wcc_flow_hdn" value="{{wcc_data.id}}">
+            <div class="invoice-appo-work">
+            <div class="row heading-border dd">
+                <div class="col-3 heading-name heading-border-col">Level for Approval Definition</div>
+                <div class="col-2 heading-name heading-border-col">Station</div>
+                <div class="col-2 heading-name heading-border-col">Role</div>
+                <div class="col-2 heading-name heading-border-col">No.of Users per Station(s)</div>
+                <div class="col-3 heading-name">Users</div>
+            </div>
+            <div class="row heading-border heading-border2">
+                <div class="col-12 level_div test1">
+                    {% get_wcc_data wcc_data.level_type wcc_data.id project.id as all_level_data %}
+                    <!-- Well Based Discipline and Well-->
+                    <!-- removed class mx-2 for well and well discipline-->
+                    {% if wcc_data.level_type == "well"%}
+                        {% for level_data in all_level_data %}
+                            <div class="row my-2"><div class="col-3 check-label">
+                                {% check_wcc_wellbased level_data.discipline_id wcc_data.id as datacount %}
+                                <input type="checkbox"  name="well_discipline" class="lvl_app_cls check_val{{level_data.discipline_id}} well_discipline_cls" {% if  datacount.0 > 0 %} checked {% endif %} value="{{level_data.discipline_id}}"><label>{{level_data.discipline_name}}-{{level_data.project_discipline}}-{{level_data.cluster}}</label>
+                            </div>
+                            <div class="col-9">
+                                {% if datacount.1 %}
+                                        <div class="row input-wid">
+                                            <div class="col-3 station">
+                                                <input type="hidden" name="hdnstation{{level_data.discipline_id}}" value="{{datacount.1.id}}">
+                                                <input type="text" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1')" name="station{{level_data.discipline_id}}" class="form-control station_cls" autocomplete="off" data_id="{{level_data.discipline_id}}" value="{{datacount.1.station}}" st_old_data="{{datacount.1.station}}">
+                                            </div>
+                                            <div class="row col-9 station_per_div">
+                                                {% get_station_data datacount.1.id True as station_datas %}
+                                                {% if station_datas %}
+                                                    {% for station in station_datas %}
+                                                    
+                                                    <div class="col-3">
+                                                    {% if datacount.1.station %}
+                                                        <input type="hidden" name="hdnstation_user{{level_data.discipline_id}}-{{forloop.counter0}}" value="{{station.id}}">
+                                                            <select name="station_role{{level_data.discipline_id}}-{{forloop.counter0}}" class="form-control role_cls">
+                                                                <option value="">--Select--</option>
+                                                                {% for wcc_role in wcc_roles %}
+                                                                    <option value="{{wcc_role.id}}" {% if station.role_id == wcc_role.id %} selected {% endif %}>{{wcc_role.role_name}}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                    {% endif %}
+                                                    </div>
+                                                    <div class="col-4">
+                                                    {% if datacount.1.station %}
+                                                        <input type="text" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1')" name="station_user{{level_data.discipline_id}}-{{forloop.counter0}}" class="form-control station_user_cls" autocomplete="off" data_id="{{forloop.counter0}}" level_id="{{level_data.discipline_id}}" value="{{station.station_user}}" old_data="{{station.station_user}}">
+                                                    {% endif %}
+                                                    </div>
+                                                    <div class="col-5 pr-0">
+                                                        {% get_station_users station.id True as usersdata %}
+                                                            {% for st_user in usersdata %}
+                                                                <div class="">
+                                                                    <select name="user{{level_data.discipline_id}}-{{forloop.parentloop.counter0}}" class="form-control user_cls" autocomplete="off">
+                                                                        <option value="">--Select--</option>
+                                                                    {% for user in users_list %}
+                                                                        <option value="{{user.user_uid}}" {% if user.user_uid == st_user.user.id  %} selected {% endif %}>{{user.user_name}} {{user.user_lastname}}-{{user.user_designation_role}}</option>
+                                                                    {% endfor %}
+                                                                    </select>
+                                                                </div>
+                                                            {% endfor %}
+                                                    </div>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                            </div>
+                            </div>
+
+                            {% for well_data in level_data.well_datas %}
+                                {% check_wcc_flowdata wcc_data.level_type well_data.id wcc_data.id as datacount %}
+                                <div class="row my-2">
+                                    <div class="col-3 check-label">
+                                    <input type="checkbox"  name="level" check_val="{{level_data.discipline_id}}" class="lvl_app_cls check_well_dis well_dis_id{{level_data.discipline_id}}"{% if  datacount.0 > 0 %} checked {% endif %}  value="{{well_data.id}}"><label>{{well_data.wellname__well_subname}}</label>
+                                    </div>
+                                    <div class="col-9">
+                                        {% if datacount.1 %}
+                                            <div class="row input-wid">
+                                                <div class="col-3 station">
+                                                    <input type="hidden" name="hdnstation{{well_data.id}}" value="{{datacount.1.id}}">
+                                                    <input type="text" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1')" name="station{{well_data.id}}" class="form-control station_cls" autocomplete="off" data_id="{{well_data.id}}" value="{{datacount.1.station}}" st_old_data="{{datacount.1.station}}">
+                                                </div>
+                                                <div class="row col-9 station_per_div">
+                                                    {% get_station_data datacount.1.id True as station_datas %}
+                                                    {% if station_datas %}
+                                                        {% for station in station_datas %}
+                                                        <div class="col-3">
+                                                        {% if datacount.1.station  %}
+                                                            <input type="hidden" name="hdnstation_user{{well_data.id}}-{{forloop.counter0}}" value="{{station.id}}">
+                                                                <select name="station_role{{well_data.id}}-{{forloop.counter0}}" class="form-control role_cls">
+                                                                    <option value="">--Select--</option>
+                                                                    {% for wcc_role in wcc_roles %}
+                                                                        <option value="{{wcc_role.id}}" {% if station.role_id == wcc_role.id %} selected {% endif %}>{{wcc_role.role_name}}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                        {% endif %}
+                                                        </div>
+                                                        <div class="col-4">
+                                                        {% if datacount.1.station  %}
+                                                            <input type="text" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1')" name="station_user{{well_data.id}}-{{forloop.counter0}}" class="form-control station_user_cls" autocomplete="off" data_id="{{forloop.counter0}}" level_id="{{well_data.id}}" value="{{station.station_user}}" old_data="{{station.station_user}}">
+                                                        {% endif %}
+                                                        </div>
+                                                        <div class="col-5 pr-0">
+                                                            {% get_station_users station.id True as usersdata %}
+                                                                {% for st_user in usersdata %}
+                                                                <div class="">
+                                                                    {% if datacount.1.station  %}
+                                                                    
+                                                                        <select name="user{{well_data.id}}-{{forloop.parentloop.counter0}}" class="form-control user_cls" autocomplete="off">
+                                                                            <option value="">--Select--</option>
+                                                                        {% for user in users_list %}
+                                                                            <option value="{{user.user_uid}}" {% if user.user_uid == st_user.user.id  %} selected {% endif %}>{{user.user_name}} {{user.user_lastname}}-{{user.user_designation_role}}</option>
+                                                                        {% endfor %}
+                                                                        </select>
+                                                                    
+                                                                    {% endif %}
+                                                                </div>
+                                                                {% endfor %}
+                                                        </div>
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                    {% else %}
+                    <!-- Discipline and cluster Edit-->
+                    {% for level_data in all_level_data %}
+                            <div class="row my-2">
+                                <div class="col-3 check-label">
+                                    {% check_wcc_flowdata wcc_data.level_type level_data.id wcc_data.id as datacount %}
+                                    <input type="checkbox" name="level" class="lvl_app_cls" {% if  datacount.0 > 0 %} checked {% endif %} value="{{level_data.id}}">
+                                    <label>{{level_data.name}}{% if wcc_data.level_type == "discipline" %}- {% if level_data.project_discipline__project_discipline == "1"%}Green Field Development{% elif level_data.project_discipline__project_discipline == "2"%}Brown Field Development{% else%}Others{% endif %}-{{level_data.project_discipline__cluster__clustersubname__cluster_subname}}{% endif %}</label>
+                                    
+                                </div>
+                                <div class="col-9">
+                                    {% if datacount.1 %}
+                                        <div class="row input-wid">
+                                            <div class="col-3 station">
+                                                <input type="hidden" name="hdnstation{{level_data.id}}" value="{{datacount.1.id}}">
+                                                <input type="text" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1')" name="station{{level_data.id}}" class="form-control station_cls" autocomplete="off" data_id="{{level_data.id}}" value="{{datacount.1.station}}" st_old_data="{{datacount.1.station}}">
+                                            </div>
+                                            <div class="row col-9 station_per_div pr-0">
+                                                {% get_station_data datacount.1.id True as station_datas %}
+                                                {% if station_datas %}
+                                                    {% for station in station_datas %}
+                                                    <div class="col-3">
+                                                        <input type="hidden" name="hdnstation_user{{level_data.id}}-{{forloop.counter0}}" value="{{station.id}}">
+                                                        <select name="station_role{{level_data.id}}-{{forloop.counter0}}" class="form-control role_cls">
+                                                            <option value="">--Select--</option>
+                                                            {% for wcc_role in wcc_roles %}
+                                                                <option value="{{wcc_role.id}}" {% if station.role_id == wcc_role.id %} selected {% endif %}>{{wcc_role.role_name}}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <input type="text" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1')" name="station_user{{level_data.id}}-{{forloop.counter0}}" class="form-control station_user_cls" autocomplete="off" data_id="{{forloop.counter0}}" level_id="{{level_data.id}}" value="{{station.station_user}}" old_data="{{station.station_user}}">
+                                                    </div>
+                                                    <div class="col-5 pr-0">
+                                                        {% get_station_users station.id True as usersdata %}
+                                                            {% for st_user in usersdata %}
+                                                                <div class="">
+                                                                    <select name="user{{level_data.id}}-{{forloop.parentloop.counter0}}" class="form-control user_cls" autocomplete="off">
+                                                                        <option value="">--Select--</option>
+                                                                    {% for user in users_list %}
+                                                                         <option value="{{user.user_uid}}" {% if user.user_uid == st_user.user.id  %} selected {% endif %}>{{user.user_name}} {{user.user_lastname}}-{{user.user_designation_role}}</option>
+                                                                    {% endfor %}
+                                                                    </select>
+                                                                </div>
+                                                            {% endfor %}
+                                                    </div>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+        <!-- Edit Ends Here-->
+        {% else %}
+        <!-- Create Starts Here-->
+        <div class="invoice-appo-work">
+            <div class="row heading-border">
+                <div class="col-3 heading-name heading-border-col">Level for Approval Definition</div>
+                <div class="col-2 heading-name heading-border-col">Stations</div>
+                <div class="col-2 heading-name heading-border-col">Role</div>
+                <div class="col-2 heading-name heading-border-col">No.of Users per Station(s)</div>
+                <div class="col-3 heading-name">Users</div>
+            </div>
+            <div class="row heading-border heading-border2">
+                <div class="col-12 level_div p-0 test">
+
+                </div>
+            </div> 
+            </div>
+        <!-- Create Ends Here-->
+        {% endif %}
+        <div class="text-center btn-cls">
+            <!-- <button type="submit" id="draft_id" class="btn btn-clr text-left draft-cls" name="submit_type" value="0">Save as Draft</button> -->
+            <button type="submit" id="save_id" value="1" class="btn btn-clr text-left save-cls">Save</button>
+        </div>
+    </form>
+
+</div>
+        
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script src="{% static 'js/wcc/wccflow.js' %}"></script>
+{% endblock %}

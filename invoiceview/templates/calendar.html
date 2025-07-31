@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/invoice_calendar.css' %}">
+<div class="modal fade" id="eventsModal" tabindex="-1" aria-labelledby="eventsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="eventsModalLabel">Events on Date</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Events will be added here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">View All</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<div id='calendar'></div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+var events = [
+  {% for event in events %}
+  {
+    title: '{{ event.title }}',
+    start: '{{ event.start|date:"Y-m-d" }}', 
+    end: '{{ event.end|date:"Y-m-d" }}', 
+    className: 'custom-event',
+    extraParam1: '{{ event.invoice_id}}',
+    extraParam2: '{{ event.module_name}}',
+
+  },
+  {% endfor %}
+];
+</script>
+<script type="text/javascript" src="{% static 'js/invoice/calendar.js' %}"></script>
+
+
+
+{% endblock %}
+
+
+
+
+

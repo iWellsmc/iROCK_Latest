@@ -1,0 +1,203 @@
+.head-inv-pre {
+    color: #AF2B50 !important;
+    font-size: 1.5rem !important;
+    text-align: left !important;
+}
+
+.btn-space {
+    margin-bottom: 3px !important;
+}
+
+.color-btn button {
+    width: 100% !important;
+}
+
+.dark_green {
+    background-color: #607e4b !important;
+}
+
+.beige {
+    background-color: #c55e0b !important;
+}
+
+.rose {
+    background-color: #bd2753 !important;
+    /* background-color: #8faadc !important; */
+}
+
+.violet {
+    background-color: #9C27B0 !important;
+}
+
+
+/********** Approval Table **********/
+.calbtn {
+    width: 150px;
+    margin-bottom: 5px;
+}
+
+.check-deductions label {
+    color: #AF2B50;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 0px;
+}
+.check-additions label {
+    color: #AF2B50;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 0px;
+}
+
+.head-inv-pre-black {
+    color: #000 !important;
+    /* color: #AF2B50 !important; */
+    font-size: 2rem !important;
+}
+
+.approval-head {
+    color: #000;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 10px auto 0px !important;
+}
+
+.coversheet-approval-table {
+    /* width: 120vw; */
+    width: 100%;
+    /* width: 70%; */
+    border: 1px solid #c7c7c7;
+    /* border: 1px solid #000; */
+}
+
+/* .set_width_cls{
+    width: 120vw !important;
+} */
+
+.coversheet-approval-table th {
+    color: var(--irock-green);
+    /* color: #AF2B50; */
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.coversheet-approval-table th,
+td {
+    padding: 10px 10px;
+    border: 1px solid #c7c7c7 !important;
+    /* border: 1px solid #000 !important; */
+    font-size: 16px;
+}
+
+.coversheet-approval-table td {
+    color: #000;
+    font-size: 16px;
+    /* font-weight: 500 !important; */
+}
+
+.coversheet-approval-table-bold {
+    font-weight: 500 !important;
+}
+
+.br-none br {
+    display: none !important;
+}
+
+.details {
+    /* border: 1px solid #000; */
+    border: 1px solid #c7c7c7;
+    border-bottom: none;
+    text-align: center;
+    width: 100%;
+}
+
+.table-red td {
+    color: red;
+}
+
+.table-black td {
+    color: #000;
+    font-weight: 600 !important;
+}
+
+.Okay-red {
+    color: red;
+}
+
+.other_deduction input {
+    color: red;
+}
+.other_additions input {
+    color: rgb(0, 0, 0);
+}
+.other_deduction input[type="text"] {
+    text-transform: capitalize;
+}
+
+.other_additions input[type="text"] {
+    text-transform: capitalize;
+}
+
+/* .coversheet-approval-table td:nth-child(2) {
+    color: #891737;
+    font-weight: 600;
+}
+.coversheet-approval-table td:nth-child(3) {
+    color: #891737;
+    font-weight: 600;
+}
+td.gross {
+    color: #000 !important;
+}
+.net_pay{
+    color: #000 !important;
+    font-weight: 600;
+}
+.payment_confirm{
+    background-color: #607e4b !important;
+} */
+
+/********** Comment Pop-up **********/
+.comment-head {
+    background-color: #FFE9E9 !important;
+    border: none !important;
+}
+
+.comment-head button {
+    padding: 0px !important;
+}
+
+.comment-head span {
+    font-size: 28px;
+    color: #96193a !important;
+    /* padding: 0px 10px !important; */
+    line-height: 0 !important;
+    /* outline: 1px solid #96193a;
+    outline-offset: -10px; */
+    border-radius: 25px;
+    /* padding: 0px 12px 5px 12px !important; */
+    padding: 0px 12px 5.8px 12px !important;
+}
+
+.comment-body {
+    background-color: #FFE9E9 !important;
+}
+
+.comment-foot {
+    background-color: #FFE9E9 !important;
+    border: none;
+    justify-content: center;
+    padding: 10px 15px !important;
+}
+
+.comment-foot button {
+    background-color: #BD2753 !important;
+    margin: 0px !important;
+}
+
+.comment-foot button:hover {
+    box-shadow: 0 8px 10px -8px #8D1636 !important;
+}
+
+/********** Comment Pop-up **********/

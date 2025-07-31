@@ -1,0 +1,162 @@
+#myModal {
+    overflow-y: hidden;
+  }
+  .modal-header {
+    cursor: move;
+  }
+
+  /********** exchange rate **********/
+  .head-inv-pre {
+    color: #AF2B50 !important;
+    font-size: 1.5rem !important;
+    text-align: left !important;
+}
+
+.btn-space {
+    margin-bottom: 3px !important;
+}
+
+.color-btn button {
+    width: 100% !important;
+}
+
+.dark_blue  {
+    background-color: #0a146e !important;
+}
+
+.chocolate_color {
+  background-color: #bf9000 !important;
+}
+
+.dark_green {
+    background-color: #607e4b !important;
+}
+
+.rose {
+    background-color: #bd2753 !important;
+    /* background-color: #8faadc !important; */
+}
+
+.beige {
+  background-color: #c55e0b !important;
+}
+
+.violet {
+  background-color: #9C27B0 !important;
+}
+
+
+.captions-head {
+  background-color: #FFE9E9 !important;
+  border: none !important;
+  padding: 0rem 1rem;
+}
+
+.btn-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.btn-flex h6 {
+  margin-bottom: 0px !important;
+}
+
+.btn-flex button {
+  width: 150px;
+}
+
+.Okay-red {
+  color: red;
+}
+
+.yes-no-btns {
+  text-align: center;
+}
+
+.yes-no-btns button {
+  margin: 0px 5px;
+}
+  /********** exchange rate **********/
+
+
+  /********** exchange rate popup **********/
+.large-pop {
+      max-width: 1000px;
+}
+
+.gen-body iframe {
+      width: 100%;
+      height: 65vh !important;
+}
+
+.ui-draggable-handle.show {
+  /* background-color: rgba(34, 41, 47, 0.45) !important; */
+}
+  /********** exchange rate popup **********/
+
+
+  /********** Comment Pop-up **********/
+.comment-head {
+  background-color: #FFE9E9 !important;
+  border: none !important;
+}
+
+.comment-head button {
+  padding: 0px !important;
+}
+
+.comment-head span {
+  font-size: 28px;
+  color: #96193a !important;
+  /* padding: 0px 10px !important; */
+  line-height: 1 !important;
+  font-weight: 600;
+  /* outline: 1px solid #96193a;
+  outline-offset: -10px; */
+  border-radius: 25px;
+  /* padding: 0px 12px 5px 12px !important; */
+  padding: 0px 12px 5.8px 12px !important;
+}
+
+.comment-body {
+  background-color: #FFE9E9 !important;
+}
+
+.comment-foot {
+  background-color: #FFE9E9 !important;
+  border: none;
+  justify-content: center;
+  padding: 10px 15px !important;
+}
+
+.comment-foot button {
+  background-color: #BD2753 !important;
+  margin: 0px !important;
+}
+
+.comment-foot button:hover {
+  box-shadow: 0 8px 10px -8px #8D1636 !important;
+}
+
+.exchan-flex{
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.curr_btn {
+  width: 170px !important;
+  height: 30px;
+}
+
+.calc_close{
+  border: none;
+    background: transparent;
+}
+.error-border {
+  border: 1px solid red;
+}
+
+/********** Comment Pop-up **********/

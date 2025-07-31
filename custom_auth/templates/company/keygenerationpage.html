@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+{% block content %} 
+{% load static %}            
+{% load custom_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/poa_login/companies.css' %}">
+
+<div class="row">
+    <div class="col-12">
+        <a  href="{% url 'custom_auth:companyview' id=data.id %}" class="btn btn-clr btn-outline-danger mr-1 mb-1 waves-effect waves-light float-left">Back</a>
+
+    </div>
+</div>
+<div class="card-title">
+                            
+    <h1 class="reg-head text-center pay-ent">Payment Details</h1>
+</div>
+
+
+
+<div class="card-content ">
+
+<div class="card-body pt-0">
+    <form action="" method="post" name="registerform" id="paymentform" enctype="multipart/form-data" class="reg-form field-spacing">
+     {% csrf_token %}
+
+     <div class="row">
+        <div class="col-3">
+            
+        </div>
+        <div class="col-6">
+            <div class="col-12">
+                <input type="hidden" id="company_id" value="{{pk}}">
+                <input type="hidden" name="role" value="2"> 
+                <label class="py-hd">Name Of Company</label>   <input type="text" class="form-control" name="company_name" id="inputCompanyName" value="{{data.company_name}}" readonly> 
+                <input type="hidden" name="companyid" value="{{data.id}}">
+            </div>     
+
+            <div class="col-12">
+                <label class="py-hd">Currency</label> 
+                <Select  name="currency" class="form-control" id="currency">
+                    <option value="">--Select--</option>
+                    {%for curr in currency %}
+                        <option name="currencyy" class="currencyy" value="{{curr.id}}" data-id="{{curr.currency}}">{{curr.currency}}&nbsp-&nbsp{{curr.currency_symbol}}</option>
+                    {%endfor%}  
+                </Select>
+            </div>
+
+            <div class="col-12">
+                <label class="py-hd">Amount</label>   <input type="text" class="form-control" name="amount" id="amountid"> 
+            </div>
+            
+            <div class="col-12">
+                <label class="py-hd">Date</label>   <input type="text" class="form-control dateformat-cls" name="date" id="date" readonly> 
+            </div>
+
+            <div class="col-12">
+                <label class="py-hd">Invoice Number</label><input type="text" class="form-control invoice-cls" name="invoicenum" id="invoicenum"> 
+            </div>
+
+            <div class="col-12">
+               <table id="file_id">
+                    <thead>
+                            <tr>
+                            <th><label class="py-hd">File</label></th>
+                            </tr>
+                    </thead>
+                    <tbody>
+                            <tr>
+                                    <td class="wid-tx"><input type="file" autocomplete="off"  accept="image, .png, .jpeg, .pdf, .jpg" class="form-control filesize"  data-error="1" name="file" id="fileid0"><br><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></td>
+                                    <td class="same-line-tx"><button id='add' class='btn btn-clr add-btn pha-sebtn' type='button' value='Add'> <i class="fa fa-plus"></i> </button>  <button id="delete" class="btn btn-clr delete-btn" type="button" value="delete"> <i class="fa fa-minus"></i> </button> </td>
+                            </tr>
+                    </tbody>    
+                </table>
+            </div>
+
+            <div class="gen-submid"><input type="submit" id="submit" class="btn btn-inline mb-50  btn-sublic submitcls"></input></div>
+        </div>
+
+        <div class="col-3">
+            
+        </div>
+    </div> 
+
+     
+
+     
+     <!-- <div class="col-md-12 float-center top-spacing"> -->
+         <!-- <a href="{% url 'custom_auth:login' %}"  class="btn btn-inline mb-50 btn-color">Back</a> -->
+         <!-- <button type="button" class="bbtn btn-inline mb-50 btn-color" data-toggle="modal" data-target="#myModal">Generate</button> -->
+      <!-- </div> -->
+
+    </form>
+</div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" ></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" ></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+ <script>
+
+
+
+
+$(document).ready(function() {
+    $("#paymentform").validate();
+ });
+
+window.addEventListener('load', (event) => {
+$(".dateformat-cls").datepicker({
+     dateFormat: 'dd-M-yy' ,
+     maxDate: new Date(),
+     changeMonth: true,
+     changeYear: true,
+     yearRange: '1900:+0',
+
+});
+
+});
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+$(document).on('change','#amountid',function(){
+    var val=$(this).val()
+    if (val.indexOf(',') !== -1)
+        {
+        var val=val.replace(/,/g, "");
+        }
+    $(this).val(numberWithCommas(val))
+        if($(this).val().indexOf('.')!=-1){         
+                if($(this).val().split(".")[1].length > 2){                
+                    if( isNaN( parseFloat( this.value ) ) ) return;
+                    this.value = parseFloat(this.value).toFixed(2);
+                }  
+            }            
+            return this; //for chaining
+})
+
+
+$.validator.addMethod(
+    "regex",
+    function(value, element, regexp) {
+        return this.optional(element) || /^[0-9.,]+$/.test(value);
+    },
+    "Please check your input."
+);
+
+
+
+
+var ids=1
+$(document).on('click','#add',function(){
+    var html ='<tr><td class="wid-tx"><input type="file" autocomplete="off"  class="form-control filesize"  data-error="2" name="file" accept="image, .png, .jpeg, .pdf, .jpg" id="fileid'+ids+'"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></td><td class="same-line-tx"><button id="add" class="btn btn-clr add-btn pha-sebtn" type="button" value="Add"> <i class="fa fa-plus"></i> </button>  <button id="delete" class="btn btn-clr delete-btn" type="button" value="delete"> <i class="fa fa-minus"></i></button></td></tr>'
+    $(this).closest('table').append(html)
+    ids ++;
+
+})
+
+
+$(document).on('click','#delete',function(){
+    var table_len=$('#file_id tbody tr').length
+    if (table_len > 1){
+        $(this).closest('tr').remove()
+    }
+
+})
+
+// $(document).on('change','#invoicenum',function(e){
+//     $(this).next('span').remove()
+//     var val=$(this).val()
+//     var currentelement=$(this)
+//     $.ajax({
+//             type: 'GET',
+//             url: '/checkinvoicenumduplicate',
+//             data: {"invoice_num":val},
+//             success: function (response) {
+//                 console.log(response)
+//                 if(response.data == 'exists'){
+//                     currentelement.next('span').remove()
+//                     currentelement.after('<span class="waring-err">Invoice Number Already Exists</span>')       
+//                     // e.preventDefault();          
+//                     $('#submit').prop('disabled',true)
+//                 }
+//                 else{
+//                     currentelement.next('span').remove()
+//                     $('#submit').prop('disabled',false)
+//                     // currentelement.removeClass("error")
+
+
+                    
+//                 }
+//             }
+//     })
+// })
+
+
+$('form[id="paymentform"]').validate({
+    rules: {
+        amount:{required:true,
+            regex: /^[0-9,]+$/,
+        },
+        date: 'required',
+        currency: 'required',
+        invoicenum: {
+            required: true,
+        remote:{
+            type: "GET",
+            url:"/checkinvoicenumduplicate",
+            data:{
+                invoice_num: function() {
+                    return $("#invoicenum").val();
+                }},
+            dataFilter: function(data) {
+                     let result = JSON.parse(data);
+                     console.log('result',result)
+                     let status=result.data
+                     console.log('status',status)
+                  if (status == 'exists') {
+                    return false
+                  }
+                  if (status=='success'){
+                    return true
+                  }
+                  }
+            
+        },  
+        },
+        file:'required',
+    },
+    messages: {
+        amount: {required:'This Field is Required',
+                regex:'Accept Only Numbers'
+        },
+        date: 'This Field is Required',
+        currency: 'This Field is Required',
+        invoicenum: {
+            required:"This Field is Required",
+            remote:'Invoice Number Already Exists',
+        },
+        file:'This Field is Required'
+    },
+    submitHandler: function(form) {
+        $('#submit').attr('disabled','disabled');
+        form.submit();
+
+    }
+  });
+</script> 
+
+
+{% endblock %}

@@ -1,0 +1,1169 @@
+{% extends "base.html" %}
+{% load InvoiceGuardTags %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href='/static/assets/css/invoice_process/company-setting.css'>
+
+<div class="row">
+  <div class="col-12 text-end">
+      <a class="btn btn-clr onClass" href="{% url 'InvoiceGuard:signatory-view-form' %}">Back</a>
+  </div>
+</div>
+
+<form method="post" name="main" class="mainform">
+  {% csrf_token %}
+  <h4 class="from-head"> Add/Edit - Financial Delegation of Authority</h4>
+   
+<!-- <div class="row">
+  <div class="col-1">
+    Set Signatory
+  </div>
+  <div class="col-3">
+    <select class="form-control set_signatory" id="set_signatory" name="set_signatory">
+      <option value="">--- Select ----</option>
+      <option value="1">Company Level</option>
+      <option value="2">Project Level</option>
+    </select>
+  </div>
+</div> -->
+
+<table class="list_signatories">
+  <tr>
+    <td>
+      <label>Select Financial Delegation of Authority</label>
+    </td>
+    <td>:</td>
+    <td>
+      <select class="set_signatory" id="set_signatory" name="set_signatory">
+        <option value="">--- Select ----</option>
+        <option value="1">Company Level</option>
+        <option value="2">Project Level</option>
+      </select>
+    </td>
+  </tr>
+</table>
+
+<div class="company_signatory invoice_project css-div" style="display:none;">
+  <h4 class="from-head">Company - Financial Delegation  of Authority</h4>
+  <div class="row">
+    <div class="col-lg-7 col-md-3">
+    </div>
+    <div class="col-lg-5 col-md-9">
+      <button class="btn btn-clr btn-master add-without-invoice mr-0">With Out Invoice Amount</button>
+      <button class="btn btn-clr btn-master add-with-invoice">With Invoice Amount</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      
+      <div class="sign-table-con table-responsive">
+      <table class="table settings-data-list-view data-list-view css-table" id="master_project_list_company">
+
+        <thead>
+          <tr>
+            <th class="">Currency</th>
+            <th class="">From Invoice Amount</th>
+            <th class="">To Invoice Amount</th>
+            <th class="nos-sig"><p>No of Signatories</p></th>
+            <th class="">Users</th>
+          </tr>
+        </thead>
+
+        <tbody class="table-list">
+          {% if company_signatory_count == 0 %}
+          <tr class="current_row">
+            <input type="hidden" name="newtr" value="new">
+            <input type="hidden" name="new_invoice_type1" value="1">
+            <td class="add-sign">
+              <div class='align_items'>
+              {% comment %} <div class="add-sign"> {% endcomment %}
+              <button id='add' class='btn btn-clr add-btn pha-sebtn mt-3 add' type='button' value='Add'> <i class="fa fa-plus"></i> </button> 
+              <button id="delete" data-id="1" class="mt-3 btn btn-clr delete-btn delete delete_new_row" type="button" value="delete"> <i class="fa fa-minus"></i> </button>
+              <select class="form-control currency" id="currency-id" name="new_currency1">
+              <option value="">--- Select Currency ----</option>
+              {% for countries in currency %}
+                <option data-id="{{currency.id}}" value="{{countries.id}}">{{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}})</option>
+              {% endfor %}
+              </select>
+            </div>
+            </td>
+            <td class="from-invoice"><input type="text" class="min_amountn form-control" name="new_min_amount1" oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))">  </td>
+            <td class="To-Invoice"><input type="text" class="max_amountn form-control" name="new_max_amount1" oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))"></td>
+            <td class="small-td">
+              <input type="text" class="no_of_users form-control" name="no_of_users" data-id="1" value="2" readonly>
+            </td>
+            <td class="user-list">
+              <div class="row">
+              <div class="col-12">
+              <select class="form-control taxtypecls signatory-user" id="sign-user-id" name="new_newuser1" class="signatory-user-id">
+                <option value="">--- Select Primary User ----</option>
+                {% for users in user %}
+                  <option data-id="1" value="{{users.id}}">{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>
+                {% endfor%}
+              </select>
+              </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+              <select class="form-control taxtypecls signatory-user" id="sign-user-id" name="new_newuser1" class="signatory-user-id">
+                <option value="">--- Select Secondary User ----</option>
+                {% for users in user %}
+                  <option data-id="1" value="{{users.id}}">{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>
+                {% endfor%}
+              </select>
+              </div>
+              </div>
+              {% comment %} <div class="col-2 user-list-add-btn">
+                <button class='btn btn-clr add-btn pha-sebtn addnewuser' data-id="1" type='button' value='Add'> <i class="fa fa-plus"></i> </button> 
+                {% if forloop.counter > 1 %}
+                <button id="delete-user" class="mt-3 btn btn-clr desc-count delete-btn" data-id="1" type="button" value="delete"> <i class="fa fa-minus"></i> </button>
+                {% endif %}
+              </div> {% endcomment %}
+              <!-- <div class="col-3"></div> -->
+            </div>
+            </td>
+            
+          </tr>
+          {% else %}
+          {%for signatory in company_signatory %}
+            <!-- crfs token -->
+          <tr>
+            <input type="hidden" name="signatory_id" value="{{signatory.id}}">
+            <input type="hidden" name="invoice_type{{signatory.id}}" class="" value="{{signatory.invoice_type}}">
+            <td class="add-sign">
+              <div class='align_items'>
+                {% if signatory.invoice_type == '1' %}
+                  <button id='add' class='btn btn-clr add-btn pha-sebtn mt-3 add' type='button' value='Add'> <i class="fa fa-plus"></i> </button>
+                {% endif %}
+                <button id="delete" data-id="{{signatory.id}}" class="mt-3 btn btn-clr delete-btn delete delete-saved-tr" type="button" value="delete"> <i class="fa fa-minus"></i> </button>
+                <!-- <button id="Edit" class="btn btn-clr add-btn pha-sebtn mt-3" type="button">Edit</button>
+                <button id="Save" class='btn btn-clr add-btn pha-sebtn mt-3' type="submit">Save</button>  -->
+            
+              <select class="form-control currency disable {% if signatory.invoice_type != '1' %}without-invoice{% endif %}" id="currency-id{{signatoryuser.currency.id}}" name="currency{{signatory.id}}" class="signatory-user-id">
+                <option value="">--- Select Currency ----</option>
+                {% for countries in currency %}
+                  <option data-id="{{currency.id}}" value="{{countries.id}}" {% if countries.id == signatory.currency.id %} selected {% endif %}>{{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}})</option>
+                {% endfor %}
+              </select>
+            </div>
+            </td>
+            <td class="from-invoice"><input type="text" class="min_amountn form-control disable" name="min_amount{{signatory.id}}" value="{{signatory.min_amount|add_seperator|default_if_none:''}}" {{signatory.min_amount|default_if_none:'readonly'}}></td>
+            <td class="To-Invoice"><input type="text" class="max_amountn form-control disable" name="max_amount{{signatory.id}}" value="{{signatory.max_amount|add_seperator|default_if_none:''}}" {{signatory.max_amount|default_if_none:'readonly'}}></td>
+            <td class="small-td">
+              <input type="text" class="no_of_users form-control" name="no_of_users" data-id="{{signatory.id}}" value="2" readonly>
+            </td>
+            <td class="user-list">
+              {%for signatoryuser in signatory|SignatoryUser %}
+              <div class="row">
+              <div class="col-12">
+              <select class="form-control taxtypecls disable signatory-user user-comp" id="sign-user-id{{signatoryuser.id}}" name="user{{signatoryuser.id}}" class="signatory-user-id">
+                <option value="">--- Select {% if forloop.counter == 1 %}Primary{%else%}Secondary{% endif %} User ----</option>
+                {% for users in user %}
+                  <option data-id="{{signatoryuser.id}}" value="{{users.id}}" {% if users.id == signatoryuser.user.id %} selected {% endif %}>{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>
+                {% endfor %}
+              </select>
+              </div>
+              {% comment %} <div class="col-2 user-list-add-btn">
+                {% if forloop.counter == 1 %}
+                <button class='btn btn-clr add-btn pha-sebtn adduser m-0' data-id="{{signatory.id}}" type='button' value='Add'> <i class="fa fa-plus"></i> </button> 
+                {% endif %}
+                {% if forloop.counter > 1 %}
+                <button id="delete-user" class="btn btn-clr desc-count delete-btn" data-id="{{signatoryuser.id}}" type="button" value="delete"> <i class="fa fa-minus"></i> </button>
+                {% endif %}
+              </div> {% endcomment %}
+              <!-- <div class="col-3"></div> -->
+            </div>
+              {% endfor %}
+            </td>
+            
+          </tr>
+          {% endfor %}
+          {% endif %}
+          </tbody>
+      </table>
+    </div>
+     
+    </div>
+  </div>
+
+</div>
+
+<!-- <div class="row select_project project_sign" style="display:none;">
+  <div class="col-1">
+    Select Project:
+  </div>
+  <div class="col-2">
+    <select class="form-control" name="get_project" id="get_project">
+      <option value="">-- Select --</option>
+      {% for project in projects %}
+      <option value="{{project.id}}">{{project}}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div> -->
+
+<table class="select_project project_sign list_signatories" style="display:none;">
+  <tr>
+    <td>Select Project</td>
+    <td>:</td>
+    <td>
+      <select class="" name="get_project" id="get_project">
+        <option value="">-- Select --</option>
+        {% for project in projects %}
+        <option value="{{project.id}}">{{project}}</option>
+        {% endfor %}
+      </select>
+    </td>
+  </tr>
+</table>
+
+  <div class="project_sign pss-div" style="display:none;">
+    <h4 class="from-head">Project - Financial Delegation  of Authority</h4>
+    <div class="row">
+      <div class="col-lg-7 col-md-3"></div>
+      <div class="col-lg-5 col-md-9">
+        <button class="btn btn-clr btn-master add-without-invoice mr-0">With Out Invoice Amount</button>
+        <button class="btn btn-clr btn-master add-with-invoice">With Invoice Amount</button>
+      </div>
+    </div>
+    
+    <div class="pro-sing-sett">
+    <table class="table settings-data-list-view data-list-view css-table" id="master_project_list_project">
+      <thead>
+        <tr>
+          <th class="">Currency</th>
+          <th class="">From Invoice Amount</th>
+          <th class="">To Invoice Amount</th>
+          <th class="nos-sig"><p>No of Signatories</p></th>
+          <th class="">Users</th>
+        </tr>
+      </thead>
+      <tbody class="table-list newtrrow">
+      </tbody>          
+      </table>
+      </div>
+  </div>
+  
+  <div class="text-center">
+    <button id="mainsave" class='btn btn-clr add-btn' type="submit">Save</button> 
+
+</form>
+
+{% endblock%}
+{% block scripts %}
+{{ block.super }}
+<script>
+  company_signatory_count = '{{company_signatory_count}}'
+  signatoryuser_currency_id = '{{signatoryuser.currency.id}}'
+  var csrf_token = '{{csrf_token}}'
+</script>
+<script type="text/javascript" src="{% static 'js/invoiceguard/add_update_signatory.js' %}"></script>
+<script>
+  let new_val=0
+  let signatory=0
+  let table_row=''
+  let currency=''
+  let mini_amount=''
+  let maxi_amount=''
+  let invoice_type=''
+  let user=''
+  let minimum_amount=''
+  let maximum_amount=''
+  let minimum_amountn=''
+  let maximum_amountn=''
+  let check_currency=''
+  let currency_type=''
+  let level_type=0
+  $(document).on('change','.set_signatory',function(){
+    selected_val= $(this).val() 
+    if(selected_val == '1'){
+      table_row='newtr'
+      signatory=1
+      currency='new_currency'
+      mini_amount='new_min_amount'
+      maxi_amount='new_max_amount'
+      invoice_type='new_invoice_type'
+      minimum_amount='min_amount'
+      maximum_amount='max_amount'
+      minimum_amountn='min_amountn'
+      maximum_amountn='max_amountn'
+      check_currency='currency'
+      level_type=1
+      currency_type='without-invoice'
+      user='new_newuser'
+      $('.company_signatory').css('display','block')
+      $('.project_sign').css('display','none')
+      $('.project_sign').find('input').each(function(){
+        $(this).addClass('signatory_project')
+      })
+      $('.project_sign').find('select').each(function(){
+        $(this).addClass('signatory_project')
+      })
+      $('.company_signatory').find('input').each(function(){
+        $(this).removeClass('signatory_company')
+      })
+      $('.company_signatory').find('select').each(function(){
+        $(this).removeClass('signatory_company')
+      })
+      $('.select_project').css('display','none')
+      new_val='signatory_project'
+  
+    }
+    if(selected_val == '2'){
+      $('#get_project').val('')
+      signatory=2
+      level_type=2
+      minimum_amount='tiny_amount'
+      maximum_amount='large_amount'
+      currency='new_currency_project'
+      table_row='newtr_project'
+      check_currency='currency_project'
+      mini_amount='new_min_amount_project'
+      maxi_amount='new_max_amount_project'
+      invoice_type='new_invoice_type_project'
+      minimum_amountn='tiny_amountn'
+      maximum_amountn='large_amountn'
+      currency_type='without-invoice-project'
+      user='new_newuser_project'
+      $('.company_signatory').css('display','none')
+      $('.select_project').css('display','block')
+      $('.company_signatory').find('input').each(function(){
+        $(this).addClass('signatory_company')
+      })
+      $('.company_signatory').find('select').each(function(){
+        $(this).addClass('signatory_company')
+      })
+      $('.project_sign').find('input').each(function(){
+        $(this).removeClass('signatory_project')
+      })
+      $('.project_sign').find('select').each(function(){
+        $(this).removeClass('signatory_project')
+      })
+      new_val='signatory_company'
+    }
+    if($(this).val() == ''){
+      $('.project_sign').css('display','none')
+      $('.company_signatory').css('display','none')
+    }
+  })
+
+
+  // add button click
+  var newtrcount = 1;
+  if (parseInt('{{company_signatory_count}}') == 0) {
+    newtrcount = 2
+  }
+
+$(document).on('change','#get_project',function(){
+  let project=$(this).val()
+  let form=``
+  let table_row=$('#master_project_list_project tbody')
+  if(project != ''){
+    $('.project_sign').css('display','block')
+    $.ajax({
+            type: "GET",
+            headers: { "X-CSRFToken": "{{ csrf_token }}"},
+            url: "{% url 'InvoiceGuard:get-signatory-project' %}",
+             data: {'pk':project},
+             success: function(response) {
+              let ajax_count=response.length
+              if(ajax_count >= 1){
+              $.each(response, function(index, item) {
+                let null_val_min=item.min_amount
+                let null_val_max=item.max_amount
+                if(isNaN(parseFloat(null_val_min)) || isNaN(parseFloat(null_val_max))){
+                  null_val_min=''
+                  new_attr='readonly'
+                  null_val_max=''
+                }
+                else{
+                  null_val_min=parseFloat(null_val_min).toLocaleString();
+                  null_val_max=parseFloat(null_val_max).toLocaleString();
+                  new_attr=''
+
+                }
+                form+=`<tr><input type="hidden" name="signatory_id_project" value="${item.id}"><input type="hidden" name="invoice_type_project${item.id}" class="" value="${item.invoice_type}"><td class="add-sign"><div class='align_items'>`
+                
+                if(item.invoice_type == '1'){
+                  form+=`<button id='add' class='btn btn-clr add-btn pha-sebtn mt-3 add' type='button' value='Add'> <i class="fa fa-plus"></i></button>`
+                }
+                form+=`<button id="delete" data-id="${item.id}" class="mt-3 btn btn-clr delete-btn delete delete-saved-tr" type="button" value="delete"> <i class="fa fa-minus"></i> </button>`
+                if(item.invoice_type != '1' ){
+                  form+=`<select class="form-control currency_project disable without-invoice-project" id="currency-id${item.currency_id}" name="currency_project${item.id}" class="signatory-user-id">`
+                }
+                else{
+                  form+=`<select class="form-control currency_project disable" id="currency-id${item.currency_id}" name="currency_project${item.id}" class="signatory-user-id">`
+                }
+                form+=`<option value="">--- Select Currency ----</option>{% for countries in currency %}<option data-id="{{currency.id}}" value="{{countries.id}}"`
+                country='{{countries.id}}'
+                currency_id=''+item.currency_id+''
+                if(currency_id == country){
+                  form+=`selected`
+                }
+                form+=`>{{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}})</option>{% endfor %}</select></div></td><td class="from-invoice"><input type="text" class="tiny_amountn form-control disable" name="min_amount_project${item.id}" ${new_attr} value="${null_val_min}" ${item.min_amount}></td><td class="To-Invoice"><input type="text" class="large_amountn form-control disable" name="max_amount_project${item.id}" ${new_attr} value="${null_val_max}" ${item.max_amount}></td><td class="small-td"><input type="text" class="no_of_users form-control" name="no_of_users" data-id="${item.id}" value="2" readonly></td><td class="user-list">`
+
+                form+=`<div class="row"><div class="col-12"><select class="form-control taxtypecls disable signatory-user user-comp" id="sign-user-id${item.users[0].id}" name="user_project${item.users[0].id}" class="signatory-user-id"><option value="">--- Select Primary User ----</option>{% for users in user %}<option data-id="${item.users[0].id}" value="{{users.id}}"`
+              userid='{{users.id}}'
+                signatory_userid=''+item.users[0].user_id+''
+                    if(userid == signatory_userid){
+                      form+=`selected`
+                    }
+                    form+=`>{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>{% endfor %}</select></div></div>`
+
+                    form+=`<div class="row"><div class="col-12"><select class="form-control taxtypecls disable signatory-user user-comp" id="sign-user-id${item.users[1].id}" name="user_project${item.users[1].id}" class="signatory-user-id"><option value="">--- Select Secondary User ----</option>{% for users in user %}<option data-id="${item.users[1].id}" value="{{users.id}}"`
+                    userid='{{users.id}}'
+                    signatory_userid=''+item.users[1].user_id+''
+                    if(userid == signatory_userid){
+                      form+=`selected`
+                    }
+                    form+=`>{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>{% endfor %}</select></div></div>`
+                  
+              form +=`</td></tr>`
+              table_row.html(form)
+            });
+          }
+          else{
+            form+=`<tr><input type="hidden" name="newtr_project" value="new"><input type="hidden" name="new_invoice_type_project1" value="1" class='new_tr'><td class="add-sign pro-sig-setting"><div class='align_items'><button id='add' class='btn btn-clr add-btn pha-sebtn add' type='button' value='Add'> <i class="fa fa-plus"></i> </button> <button id="delete" data-id="1" class="btn btn-clr delete-btn delete delete_new_row" type="button" value="delete"> <i class="fa fa-minus"></i> </button><select class="form-control common_select currency_project" id="currency-id" name="new_currency_project1"><option value="">--- Select Currency ----</option>{% for countries in currency %}<option data-id="{{currency.id}}" value="{{countries.id}}">{{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}})</option>{% endfor %}</select></div></td><td class="from-invoice"><input type="text" class="tiny_amount form-control common_cls" name="new_min_amount_project1" oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))">  </td><td class="To-Invoice"><input type="text" class="large_amount common_cls form-control" name="new_max_amount_project1" oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))"></td><td class="small-td"><input type="text" class="no_of_users form-control" name="no_of_users" data-id="2" value="2" readonly></td>
+              <td class="user-list">
+                <div class="row"><div class="col-12">
+                <select class="form-control taxtypecls disable signatory-user user-comp" id="sign-user-id{{signatoryuser.id}}" name="new_newuser_project1" class="signatory-user-id"><option value="">--- Select Primary User ----</option>{% for users in user %}<option value="{{users.id}}" >{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>{% endfor %}</select></div></div>
+                <div class="row"><div class="col-12">
+                <select class="form-control taxtypecls disable signatory-user user-comp" id="sign-user-id{{signatoryuser.id}}" name="new_newuser_project1" class="signatory-user-id"><option value="">--- Select Secondary User ----</option>{% for users in user %}<option value="{{users.id}}" >{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>{% endfor %}</select></div></div></td></tr>`
+            table_row.html(form)
+            }
+            }
+            
+           });
+  }
+  else{
+    $('.project_sign').css('display','none')
+  }
+
+})
+
+  $(document).on('click','.add',function(){
+    console.log('add')
+      const add_val=$(this)
+      let id = $(this).data('id');
+      // id is not defined
+      if (id == undefined) {
+        id = 0
+      }
+
+      // closest tr find currency id
+      let currency_id = $(this).closest('tr').find('.currency,.currency_project').val();
+      let min_id=$(this).closest('tr').find('.min_amountn,.min_amount,.tiny_amount,.tiny_amountn').val();
+      let mini=$(this).closest('tr').find('.min_amountn,.min_amount,.tiny_amount,.tiny_amountn')
+      let max_id = $(this).closest('tr').find('.max_amountn,.max_amount,.large_amount,.large_amountn').val()
+      let maxi = $(this).closest('tr').find('.max_amountn,.max_amount,.large_amount,.large_amountn')
+      // jquery each function
+      let max_amount_array = [0];
+      
+      $('.'+check_currency+' option[value="' + currency_id + '"]').filter('option:selected').each(function(index,value){
+        if($(this).val() == currency_id){
+          // get max amount
+          max = $(this).closest('tr').find('.max_amountn,.max_amount,.large_amount,.large_amountn').val()
+          let parsedMax = parseInt(max.replace(/,/g, ''));
+          if (!isNaN(parsedMax)) {
+            max_amount_array.push(parsedMax);
+          }
+        }
+      })
+      console.log('new_val',new_val)
+
+      if(currency_id==''){
+        $(this).closest('tr').find('.currency,.currency_project').addClass('con_error')
+      }
+    if(!mini.prop('readonly')){
+      if(min_id==''){
+        $(this).closest('tr').find('.min_amountn,.min_amount,.tiny_amount,.tiny_amountn').addClass('con_error')
+      }
+    }
+    if(!maxi.prop('readonly')){
+      if(max_id==''){
+        $(this).closest('tr').find('.max_amountn,.max_amount,.large_amount,.large_amountn').addClass('con_error')
+      }
+    }
+     
+      
+      // get array max amount
+      let maxs = max_amount_array.reduce((a, b) => Math.max(a, b))+1;
+      console.log('maxs',maxs)
+      let next_level_value=maxs.toLocaleString();
+      let form=`<tr><input type="hidden" name="${table_row}" value="new"><input type="hidden" name="${invoice_type}${newtrcount}" value="1" class='new_tr'><td class="add-sign"> <div class='align_items'><button id='add' onclick="scroll_function()" class='btn btn-clr add-btn pha-sebtn mt-3 add' type='button' value='Add'> <i class="fa fa-plus"></i> </button> <button id="delete" class="btn btn-clr delete-btn delete-usaved-tr delete" type="button" value="delete"> <i class="fa fa-minus"></i> </button><select class="form-control ${check_currency} disable" id="currency-id{{signatoryuser.currency.id}}" name="${currency}${newtrcount}" class="signatory-user-id"><option value="">--- Select Currency ----</option>{% for countries in currency %}<option data-id="{{currency.id}}" value="{{countries.id}}">{{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}})</option>{% endfor %}</select></div></td><td class="from-invoice"><input type="text" class="${minimum_amount} form-control disable" id='mini_id' oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))" name="${mini_amount}${newtrcount}" value="${next_level_value}"></td><td class="To-Invoice"><input class="${maximum_amount} form-control disable" type="text" id='maxi_id' oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))" name="${maxi_amount}${newtrcount}" value=""></td><td class="small-td"><input type="number" class="no_of_users form-control" name="new_no_of_users" value="2" readonly> </td><td class="user-list"><div class="row" id="${newtrcount}"><div class="col-12"><select class="form-control taxtypecls disable signatory-user" name="${user}${newtrcount}"><option value="">--- Select Primary User ----</option>{% for users in user %}<option value="{{users.id}}">{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>{% endfor %}</select></div></div>
+        <div class="row"><div class="col-12"><select class="form-control taxtypecls disable signatory-user" name="${user}${newtrcount}"><option value="">--- Select Secondary User ----</option>{% for users in user %}<option value="{{users.id}}">{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>{% endfor %}</select></div>  
+        </div></td></tr>`
+
+      
+
+    let count=0
+      $('input').not('[readonly]').not('.'+new_val+'').each(function() {
+        if ($(this).val()=='') {
+          $(this).addClass('con_error')
+          count++
+        }
+      });
+      $('select').not('[readonly]').not('.'+new_val+'').each(function() {
+        if ($(this).val()=='') {
+          $(this).addClass('con_error')
+          count++
+        }
+      });
+      if(currency_id!='' && count==0){
+        $(this).closest('tbody').append(form).find(`tr:last .${check_currency} option[value=${currency_id}]`).prop('selected', true)
+      }
+      else{
+          swal.fire('Fill the Entries')
+      }
+      $('html, body').animate({scrollTop:$(document).height()})      
+      newtrcount++;
+  })
+  
+
+
+// $(document).on('keyup','.min_amount,min_amountn,.max_amount,.max_amountn',function(){
+//   let check_limit=$(this).val().length
+//   if (check_limit>=19){
+//     new swal({
+//       title: "Maximum Amount",
+//       button: "Ok",
+//     })
+//     $(this).val('')
+//   }
+// })
+
+// with-out-invoice button click add new row
+$(document).on('click','.add-without-invoice',function(e){
+  console.log('level_type',level_type)
+  let invoice_project=$(this)
+  if(level_type == 1){
+    invoice_project=$(this).parents('div').last().find('.invoice_project')
+  }
+  else{
+    invoice_project=$(this).parents('div').last().find('.project_sign')
+  }
+  let table_length=invoice_project.find('table tbody tr').length
+  
+  $('html, body').animate({scrollTop:$(document).height()})
+    let form=`<tr><input type="hidden" name="${table_row}" value="new"><input type="hidden" name="${invoice_type}${newtrcount}" value="2" class='new_tr'><td class="add-sign"> <div class='align_items'><button id="delete" class="mt-3 btn btn-clr delete-btn delete-usaved-tr delete" type="button" value="delete"> <i class="fa fa-minus"></i></button><select class="form-control ${currency_type}" id="currency-id{{signatoryuser.currency.id}}" name="${currency}${newtrcount}" class="signatory-user-id"><option value="">--- Select Currency ----</option>{% for countries in currency %}<option data-id="{{currency.id}}" value="{{countries.id}}">{{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}})</option>{% endfor %}</select></div></td><td class="from-invoice"><input type="number" readonly class="${minimum_amount} form-control disable readonly_cls" name="${mini_amount}${newtrcount}" value=""></td><td class="To-Invoice"><input readonly class="${maximum_amount} form-control readonly_cls disable" type="number" name="${maxi_amount}${newtrcount}" value=""></td><td class="small-td"><input type="number" class="no_of_users form-control" name="new_no_of_users" value="2" readonly> </td><td class="user-list"><div class="row" id="${newtrcount}"><div class="col-12"><select class="form-control taxtypecls disable signatory-user" name="${user}${newtrcount}"><option value="">--- Select Primary User ----</option>{% for users in user %}<option value="{{users.id}}">{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>{% endfor %}</select></div></div>
+    <div class="row"><div class="col-12"> 
+    <select class="form-control taxtypecls disable signatory-user" name="${user}${newtrcount}"><option value="">--- Select Secondary User ----</option>{% for users in user %}<option value="{{users.id}}">{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>{% endfor %}</select></div></div></div></td></tr>`
+    // append the form
+    let count=0
+    let new_row_count=0
+    if(table_length == 1){
+      let first_tr=invoice_project.find('table tbody tr:first td')
+      first_tr.find('select').not('[readonly]').not('.'+new_val+'').each(function() {
+        if($(this).val()==''){
+          new_row_count++
+        }
+      })
+      first_tr.find('input').not('[readonly]').not('.'+new_val+'').each(function() {
+        if($(this).val()==''){
+          new_row_count++
+        }
+      })
+      if(new_row_count == 5){
+      invoice_project.find('table tbody tr:first').remove()
+      }
+      else{
+      $('select').not('[readonly]').not('.'+new_val+'').each(function() {
+      if ($(this).val()=='') {
+        $(this).addClass('con_error')
+        count++
+      }
+    });
+  }
+}
+else{
+  $('select').not('[readonly]').not('.'+new_val+'').each(function() {
+    if ($(this).val()=='') {
+      $(this).addClass('con_error')
+      count++
+    }
+  })
+}
+    if(count==0){
+      if(signatory == '1' ){
+        e.preventDefault();
+      $('#master_project_list_company tbody').append(form);
+      }
+      if(signatory == '2' ){
+        e.preventDefault();
+        $('#master_project_list_project tbody').append(form);
+        }
+    }
+    else{
+      swal.fire('Fill the Entries')
+    }
+   
+    
+    newtrcount++;
+    //ids ++;
+})
+
+$(document).on('click','.add-with-invoice',function(e){
+  let invoice_project=$(this)
+  if(level_type == 1){
+    invoice_project=$(this).parents('div').last().find('.invoice_project')
+  }
+  else{
+    invoice_project=$(this).parents('div').last().find('.project_sign')
+  }
+  let table_length=invoice_project.find('table tbody tr').length
+
+  $('html, body').animate({scrollTop:$(document).height()})
+  let form = `<tr><input type="hidden" name="${table_row}" value="new"><input type="hidden" name="${invoice_type}${newtrcount}" value="1" class='new_tr'><td> <div class='align_items'><button id='add' class='btn btn-clr add-btn pha-sebtn add' type='button' value='Add'> <i class="fa fa-plus"></i> </button> <button id="delete" class="mt-3 btn btn-clr delete-btn delete-usaved-tr delete" type="button" value="delete"> <i class="fa fa-minus"></i> </button><select class="form-control ${check_currency} disable" id="currency-id{{signatoryuser.currency.id}}" name="${currency}${newtrcount}" class="signatory-user-id"><option value="">--- Select Currency ----</option>{% for countries in currency %}<option data-id="{{currency.id}}" value="{{countries.id}}">{{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}})</option>{% endfor %}</select></div></td><td><input type="text" class="${minimum_amount} form-control disable" oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))" name="${mini_amount}${newtrcount}" value=""></td><td><input class="${maximum_amount} form-control disable" type="text" oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))" name="${maxi_amount}${newtrcount}" value=""></td><td><input type="text" class="no_of_users form-control" name="new_no_of_users" value="2" readonly> </td>
+    <td class="user-list"><div class="row" id="${newtrcount}"><div class="col-12"><select class="form-control taxtypecls disable signatory-user" name="${user}${newtrcount}"><option value="">--- Select Primary User ----</option>{% for users in user %}<option value="{{users.id}}">{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>{% endfor %}</select></div></div>
+      <div class="row"><div class="col-12">
+      <select class="form-control taxtypecls disable signatory-user" name="${user}${newtrcount}"><option value="">--- Select Secondary User ----</option>{% for users in user %}<option value="{{users.id}}">{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>{% endfor %}</select></div></div></div></div></td></tr>`
+  let count=0
+  let new_row_count=0
+  if(table_length == 1){
+    let first_tr=invoice_project.find('table tbody tr:first td')
+    if(first_tr.find('#currency-id').hasClass(''+currency_type+'')){
+
+      first_tr.find('select').not('[readonly]').not('.'+new_val+'').each(function() {
+        if($(this).val()==''){
+          new_row_count++
+        }
+      })
+      first_tr.find('input').not('[readonly]').not('.'+new_val+'').each(function() {
+        if($(this).val()==''){
+          new_row_count++
+        }
+      })
+      if(new_row_count == 3){
+        invoice_project.find('table tbody tr:first').remove()
+        }
+        else{
+          $('input').not('[readonly]').not('.'+new_val+'').each(function() {
+            if ($(this).val()=='') {
+              $(this).addClass('con_error')
+              count++
+            }
+          });
+          $('select').not('[readonly]').not('.'+new_val+'').each(function() {
+            if ($(this).val()=='') {
+              $(this).addClass('con_error')
+              count++
+            }
+          });
+        }
+   
+    }
+    else{
+      $('input').not('[readonly]').not('.'+new_val+'').each(function() {
+        if ($(this).val()=='') {
+          $(this).addClass('con_error')
+          count++
+        }
+      });
+      $('select').not('[readonly]').not('.'+new_val+'').each(function() {
+        if ($(this).val()=='') {
+          $(this).addClass('con_error')
+          count++
+        }
+      });
+    }
+  }
+  else{
+    $('input').not('[readonly]').not('.'+new_val+'').each(function() {
+      if ($(this).val()=='') {
+        $(this).addClass('con_error')
+        count++
+      }
+    });
+    $('select').not('[readonly]').not('.'+new_val+'').each(function() {
+      if ($(this).val()=='') {
+        $(this).addClass('con_error')
+        count++
+      }
+    });
+  }
+ console.log('count',count)
+  if(count==0){
+    console.log(signatory)
+    if(signatory == '1' ){
+      e.preventDefault();
+    $('#master_project_list_company tbody').append(form);
+    }
+    if(signatory == '2' ){
+      e.preventDefault();
+      $('#master_project_list_project tbody').append(form);
+      }
+  }
+  else{
+    swal.fire('Fill the Entries')
+  }
+  newtrcount++;
+});
+
+// $(document).on('change','.without-invoice, .currency',function(){
+// let currency_id = $(this).val()
+// let this_element = $(this)
+// console.log({'this currency':$(this).val()})
+// //$('.without-invoice option[value="' + currency_id + '"]').filter('option:selected').each(function(index,value){
+// //console.log({'this1234':$(value).val()})
+// if($('.without-invoice option[value="' + currency_id + '"]:selected').length > 0) {
+//   console.log($('.without-invoice').length,true)
+//   $('.without-invoice, .currency').not($(this)).each(function(index,value){
+//     console.log('each functtion value ',$(value).val(), currency_id)
+//     // if any currency is matched with value of each currency then show the alert
+    
+//     if($(value).val() == currency_id){
+//       new swal({
+//         title: "Data already Exists for Selected Currency",
+//         button: "Ok",
+//       })
+//       this_element.val('')
+//     }
+//   })
+
+// }
+
+// })
+
+// // on change of max amount
+// $(document).on('change','.max_amount,.max_amountn',function(){
+//     let val_of_max=$(this).closest('tr').find('.min_amount,.min_amountn').val();
+//     if(val_of_max==''){
+//       new swal({
+//         title: "Enter Min Invoice Amount",
+//         button: "Ok",})
+//       $(this).val('')
+//     }
+//     console.log({'val of max':val_of_max})
+//     let min_amount = parseInt($(this).closest('tr').find('.min_amount').val());
+//     let max_amount = parseInt($(this).val());
+//     if(min_amount > max_amount){
+//         new swal({
+//         title: "Min Invoice Amount should be Lesser than Max Invoice Amount",
+//         button: "Ok",
+//       });
+//       // empty the max amount
+//       $(this).val('')
+//     }
+// })
+
+// $(document).on('change','.max_amount,.max_amountn',function(){
+//   const this_value=$(this).val()
+//   const closest_val=$(this).closest('tr').find('.min_amount,.min_amountn').val()
+//   if(this_value==closest_val){
+//     new swal({
+//         title: "Same Invoice Amount Selected",
+//         button: "Ok",
+//       });
+//       $(this).val('')
+//   }
+//   if(parseInt(this_value) < parseInt(closest_val)){
+//     new swal({
+//       title: "Max Invoice Amount Should be greater than Min Invoice Amount",
+//       button: "Ok",
+//     });
+//     $(this).val('')
+//   }
+// })
+
+// $(document).on('change','.min_amount,.min_amountn',function(){
+//   const this_value=$(this).val()
+//   const closest_val=$(this).closest('tr').find('.max_amount,.max_amountn').val()
+//   if(this_value==closest_val){
+//     new swal({
+//         title: "Same Invoice Amount Selected",
+//         button: "Ok",
+//       });
+//       $(this).val('')
+//   }
+//   if(closest_val!=''){
+//     if(parseInt(closest_val) < parseInt(this_value)){
+//       new swal({
+//         title: "Max Invoice Amount Should be greater than Min Invoice Amount",
+//         button: "Ok",
+//       });
+//       $(this).val('')
+//     }
+// }
+// })
+
+
+
+// $(document).on('change','.max_amount ',function(){
+//   let min_val = parseFloat($(this).val().replace(/,/g, ''));
+//   const this_value=$(this)
+//   const this_currency_id = $(this).closest('tr').find('.currency').val()
+//   $('.min_amountn').each(function(){
+//     let currency_val=$(this).closest('tr').find('.currency').val()
+//     if(min_val!=$(this).val().replace(/,/g, '')){
+//       let max_val=this_value.closest('tr').find('.min_amount,.min_amountn').val()
+//       if(!(min_val< parseFloat($(this).val().replace(/,/g, ''))) &&max_val<parseFloat($(this).val().replace(/,/g, ''))){
+//           if(currency_val==this_currency_id){
+//             new swal({
+//             title: "Existing Range Selected",
+//             button: "Ok",
+//           });
+//               this_value.val('');
+
+//         }
+//       }
+
+//     }
+//   })
+  
+//   $('.min_amount').each(function(){
+//     let currency_val=$(this).closest('tr').find('.currency').val()
+//     if(min_val!=$(this).val().replace(/,/g, '')){
+//       let max_val=this_value.closest('tr').find('.min_amount,.min_amountn').val()
+//       if(!(min_val< parseFloat($(this).val().replace(/,/g, ''))) &&max_val<parseFloat($(this).val().replace(/,/g, ''))){
+//           if(currency_val==this_currency_id){
+//             new swal({
+//             title: "Existing Range Selected",
+//             button: "Ok",
+//           });
+//               this_value.val('');
+
+//         }
+//       }
+
+//     }
+//   })
+// })
+
+// add user
+{% comment %} $(document).on('click','.adduser',function(){
+    let id = $(this).data('id');  
+    console.log('new user id',id)
+    // id is not defined
+    if (id == undefined) {
+      id = 0
+    }
+    // append the select tag
+    $(this).closest('tr').find('.user-list').append(`<div class="row"><div class="col-9"><select class="form-control disable newuser signatory-user" name="newuser${id}"><option value="">--- Select User ----</option>{% for users in user %}<option value="{{users.id}}">{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>{% endfor %}</select></div><div class="col-2"><button  class="btn btn-clr delete-btn delete-unsaved-user desc-count" data-id="{{signatoryuser.id}}" type="button" value="delete"> <i class="fa fa-minus"></i> </button></div><div class="col-1"></div>`)
+    let get_noof_user = $(this).closest('tr').find('.no_of_users').val()
+    let set_no_of_user = $(this).closest('tr').find('.no_of_users').val(parseInt(get_noof_user)+1)
+})
+// add new_newuser
+$(document).on('click','.addnewuser',function(){
+  let id = $(this).data('id');  
+  console.log('new user id',id)
+  // id is not defined
+  if (id == undefined) {
+    id = 0
+  }
+  // append the select tag
+  $(this).closest('tr').find('.user-list').append(`<div class="row"><div class="col-9"><select class="form-control disable newuser signatory-user" name="new_newuser${id}"><option value="">--- Select User ----</option>{% for users in user %}<option value="{{users.id}}">{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>{% endfor %}</select></div><div class="col-2"><button class="btn btn-clr delete-btn delete-unsaved-user desc-count" data-id="{{signatoryuser.id}}" type="button" value="delete"> <i class="fa fa-minus"></i> </button></div><div class="col-1"></div>`)
+  let get_noof_user = $(this).closest('tr').find('.no_of_users').val()
+  let set_no_of_user = $(this).closest('tr').find('.no_of_users').val(parseInt(get_noof_user)+1)
+});
+
+ {% endcomment %}
+
+$(document).on('change', '.min_amount, .min_amountn, .max_amount,.max_amountn,.tiny_amount,.tiny_amountn,.large_amount,.large_amountn', function(){
+  let thisElement = $(this)
+  const this_value = $(this).val()
+  
+  // Convert the string to a numeric value (integer or floating-point)
+  var numericValue = parseFloat(this_value.replace(/,/g, ''));
+
+  // Display the result with commas
+  var formattedValue = numericValue.toLocaleString();
+  if (numericValue == '' || isNaN(numericValue)){
+    $(this).val('')
+  }
+  else{
+    $(this).val(formattedValue)
+  }
+})
+
+// // signatory-user select tag click
+// $(document).on('click','.signatory-user',function(){
+//   let user_id = $(this).val()
+//   let this_element = $(this)
+//   // if user is already selected in same row then disable option
+//   $(this).closest('tr').find('.signatory-user').not($(this)).each(function(index,value){
+//     if($(value).val() == user_id && $(value).val() != ''){
+//       new swal({
+//         title: "User Already Selected",
+//         button: "Ok",
+//       });
+//       // empty the user
+//       this_element.val('')
+//     }
+//   })
+// })
+
+
+// // delete user
+// $(document).on('click','.delete-usaved-tr',function(){
+//     // remove tr
+//     $(this).closest('tr').remove()
+// })
+
+// $(document).on('change','.currency',function(){
+//     $(this).closest('tr').find('.min_amount,.max_amount,.max_amountn,.min_amountn').val('')
+  
+// })
+
+
+// $(document).on('click','.delete-saved-tr',function(){
+//   const  get_data_id = $(this).data('id')
+//   const remove_tr = $(this).closest('tr')
+//   swal.fire({
+//   text: "Are you sure you want to delete this Record?",
+//   showCancelButton: true,
+//   confirmButtonColor: '#3085d6',
+//   cancelButtonColor: '#d33',
+//   confirmButtonText: 'Yes',
+//   cancelButtonText: 'No',
+// }).then(function(result) {
+//   if (result.value) {
+//     $.ajax({
+//       type: "POST",
+//       headers: { "X-CSRFToken": "{{ csrf_token }}"},
+//       url: "{% url 'InvoiceGuard:delete-signatory-form' %}",
+//       data: {'pk':get_data_id},
+//       success: function(data){
+//         remove_tr.remove()
+//       }
+//     });
+//   }
+// });
+// })
+
+// $(document).on('click','#delete-user',function(){
+//   var  get_data_id = $(this).data('id')
+//   let user_id = $(this).closest('td').find(`select[id="sign-user-id${get_data_id}"]`).val()
+//   // call the ajax function POST method
+//   // sweet alert for confirmation of delete if clicked yes then delete the user call the ajax function
+//   let this_element = $(this).closest('.row')
+//   let row_length = $(this).closest('tr').find('.row').length
+//   let del_user_val=$(this).closest('tr').find('.no_of_users')
+  
+//   if (row_length > 1){
+//   swal.fire({
+//   text: "Are you sure you want to delete this user?",
+//   showCancelButton: true,
+//   confirmButtonText: "Yes",
+//   cancelButtonText: "No",
+//   confirmButtonColor: '#3085d6',
+//   cancelButtonColor: '#d33',
+// }).then(function(result) {
+//   if (result.value) {
+//     $.ajax({
+//       type: "POST",
+//       headers: { "X-CSRFToken": "{{ csrf_token }}"},
+//       url: "{% url 'InvoiceGuard:delete-signatory-user-form' %}",
+//       data: {'pk':get_data_id},
+//       success: function(data){
+
+//         let get_no_of_user = del_user_val.val()
+//         let set_no_of_user=del_user_val.val(parseInt(get_no_of_user)-1)
+//         this_element.remove()
+//       }
+//     });
+//   }
+// });
+//   }
+//   else{
+//       return false;
+//   }
+// })
+
+// $(document).on('click','.delete-unsaved-user',function(){
+//   let this_element = $(this)
+//   let get_no_of_user = $(this).closest('tr').find('.no_of_users').val()
+//   let set_no_of_user = $(this).closest('tr').find('.no_of_users').val(parseInt(get_no_of_user)-1)
+//   $(this).closest('.row').remove()
+//   //let set_no_of_user = $(this).closest('tr').find('.no_of_users').val(parseInt(get_no_of_user)-1)
+//   //let get_no_of_user = $(this).closest('tr').find('.no_of_users').val()
+// })
+
+
+
+// $(document).on('click','#Edit',function(){
+// // remove all readonly closest tr
+// $(this).closest('tr').find('.disable').removeAttr('readonly')
+// })
+
+// $(document).on('change','.min_amount,.max_amount',function(){
+//   let this_value=$(this)
+//   let thisElement = $(this).val()
+//   const this_currency_id = $(this).closest('tr').find('.currency').val()
+//   $('.min_amountn').each(function(){
+//     if(thisElement==$(this).val().replace(/,/g, '')){
+//       let currency_val=$(this).closest('tr').find('.currency').val()
+//       console.log('val',currency_val)
+//       if(currency_val==this_currency_id){
+//         swal.fire({
+//           text: "Invoice Amount Range already exists",
+//           showCancelButton: false,
+//           confirmButtonText: "Ok",
+//           confirmButtonColor: '#3085d6',
+//         });
+//         this_value.val('')
+//       }
+//     }
+//   })
+//   $('.max_amountn').each(function(){
+//     if(thisElement==$(this).val().replace(/,/g, '')){
+//       let currency_val=$(this).closest('tr').find('.currency').val()
+//       console.log('val',currency_val)
+//       if(currency_val==this_currency_id){
+//         swal.fire({
+//           text: "Invoice Amount Range already exists",
+//           showCancelButton: false,
+//           confirmButtonText: "Ok",
+//           confirmButtonColor: '#3085d6',
+//         });
+//         this_value.val('')
+//       }
+//     }
+//   })
+//   $('.max_amount').slice(0, -1).each(function(){
+//   if(thisElement==$(this).val().replace(/,/g, '')){
+//     let currency_val=$(this).closest('tr').find('.currency').val()
+//     console.log('val',currency_val)
+//     if(currency_val==this_currency_id){
+//       swal.fire({
+//         text: "Invoice Amount Range already exists",
+//         showCancelButton: false,
+//         confirmButtonText: "Ok",
+//         confirmButtonColor: '#3085d6',
+//       });
+//       this_value.val('')
+//     }
+//   }
+// })
+// $('.min_amount').slice(0, -1).each(function(){
+//   if(thisElement==$(this).val().replace(/,/g, '')){
+//     let currency_val=$(this).closest('tr').find('.currency').val()
+//     console.log('val',currency_val)
+//     if(currency_val==this_currency_id){
+//       swal.fire({
+//         text: "Invoice Amount Range already exists",
+//         showCancelButton: false,
+//         confirmButtonText: "Ok",
+//         confirmButtonColor: '#3085d6',
+//       });
+//       this_value.val('')
+//     }
+//   }
+// })
+
+// })
+
+
+
+
+// $(document).on('change', '.min_amount, .min_amountn, .max_amount,.max_amountn', function(){
+//   let thisElement = $(this)
+//   console.log({'this element':thisElement})
+//   const this_value = $(this).val()
+//   console.log({'this_val':this_value})
+//   const this_tr = $(this).closest('tr')
+//   console.log({'this tr':this_tr})
+//   const this_currency_id = this_tr.find('.currency').val()
+//   console.log({'this currency id':this_currency_id})
+//   $('.currency option[value="' + this_currency_id + '"]').filter('option:selected').not(thisElement.closest('tr')).each(function(index,value){
+//     if($(value).val() == this_currency_id && $(value).closest('tr') !== this_tr) {
+//       max = $(value).closest('tr').find('.max_amount,.max_amountn').val()
+//       console.log({'max':max})
+//       let parsedMax = parseInt(max.replace(/,/g, ''));
+//       min = $(value).closest('tr').find('.min_amountn , .min_amount').val()
+//       let parsedMin = parseInt(min.replace(/,/g, ''));
+//       if (!isNaN(parsedMax) && !isNaN(parsedMin)) {
+//         console.log({'numberInRange':[parsedMin, parsedMax]})
+//         if (this_value != parsedMax && this_value != parsedMin){
+//         numberInRange(this_value, parsedMin, parsedMax, thisElement)
+//         }
+//       }
+//     }
+//   })
+// })
+
+// function numberInRange(num, first, second, thisElement) {
+//   let max = Math.max(first, second);
+//   let min = Math.min(first, second);
+//   console.log({'min':min,'max':max});
+//   if (num >= min && num <= max) {
+//     swal.fire({
+//       text: "Invoice Amount Range already exists",
+//       showCancelButton: false,
+//       confirmButtonText: "Ok",
+//       confirmButtonColor: '#3085d6',
+//     });
+//     thisElement.val('')
+//   }
+//   return false;
+// }
+
+// $(document).on('submit', '.mainform', function(e){
+//   e.preventDefault();
+//   // validate the form all fields are required
+//     $('input').not('[readonly]').each(function(index,val) {
+//       // validate the input fields if empty then add the class
+//       if ($(this).val() == '') {
+//         $(this).addClass('con_error')
+//       }else{
+//         $(this).removeClass('con_error')
+//       }
+//     })
+//     $('select').not('[readonly]').each(function(index,val) {
+//       // validate the input fields if empty then add the class
+//       if ($(this).val() == '') {
+//         $(this).addClass('con_error')
+//       }else{
+//         $(this).removeClass('con_error')
+//       }
+//     })
+//     // if any input field is invalid then return false
+//     if ($('.con_error').length > 0) {
+//       return false
+//     }
+//     else{
+//       // if all the input fields are valid then call the ajax function
+//       $(document).find('table tbody tr input[name="newtr"]').each(function(index,value){
+//         $(value).closest('tr').find('.currency, .without-invoice').attr('name',`new_currency${index+1}`)
+//         $(value).closest('tr').find('.min_amount, .min_amountn').attr('name',`new_min_amount${index+1}`)
+//         $(value).closest('tr').find('.max_amount, .max_amountn').attr('name',`new_max_amount${index+1}`)
+//         $(value).closest('tr').find('.new_tr').attr('name',`new_invoice_type${index+1}`)
+//         $(value).closest('tr').find('.signatory-user').attr('name',`new_newuser${index+1}`)
+//       })
+//         let main_form_data = $(this).serialize();
+//         post_data(main_form_data);
+//         $('#mainsave').attr('disabled','disabled')
+//     }
+// })
+// // remove the class con_error on change
+// $(document).on('change','select',function(){
+//   $(this).removeClass('con_error')
+// })
+// // remove the class con_error on change
+// $(document).on('keyup','input',function(){
+//   $(this).removeClass('con_error')
+// })
+
+// ajax function
+// function post_data(form_data){
+//   $.ajax({
+//     type: "POST",
+//     headers: { "X-CSRFToken": "{{ csrf_token }}"},
+//     url: "{% url 'InvoiceGuard:ajax-post-view-signatory-form' %}",
+//     data: form_data, 
+//     success: function(data){
+//       // redirect to the dashboard
+//       window.location.href = "{% url 'InvoiceGuard:signatory-view-form' %}";
+//     }
+// });
+// }
+
+
+// $(document).on('click','.delete_new_row',function(){
+//   $(this).closest('tr').remove()
+// })
+
+
+
+</script>
+{%endblock%}

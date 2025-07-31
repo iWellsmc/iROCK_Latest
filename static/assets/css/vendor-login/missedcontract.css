@@ -1,0 +1,46 @@
+.vend-thead th {
+    text-align: center;
+}
+
+.vend-thead td:nth-child(1) {
+    text-align: center !important;
+
+}
+
+.vend-thead td:nth-child(4) {
+    text-align: center !important;
+}
+
+.vend-thead td {
+    border-right: 1px solid var(--tableborder-color);
+}
+.prj-back_clr th
+  {
+    background: transparent !important;
+  }
+  .all-tbl-hd th {
+    text-transform: capitalize !important;
+}
+.sta-dan {
+    padding: 5px 20px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+.vends-invite-lists table th:nth-child(2){
+ width: 10%;
+}
+@media screen and (min-width:768px) and (max-width:1023px){
+    .missed-contract-list {
+        width: 220% !important;
+    }
+}
+@media screen and (min-width:1024px) and (max-width:1199px){
+    .missed-contract-list {
+        width: 115vw !important;
+    }
+}
+@media screen and (min-width:1200px) and (max-width:1399px){
+    .missed-contract-list {
+        width: 115vw !important;
+    }
+}

@@ -1,0 +1,1582 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+<style>
+  .accordion-content {
+    display: none;
+    transition: max-height 0.3s ease-out;
+    overflow: hidden;
+  }
+  .accordion-content.show {
+    display: table-row;
+    max-height: 1000px; /* Adjust as needed */
+  }
+</style>
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/vendorcontract.css' %}">
+<div class="px-4">
+    <div class="row">
+        <div class="col-12 text-end">
+
+            {% if contracts_count > 0%}
+            <button type="button" class="btn btn-clr chck-tst popup_viewcode"><a href="{% url 'projects:contractmasterlist' %}">Back</a></button>
+
+            {% else %}
+            <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'projects:contractmasterlist' %}">Back</a></button>
+
+            {% endif%}
+        </div>
+    </div>
+
+    <h3 class="from-head">Create Contract Master</h3>
+
+    <input type='hidden' id='user_role' value='{{request.user.roles_id}}'>
+  
+<form class="form-txt mx-3"  method="POST" id="contractmaster"  enctype="multipart/form-data" >
+        {% csrf_token %}
+        <select name="companycurrenices" id="id_companycurrenices" style="display:none">
+            {% for country in companycurrency%}
+            <option value="{{country.id}}">{{country.currency_symbol}}-{{country.currency}} ({{country.name}})</option>
+            {% endfor %}
+        </select>
+
+        <select name="projects" id="id_projects" style="display:none">
+            {% for project in projects%}
+            <option value="{{project.id}}" data-id="{{project.active_status}}">{{project.projectname.name}}</option>
+            {% endfor %}
+        </select>
+
+    <div class="row align-items-center">
+        <div class="col-lg-6 col-md-6 d-flex align-items-end gap-3">
+            <input type="hidden" name="dateformat" id="companydateformat" value={{company.dateformat}}>
+            <div class="w-fit"><label class="txt-name" style="width: max-content;">Vendor Name : </label></div>
+            {% if edit %}
+            <div>
+                <input type="hidden" name="vendorname" value="{{pk}}" class="vendor-cls">
+                <p class="p-0 m-0">{{vendormasterlist.vendor_name}}</p>
+            </div>
+            {% else %}
+            <select name="vendorname" {% if edit %}{% if vendor_id > 0 %}disabled{% endif %}{% endif %} id="vendor_name_id" class="form-control form-select vendor-cls num-cls" placeholder="Vendor Name" >
+                <option value="">--Select Vendor--</option>
+                {% for vendor in vendormasterlist %}
+                <option value="{{vendor.id}}" data-id="{{vendor.active_status}}" {% if edit %}{% if vendor_id == vendor.id %}selected{% endif %}{% endif %}>{{vendor.vendor_name}}</option>
+                {% endfor %}
+            </select>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-6 col-md-6 text-right">
+        <button type="button" class="btn btn-clr text-left Add_new_contract" data-toggle="modal" data-target="#add_new_contract">Add New Contract</button>
+
+        </div>
+    </div>
+    <br>
+   
+    {% if edit %}
+    {% if contracts_count > 0 %}
+    <div class="row">
+    <table class="first-table irock-table">
+        <thead>
+            <th>S.No.</th>
+            <th>SO Reference Number</th>
+            <th>Name Of Service</th>
+            <th>Project Name</th>
+            <th>Contract Type</th>
+            <th>SO Executed Date</th>
+            <th>Maximum Value Of SO</th>
+            <th class="fix-width-action">Actions</th>
+        </thead>
+        
+        <tbody>
+            {% for contract_list in contracts %}
+
+            <tr >
+                <input type="hidden" value="{{contract_list.id}}" name="contract_ids" class="contract_ids"/>
+                    <td class="s_no">{{forloop.counter}}</td>
+                    <td>{{contract_list.reference_number|default_if_none:"---"}}</td>
+                    <td>{{contract_list.name_service|default_if_none:"---"}}</td>
+                    <td >{{contract_list.projects.projectname|default_if_none:"---"}}</td>
+                    <td >{% if contract_list.types_service == 'service' %}Services{% elif contract_list.types_service == 'service_supply' %}Services & supplies{% elif contract_list.types_service == 'supply' %}Supply {% else %} --- {% endif %}</td>
+                    
+                    <td class="text-center">{{contract_list.executed_date|checktime:request.user.company.id|default_if_none:"---"}}</td>
+                    <td class="text-center">{{contract_list.currency.currency_symbol|default_if_none:"---"}} {{contract_list.amount|amount_convertion_to_separtors}}</td>
+                    <td class="text-center">
+                        <a class="accordion-toggle showtoggle" data-toggle="collapse" data-target=".accordion-content-{{contract_list.id}}">
+                            <span class="action-edit align-icons text-decoration-none">
+                                <i class="fa fa-eye" title="View"></i>
+                              </span>                    
+                            </a>
+                        <a class="del_contract">
+                            <span class="action-edit align-icons text-decoration-none"></span>
+                            <i class="fa fa-trash-o" title="Delete"></i>
+                        </span> 
+                    </a>
+                        {% if contract_list.save_type == '1' or contract_list.save_type == 1 %}
+                        <a  class="edit_contract" data-id='{{contract_list.id}}' data-toggle="modal" data-target="#edit_contract">
+                            <span class="action-edit align-icons text-decoration-none"></span>
+                            <i class="fa fa-pencil" title="Edit"></i>
+                        </span> 
+                    </a>
+                        {% endif %}
+                    
+                    </td>
+                        
+            </tr>
+            
+            <tr class="accordion-content accordion-content-{{contract_list.id}} collapse">
+            <td colspan="7">
+          <table class="w-100 second-table">
+            <thead>
+            <tr>
+            <th>Project Discipline</th>
+            <th>Discipline Type</th>
+            <th>WCC <i class='fa fa-info-circle jqtooltip i-con-clr' title = "Work Completion Certificate Submission Required" style='color:#000000'></th>
+            </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td >{{contract_list.projectdiscipline|convert_projectdiscipline|default_if_none:"---"}}</td>
+                <td>{{contract_list.projectdisciplinetype.discipline_subtype|default_if_none:"---"}}</td>
+
+                <td> {% if contract_list.wcc == 1 %}Yes{% elif contract_list.wcc == 0 %}No{% else %}---{% endif %}</td>
+                
+              </tr>
+              <tr>
+                <td>
+                <div class="row">
+
+                    {% get_contract_file contract_list.id 'original' 1 as contract_files %}
+                    {%if contract_files.1 != 0  %}
+                    <div class="col-6"> 
+                      <h4>Contract Files</h4>
+                      <ul class="view-ul">
+            
+                    {% for contract_file in contract_files.0 %}
+                      
+                    <li class="mb-2">
+                    <a target="_blank" href="{% url 'invoice:view_contractfiles' pk=contract_file.id %}">{{ contract_file.original_file_name }}</a>
+            
+                    </li>
+            
+                    {% empty %}
+            
+                    {% endfor %}
+                  </ul>
+                  </div>
+                  {% endif %}
+            
+                    {% get_contract_file contract_list.id 'original' 2 as pricetables %}
+                    {%if pricetables.1 != 0  %}
+                    <div class="col-6"> 
+                      <h4>Price Table Files</h4>
+                      <ul class="view-ul">
+            
+                    {% for file in pricetables.0 %}
+            
+                    <li class="mb-2">
+                      <a target="_blank" href="{% url 'invoice:view_contractfiles' pk=file.id %}">{{ file.original_file_name }}</a>
+            
+                      </li>
+            
+                    {% endfor %}
+                      </ul>
+                    </div>
+            
+                      {% endif %}
+            
+                    </div>
+                </td>
+            
+              </tr>
+              <!-- Add more details here -->
+            </tbody>
+          </table>
+        </td>
+        </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<table class="first-table irock-table">
+    <thead>
+        <th>S.No.</th>
+        <th>SO Reference Number</th>
+        <th>Name Of Service</th>
+        <th>Project Name</th>
+        <th>Contract Type</th>
+        <th>SO Executed Date</th>
+        <th>Maximum Value Of SO</th>
+        <th class="fix-width-action">Actions</th>
+    </thead>
+    <tbody>
+        <tr>
+            <td colspan="8" class="text-center">----</td>
+        </tr>
+    </tbody>
+</table>
+{% endif %}
+{% endif %}
+
+
+    <div class="modal fade calculator-draggable calc-wid" id="add_new_contract" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" data-backdrop="static" data-keyboard="false" role="document" style='max-width: 45%;'>
+        <div class="modal-content" data-backdrop="static">
+          
+          <div class="modal-header comment-head">
+            <h5 class="modal-title" id="exampleModalCenterTitle">Add New Contract</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div class="modal-body contract_vendor">
+           
+
+          </div>
+
+          <div class="modal-footer comment-foot">
+            <button type="button" class="submit_contract btn btn-clr" value='1'>Save as Draft</button>
+            <button type="button" id="save_as_new" class="btn btn-clr text-left " value='2'>Save & Add New</button>
+            <button type="button" class="submit_contract btn btn-clr" value='2'>Save</button>
+
+          </div>
+          </div>
+          
+      </div>
+    </div>
+    <div class="text-center btn-cls">
+        <input type="hidden" name="submit_type" class="submit_type" value=0>
+        {% comment %} <button type="submit" class="btn btn-clr text-left draft-cls">Save as Draft</button> {% endcomment %}
+        <button type="submit" id="save_id" class="btn btn-clr text-left final-cls">Submit</button>
+
+    </div>
+    </div>
+    </div>
+
+
+    <div class="modal fade calculator-draggable calc-wid" id="edit_contract" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" data-backdrop="static" data-keyboard="false" role="document" style='max-width: 45%;'>
+          <div class="modal-content" data-backdrop="static">
+            
+            <div class="modal-header comment-head">
+              <h5 class="modal-title" id="exampleModalCenterTitle">Edit Contract</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+  
+            <div class="modal-body edit_contract_vendor">
+             
+  
+            </div>
+  
+            <div class="modal-footer comment-foot">
+              <button type="button" name="contract_action" class="submit_contract btn btn-clr" value='1'>Save as Draft</button>
+              <button type="button" name="contract_action" class="submit_contract btn btn-clr" value='2'>Submit</button>
+            </div>
+            </div>
+        </div>
+      </div>
+      </div>
+      </div>
+
+</form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+    {% comment %} <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script> {% endcomment %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" ></script>
+    <script src="{% static 'js/contract/createcontract.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+
+<script>
+
+    function notfy_func(type,message,bg){
+        if (document.querySelector('.notyf__toast')) {
+            return; // If there are existing notifications, exit the function
+        }
+        notyf.open({
+            type: type,
+            message: message,
+            background:bg ,
+    
+        });
+    }
+
+    $(document).on('click','.popup_viewcode',function(){
+        
+        notfy_func('success','Added Contract Details has been Saved as Draft','##BD2753')
+    })
+
+
+
+    const notyf = new Notyf({
+        duration: 5000,
+        position: {
+            x: 'right',
+            y: 'top',
+        },
+        types: [
+            {
+            type: 'warning',
+            // background: '#D3D3D3',
+            duration: 4000,
+            icon: {
+                className: 'material-icons',
+                tagName: 'i',
+                // text: 'warning',
+                // dismissible: true
+            }
+            },
+            {
+            type: 'error',
+            // background: '#D3D3D',
+            duration: 4000,
+            // dismissible: true
+            },
+            {
+            type: 'success',
+            // background: '#D3D3D',
+            // background: '##BD2753',
+            duration: 4000,
+            // dismissible: true
+            }
+        ]
+        });
+
+
+    var companycurrency="{{companycurrency}}"
+    var csrf_token = "{{ csrf_token }}"
+    var id={{request.company.id}};
+    var current_url = '{{request.scheme}}://{{request.get_host}}'
+    var rights= 1
+    // alert(id)
+    if (companycurrency == 'None'){
+        swal.fire({
+        text: "Kindly Add Currency in General Settings Before Creating the Contract",   
+        type: "success"
+        }).then(function() {
+            window.location.href='../generalsetting/'+id+'/'
+        });
+       
+       
+    }
+    var optiondict={}
+    var list=[]
+    $("#id_companycurrenices option").each(function(){
+        var thisOptionValue=$(this).val();
+        var thistext=$(this).text()
+        optiondict={"id":thisOptionValue,"symbol":thistext}
+
+        list.push(optiondict)
+    });
+
+    var projectlist=[]
+    var projectoptiondict={}
+    $("#id_projects option").each(function(){
+        var thisOptionValue=$(this).val();
+        var thistext=$(this).text()
+        var datas=$(this).attr('data-id')
+        projectoptiondict={"id":thisOptionValue,"projectname":thistext,'active_status':datas}
+        console.log('projectoptiondict',projectoptiondict)
+        projectlist.push(projectoptiondict)
+    });
+
+    //console.log(projectlist)
+
+    var hdn_dateformat=$('#companydateformat').val()
+    $(document).on('click','.service-input',function(){
+        var val=$(this).val()
+        var index=0
+        // var index=$(this).closest('tr').index();
+        
+        var tableshow=""
+        if ($(this).is(':checked')){
+
+            tableshow+='<div class="ser-vice-scroll"><table id="'+val+'table" class="contracttablecls ser-vice-wid">'
+            if (val == 'service'){
+                tableshow+='<thead><tr id="content-head" ><th class="empty-wid"></th>'
+                if (rights == 1){
+                    tableshow+='<th>WCC <i class="fa fa-info-circle" title="Work Completion Certificate Submission Required"></i></th>'
+                }
+                tableshow+='<th class="nos-wid">Name of Service</th><th>Project</th><th>Project Discipline</th><th>Discipline Type</th><th>SO Reference Number</th><th>Executed Date</th><th>Maximum Value of SO</ th><th>Upload Contract</th><th>Upload Price Table</th><th></th></tr></thead>'
+
+                tableshow+='<tbody><tr accept="image, .png, .jpeg, .pdf, .jpg" class="vend-service-top"><td class="btn-line-same"> <button id="service-add" data-id='+val+' class="out-btn add-contra-btn" type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="service-delete" class="out-btn minu-contra-btn" delete-"btn" type="button" value="'+val+'"> <i class="fa fa-minus"></i></button> </td>'
+                if (rights == 1){
+                    tableshow+='<td class="ser-wid text-center"><input type="checkbox" class="wcc-cbx wcc_flow_cls" name="'+val+'wcc" value="1"> <input type="hidden" value="0" name="'+val+'wcc"></td>'
+                }
+                tableshow+='<td class="ser-wid"><textarea rows="3" cols="30" id="name_service" name="'+val+'n_service" class="form-control nameofsevice vendor-cls" placeholder="Name of service"></textarea></td> <td class="prj-wid"><select name="'+val+'project" class="form-control projectcls projectselect vendor-cls"><option value="" selected>-Select Project-</option></select></td> <td class="width-increase prj-wid"><select type id="project_discipline" name="'+val+'project_discipline" sername='+val+' class="form-control p_discipline_cls project-disciplinename vendor-cls"><option value="">--Project Discipline--</option></select></td>  <td class="width-increase prj-wid"><select name="'+val+'disciplinetype" id="disciplinetype_id" class="form-control project-discipline-type vendor-cls" placeholder="Discipline Type"><option value="">--Discipline Type--</option></select></td> <td class="ser-wid"><textarea rows="3" cols="30" id="ref_num" name="'+val+'ref_number" class="form-control refcls soreferencenumber vendor-cls" placeholder="SO Reference Number"></textarea></td> <td class="date-width"><input type="text" name="'+val+'execute_date"  autocomplete="off" class="dateformat-cls form-control vendor-cls num-cls" placeholder="Executed date"></td> <td class="maxi-width"><select id="maximum_value" name="'+val+'currency" class="maximum-cls form-control max-val-select vendor-cls"></select> <input list="browsers" id="amount_currency" name="'+val+'amount" class="amount_currency_cls form-control contra-currency nomax-limit vendor-cls" autocomplete="off"/ ><datalist id="browsers"><option value="No Max Limit"></datalist> </td> <td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg" id="c_file" name="'+val+'contract_file" class="contrac-uploadfile"></td> <td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg"  id="price_file" name="'+val+'contract_price_file" class="" multiple></td></tr><tr><td colspan="2" class="add-ment contract-priceupload"> <button id="amendment-add" data-id='+val+'  class="btn btn-clr add-btn-adda" type="button" serval="0" value="extrafiles">Amendment/Addendum</button> </td></tr> <tr class="verti-td-same"> <td colspan="10" class="added-bottom-space"></td> </tr></tbody>'
+                tableshow+='</table></div>'
+  
+            }
+            else if (val == 'supply'){
+                 tableshow+='<thead><tr id="content-head" ><th class="empty-wid"></th>'
+                if (rights == 1){
+                    tableshow+='<th>WCC <i class="fa fa-info-circle" title="Work Completion Certificate Submission Required"></i></th>'
+                }
+                tableshow+='<th class="nos-wid">Name of Supply</th><th>Project</th><th>Project Discipline</th><th>Discipline Type</th><th>PO Reference Number</th><th>Executed Date</th><th>Maximum Value of PO</ th><th>Upload Contract</th><th>Upload Price Table</th><th></th></tr></thead>'
+
+                 tableshow+='<tbody><tr class="vend-service-top"><td class="btn-line-same"> <button id="service-add" data-id='+val+' class="out-btn add-contra-btn" type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="service-delete" class="out-btn minu-contra-btn" delete-"btn" type="button" value="'+val+'"> <i class="fa fa-minus"></i></button> </td>'
+                if (rights == 1){
+                    tableshow+='<td class="ser-wid text-center"><input type="checkbox" class="wcc-cbx wcc_flow_cls" name="'+val+'wcc" value="1"> <input type="hidden" value="0" name="'+val+'wcc"></td>'
+                }
+                tableshow+='<td class="ser-wid"><textarea rows="3" cols="30" id="name_service" name="'+val+'n_service" class="form-control vendor-cls num-cls"  placeholder="Name of service"></textarea></td> <td class="prj-wid"><select name="'+val+'project" class="form-control projectcls vendor-cls"><option value="" selected>-Select Project-</option></select></td> <td class="width-increase  prj-wid"><select type id="project_discipline" name="'+val+'project_discipline" sername='+val+' class="form-control p_discipline_cls vendor-cls"><option value="">--Project Discipline--</option>  </select></td>  <td class="width-increase prj-wid"><select name="'+val+'disciplinetype" id="disciplinetype_id" class="form-control vendor-cls num-cls" placeholder="Discipline Type"><option value="">--Discipline Type--</option></select></td> <td><textarea rows="3" cols="30" id="ref_num" name="'+val+'ref_number" class="form-control refcls vendor-cls" placeholder="PO Reference Number"></textarea></td> <td class="date-width"><input type="text" name="'+val+'execute_date"  autocomplete="off" class="supplydateformat-cls form-control date-width vendor-cls" placeholder="Executed date"></td> <td class="maxi-width"><select id="maximum_value" name="'+val+'currency" class="maximum-cls form-control vendor-cls num-cls"></select> <input list="browsers" id="amount_currency" name="'+val+'amount" class="amount_currency_cls form-control contra-currency vendor-cls nomax-limit" autocomplete="off"/ ><datalist id="browsers"><option value="No Max Limit"></datalist> </td> <td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg" id="c_file" name="'+val+'contract_file" class=""></td> <td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg" id="price_file" name="'+val+'contract_price_file" class="" multiple></td></tr><tr><td colspan="2" class="add-ment"> <button id="amendment-add" data-id='+val+' tableval="0" class="btn btn-clr add-btn-supply" type="button" serval="0" value="extrafiles">Amendment/Addendum</button></td></tr> <tr class="verti-td-same"> <td colspan="10" class="added-bottom-space"></td> </tr> </tbody>'
+                 tableshow+='</table>'
+
+                
+            }
+            
+            else{
+                 tableshow+='<thead><tr id="content-head" ><th class="empty-wid"></th>'
+                if (rights == 1){
+                    tableshow+='<th>WCC <i class="fa fa-info-circle" title="Work Completion Certificate Submission Required"></i></th>'
+                }
+                tableshow+='<th class="nos-wid">Name of Contract</th><th>Project</th><th>Project Discipline</th><th>Discipline Type</th><th>Contract Reference Number</th><th>Executed Date</th><th>Maximum Value of Contract</ th><th>Upload Contract</th><th>Upload Price Table</th><th></th></tr></thead>'
+
+                 tableshow+='<tbody><tr class="vend-service-top"><td class="btn-line-same"> <button id="service-add" data-id='+val+' class="out-btn add-contra-btn" type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="service-delete" class="out-btn minu-contra-btn" delete-"btn" type="button" value="'+val+'"> <i class="fa fa-minus"></i></button> </td>'
+                if (rights == 1){
+                    tableshow+='<td class="ser-wid text-center"><input type="checkbox" class="wcc-cbx wcc_flow_cls" name="'+val+'wcc" value="1"> <input type="hidden" value="0" name="'+val+'wcc"></td>'
+                }  
+                tableshow+='<td class="ser-wid"><textarea rows="3" cols="30" id="name_service" name="'+val+'n_service" class="form-control vendor-cls"  placeholder="Name of service"></textarea></td> <td class="prj-wid"><select name="'+val+'project" class="form-control projectcls vendor-cls"><option value="" selected>-Select Project-</option></select></td> <td class="width-increase  prj-wid"><select type id="project_discipline" name="'+val+'project_discipline" sername='+val+' class="form-control p_discipline_cls vendor-cls"> <option value="">--Project Discipline--</option> </select></td>  <td class="width-increase prj-wid"><select name="'+val+'disciplinetype" id="disciplinetype_id" class="form-control vendor-cls num-cls" placeholder="Discipline Type"><option value="">--Discipline Type--</option></select></td> <td><textarea rows="3" cols="30" id="ref_num" name="'+val+'ref_number" class="form-control refcls vendor-cls" placeholder="Contract Reference Number"></textarea></td> <td class="date-width"><input type="text" name="'+val+'execute_date"  autocomplete="off" class="sersuppdateformat-cls form-control date-width vendor-cls" placeholder="Executed date"></td>  <td class="maxi-width"><select id="maximum_value" name="'+val+'currency" class="maximum-cls form-control vendor-cls num-cls"></select> <input list="browsers" id="amount_currency" name="'+val+'amount" class="amount_currency_cls form-control contra-currency vendor-cls nomax-limit" autocomplete="off"/ ><datalist id="browsers"><option value="No Max Limit"></datalist> </td> <td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg" id="c_file" name="'+val+'contract_file" class=""></td> <td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg" id="price_file" name="'+val+'contract_price_file" class="" multiple></td></tr><tr><td colspan="2" class="add-ment"> <button id="amendment-add" data-id='+val+' tableval="0" class="btn btn-clr add-btn-ss" type="button" serval="0" value="extrafiles">Amendment/Addendum</button></td></tr> <tr class="verti-td-same"> <td colspan="10" class="added-bottom-space"></td> </tr></tbody>'
+                 tableshow+='</table>'
+
+                
+
+            }
+            var selectoption='<option value="" selected>--Select--</option>'
+
+            $.each(list,function(key,value){
+                selectoption+='<option value='+value.id+'>'+value.symbol+'</option>'
+            })
+            var projectoption='<option value="" selected>--Select--</option>'
+
+            $.each(projectlist,function(key,value){
+                projectoption+='<option value='+value.id+' data-id='+value.active_status+'>'+value.projectname+'</option>'
+            })
+            
+            $(this).parent().after(tableshow)
+            $('.projectcls').html(projectoption)
+            $('.maximum-cls').html(selectoption)
+
+        }
+        else{
+            $('#'+val+'table').remove()
+        }
+    })
+
+    
+    if (hdn_dateformat ==''){
+        $(document).on('focus',".dateformat-cls", function(){
+            $(this).datepicker({
+                dateFormat: 'dd-M-yy',
+                maxDate:new Date(),
+                yearRange: '1900:+0',
+                changeMonth:true,
+                changeYear:true,
+            });
+          });
+    }
+    else{
+        $(document).on('focus',".dateformat-cls", function(){
+            $(this).datepicker({
+                dateFormat: hdn_dateformat,
+                maxDate:new Date(),
+                yearRange: '1900:+0',
+                changeMonth:true,
+                changeYear:true,
+            });
+          });
+    }
+
+
+    if (hdn_dateformat ==''){
+        $(document).on('focus','.supplydateformat-cls',function(){
+            $(this).datepicker({
+                dateFormat: 'dd-M-yy',
+                maxDate:new Date(),
+                yearRange: '1900:+0',
+                changeMonth:true,
+                changeYear:true,
+            });
+          });
+    }
+    else{
+        $(document).on('focus','.supplydateformat-cls',function(){
+            $(this).datepicker({
+                dateFormat: hdn_dateformat,
+                maxDate:new Date(),
+                yearRange: '1900:+0',
+                changeMonth:true,
+                changeYear:true,
+            });
+          });
+    }
+
+
+    if (hdn_dateformat ==''){
+        $(document).on('focus','.sersuppdateformat-cls',function(){
+            $(this).datepicker({
+                dateFormat: 'dd-M-yy',
+                maxDate:new Date(),
+                yearRange: '1900:+0',
+                changeMonth:true,
+                changeYear:true,
+            });
+          });
+    }
+    else{
+        $(document).on('focus','.sersuppdateformat-cls',function(){
+            $(this).datepicker({
+                dateFormat: hdn_dateformat,
+                maxDate:new Date(),
+                yearRange: '1900:+0',
+                changeMonth:true,
+                changeYear:true,
+            });
+          });
+    }
+
+
+    $(document).on('change','.projectcls',function(){
+        var val=$(this).val()
+        var current_element=$(this)
+        var get_role=$('#user_role').val()
+        const find_text=$(this).find('option:selected').text()
+        var check_status=$(this).find('option:selected').attr('data-id')
+        if(check_status == 'False'){
+            $(this).val('')
+            if (get_role == 2){
+                swal.fire(''+find_text+' Inactive.')
+            }
+            if (get_role == 3){
+            swal.fire(''+find_text+' Inactive. Please contact Client Admin')
+            }
+        }
+        $(this).closest('tr').find('#disciplinetype_id').html('<option>--Select--</option>')
+        var currentelement=$(this)
+        if ( currentelement == ''){
+            $('.p_discipline_cls').html('<option>--Select--</option>')
+        }
+        else{
+            $.ajax({
+                type:"GET",
+                url:'/projects/companyprojectdevelopment',
+                data:{'projectid':val},
+                success: function(data){
+                    if(data.data == 'invoiceflow'){
+                        swal.fire('Invoice Flow not Added in this Project');
+                        current_element.val('')
+
+                    }else{
+                        var html=''
+                        html +='<option value="">--Select--</option>'
+                        $.each(data.data,function(key,val){
+                                html +='<option value='+val.id+'>'+val.fieldname+'</option>'
+
+                        })
+                        $('.p_discipline_cls').html(html)
+                        if (data.project_wcc_flow == 0){
+                            if ($('.wcc_flow_cls').is(':checked')){
+                                // swal.fire('WCC Flow not Added in this Project');
+                                // currentelement.closest('tr').find('.wcc_flow_cls').prop('checked',false)
+                                // currentelement.closest('td').find('input[type=hidden]').attr('disabled',false);
+                            }
+                        }
+                    }
+                 
+                }
+            })
+        }
+
+        //--Select--</option> <option val="green_field_development">Green Field<br> Development</option> <option val="brown_field_development">Brown Field Development</option> <option val="others">Others</option>
+    })
+
+
+    $(document).on('change','.p_discipline_cls',function(){
+        var val=$(this).val()
+        var sername=$(this).attr('sername')
+        let get_project_id=$('.projectcls').not(':hidden').find(':selected').val();
+        var currentelement=$(this)
+        if (val == ''){
+            $('#disciplinetype_id').html('<option value="">--Select--</option>')
+        }
+        else{
+            $.ajax({
+                type:"GET",
+                url:'/projects/companyprojectdevelopment',
+                data:{
+                    'projectdisciplineid':val, 
+                    'projectid':get_project_id,
+                },
+                success: function(data){
+                    var html=''
+                    html +='<option value="">--Select--</option>'
+                    $.each(data.data,function(key,val){
+                        html +='<option value='+val.value+'>'+val.text+'</option>'
+                    })
+                    
+                $('#disciplinetype_id').html(html)
+                }
+            })
+        }
+
+    })
+
+    $(document).on('click','#amendment-add',function(){
+        var setindexval=$(this).attr('serval')
+        var val=$(this).attr('data-id')
+        var value=$(this).val()
+        var indexval=$('#'+val+'table tr:last').index()
+        var trindex=$(this).closest('tr').index()
+        if (trindex == 0){
+            closeindex = trindex
+        }
+        else{
+            closeindex = trindex-1
+        }
+
+        if ($(this).closest('tr').next('tr').find('td').find('table').length){
+            
+            html+='<tr>'
+            if (rights == 1){
+                html+='<td class="text-center"><input type="checkbox" class="wcc-cbx amend_wcc_flow_cls" name="'+val+'wcc'+setindexval+'" value="1"> <input type="hidden" value="0" name="'+val+'wcc'+setindexval+'"></td>'
+            }
+            html+='<td><select name="'+val+'extrafile'+setindexval+'" class="form-control amendmenttype-select vendor-cls"> <option value="">--Select--</option><option value="Amendment">Amendment</option> <option value="Addendum">Addendum</option> </select></td> <td><textarea rows="3" cols="30" name="'+val+'ref_num'+setindexval+'" class="form-control referencenum vendor-cls refcls" placeholder="Reference Number"></textarea></td> <td><input type="text" name="'+val+'dateformat'+setindexval+'" autocomplete="off" class="dateformat-cls form-control executeddate_amen vendor-cls" placeholder="Excuted date"></td> <td><select id="maximum_value" name="'+val+'currency'+setindexval+'" class="maximum-extra-cls form-control maxvalue_currency vendor-cls"></select> <input list="browsers" type="text" id="amount_currency" name="'+val+'amount'+setindexval+'" autocomplete="off" class="amount_currency_cls form-control contra- maxvalue-select vendor-cls"> <datalist id="browsers"><option value="No Max Limit" id=no-max-val></datalist> </td> </td> <td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg" name="'+val+'changed_con_file'+setindexval+'" class="form-control amen_contract"></td> <td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg"name="'+val+'changed_price_file'+setindexval+'" class="form-control amen_pricetable vendor-cls" multiple></td> <td><button id="extrafile-delete" class="btn-clr btn minus-btn-add" type="button" value="delete"> <i class="fa fa-minus"></i></button></td></tr>'
+
+            $('#'+val+''+value+''+closeindex+'').append(html)
+            var selectoption='<option value="" selected>--Select--</option>'
+            $.each(list,function(key,value){
+                selectoption+='<option value='+value.id+'>'+value.symbol+'</option>'
+            })
+            $('#'+val+''+value+''+closeindex+' tr:last').find('.maximum-extra-cls').html(selectoption)
+        }
+        else{
+            
+            var html='<table id="'+val+''+value+''+closeindex+'">'
+            // if (val == 'service'){
+                html +='<thead class="addmen-title"><tr>'
+                if (rights == 1){
+                    html+='<th>WCC <i class="fa fa-info-circle" title="Work Completion Certificate Submission Required"></i></th>'
+                }
+                html+='<th>Type</th><th>Reference Number</th><th>Executed Date</th><th>Maximum Value</th><th>Upload Contract</th><th>Upload Price Table</th></tr></thead>'
+            // }
+            // else if(val == 'supply'){
+            //     html +='<thead class="addmen-title"><tr><th>Type</th><th>Reference Number</th><th>Executed Date</th><th>Maximum Value</th><th>Upload Contract</th><th>Upload Price Table</th></tr></thead>'
+            // }
+            // else{
+            //     html +='<thead class="addmen-title"><tr><th>Type</th><th>Reference Number</th><th>Executed Date</th><th>Maximum Value</th><th>Upload Contract</th><th>Upload Price Table</th></tr></thead>'
+            // }
+            html+='<tbody><tr class="same-line-tdetail">'
+            if (rights == 1){
+                html+='<td class="text-center"><input type="checkbox" class="wcc-cbx amend_wcc_flow_cls" name="'+val+'wcc'+setindexval+'" value="1"> <input type="hidden" value="0" name="'+val+'wcc'+setindexval+'"></td>'
+            }
+            html+='<td> <select name="'+val+'extrafile'+setindexval+'" class="form-control vendor-cls num-cls"> <option value="">--Select--</option> <option value="Amendment">Amendment</option> <option value="Addendum">Addendum</option> </select> </td> <td><textarea rows="3" cols="30" name="'+val+'ref_num'+setindexval+'" class="form-control vendor-cls num-cls refcls" placeholder="Reference Number"></textarea></td> <td><input type="text" name="'+val+'dateformat'+setindexval+'" autocomplete="off" class="dateformat-cls form-control vendor-cls num-cls" placeholder="Executed date"></td> <td><select id="maximum_value" name="'+val+'currency'+setindexval+'" class="maximum-extra-cls form-control vendor-cls num-cls"></select> <input list="browsers" type="text" id="amount_currency" name="'+val+'amount'+setindexval+'" autocomplete="off" class="amount_currency_cls form-control contra-currency vendor-cls"> <datalist id="browsers"><option value="No Max Limit"></datalist> </td> <td> <input type="file"  accept="image, .png, .jpeg, .pdf, .jpg"  name="'+val+'changed_con_file'+setindexval+'" class="form-control"> </td> <td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg" name="'+val+'changed_price_file'+setindexval+'" class="form-control" multiple></td> <td><button id="extrafile-delete" class="btn-clr btn minus-btn-add vendor-cls" type="button" value="delete"> <i class="fa fa-minus"></i></button></td></tr></tbody></table>'
+
+            $(this).closest('tr').next('tr').find('td').append(html)
+            var selectoption='<option value="" selected>--Select--</option>'
+            $.each(list,function(key,value){
+                selectoption+='<option value='+value.id+'>'+value.symbol+'</option>'
+            })
+            $(this).closest('tr').next('tr').find('td').find('.maximum-extra-cls').html(selectoption)
+        }
+    })
+
+    $(document).on('click','#extrafile-delete',function(){
+        var tableid=$(this).closest('table').attr('id')
+        
+        var tablelen=$('#'+tableid+' tbody tr').length
+        if (tablelen >1){
+            $(this).closest('tr').remove()
+        }
+        else{
+            $(this).closest('table').remove()
+        }
+
+    })
+
+var row=1
+var serviceval=1;
+var supplyval=1;
+var sersuppval=1;
+$(document).on('click','#service-add',function(){
+    var index=$(this).closest('tr').index();
+
+    var val=$(this).attr('data-id')
+    var tableshow=''
+
+    if (val == 'service'){
+        tableshow+='<tr class="vend-service-top"><td class="btn-line-same"> <button id="service-add" data-id='+val+' class="out-btn add-contra-btn" type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="service-delete" class=" out-btn" delete-"btn" type="button" value="'+val+'"> <i class="fa fa-minus"></i></button> </td>'
+        if (rights == 1){
+            tableshow+='<td class="text-center"><input type="checkbox" class="wcc-cbx wcc_flow_cls" name="'+val+'wcc" value="1"> <input type="hidden" value="0" name="'+val+'wcc"></td>'
+        }
+        tableshow+='<td><textarea rows="3" cols="30" id="name_service" name="'+val+'n_service" class="form-control vendor-cls num-cls" placeholder="Name of service"></textarea></td>  <td><select name="'+val+'project" class="form-control projectcls vendor-cls"><option value="">--Select Project--</option></select></td> <td class="width-increase"><select id="project_discipline" name="'+val+'project_discipline" sername='+val+' class="form-control p_discipline_cls vzendor-cls"><option value="">--Project Discipline--</option> </select></td>  <td class="width-increase"><select name="'+val+'disciplinetype" id="disciplinetype_id" class="form-control"><option val="">--Discipline Type--</option></select></td> <td><textarea rows="3" cols="30" id="ref_num" name="'+val+'ref_number" class="form-control refcls vendor-cls" placeholder="SO Reference Number"></textarea></td> <td class="date-width"><input type="text" name="'+val+'execute_date"  autocomplete="off" class="dateformat-cls form-control date-width" placeholder="Executed date"></td> <td class="maxi-width"><select id="maximum_value" name="'+val+'currency" class="maximum-cls form-control vendor-cls"</select> <input list="browsers" id="amount_currency" name="'+val+'amount" class="amount_currency_cls form-control contra-currency vendor-cls" autocomplete="off"/ ><datalist id="browsers"><option value="No Max Limit"></datalist> </td> <td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg"  id="c_file" name="'+val+'contract_file" class=""></td> <td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg"  id="price_file" name="'+val+'contract_price_file" class="" multiple></td></tr><tr><td colspan="2" class="add-ment"> <button id="amendment-add" data-id='+val+' tableval="0" class="btn btn-clr add-btn-adda" type="button" serval="'+serviceval+'" value="extrafiles">Amendment/Addendum</button></td> </tr> <tr class="verti-td-same"><td colspan="10" class="added-bottom-space"></td></tr>'
+
+        // tableshow+='<tr class="vend-service-top"><td class="btn-line-same"> <button id="service-add" data-id='+val+' class="out-btn add-contra-btn" type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="service-delete" class=" out-btn" delete-"btn" type="button" value="'+val+'"> <i class="fa fa-minus"></i></button> </td><td><textarea rows="3" cols="30" id="name_service" name="'+val+'n_service" class="form-control" placeholder="Name of service"></textarea></td>  <td><select name="'+val+'project" class="form-control projectcls"><option value="">--Select Project--</option></select></td> <td class="width-increase"><select name="'+val+'project_discipline" sername='+val+' class="form-control p_discipline_cls"><option value="">--Project Discipline--</option> </select></td>  <td class="width-increase"><select name="'+val+'disciplinetype" id="disciplinetype_id" class="form-control"><option value="">--Discipline Type--</option></select></td> <td><textarea rows="3" cols="30" id="ref_num" name="'+val+'ref_number" class="form-control refcls" placeholder="SO Reference Number"></textarea></td> <td class="date-width"><input type="text" name="'+val+'execute_date"  autocomplete="off" class="dateformat-cls form-control date-width" placeholder="Executed date"></td> <td class="maxi-width"><select id="maximum_value" name="'+val+'currency" class="maximum-cls form-control"</select> <input list="browsers" id="amount_currency" name="'+val+'amount" class="amount_currency_cls form-control contra-currency" autocomplete="off"/ ><datalist id="browsers"><option value="No Max Limit"></datalist> </td> <td><input type="file" id="c_file" name="'+val+'contract_file" class=""></td> <td><input type="file" id="price_file" name="'+val+'contract_price_file" class=""></td></tr><tr><td colspan="2" class="add-ment"> <button id="amendment-add" data-id='+val+' tableval="0" class="btn btn-clr add-btn-adda" type="button" serval="'+serviceval+'" value="extrafiles">Amendment/Addendum</button></td> </tr> <tr class="verti-td-same"><td colspan="10" class="added-bottom-space"></td></tr>'
+            
+        serviceval++;
+
+    }
+
+    else if (val == 'supply'){
+
+        tableshow+='<tr class="vend-service-top"><td class="btn-line-same"> <button id="service-add" data-id='+val+' class="out-btn add-contra-btn" type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="service-delete" class=" out-btn" delete-"btn" type="button" value="'+val+'"> <i class="fa fa-minus"></i></button> </td>'
+        if (rights == 1){
+            tableshow+='<td class="text-center"><input type="checkbox" class="wcc-cbx wcc_flow_cls" name="'+val+'wcc" value="1"> <input type="hidden" value="0" name="'+val+'wcc"></td>'
+        }
+        tableshow+='<td><textarea rows="3" cols="30" id="name_service" name="'+val+'n_service" class="form-control vendor-cls num-cls" placeholder="Name of service"></textarea></td> <td><select name="'+val+'project" class="form-control projectcls vendor-cls"><option value="">--Select Project--</option></select></td> <td class="width-increase"><select type id="project_discipline" name="'+val+'project_discipline" sername='+val+' class="form-control p_discipline_cls vendor-cls"><option value="">--Project Discipline--</option> </select></td>  <td class="width-increase"><select name="'+val+'disciplinetype" id="disciplinetype_id" class="form-control"><option val="">--Discipline Type--</option></select></td><td><textarea rows="3" cols="30" id="ref_num" name="'+val+'ref_number" class="form-control refcls vendor-cls" placeholder="PO Reference Number"></textarea></td> <td class="date-width"><input type="text" name="'+val+'execute_date"  autocomplete="off" class="supplydateformat-cls form-control date-width" placeholder="Executed date"></td> <td class="maxi-width"><select id="maximum_value" name="'+val+'currency" class="maximum-cls form-control vendor-cls"</select> <input list="browsers" id="amount_currency" name="'+val+'amount" class="amount_currency_cls form-control contra-currency vendor-cls" autocomplete="off"/ ><datalist id="browsers"><option value="No Max Limit"></datalist> </td> <td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg"  id="c_file" name="'+val+'contract_file" class=""></td> <td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg" id="price_file" name="'+val+'contract_price_file" class="" multiple></td></tr><tr><td colspan="2" class="add-ment"> <button id="amendment-add" data-id='+val+' tableval="0" class="btn btn-clr add-btn-supply" type="button" serval="'+supplyval+'" value="extrafiles">Amendment/Addendum</button> </td> </tr> <tr class="verti-td-same"><td colspan="10" class="added-bottom-space"></td></tr>'
+
+        // tableshow+='<tr class="vend-service-top"><td class="btn-line-same"> <button id="service-add" data-id='+val+' class="out-btn add-contra-btn" type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="service-delete" class=" out-btn" delete-"btn" type="button" value="'+val+'"> <i class="fa fa-minus"></i></button> </td><td><textarea rows="3" cols="30" id="name_service" name="'+val+'n_service" class="form-control" placeholder="Name of service"></textarea></td> <td><select name="'+val+'project" class="form-control projectcls"><option value="">--Select Project--</option></select></td> <td class="width-increase"><select name="'+val+'project_discipline" sername='+val+' class="form-control p_discipline_cls"><option value="">--Project Discipline--</option> </select></td>  <td class="width-increase"><select name="'+val+'disciplinetype" id="disciplinetype_id" class="form-control"><option value="">--Discipline Type--</option></select></td><td><textarea rows="3" cols="30" id="ref_num" name="'+val+'ref_number" class="form-control refcls" placeholder="PO Reference Number"></textarea></td> <td class="date-width"><input type="text" name="'+val+'execute_date"  autocomplete="off" class="supplydateformat-cls form-control date-width" placeholder="Executed date"></td> <td class="maxi-width"><select id="maximum_value" name="'+val+'currency" class="maximum-cls form-control"</select> <input list="browsers" id="amount_currency" name="'+val+'amount" class="amount_currency_cls form-control contra-currency" autocomplete="off"/ ><datalist id="browsers"><option value="No Max Limit"></datalist> </td> <td><input type="file" id="c_file" name="'+val+'contract_file" class=""></td> <td><input type="file" id="price_file" name="'+val+'contract_price_file" class=""></td></tr><tr><td colspan="2" class="add-ment"> <button id="amendment-add" data-id='+val+' tableval="0" class="btn btn-clr add-btn-supply" type="button" serval="'+supplyval+'" value="extrafiles">Amendment/Addendum</button> </td> </tr> <tr class="verti-td-same"><td colspan="10" class="added-bottom-space"></td></tr>'
+
+        supplyval++;
+
+
+    }
+    else{
+
+        tableshow+='<tr class="vend-service-top"><td class="btn-line-same"> <button id="service-add" data-id='+val+' class="out-btn add-contra-btn" type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="service-delete" class=" out-btn" delete-"btn" type="button" value="'+val+'"> <i class="fa fa-minus"></i></button> </td>'
+        if (rights == 1){
+            tableshow+='<td class="text-center"><input type="checkbox" class="wcc-cbx wcc_flow_cls" name="'+val+'wcc" value="1"> <input type="hidden" value="0" name="'+val+'wcc"></td>'
+        }
+        tableshow+='<td><textarea rows="3" cols="30" id="name_service" name="'+val+'n_service" class="form-control vendor-cls num-cls" placeholder="Name of service"></textarea></td> <td><select name="'+val+'project" class="form-control projectcls vendor-cls"><option value="">--Select Project--</option></select></td> <td class="width-increase"><select type id="project_discipline" name="'+val+'project_discipline" sername='+val+' class="form-control p_discipline_cls vendor-cls"><option val="">--Project Discipline--</option> </select></td>  <td class="width-increase"><select name="'+val+'disciplinetype" id="disciplinetype_id" class="form-control"><option val="">--Discipline Type--</option></select></td> <td><textarea rows="3" cols="30" id="ref_num" name="'+val+'ref_number" class="form-control refcls vendor-cls" placeholder="Contract Reference Number"></textarea></td> <td class="date-width"><input type="text" name="'+val+'execute_date"  autocomplete="off" class="sersuppdateformat-cls form-control date-width" placeholder="Executed date"></td> <td class="maxi-width"><select id="maximum_value" name="'+val+'currency" class="maximum-cls form-control vendor-cls num-cls"</select> <input list="browsers" id="amount_currency" name="'+val+'amount" class="amount_currency_cls form-control contra-currency vendor-cls" autocomplete="off"/ ><datalist id="browsers"><option value="No Max Limit"></datalist> </td> <td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg" id="c_file" name="'+val+'contract_file" class=""></td> <td><input type="file" accept="image, .png, .jpeg, .pdf, .jpg" id="price_file" name="'+val+'contract_price_file" class="" multiple></td></tr><tr><td colspan="2" class="add-ment"> <button id="amendment-add" data-id='+val+' tableval="0" class="btn btn-clr add-btn-ss" type="button" serval="'+sersuppval+'" value="extrafiles">Amendment/Addendum</button> </td> </tr> <tr class="verti-td-same"><td colspan="10" class="added-bottom-space"></td></tr>'
+
+        // tableshow+='<tr class="vend-service-top"><td class="btn-line-same"> <button id="service-add" data-id='+val+' class="out-btn add-contra-btn" type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="service-delete" class=" out-btn" delete-"btn" type="button" value="'+val+'"> <i class="fa fa-minus"></i></button> </td><td><textarea rows="3" cols="30" id="name_service" name="'+val+'n_service" class="form-control" placeholder="Name of service"></textarea></td> <td><select name="'+val+'project" class="form-control projectcls"><option value="">--Select Project--</option></select></td> <td class="width-increase"><select name="'+val+'project_discipline" sername='+val+' class="form-control p_discipline_cls"><option value="">--Project Discipline--</option> </select></td>  <td class="width-increase"><select name="'+val+'disciplinetype" id="disciplinetype_id" class="form-control"><option value="">--Discipline Type--</option></select></td> <td><textarea rows="3" cols="30" id="ref_num" name="'+val+'ref_number" class="form-control refcls" placeholder="Contract Reference Number"></textarea></td> <td class="date-width"><input type="text" name="'+val+'execute_date"  autocomplete="off" class="sersuppdateformat-cls form-control date-width" placeholder="Executed date"></td> <td class="maxi-width"><select id="maximum_value" name="'+val+'currency" class="maximum-cls form-control"</select> <input list="browsers" id="amount_currency" name="'+val+'amount" class="amount_currency_cls form-control contra-currency" autocomplete="off"/ ><datalist id="browsers"><option value="No Max Limit"></datalist> </td> <td><input type="file" id="c_file" name="'+val+'contract_file" class=""></td> <td><input type="file" id="price_file" name="'+val+'contract_price_file" class=""></td></tr><tr><td colspan="2" class="add-ment"> <button id="amendment-add" data-id='+val+' tableval="0" class="btn btn-clr add-btn-ss" type="button" serval="'+sersuppval+'" value="extrafiles">Amendment/Addendum</button> </td> </tr> <tr class="verti-td-same"><td colspan="10" class="added-bottom-space"></td></tr>'
+
+        sersuppval++;
+
+    }
+    var selectoption='<option value="" selected>--Select--</option>'
+    $.each(list,function(key,value){
+        selectoption+='<option value='+value.id+'>'+value.symbol+'</option>'
+    })
+
+    var projectoption='<option value="" selected>--Select--</option>'
+
+    $.each(projectlist,function(key,value){
+        projectoption+='<option value='+value.id+' data-id='+value.active_status+'>'+value.projectname+'</option>'
+    })
+// developer code
+     $('#'+val+'table').append(tableshow);
+    
+//UI CODE
+    // $('#'+val+'table tbody:last tr:last').after(tableshow)
+    
+
+
+    $('.projectcls').html(projectoption)
+    $('.maximum-cls').html(selectoption)
+    //$('.maximum-cls').html(selectoption)
+})
+
+$(document).on('click','#service-delete',function(){
+    var value=$(this).val();
+    if (value == 'service'){
+        serviceval--;
+    }
+    else if(value == 'supply'){
+        supplyval--;
+    }
+    else{
+        sersuppval--;
+    }
+    if ($('#'+value+'table tbody tr').length > 3){
+        $(this).closest('tr').next('tr').next('tr').remove();
+        $(this).closest('tr').next('tr').remove();
+        $(this).closest('tr').remove();
+    }
+
+})
+
+    function numberWithCommas(number) {
+
+        var parts = number.toString().split(".");
+
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return parts.join(".");
+    }
+
+
+    $(document).on('change','.amount_currency_cls',function(){
+        $(this).next('span').remove();
+        var val=$(this).val()
+        if (val!='No Max Limit' && val!='no max limit')
+        {
+        $(this).val(val.replace(/([-€~!@#$%^&*()_+=`{}\[\]\|\\:;'<>A-Za-z])+/g, ''));
+        }
+       
+        var number=$(this).val()
+        if ( number !=''){
+            if (number==0){
+                $(this).after('<span class="waring-err">Value cannot be Zero</span>')
+            }
+            else{
+                $(this).next('span').remove();
+            }
+        }
+        else{
+            $(this).next('span').remove();
+        }
+        $(".amount_currency_cls").each(function() {
+            var num = $(this).val();
+            var removecomma=num.replace(/,/g, '');
+            var commaNum = numberWithCommas(decimal_value(removecomma));
+            $(this).val(commaNum);
+        });
+        if($(this).val().indexOf('.')!=-1){         
+            if($(this).val().split(".")[1].length > 2){                
+                if( isNaN( parseFloat( this.value ) ) ) return;
+                this.value = parseFloat(this.value).toFixed(2);
+            }  
+         }            
+         return this; //for chaining
+    });
+
+
+  function getInputType(value) {
+
+     if(!Number.isNaN(Number(value)))
+        return "number";
+    else
+        return typeof value;
+}
+
+
+$(document).on('keyup','.refcls',function(){
+    $(this).next('span').remove()
+    var val=$(this).val().toLowerCase()
+    if(val !='')
+    {
+        $(this).next('span').remove()
+    
+    var currentelement=$(this)
+    $.ajax({
+        type: "GET",
+        url:'/projects/checkcontractrefduplicate',
+        data: {'refnum':val},
+        success: function(data)
+        {
+            if (data.data == 'exists'){
+                currentelement.next('span').remove()
+                currentelement.after('<span class="waring-err">Contract already exists in the contract master</span>')
+            }
+            else{
+                currentelement.next('span').remove()
+                var z=0;
+                $(".refcls").each(function(key,value){
+                    var y=$(value).val().toLowerCase();
+                    if (val !='' && y !=''){
+                        if(val==y){
+                            z=z+1;
+                        }
+                }
+                });
+                
+                if(z > 1){
+                    // currentelement.addClass("error")
+                    // currentelement.attr('data-error',0); 
+                    currentelement.after('<span class="waring-err">Contract already exists</span>')
+                }
+                else{
+                    currentelement.removeClass("error")
+                    // currentelement.attr('data-error',1); 
+
+                }   
+            }
+        }
+    })
+    }
+    else{
+        // $(this).after('<span class="waring-err">Enter SO Reference Number</span>')
+    }
+})
+
+// $(document).on('keyup','.num-cls',function(){
+//     $(this).next('span').remove()
+//     var val=$(this).val()
+//     if(val !='')
+//     {
+//         $(this).next('span').remove()
+    
+//     var currentelement=$(this)
+//     $.ajax({
+//         type: "GET",
+//         url:'/projects/checkcontractreferencenum',
+//         data: {'refnum':val},
+//         success: function(data)
+//         {
+//             if (data.data == 'exists'){
+//                 currentelement.after('<span class="waring-err">Contract already exists in the contract master</span>')
+//             }
+//             else{
+//                 currentelement.next('span').remove()
+//             }
+//         }
+//     })
+//     }
+//     else{
+//         console.log('a')
+//         // $(this).after('<span class="waring-err">Enter Reference Number</span>')
+//     }
+// })
+
+
+
+
+$(document).on('click','#submit',function(event){
+
+    if($('input[name=types_service]:checked').length >= 0){
+        swal.fire('click the check ');
+        } 
+    $('.vendor-cls').each(function(){
+    if ($(this).val() == "") {
+        $(this).css("border-color", "red");
+            // $(this).text('.').css("color", "red");
+        // $(this).closest('tr').after('<span class="waring-err">Error</span>')
+        
+                   
+    }
+     else {
+        $(this).css("border-color", "");
+    //     $(this).closest('tr').after('<span class="waring-err"></span>')
+    }
+ 
+});              
+
+event.preventDefault();
+
+});
+
+$("#vendor_name_id").change(function(){
+let status=$(this).find(':selected').attr('data-id')
+if (status==2){
+    $("#save_id").attr("disabled", true);
+    swal.fire("This Vendor Is Currently Inactive")
+    $('#vendor_name_id').after('<span id="emailidexists" class="error" >This Vendor Is Currently Inactive</span>')
+}
+else{
+    $("#save_id").attr("disabled", false);
+    $('#emailidexists').remove();
+}
+});
+
+$(document).on('click','.final-cls',function(e){
+     var form=$('#contractmaster')
+    form.submit()
+})
+
+
+{% comment %} $(document).on('click','.final-cls',function(e){
+    e.preventDefault()
+    var count=0
+    var checkedcount=0
+    var form=$('#contractmaster')
+    $('input.commoncls[type=checkbox]').each(function(){
+        if ($(this).is(':checked')){
+            console.log('true')
+            checkedcount ++;
+        }
+        else{
+            // checkedcount ++;
+            // console.log($(this))
+            $(this).addClass('con_error')
+        }
+    })
+    $('select').each(function(){
+        var val=$(this).find(':selected').val()
+        
+        if (val == ''){
+            count ++;
+            // console.log($(this))
+            $(this).addClass('con_error')
+            // console.log('a')
+        }
+    })
+    // input:file,
+    $("input:text, input:file, textarea").each(function(){
+       
+        var val=$(this).val()
+        if (val == ''){
+            count ++;
+            // console.log($(this))
+            $(this).addClass('con_error')
+        }
+       
+    });
+    // console.log(count)
+    if (checkedcount == 0){
+        swal.fire("Please Select Contract Information")
+    }
+    if (count == 0 && checkedcount > 0){
+        $('.submit_type').val(1)
+        // alert('s')
+        form.submit()
+    }
+}) {% endcomment %}
+
+
+$(document).on('change','.con_error',function(){
+    $(this).removeClass('con_error')
+    
+})
+
+$(document).on('click','.wcc_flow_cls',function(){
+    let get_project_id=$('.projectcls').not(':hidden').find(':selected').val();
+    let current_element=$(this);
+
+    if (get_project_id){
+        if ($(this).is(':checked')){
+            $.ajax({
+                type:"GET",
+                url:'/projects/companyprojectdevelopment',
+                data:{'projectid':get_project_id},
+                success: function(data){
+                    if (data.project_wcc_flow == 0){
+                        swal.fire('WCC Flow not Added in this Project')
+                        $('.wcc_flow_cls').prop('checked',false);
+
+                    }
+                    else{
+                        $('.wcc_flow_cls').prop('checked',true);
+                    }
+                }
+            })
+        }
+        else{
+        }
+    }
+    else{
+        swal.fire('Select Project and Then Select WCC');
+        $('.wcc_flow_cls').prop('checked',false);
+    }
+})
+
+
+$(document).on('click','.amend_wcc_flow_cls',function(){
+    let get_project_id=$('.projectcls').find(':selected').val();
+    let current_element=$(this);
+    if (get_project_id){
+        if ($(this).is(':checked')){
+            $.ajax({
+                type:"GET",
+                url:'/projects/companyprojectdevelopment',
+                data:{'projectid':get_project_id},
+                success: function(data){
+                    if (data.project_wcc_flow == 0){
+                        // swal.fire('Wcc Flow not Added in this Project')
+                        // current_element.prop('checked',false);
+                        // current_element.closest('td').find('input[type=hidden]').attr('disabled',false);
+                    }
+                    else{
+                        current_element.prop('checked',true);
+                        current_element.closest('td').find('input[type=hidden]').attr('disabled',true);
+                    }
+                }
+            })
+        }
+        else{
+            $(this).closest('td').find('input[type=hidden]').attr('disabled',false);
+        }
+    }
+    else{
+        swal.fire('Select Project and Then Select WCC');
+        current_element.prop('checked',false);
+        current_element.closest('td').find('input[type=hidden]').attr('disabled',false); 
+    }
+})
+
+
+$(document).on('click','.Add_new_contract',function(e){
+  var vendor_id = $('.vendor-cls').val()
+  e.preventDefault();
+    assign_contractmaster(vendor_id)
+  
+})
+
+function assign_contractmaster(vendor_id){
+  $.ajax({
+    type: "POST",
+    headers: { "X-CSRFToken":  csrf_token },
+    url: "/projects/assigncontractmastertovendor",
+    data: {'vendorid':vendor_id},
+    success: function(data){
+      $('.contract_vendor').empty()
+      $('.contract_vendor').append(data.contractmasterview)
+      $('.contract_vendor').find('.vendor_id').val(vendor_id)
+    }
+});
+}
+
+$(document).on('click','.add-btn',function(){
+  html=$(this).closest('tr').clone()
+  html.find('.con_file_cls').attr('name','con_files')
+  html.find('.con_price_file_cls').attr('name','price_files')
+  html.find('.contract_file_ids').remove()
+  html.find('.price_file_ids').remove()
+  html.find('p').remove()
+  html.find('.con_file_cls,.con_price_file_cls').val('')
+  $(this).closest('tbody').append(html)
+})
+
+$(document).on('change','.con_file_cls,.con_price_file_cls',function(){
+    $(this).closest('td').find('p').remove()
+})
+
+$(document).on('click','.del-btn',function(){
+  let tr_length=$(this).closest('tbody').find('tr').length
+  if (tr_length > 1){
+  $(this).closest('tr').remove()
+  }
+})
+
+$(document).on('click','.submit_contract',function(){
+    $('.save_type').val($(this).val())
+    var form = $('#contractMasterView')[0]; // Get the form element
+    var form_data = new FormData(form);
+    var vendor_id=$('.vendor_id').val()
+    var count=0
+    var checkedcount=0
+    var this_val=$(this).val()
+    if ($(this).val() == '2'){
+    
+    $('input.commoncls[type=checkbox]').not(':hidden').each(function(){
+        if ($(this).is(':checked')){
+            checkedcount ++;
+        }
+        else{
+            // checkedcount ++;
+            // console.log($(this))
+            $(this).addClass('con_error')
+        }
+    })
+    var isChecked = false;
+        $('input[name="types_service"]').each(function() {
+            if ($(this).is(':checked')) {
+                    isChecked = true;
+            }
+        });
+
+        if (!isChecked) {
+            Swal.fire('Please select Type of Contract');
+            return false;
+        }
+
+    $('select').not(':hidden').each(function(){
+        var val=$(this).find(':selected').val()
+        
+        if (val == ''){
+            count ++;
+            // console.log($(this))
+            $(this).addClass('con_error')
+            // console.log('a')
+        }
+    })
+    // input:file,
+    $("input:text,  textarea").not(':hidden').each(function(){
+       
+        var val=$(this).val()
+        if (val == ''){
+            count ++;
+            // console.log($(this))
+            $(this).addClass('con_error')
+        }
+       
+    });
+    $('#ref_num').not(':hidden').each(function(){
+        var this_ref_num=$(this)
+        var ref_num=$.trim($(this).val())
+        var contract_id=$('.contract_id').val()
+        reference_number(this_ref_num,ref_num,contract_id)
+        if($(this).hasClass('con_error')){
+            count ++;
+        }
+    })
+
+    $('.con_file_cls').each(function() {
+        var val=$(this).val()
+        if (val == ''){
+            if($(this).closest('td').find('p').length == 0){
+                count ++;
+            $(this).addClass('con_error')
+            }
+            
+        }
+    });
+    $('.con_price_file_cls').each(function() {
+        var val=$(this).val()
+        if (val == ''){
+            if($(this).closest('td').find('p').length == 0){
+                count ++;
+            $(this).addClass('con_error')
+            }
+            
+        }
+    });
+}
+else if ($(this).val() == '1'){
+   // var isChecked = false;
+            //$('input[name="types_service"]').each(function() {
+            //    if ($(this).is(':checked')) {
+            //        isChecked = true;
+            //    }
+            //});
+
+           // if (!isChecked) {
+            //    Swal.fire('Please select Type of Contract');
+            //    return false;
+           // }
+    $('#ref_num').not(':hidden').each(function(){
+        var this_ref_num=$(this)
+        var ref_num=$.trim($(this).val())
+        var contract_id=$('.contract_id').val()
+        reference_number(this_ref_num,ref_num,contract_id)
+        if($(this).hasClass('con_error')){
+            count ++;
+        }
+    })
+    
+
+    
+}
+    
+    if (count == 0 && checkedcount >= 0){
+        $('.submit_contract').attr('disabled','disabled')
+        $('#save_as_new').attr('disabled','disabled')
+        $.ajax({
+            type: "POST",
+            headers: { "X-CSRFToken": csrf_token },
+            url: "/projects/postcontractmaster",
+            data: form_data, 
+            contentType: false, // Let jQuery handle the content type
+            processData: false,
+            enctype: 'multipart/form-data',
+            success: function(data){
+              $('.close').trigger('click');
+              if(this_val == '2' || this_val == '1' ){
+                //alert(current_url+'/projects/createvendormastercontract/'+vendor_id+'')
+               window.location.href = current_url+'/projects/createvendormastercontract/'+vendor_id+''
+              }
+              else{
+              window.location.reload();
+              }
+              $('.submit_contract').attr('disabled',false)
+              $('#save_as_new').attr('disabled',false)
+            }
+        });
+        
+    }
+
+    
+  
+})
+$('.close').on('click', function() {
+    var vendor_id = $('.vendor_id').val();
+    if (vendor_id === undefined || vendor_id === 'undefined') {
+        window.location.href = current_url + '/projects/createnewcontractmaster';
+    } else {
+        window.location.href = current_url + '/projects/createvendormastercontract/' + vendor_id;
+    }
+});
+
+$(document).ready(function() {
+    // Select the dropdown element by its ID
+    $('#vendor_name_id').change(function() {
+    var vendor_id=$(this).val()
+      // Do something with the selected value
+      window.location.href = current_url + '/projects/createvendormastercontract/' + vendor_id;
+    //   $(this).prop('selectedIndex', 1);
+      $(this).prop('disabled', true);
+
+
+      
+      // You can perform any other action here based on the selected value
+    });
+  });
+
+
+$(document).on('click','.del_contract',function(){
+    var this_tr=$(this)
+    var contract_id = $(this).closest('tr').find('.contract_ids').val()// Get the form element
+    $.ajax({
+        type: "POST",
+        headers: { "X-CSRFToken": csrf_token },
+        url: "/projects/delcontractmaster",
+        data: {'contract_id':contract_id},
+        success: function(data){
+            this_tr.closest('tr').remove()
+            let sno=1
+            $('.s_no').each(function(){
+                $(this).text(sno)
+                sno++
+            })
+        }
+    });
+})
+
+
+$(document).on('change','#vendor_name_id',function(){
+    var selected_vendor=$(this).val()
+    $.ajax({
+        type: "GET",
+        headers: { "X-CSRFToken": csrf_token },
+        url: "/projects/getcontracterdata",
+        data: {'selected_vendor':selected_vendor},
+        success: function(data){
+            if (data.length > 0){
+            var html='<thead><th>S.No.</th><th>Name Of Service</th><th>Project Name</th><th>Project Discipline</th><th>Discipline Type</th><th>SO Reference Number</th><th>SO Executed Date</th><th>Maximum Value Of SO</th><th>Actions</th></thead><tbody>'
+            let s_no=1
+            data.contract_data.forEach(function(item) {
+                console.log({'item':item})
+                html += '<tr><input type="hidden" value="' +item.id+ '" name="contract_ids" class="contract_ids"><td>'+s_no+'</td><td>'+item.name_service+'</td><td>'+item.project_name+'</td><td>'+item.projectdiscipline+'</td><td>'+item.discipline_subtype+'</td><td>'+item.reference_number+'</td><td>'+item.executed_date+'</td><td>'+item.currency+'</td>';
+                html += '</tr>';
+                s_no++
+            });
+            $('.create_table').html(html)
+            }
+            else{
+                $('.create_table').html('')
+                console.log({'data':data.contract_data})
+            }
+        }
+    });
+})
+
+
+
+$(document).on('click','.edit_contract',function(e){
+    var contract_id=$(this).attr('data-id')
+    e.preventDefault();
+        $.ajax({
+          type: "POST",
+          headers: { "X-CSRFToken":  csrf_token },
+          url: "/projects/assigncontractmastertovendor",
+          data: {'contract_id':contract_id},
+          success: function(data){
+            $('.edit_contract_vendor').empty()
+            $('.edit_contract_vendor').html(data.contractmasterview)
+            $('.edit_contract_vendor').find('.vendor_id').val(vendor_id)
+          }
+      });
+    
+  })
+  
+  
+
+{% comment %} 
+<tbody>
+    {% for contract_list in contracts %}
+    <tr>
+            <td class="td-left">{{contract_list.projectdiscipline|convert_projectdiscipline|default_if_none:"---"}}</td>
+            <td>{{contract_list.projectdisciplinetype.discipline_subtype|default_if_none:"---"}}</td>
+            <td>{{contract_list.reference_number|default_if_none:"---"}}</td>
+            <td>{{contract_list.executed_date|checktime:request.user.company.id|default_if_none:"---"}}</td>
+            <td>{{contract_list.currency.currency_symbol|default_if_none:"---"}} {{contract_list.amount|default_if_none:"---"}}</td>
+            <td>
+                <button type="button" class="btn btn-clr del_contract">
+                    -
+                </button></td>
+    </tr>
+    {% endfor %}
+</tbody> {% endcomment %}
+
+</script>
+<script>
+    $(document).ready(function(){
+        $("#save_as_new").click(function(){
+
+            $('.save_type').val($(this).val())
+            var form = $('#contractMasterView')[0]; // Get the form element
+            var form_data = new FormData(form);
+            var vendor_id=$('.vendor_id').val()
+            var count=0
+            var checkedcount=0
+
+            var price_table = $('.con_price_file_cls:first');
+            var contract_table = $('.con_file_cls:first');
+            var this_val=$(this).val()
+            if ($(this).val() == '2'){
+            
+            $('input.commoncls[type=checkbox]').not(':hidden').each(function(){
+                if ($(this).is(':checked')){
+                    checkedcount ++;
+                }
+                else{
+                    // checkedcount ++;
+                    // console.log($(this))
+                    $(this).addClass('con_error')
+                }
+            })
+            var isChecked = false;
+            $('input[name="types_service"]').each(function() {
+                if ($(this).is(':checked')) {
+                    isChecked = true;
+                }
+            });
+
+            if (!isChecked) {
+                Swal.fire('Please select Type of Contract');
+                return false;
+            }
+
+            $('select').not(':hidden').each(function(){
+                var val=$(this).find(':selected').val()
+                
+                if (val == ''){
+                    console.log('this',$(this))
+                    count ++;
+                    // console.log($(this))
+                    $(this).addClass('con_error')
+                    // console.log('a')
+                }
+            })
+            $('#ref_num').not(':hidden').each(function(){
+                var this_ref_num=$(this)
+                var ref_num=$.trim($(this).val())
+                var contract_id=$('.contract_id').val()
+                reference_number(this_ref_num,ref_num,contract_id)
+                if($(this).hasClass('con_error')){
+                    count ++;
+                }
+            })
+            // input:file,
+            $("input:text, input:file, textarea").not(':hidden').each(function(){      
+                //console.log('input',$(this))         
+                var val=$(this).val()
+                if (val == ''){
+                    count ++;
+                    // console.log($(this))
+                    $(this).addClass('con_error')
+                }
+               
+            });
+        }
+        if (count == 0 && checkedcount >= 0){
+            $('.submit_contract').attr('disabled','disabled')
+            $('#save_as_new').attr('disabled','disabled')
+        $.ajax({
+            type: "POST",
+            headers: { "X-CSRFToken": csrf_token },
+            url: "/projects/postcontractmaster",
+            data: form_data, 
+            contentType: false, // Let jQuery handle the content type
+            processData: false,
+            enctype: 'multipart/form-data',
+            success: function(data){
+
+                $("input:text, input:file, textarea").each(function() {
+                    // Set the value of each selected element to empty
+                    $(this).val('');
+                });
+
+                $("input:file").not(price_table).not(contract_table).each(function() {
+                    $(this).val('');
+                    $(this).closest('tr').remove();
+                });
+                
+
+                $('select.pops').each(function() {
+                    // Set the selectedIndex to 0 to select the first option
+                    $(this).prop('selectedIndex', 0);
+                });
+                $('#wcc').prop('checked', false);
+                $("#successCard").removeClass("d-none");
+        
+        // Hide success card after 3 seconds (adjust duration as needed)
+                 setTimeout(function() {
+                $("#successCard").addClass("d-none");
+                    }, 3000); 
+
+                $('.submit_contract').attr('disabled',false)
+                $('#save_as_new').attr('disabled',false)
+
+              
+            }
+        });
+    }
+
+            // Your code to execute when the button is clicked goes here
+            // For example:
+        });
+    });
+
+
+$(document).on('keyup','#ref_num',function(){
+    var this_ref_num=$(this)
+    var ref_num=$.trim($(this).val())
+    var contract_id=$('.contract_id').val()
+    reference_number(this_ref_num,ref_num,contract_id)
+})
+
+$(document).on('change','#ref_num',function(){
+    var this_ref_num=$(this)
+    var ref_num=$.trim($(this).val())
+    var contract_id=$('.contract_id').val()
+    reference_number(this_ref_num,ref_num,contract_id)
+})
+
+function reference_number(this_ref_num,ref_num,contract_id){
+    $.ajax({
+        type: "GET",
+        headers: { "X-CSRFToken": csrf_token },
+        url: "/projects/checkreferencenumber",
+        data: {
+            'ref_num':ref_num,
+            'contract_id':contract_id
+        }, 
+        success: function(data){
+            if(data.data == '1' || data.data == 1){
+                this_ref_num.addClass('con_error')
+            }
+            else{
+                this_ref_num.removeClass('con_error')
+            }
+          
+        }
+    });
+}
+
+$(document).ready(function(){
+    selectedValue=$('#vendor_name_id').val();
+        console.log("Selected value: " + selectedValue);
+        if(selectedValue === null || selectedValue === ""){
+            $('.Add_new_contract').click(function(event){
+                $('.Add_new_contract').removeAttr('data-target');
+                swal.fire('Please Select vendor name');
+                event.preventDefault();
+            })
+        }else{
+            $('.Add_new_contract').attr({'data-target':'#add_new_contract'});
+        }
+});
+function addEmptyRow() {
+        // Create a new row with '---' text in each cell
+        var newRow = $('<tr>');
+        newRow.append('<td colspan="8" class="text-center">---</td>');
+        
+        // Append the new row to the table body
+        $('.irock-table tbody').append(newRow);
+    }
+
+    // Add an event listener to the delete contract button
+    $('.del_contract').click(function() {
+        // Call the function to add '---' row in the center of the table
+        addEmptyRow();
+    });
+
+
+    $(document).ready(function() {
+        $(".showtoggle").on('click', function() {
+        let nxttr = $(this).closest('tr').next('tr');
+        $(this).closest('table tbody').find('.collapse').not(nxttr.find('.collapse')).removeClass('show');
+       });
+    
+       });
+
+    </script>
+{% endblock %}

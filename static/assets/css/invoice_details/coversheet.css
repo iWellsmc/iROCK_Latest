@@ -1,0 +1,304 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Babylonica&family=Ballet&family=Birthstone+Bounce&family=Caveat&family=Dancing+Script:wght@500&family=Dr+Sugiyama&family=Kristi&family=La+Belle+Aurore&family=Licorice&family=Mea+Culpa&family=Meddon&family=Miss+Fajardose&family=Monsieur+La+Doulaise&family=Mr+Dafoe&family=Mrs+Saint+Delafield&family=Passions+Conflict&family=Qwigley&family=Satisfy&family=Tangerine:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat&family=Dancing+Script:wght@500&family=Qwigley&family=Sacramento&family=Yellowtail&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Babylonica&family=Ballet&family=Birthstone+Bounce&family=Caveat&family=Dancing+Script:wght@500&family=Dr+Sugiyama&family=Kristi&family=La+Belle+Aurore&family=Licorice&family=Mea+Culpa&family=Meddon&family=Miss+Fajardose&family=Monsieur+La+Doulaise&family=Mr+Dafoe&family=Mrs+Saint+Delafield&family=Passions+Conflict&family=Qwigley&family=Satisfy&family=Tangerine:wght@400;700&family=Zeyada&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat&family=Dancing+Script:wght@500&family=Homemade+Apple&family=Kristi&family=Mr+Dafoe&family=Mrs+Saint+Delafield&family=Qwigley&family=Satisfy&family=Tangerine:wght@400;700&family=Yellowtail&display=swap');
+
+.head-inv-pre {
+    color: #AF2B50 !important;
+    font-size: 2rem !important;
+}
+
+.head-inv-pre-black {
+    color: #000 !important;
+    /* color: #AF2B50 !important; */
+    font-size: 2rem !important;
+}
+
+.inv_rec_cls {
+    border-radius: 30px !important;
+    margin-top: 10px;
+}
+
+.inv_rec_cls p {
+    margin: 10px 10px !important;
+}
+
+.inv_rec_cls p:nth-child(1) {
+    font-weight: 600;
+}
+
+.logo {
+    width: auto !important;
+    padding: 10px 0px !important;
+}
+
+.logo img {
+    width: 100px !important;
+    height: 75px !important;
+    /* border-radius: 50% !important; */
+}
+
+.company-details{
+    text-align: center ;
+    width: 85%;
+}
+
+.company-details p {
+    color: #000;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 0px;
+    display: inline-block;
+}
+
+.parent {
+    justify-content: center;
+    width: 100%;
+    margin: auto;
+}
+
+.row-border {
+    border: 1px solid #c7c7c7;
+}
+
+.bor-top {
+    border-top: none !important;
+}
+
+.bor-bottom-none {
+    border-bottom: none;
+}
+
+.bor-ryt {
+    border-right: 1px solid #c7c7c7;
+}
+
+.row-content h4 {
+    color: #AF2B50;
+    font-size: 16px;
+    font-weight: 600;
+    word-break: break-word;
+    /* width: 25%; */
+    margin: 10px auto !important;
+}
+
+.row-content p {
+    color: #000;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 10px auto !important;
+}
+
+.captions {
+    color: #AF2B50;
+    font-size: 16px;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+.red {
+    color: red !important;
+    font-weight: 600 !important;
+}
+
+.lr-bor {
+    border-left: 1px solid #c7c7c7 !important;
+    border-right: 1px solid #c7c7c7 !important;
+}
+
+.left-pad-4 {
+    padding-left: 4px;
+}
+
+.exchange_rate_p {
+    color: #ed1d1b !important;
+    font-weight: 700 !important;
+}
+
+.exchange_rate_p_black {
+    color: #000 !important;
+    font-weight: 700 !important;
+}
+
+/********** Approval Table **********/
+.approval-head {
+    color: #000;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 10px auto 0px !important;
+}
+
+.coversheet-approval-table {
+    /* width: 120vw; */
+    /* width: 100%; */
+    width: 70%;
+    border: 1px solid #c7c7c7;
+    /* border: 1px solid #000; */
+}
+/* .set_width_cls{
+    width: 120vw !important;
+} */
+
+.coversheet-approval-table th {
+    color: var(--irock-green);
+    border: 1px solid #c7c7c7 !important;
+    /* color: #AF2B50; */
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.coversheet-approval-table th, td {
+    padding: 10px 10px;
+    /* border: 1px solid #000 !important; */
+    font-size: 16px;
+}
+
+.coversheet-approval-table td {
+    color: #000;
+    font-size: 16px;
+    border: 1px solid #c7c7c7 !important;
+    /* font-weight: 500 !important; */
+}
+
+.coversheet-approval-table-bold {
+    font-weight: 500 !important;
+}
+
+.signature-img img {
+    width: 250px;
+}
+
+/** invoice approved css starts here **/
+
+.coversheet-users {
+    width: 100%;
+    margin-bottom: 50px;
+}
+
+.coversheet-users th {
+    /* color: #007480; */
+    color: #fff;
+    background-color: #891737;
+    /* color: #AF2B50; */
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.coversheet-users th, td {
+    padding: 10px 10px;
+    border: 1px solid #c7c7c7 !important;
+    /* border: 1px solid #000 !important; */
+    font-size: 16px;
+}
+
+.coversheet-users td {
+    color: #000;
+    font-size: 16px;
+    /* font-weight: 500; */
+}
+
+.table-red td {
+    color: red;
+}
+
+.table-black td {
+    color: #000;
+    font-weight: 600;
+}
+
+.coversheet-users-image {
+    text-align: center;
+}
+
+.coversheet-users-image img {
+    width: 250px;
+}
+
+.coversheet-users-image p {
+    font-size: 30px;
+    font-weight: 600;
+    margin-bottom: 0px;
+}
+
+/* .inv_approved_cls {
+    text-align: center;
+    border: solid 3px;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 30px !important;
+    margin-top: 10px !important;
+}
+
+.inv_approved_cls p {
+    margin: 10px 10px !important;
+}
+
+.inv_approved_cls p:nth-child(1) {
+    font-weight: 600;
+}
+
+.inv_approved_cls{
+    color:#42ed3e;
+} */
+
+
+.inv_approved_cls {
+    border-radius: 30px !important;
+    margin-top: 10px;
+    text-align: center;
+    margin-top: 20px;
+    border: solid 3px #000;
+    font-size: 15px;
+    font-weight: 500;
+    color: #679B6E;
+}
+
+.inv_approved_cls p {
+    margin: 10px 10px !important;
+}
+
+.inv_approved_cls p:nth-child(1) {
+    font-weight: 600;
+}
+/** invoice approved css ends here **/
+
+/********** Approval Table **********/ 
+
+.br-none br {
+    display: none !important;
+}
+
+.details {
+    /* border: 1px solid #000; */
+    border:1px solid #c7c7c7;
+    border-bottom: none;
+    text-align: center;
+    width: 70%;
+}
+
+.line-brk{
+    word-break: break-word;
+    width:35%;
+}
+
+
+@media only screen and (min-width:768px) and (max-width: 1023px) {
+.compy-detail-coveshet h4{
+    font-size: 20px !important;
+}
+.compy-detail-coveshet p{
+    font-size: 15px !important;
+}
+}
+
+
+.split_name{
+    color:#6d0825 ;
+    font-size: 25px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}

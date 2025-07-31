@@ -1,0 +1,35 @@
+.approvalwcc-table {
+    border: 1px solid var(--tableborder-color) !important;
+}
+
+.approvalwcc-table th {
+    background-color: #fff !important;
+}
+
+.approvalwcc-table td {
+    text-align:  var(--centertext-align);
+}
+.approvalwcc-table td:nth-child(3){
+    text-align: var(--lefttext-align);
+}
+.approvalwcc-table td:nth-child(7){
+    text-align: var(--lefttext-align) !important;
+}
+
+.approvalwcc-table th:nth-child(2){
+    width:110px;
+}
+
+.td-left {
+    text-align: var(--lefttext-align);
+}
+
+
+@media only screen and (min-width:768px) and (max-width:1023px){
+    .approvalwcc-table td {
+        width: 30px !important;
+    }
+    .approvalwcc-table th {
+       padding: 8px 35px;
+        }
+}

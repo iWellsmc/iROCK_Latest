@@ -1,0 +1,425 @@
+<html>
+    
+    {% load static %}
+    {% load widget_tweaks %}
+    <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=0,minimal-ui">
+    <meta name="description" content="Vuexy admin is super flexible, powerful, clean &amp; modern responsive bootstrap 4 admin template with unlimited possibilities.">
+    <meta name="keywords" content="admin template, Vuexy admin template, dashboard template, flat admin template, responsive admin template, web app">
+    <meta name="author" content="PIXINVENT">
+    <title>IROCK</title>
+    <link rel="apple-touch-icon" href="../../../app-assets/images/ico/apple-icon-120.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500;1,600" rel="stylesheet">
+   <!-- BEGIN: Theme CSS-->
+   <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-extended.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/colors.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/components.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/themes/dark-layout.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/themes/semi-dark-layout.css' %}">
+
+  <!-- BEGIN: Page CSS-->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/core/menu/menu-types/vertical-menu.css' %}">
+  {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'css/core/colors/palette-gradient.css' %}"> {% endcomment %}
+  {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'css/pages/authentication.css' %}"> {% endcomment %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+   <!-- END: Page CSS-->
+   <!-- BEGIN: Custom CSS-->
+   {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'vendors/css/forms/select/select2.min.css' %}"> {% endcomment %}
+   <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+ <!--bootstrap style cdn-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+    </head>
+    <body>
+        <form  class="form-txt" id="vendorRegistration">
+            {% csrf_token %}
+        <div class="row">
+            <div class="col-sm-6"> 
+                <h3 class="from-head">Vendor Company Information</h3>
+            </div>
+            <div class="col-sm-6"> 
+                <h3 class="from-head">Vendor Company Address</h3>
+            </div>
+        </div>
+            
+        <div class="row out-vendor">
+            <div class="col-sm-6">
+                  <input type="hidden" name="invitevid" id="invite_vendor_id" value="{{invite_vid.id}}">
+                  <input type="hidden" name="userid" id="user_id" value="{{invite_vid.user.id}}">
+                  <input type="hidden" name="companyid" id="company_id" value="{{invite_vid.company.id}}">
+                  <label for="staticEmail" class="col-form-label" >Vendor Name<span class="star-clr">*</span></label>
+                  <input type="text" id="vendorname" name="vendorname" class="form-control" value="{{invite_vid.vendorcompany}}"placeholder="vendor name"><br>
+                  <label for="staticEmail" class="col-form-label">Country Of Incorporation<span class="star-clr">*</span></label>
+                  <select id="Incorporationcountryid" name="vendor_country_list_incorporation" class="form-control" placeholder="Country Of Incorporation">
+                    <option  value="" selected="selected">---Select Country---</option>
+                    {% for country in maincountry%}
+                    <option value="{{country.id}}">{{country.nicename}}</option>
+                    {% endfor %}
+                </select><br>
+                  <label for="staticEmail" class="col-form-label">Register Number in the Country of Incorporation<span class="star-clr">*</span></label>
+                  <input type="text" id="Registernumber" name="Registernumber" class="form-control" placeholder="Register Number in the Country of Incorporation"><br>
+                  <label for="staticEmail" class="col-form-label">Vendor Company Website<span class="star-clr">*</span></label>
+                  <input type="text" id="website" name="website" class="form-control" placeholder="Vendor Company Website"><br>
+            </div>
+            <div class="col-sm-6">
+                <label for="staticEmail" class="col-form-label">Country Of Operation<span class="star-clr">*</span></label>
+                <select id="Operation_country_id" name="vendor_country_list" class="form-control">
+                    <option  value="" selected="selected">---Select Country---</option>
+                    {% for country in countries%}
+                    <option value="{{country.id}}">{{country.name}}</option>
+                    {% endfor %}
+                </select><br>
+                <label for="staticEmail" class="col-form-label">State in the  Country of Operation<span class="star-clr">*</span></label>
+                <select id="Operation_state_id" name="vendor_state_list" class="form-control">
+                    <option  value="" selected="selected">---Select state---</option>
+                    {% for state in data%}
+                    <option value="{{state.id}}">{{state.name}}</option>
+                    {% endfor %}
+                </select><br>
+                <label for="staticEmail" class="col-form-label">Vendor Company Official Address<span class="star-clr">*</span></label>
+                <textarea rows="3" cols="50" name="address"  class="form-control"></textarea>
+       
+            </div>
+           
+        </div>
+    
+        <div class="row">
+                <h3 class="from-head">Vendor Tax Details</h3>
+                <!-- <div class="row">
+                    <div class="col-sm-6"> 
+                        <h5 class="from-head">Tax Name</h3>
+                    </div>
+                    <div class="col-sm-6"> 
+                        <h5 class="from-head">Tax Number</h3>
+                    </div>
+                </div> -->
+            <div class="col-12 out-phasing">
+               
+                <table id="tax" class="vendor-inv">
+                    <thead>
+                    <tr>
+                    
+                   <th class="col-form-label">Tax Name<span class="star-clr">*</span></th>
+                   <th class="col-form-label">Tax Number<span class="star-clr">*</span></th>
+                   </tr>
+                   </thead>
+                   <tbody  class="basic-tax-in">
+                    <tr>
+                        
+                        
+                        
+                          <td><input type="text" name="taxname"  class="form-control taxname-cls" placeholder="Tax Name"></td>
+                           
+                            
+                            <td><input type="text" name="taxnumber"  id="taxnum" class="form-control taxnumber-cls" placeholder="Tax Number">
+                            <td class="same-line-btn"><button id='add' class='btn out-btn add-btn' type='button' value='Add'> <i class="fa fa-plus"></i> </button> <button id='delete' class='btn out-btn delete-btn' type='button' value='delete'> <i class="fa fa-minus"></i> </button></td>
+                                
+                        
+                       
+                        
+                      
+                        
+                        
+                       
+                    </tr>
+                    <tr>
+                    <div class="text-left">
+                    <td><span id="errmsg" ></span></td>
+            </div>
+        </tr>
+        </tbody>
+                </table>
+                <div class="row">
+                    <div class="text-center btn-cls">
+                        {% comment %} <button type="button" class="btn btn-clr text-left draft-cls" >Save as Draft</button> {% endcomment %}
+                        <button type="button" class="btn btn-clr text-left submit-cls" >Save & Next</button>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        </form>
+        <footer class="footer footer-static footer-light">
+            <p class="footer-txt"><span class="">Copyright &copy; 2021<a class="middle-txt" href="http://www.iwellsmc.com" target="_blank">iWells Integrated Management Consultants DMCC,</a>All rights Reserved</span>
+            {% comment %} <button class="btn btn-primary btn-icon scroll-top" type="button"><i class="feather icon-arrow-up"></i></button> {% endcomment %}
+            </p>
+        </footer>
+        <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script> 
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+        <script src="https://jqueryvalidation.org/files/dist/jquery.validate.min.js"></script>
+        <script src="https://jqueryvalidation.org/files/dist/additional-methods.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    
+    
+
+<script>
+
+    $(document).on('change', '#Operation_country_id', function() {
+        var country_id=$(this).val();
+        var html=''
+        $.ajax({
+            type:"GET",
+            url:'/projects/getstate',
+            data:{'countryid':country_id},
+            success: function(data){
+                console.log(data)
+                html +='<option  value="" selected="selected">---Select state---</option>'
+                $.each(data.data,function(key,val){
+                    html +='<option value='+val.id+'>'+val.name+'</option>'
+                   
+                })
+                $('#Operation_state_id').html(html)
+            }
+        })
+    });
+
+
+
+
+
+
+var row=1;
+var emptytaxnamedata;
+var emptytaxnumdata;
+$(document).on("click","#add", function(){
+    var spanid=$(this).closest('tr').index()
+    $('#taxnm-'+spanid+'').remove()
+    $('#taxnum-'+spanid+'').remove()
+    $('.taxname-cls').each(function(){
+        var val =$(this).val()
+        
+        if (val  == ''){
+            emptytaxnamedata = false;
+            $(this).closest('td').find('input').after('<span class="waring-err" id="taxnm-'+spanid+'" >Please Provide a Tax Name</span>')
+
+        }
+        else{
+            emptytaxnamedata = true;
+            $('#taxnm-'+spanid+'').remove()
+        }
+    })
+
+    $('.taxnumber-cls').each(function(){
+        var val =$(this).val()
+        
+        if (val  == ''){
+            emptytaxnumdata = false;
+            $(this).closest('td').find('input').after('<span class="waring-err" id="taxnum-'+spanid+'" >Please Provide a Tax Number</span>')
+        }
+        else{
+            emptytaxnumdata = true;
+            $('#taxnum-'+spanid+'').remove()
+
+        }
+    })
+    if (taxname == true && taxnum == true  && emptytaxnamedata == true && emptytaxnumdata == true ){
+        var new_row1='<tr id=id="blockrow"'+row+'"><div class="row"><div class="col-12"><td><input  id="taxname'+row+'" "type="text" name="taxname" class="form-control taxname-cls"></td></div><div class="col-6"><td><input  id="taxnumber'+row+'" type="text" name="taxnumber" class="form-control taxnumber-cls"></td> <td class="same-line-btn"><button id="add" class="btn out-btn add-btn" type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="delete" class="btn out-btn" delete-"btn" type="button" value="delete"> <i class="fa fa-minus"></i> </button></td></div></div></tr>'
+
+        $("#tax").append(new_row1);
+        row++;
+        return false;
+    }
+
+
+})
+$(document).on("click", "#delete", function () {
+    emptytaxnamedata = true
+    emptytaxnumdata = true
+    if (taxname == true && taxnum == true && emptytaxnamedata == true && emptytaxnumdata == true ){
+        if(row>1) {
+            $(this).closest('tr').remove();
+            row--;
+            }
+        return false;
+    }
+
+})
+
+$.validator.addMethod(
+    "regex",
+    function(value, element, regexp) {
+        return this.optional(element) || regexp.test(value);
+    },
+    "Please check your input."
+);
+$("#vendorRegistration").validate({
+    rules: {
+        vendorname: {
+        required: true,
+        },
+        Registernumber: {
+          required:true,
+        },
+        website: {
+            required: true,
+        },
+        address:{
+            required:true,
+
+        },
+        vendor_country_list_incorporation:{
+            required:true,
+        },
+        vendor_country_list:{
+            required:true,
+        },
+        vendor_state_list:{
+            required:true,
+        },
+
+    },
+    messages: {
+        vendor_state_list:{
+            required:"Please Provide a State"
+        },
+        vendorname:{
+            required:"Please Provide Vendor Name",
+        },
+        Registernumber:{
+            required:"Please Provide a Register Number",
+        },
+        website:{
+            required:"Please Provide a Website",
+        },
+        address:{
+            required:"Please Provide a Address",
+        },
+        vendor_country_list_incorporation:{
+          required:"Please Select a Incorporation Country",
+        },
+        vendor_country_list: {
+          required: "Please Select a Country",
+        },
+        errorElement : 'span',
+        },
+});
+
+var datas;
+    $(".submit-cls").click(function(){  
+        if($("#vendorRegistration").valid()){ 
+            datas = true; 
+        }
+        else{
+            datas =false;
+        }
+    })
+
+var taxname=true;
+    $(document).on('keyup','.taxname-cls',function(){
+        var val=$(this).val();
+        var z=0;
+        $('input').each(function(){
+            if (val !='' && y !=''){
+                var y=$(this).val();
+                if(val==y){
+                    z=z+1;
+                }
+            }
+        });
+        if(z>1){
+            var spanid=$(this).closest('tr').index()
+            $('#taxnm-'+spanid+'').remove()
+            $(this).addClass("error")
+            taxname=false
+            $(this).closest('td').find('input').after('<span class="waring-err" id="taxnm-'+spanid+'" >Tax Name Already exists</span>')
+        }
+        else{
+            var spanid=$(this).closest('tr').index()
+            $(this).removeClass("error")
+            taxname = true;
+            $('#taxnm-'+spanid+'').remove()
+        }
+
+    })
+
+
+var taxnum=true;
+    $(document).on('keyup','.taxnumber-cls',function(){
+        var val=$(this).val();
+        var spanid=$(this).closest('tr').index()
+        $('#taxnum-'+spanid+'').remove()
+        var z=0;
+        if (val.length <= 50){
+            taxnum=true
+            $('#taxnum'+spanid+'').remove()
+        }
+        else {
+            taxnum = false;
+            $('#taxnum'+spanid+'').remove()
+            $(this).closest('td').find('input').after('<span class="waring-err" id=taxnum'+spanid+'>Maximum 50 Characters only</span>')
+        }
+    })
+
+    $(document).on("click", ".submit-cls", function (){
+        var form=$("#vendorRegistration");
+        $('.taxname-cls').each(function(){
+            var val =$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#taxnm-'+spanid+'').remove()
+            
+            if (val  == ''){
+                emptytaxnamedata = false;
+                $(this).closest('td').find('input').after('<span class="waring-err" id="taxnm-'+spanid+'" >Please Provide a Tax Name</span>')
+    
+            }
+            else{
+                emptytaxnamedata = true;
+                $('#taxnm-'+spanid+'').remove()
+            }
+        })
+
+        $('.taxnumber-cls').each(function(){
+            var val =$(this).val()
+            var spanid=$(this).closest('tr').index()
+            $('#taxnum-'+spanid+'').remove()
+            if (val  == ''){
+                emptytaxnumdata = false;
+                $(this).closest('td').find('input').after('<span class="waring-err" id="taxnum-'+spanid+'" >Please Provide a Tax Number</span>')
+            }
+            else{
+                emptytaxnumdata = true;
+                $('#taxnum-'+spanid+'').remove()
+    
+            }
+        })
+        console.log(datas)
+        console.log(taxname)
+        console.log(taxnum)
+        console.log(emptytaxnamedata)
+        console.log(emptytaxnumdata)
+        if (datas == true && taxname == true && taxnum == true && emptytaxnamedata == true && emptytaxnumdata == true){
+            var invite_vendor_id=$('#invite_vendor_id').val();
+            $(this).prop('disabled', true);
+            $.ajax({
+                type:"POST",
+                url:'/projects/createvendoroutside',
+                data:form.serialize(),
+                success: function(data){
+                    console.log(data)
+                    //console.log(data.vendorid);
+                    var vendorid=data.vendorid
+                    var current_url=$(location).attr("href")
+                    var url = current_url.replace(''+invite_vendor_id+'/outervendorbasicinfo','outervendorregistration/'+data.vendorid);
+                    document.location.href = url;
+        
+                }
+            })
+        }
+
+    
+    })
+
+ </script>
+
+
+    </body>
+</html>

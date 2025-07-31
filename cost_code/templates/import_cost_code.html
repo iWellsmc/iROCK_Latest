@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% load cost_code_tags %}
+
+
+<div>
+    <div class="row">
+        <h3 class="from-head">Import Cost Code</h3>
+    </div>
+    <div class="row">
+        <div class="col-3">
+            <button type="button" class="btn btn-clr btn-master"><a href="{% url 'cost_code:downloadcostcode_template' %}">Download CostCode Template</a></button>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="row">
+        <div class="col-4">
+            <input type="hidden" name="costcode_type" class="costcode_type" id="costcode_type">
+            <input type="hidden" name="total_rows" class="total_rows" id="total_rows">
+
+
+            <label for="staticEmail" class="col-form-label">Select Root Category<span
+                class="star-clr">*</span></label>
+            <input type="hidden" name="level1_costcode" class="level1_costcode" id="level1_costcode">
+            <select id="level1_category" name="level1_category" class="form-control">
+                <option value="" selected="selected">---Select ---</option>
+                {% for discipline in alldiscipline%}
+                    {% for development in alldevelopment%}
+                        <option value="{{discipline.id}}_{{development.id}}">{{discipline.name}}({{development.development_type}})</option>
+                    {% endfor %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-4">
+            <label for="staticEmail" class="col-form-label">Select Sub Category<span
+                class="star-clr">*</span></label>
+            <input type="hidden" name="level2_costcode" class="level2_costcode" id="level2_costcode">
+            <select id="level2_category" name="level2_category" class="form-control"></select>
+        </div>
+        <div class="col-4">
+            <input type="file" name="costcodefile" class="filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+        </div>
+    </div>
+
+    <div class="text-center btn-cls">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+    </form>
+   
+</div>
+        
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script src="{% static 'js/cost_code/generate_cost_code.js' %}"></script>
+
+{% endblock %}

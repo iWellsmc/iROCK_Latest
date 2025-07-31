@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load custom_tags %}
+{% load InvoiceGuardTags %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/reports/editpaymentaccount.css' %}">
+
+<div>
+  <h3 class="from-head">Edit Payment Account</h3>
+  
+  <div class="row">
+      <div class="col-9">
+
+      </div>
+      <div class="col-3 text-end">
+      
+      </div>
+  </div>
+
+  <div class="row">
+    <div class="col-5 head_cls">
+        <!-- <div class="vin-no"><label>VIN :</label><span id="vin_id"></span></div>
+        <div class="ven-name"><label>Vendor Name :</label><span id="ven_id"></span></div> -->
+
+        <!-- <table>
+            <tr class="vin-no">
+                <td><label>VIN</label></td>
+                <td class="dot-colon">:</td>
+                <td><span id="vin_id"> {{paymentact_details.vendor.vin}}</span></td>
+            </tr>
+
+            <tr class="ven-name">
+                <td><label>Vendor Name</label></td>
+                <td class="dot-colon">: </td>
+                <td><span id="ven_id">{{paymentact_details.vendor.vendor_name}}</span></td>
+            </tr>
+            <tr class="ven-name">
+                <td><label>Currency</label></td>
+                <td class="dot-colon">: </td>
+                <td><span id="ven_id">{{paymentact_details.currency.currency_symbol}}-{{paymentact_details.currency.currency}}</span></td>
+            </tr>
+        </table> -->
+    </div>
+</div>
+
+
+<div class="row d-flex justify-content-center">
+  <div class="col-6 col-lg-5 col-md-9">
+  <div class="invite-cards">
+    <table>
+      <tr class="vin-no">
+          <td><label>VIN</label></td>
+          <td class="dot-colon">:</td>
+          <td><span id="vin_id"> {{paymentact_details.vendor.vin}}</span></td>
+      </tr>
+
+      <tr class="ven-name">
+          <td><label>Vendor Name</label></td>
+          <td class="dot-colon">: </td>
+          <td><span id="ven_id">{{paymentact_details.vendor.vendor_name}}</span></td>
+      </tr>
+      <tr class="ven-name">
+          <td><label>Currency</label></td>
+          <td class="dot-colon">: </td>
+          <td><span id="ven_id">{{paymentact_details.currency.currency_symbol}}-{{paymentact_details.currency.currency}}</span></td>
+      </tr>
+  </table>
+
+
+
+
+    <form  method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="tablefield">
+          <div class="row tr_row mt-3">
+            <div class="col-md-12 mb-3">
+              <input type="text" name="amount" value={{paymentact_details.amount}} autocomplete="off" class="form-control amount" placeholder="Amount">
+            </div>
+            <div class="col-md-12">
+              <input type="file" name="image" id="file-input" accept="image/png, image/jpeg, application/pdf" class="form-control edit-client-int file filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+              <p class="file-name-contra">{{paymentact_details.paymentfile}}</p>
+            </div>
+          </div>
+      </div>
+
+    <div class="text-center">
+      <button type="submit" class="btn btn-clr com-save generate_report">Submit</button>
+    </div>
+  </table>
+
+  </form>
+  </div>
+</div>
+</div>
+  
+
+{%endblock%}
+{% block scripts %}
+{{ block.super }}
+<script>
+    var csrf_token = '{{csrf_token}}'
+</script>
+<script type="text/javascript" src="{% static 'js/invoice/addpaymentaccount.js' %}"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script>
+</script>
+
+{%endblock%}

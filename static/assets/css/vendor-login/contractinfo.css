@@ -1,0 +1,116 @@
+.comp_currency{
+display: none;
+}
+
+.note-editable{
+    text-align: left !important;
+}
+
+.vend-thead th {
+    text-align: var(--centertext-align);
+}
+.vin_left{
+    text-align: left !important;
+}
+.vend-thead td:nth-child(1) {
+    text-align: var(--centertext-align) !important;
+
+}
+
+.vend-thead td:nth-child(4) {
+    text-align: var(--centertext-align) !important;
+}
+
+.vend-thead td {
+    border-right: 1px solid var(--tableborder-color);
+}
+.prj-back_clr th
+  {
+    background: transparent !important;
+  }
+
+  .vennd-conn td:nth-child(2) {
+    text-align: var(--centertext-align);
+}
+.all-tbl-hd th {
+    text-transform: capitalize !important;
+}
+td.contra-first-tbl {
+    border-right: 2px solid  var(--tableborder-color);
+    /* padding: 20px 20px; */
+    border-bottom: 1px solid  var(--tableborder-color) !important;
+    word-break: break-word !important;
+}
+/* table.type-last-vend {
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px;
+    table-layout: fixed;
+    width: 100% !important;
+} */
+table.type-last-vend th{
+    border-top: 1px solid var(--tableborder-color) !important;
+   }
+   .wid-sn{
+    border-left: 1px solid var(--tableborder-color) !important;
+   }
+    .vieww-serr td{
+    border-right: none !important; 
+    border-left: none !important;
+    border-top: none !important;
+   } 
+   tr.amen-type-lists td:nth-child(2){
+    font-weight: 600 !important;
+   }
+   .list_tab_vendor{
+    border-radius: 5px; 
+    box-shadow: 0px 0px 6px !important;
+    table-layout: fixed;
+    width: 100% !important;
+     border: 1px solid var(--tableborder-color); 
+   }
+@media screen and (min-width:768px) and (max-width:1199px){
+    table.type-last-vend{
+        width: 150vw !important;
+    }
+    table.type-last-vend th{
+     border-top: 1px solid var(--tableborder-color) !important;
+    }
+}
+@media screen and (min-width:1200px) and (max-width:1399px){
+    table.type-last-vend{
+        width: 100vw !important;
+    }
+    table.type-last-vend th{
+     border-top: 1px solid var(--tableborder-color) !important;
+    }
+}
+
+
+.vieww-serr {
+    border: 1px solid var(--tableborder-color) !important;
+}
+
+.vieww-serr th {
+    white-space: normal !important;
+}
+
+.seek-left td:nth-child(6) {
+    text-align: left !important;
+}
+
+
+/********** Add Missing Contract **********/
+.addmissing-table th {
+    border: 1px solid var(--tableborder-color) !important;
+    padding: 10px 10px;
+    text-align: var(--centertext-align);
+}
+
+.addmissing-table td {
+    border: 1px solid var(--tableborder-color);
+    padding: 10px 10px;
+
+}
+/********** Add Missing Contract **********/
+
+

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+{% load custom_tags %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/user_Management/users.css' %}">
+
+<div>
+      <h5 class="from-head">Dispute Resolution Team</h5>
+      {% comment %} <div class="row">
+        <div class="col-9"></div>
+        <div class="col-3">
+          {% if request.user.roles_id == 2 %}
+                  
+                      <button type="button" class="btn btn-clr btn-master chck-tst mr-0"><a href="{% url 'custom_auth:add-committee-form' %}">Add Members</a></button>
+
+              {% endif %}
+        </div>
+      </div> {% endcomment %}
+
+      <div class="row">
+        <div class="col-12">
+          <div class="table-responsive text-nowrap">
+            <table class="table settings-data-list-view data-list-view list-user-table-width irock-table"
+            id="master_project_list">
+            <thead class="list-user">
+              <tr>
+                <th>S/N</th>
+                <th class="wid-iin">First Name <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button> </th>
+                <th class="wid-iin">Last Name <button class="filter-btn" data-filter="last-name"> <i class="fas fa-sort"></i></button></th>
+                <th>Designation <button class="filter-btn" data-filter="designation"> <i class="fas fa-sort"></i></button></th>
+                <th>Department <button class="filter-btn" data-filter="dept"> <i class="fas fa-sort"></i></button></th>
+                <th>Group <button class="filter-btn" data-filter="group"> <i class="fas fa-sort"></i></button></th>
+                <th class="wid-email">Email <button class="filter-btn" data-filter="email"> <i class="fas fa-sort"></i></button></th>
+                <th class="wid-mob">Mobile No <button class="filter-btn" data-filter="mobile"> <i class="fas fa-sort"></i></button></th>
+                {% comment %} <th>Actions</th> {% endcomment %}
+              </tr>
+            </thead>
+            <tbody class=" table-list">
+              {% if usercount == 0 %}
+              <tr>
+                <td colspan="9" class="cls-nil">
+                  ---
+                </td>
+              </tr>
+              {%else%}
+              {%for user in users %}
+              <tr>
+                <td>{{forloop.counter}}</td>
+                <td class="td-left">{{user.name}}</td>
+                <td class="td-left">{{user.lastname}}</td>
+                <td class="td-left">
+                  <p class="txt-word-break">{{user.designation_role|default_if_none:"---"}}</p>
+                </td>
+                <td class="td-left">
+                  <p class="txt-word-break">{{user.user_department|default_if_none:"---"}}</p>
+                </td>
+                <td class="td-left">
+                  <p class="txt-word-break">{{user.user_group|default_if_none:"---"}}</p>
+                </td>
+                <td class="td-left" >{{user.email}}</td>
+                <td class="td-center">{% get_phone_number user.mobile_countrycode %}-{{user.mobile|default_if_none:"---"}}</td>
+                {% comment %} <td class="text-center">
+                  <button type='button' class='btn btn-clr btn-master chck-tst mr-0 '><a href="{% url 'custom_auth:editusercommittee' pk=user.id %}">Edit</a></button>
+                  <button type='button' class='btn btn-clr btn-master chck-tst mr-0 del_user' data-id='{{user.id}}'>Delete User</button>
+                </td>
+     {% endcomment %}
+              </tr>
+              {% endfor %}
+              {% endif %}
+          </table>
+    
+          </div>
+              </div>
+            </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script> 
+  let csrftoken='{{csrf_token}}'
+</script>
+<script type="text/javascript" src="{% static 'js/custom_auth/creditdispute.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/projects/userslist.js' %}"></script>
+{% endblock %}

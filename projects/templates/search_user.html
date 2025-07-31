@@ -1,0 +1,180 @@
+{% load static %}
+{% load custom_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/user_Management/users.css' %}">
+
+<section id="data-list-view" class="data-list-view-header">
+    <div>
+      <h4 class="from-head"> </h4>
+      <div class="row">
+         <div class="col-12 text-end">
+            <button type="button" class="btn btn-clr onClass">Create User</button>
+          <!-- <a href="{% url 'projects:usercreate' %}">Create User</a> -->
+        </div>
+      </div>
+      <div class="row my-4">
+        <div class="col-8"> 
+          <div class="all-noti-box">
+            <div class="show-noti p-0">
+                <label class="mb-0">Show <select id="datafilters" class="changevalue select-style">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+            </select> entries</label>
+        </div>
+        </div>
+        </div>
+        <div class="col-4 text-end">
+          <form method="get">
+            <input type="text" id="myInput" class="search-f-inf" name="q" placeholder="Search User Name" value="{{query}}" autocomplete="off">
+          </form>          
+        </div>
+    </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="table-responsive text-nowrap">
+            <table class="table settings-data-list-view data-list-view project_master all-tbl-hd list-user-table-width tab-res irock-table"
+            id="master_project_list">
+            <thead class="list-user">
+              <tr>
+                <th>S/N</th>
+                <th class="wid-iin">First Name</th>
+                <th class="wid-iin">Last Name</th>
+                <th>Designation</th>
+                <th>Department</th>
+                <th>Group</th>
+                <th class="wid-email">Email</th>
+                <th class="wid-mob">Mobile No</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody class=" table-list">
+              {% if usercount == 0 %}
+              <tr>
+                <td colspan="9" class="cls-nil">
+                  ---
+                </td>
+              </tr>
+              {%else%}
+              {%for user in process_list %}
+              <tr>
+                <td>{{process_list.start_index|add:forloop.counter0 }}</td>
+                <td class="td-left">{{user.name}}</td>
+                <td class="td-left">{{user.lastname}}</td>
+                <td class="td-left">
+                  <p class="txt-word-break">{{user.designation_role|default_if_none:"---"}}</p>
+                </td>
+                <td class="td-left">
+                  <p class="txt-word-break">{{user.user_department|default_if_none:"---"}}</p>
+                </td>
+                <td class="td-left">
+                  <p class="txt-word-break">{{user.user_group|default_if_none:"---"}}</p>
+                </td>
+                <td class="td-left" >{{user.email}}</td>
+                <td>{% get_phone_number user.mobile_countrycode %}-{{user.mobile|default_if_none:"---"}}</td>
+                <td>
+                  <div class="ic-onsm">
+                    <a class="btn px-1" href="{% url 'projects:userview' pk=user.id|replacecommaid %}">
+                      <span class="action-edit">  <!-- Class Removed ->  align-icons -->
+                        <i class="fa fa-eye" title="View"></i>
+                      </span>
+                    </a>
+                    <a class="btn px-1" href="{% url 'projects:userrights' pk=user.id|replacecommaid %}">
+                      <span class="action-edit">  <!-- Class Removed ->  align-icons -->
+                        <i title="General Rights" class="fa fa-check-square-o"></i>
+    
+                      </span>
+                    </a>
+                    <a class="btn px-1" href="{% url 'projects:userprojectrights' pk=user.id|replacecommaid %}">
+                      <span class="action-edit">  <!-- Class Removed ->  align-icons -->
+                        <i title='Project Specific Rights' class="fa-solid fa-list-check"></i>
+    
+                      </span>
+                    </a>
+                    <a class="btn px-1" href="{% url 'projects:useredit' pk=user.id|replacecommaid %}">
+                      <span class="action-edit">  <!-- Class Removed ->  align-icons -->
+                        <i class="fa fa-pencil-square-o" title="Edit"></i>
+                      </span>
+                    </a>
+                    <a class="btn px-1 user_delete_cls" userid="{{user.id|replacecommaid}}" username="{{user.name}} {{user.lastname|default_if_none:''}}">
+                      <span class="action-edit">  <!-- Class Removed ->  align-icons -->
+                        <i class="fa fa-trash" title="Delete"></i>
+                      </span>
+                    </a>
+                  </div>
+                </td>
+    
+              </tr>
+              {% endfor %}
+              {% endif %}
+                    <input type="hidden" class="scheme" value="{{scheme}}">
+                    <input type="hidden" class="gethost" value="{{gethost}}">
+                    <input type="hidden" class="csrf_token" value="{{csrf_token}}">
+                    <input type="hidden" class="entries" value="{{pageper_data}}">
+          </table>
+    
+          </div>
+              </div>
+      </div>
+    </div>
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center">
+      {% if process_list.has_previous %}
+          <li class="page-item">
+          <a class="btn-clr page-link" href="{{ request.META.HTTP_REFERER }}">Previous</a>
+        </li>
+      {% else %}
+          <li class="page-item disabled">
+          <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Previous</a>
+        </li>
+      {% endif %}
+    
+      {% if process_list.number|add:'-4' > 1 %}
+          <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ process_list.number|add:'-5' }}">&hellip;</a></li>
+      {% endif %}
+    
+      {% for i in process_list.paginator.page_range %}
+          {% if process_list.number == i %}
+              <li class="page-item pg-count active" aria-current="page">
+            <span class="btn-clr pg-circle page-link">
+              {{ i }}
+              <span class="sr-only">(current)</span>
+            </span>
+          </li>
+          {% elif i > process_list.number|add:'-5' and i < process_list.number|add:'5' %}
+    
+            {% if request.GET.vendor %}
+          <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&page={{ i }}">{{ i }}</a></li>
+            {% elif request.GET.vendor and request.GET.sortname %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+            {% elif request.GET.vendor and request.GET.sortvendorname %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+            {% elif request.GET.sortname %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+            {% elif request.GET.sortvendorname %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+            {% else %}
+              <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+          {% endif %}
+    {% endfor %}
+      {% if process_list.paginator.num_pages > process_list.number|add:'4' %}
+        <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ process_list.number|add:'5' }}">&hellip;</a></li>
+      {% endif %}
+    
+      {% if process_list.has_next %}
+          <li class="page-item pg-count">
+          <a class="btn-clr page-link" href="?page={{ process_list.next_page_number }}">Next</a>
+        </li>
+      {% else %}
+          <li class="page-item disabled">
+          <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Next</a>
+        </li>
+      {% endif %}
+    </ul>
+    </nav>
+    </div>
+    
+    </div>
+    </section>

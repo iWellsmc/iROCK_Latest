@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/contractqueries.css' %}">
+<div>
+    <h4 class="from-head">Query List</h4>
+
+        <div class="row">
+            <div class="col-9">
+            </div>
+            <div class="col-3 text-end">
+                <button type="button" class="btn btn-clr waves-effect waves-float waves-light"><a href="/projects/contractlist">Raise a Query</a></button>
+            </div>
+        </div>
+            <div class="vends-invite-lists query-tab_wid table-responsive text-nowrap">
+              <table class="table prj-back_clr settings-data-list-view data-list-view project_master vend-thead vend-tt vend-border all-tbl-hd irock-table ">
+                  <thead >
+                      <tr >
+                          <th>S/N</th> 
+                          <th>VIN</th>
+                          <th>Contract Ref No</th>     
+                          <!-- <th>Reason</th> -->
+                          <!-- <th>Uploaded Documents</th> -->
+                          <!-- <th>Reason For Denial</th> -->
+                          <th>Status</th>
+                          <th>Action</th>
+                          {% comment %} <th>Invite Sent Date</th> {% endcomment %}
+                      </tr>
+                  </thead>
+                  <tbody class="table-list">
+                      {% if len_querylist > 0 %}
+                        {% for query in querylists %}
+                        <tr>
+                        <td class="vin_center left_align_proj">{{forloop.counter}}</td>
+                        <td class="vin_center left_align_proj">{{query.user.cin_number}}</td>
+                        <td class="vin_center left_align_proj text-wrap">{{query.refnum|category_replace}}</td>
+                        <!-- <td>{{query.reason|safe}}</td> -->
+                        <!-- <td>
+                        {% checkfile query.c_file as filecount%}
+                        {% if  filecount > 0%}
+                        <a href="{{query.c_file.url}}" target="_blank" class="qu-viewnme">{{query.c_file.name}}</a>
+                        {% endif %}
+                        </td> -->
+                        <!-- <td>
+                            {{query.deniedreason|default_if_none:"---"}}
+                        </td> -->
+                        <td class="text-center status-nme left_align_proj text-wrap">
+                            {% if query.status == 1 %}
+                                <div class="badge badge-warning sta-war">
+                                    Open
+                                </div>
+                            {% elif query.status == 0 %}
+                                <div class="badge badge-danger sta-dan">
+                                    Closed
+                                </div>
+                            {% endif %}
+                            
+                        </td>
+                        <td class="query-act text-wrap">
+                            <a href="{% url 'projects:queryhistory' pk=query.id %}" class="btn his-oty px-1"><i class="fa fa-history" title="History" aria-hidden="true"></i></a>
+                            <!-- {% if query.status == 1 %}
+                            <a href="{% url 'projects:querydenied' pk=query.id %}" class="close-sim"><i class="fa fa-times-circle" title="Close"></i> </a>
+                            {% endif %} -->
+                        </td>
+                        </tr>
+                        {% endfor %}
+                      {% else %}
+                      <tr>
+                          <td colspan="7" class="cls-nil text-center">
+                            ---
+                          </td>
+                        </tr>
+                      {% endif %}
+                  </tbody>
+              </table>
+              </div>
+          
+</div>
+{% endblock %}

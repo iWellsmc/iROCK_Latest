@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/invoice.css' %}">
+
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li  {% if message.tags %} class="{{ message.tags }} msg-cls"{% endif %} style="display:none;"> {{ message }} </li>
+    {% endfor %}
+</ul>
+{% endif %}
+    <div>
+        <h3 class="from-head">Total Invoices Submitted to Date</h3>
+
+        <div class="row">
+            <div class="col-9">
+            </div>
+            <div class="col-3">
+                {% if vendorid.active_status == 1 %}
+                {% if vendor_status == True %}
+                <button type="button" class="btn btn-clr btn-master mr-0"><a href="{% url 'invoice:createinvoice' %}">Submit Invoice</a></button>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        <div id="loader" class="loader"></div>
+        <div class="table-responsive text-nowrap inv-table_wid">
+        <table class="table prj-back_clr settings-data-list-view data-list-view invoicelist tot-in irock-table invoicevendor-table" id="master_project_list">
+            <thead >
+                <tr >
+                    <input type="hidden" id="user_sign" value="{{sign_data}}">
+                    <th>S/N</th> 
+                    <th class="">Invoice No <button class="filter-btn" data-filter="inv-num"> <i class="fas fa-sort"></i></button></th>     
+                    <th>Submitted Date <button class="filter-btn" data-filter="submit-date"> <i class="fas fa-sort"></i></button></th>
+                    <th>Approval Status <button class="filter-btn" data-filter="approval"> <i class="fas fa-sort"></i></button></th>
+                    <th>Approval/Disputed Date <button class="filter-btn" data-filter="appr-date"> <i class="fas fa-sort"></i></button></th>
+                    <th>Payment Status <button class="filter-btn" data-filter="pay-status"> <i class="fas fa-sort"></i></button></th>
+                    <th>Payment Date<button class="filter-btn" data-filter="pay-date"> <i class="fas fa-sort"></i></button></th>
+                    <th class="status-width-invoice">Status <button class="filter-btn" data-filter="status"> <i class="fas fa-sort"></i></button></th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody class="table-list">
+                <!-- {% if invoice_count == 0 %}
+                <tr>
+                    <td colspan="9" class="cls-nil">
+                      ---
+                    </td>
+                  </tr>   
+                  {%else%}
+                {% for invoice in allinvoices %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td class="t-sub-data">
+                        {%for costinvoice in invoice.id|getinvoices %}
+                        <div class="cos-in-nu">{{costinvoice.invoice_number}}</div>
+                        {% empty %}
+                        <div>---</div>
+                        {% endfor %}
+                    </td>
+                    <td class="date-center text-wrap"> 
+                        {%for costinvoice in invoice.id|getinvoices %}
+                        <div>{{costinvoice.invoice_submission_date|confulldate:costinvoice.invoice.company.id|default_if_none:"---"}}</div>
+                        {% empty %}
+                        <div>---</div>
+                        {% endfor %}
+                    </td>
+                    <td class="td-left">
+                                {%for costinvoice in invoice.id|getinvoices %}
+                                    <div>{% if costinvoice.approval_status == 6 and invoice.invoice_status == 6 %} Disputed {% elif costinvoice.approval_status == 1 and invoice.invoice_status == 2 and invoice.approval_status == 0%} Awaiting Approval {% elif costinvoice.approval_status == 1 and invoice.invoice_status == 2 and invoice.approval_status == 1 %} Approved{% elif costinvoice.approval_status == 1 and invoice.invoice_status == 1 %} Not Yet Submitted {% elif costinvoice.approval_status == 4 and invoice.invoice_status == 4 %} Returned {% elif costinvoice.approval_status == 5 and invoice.invoice_status == 5 %} Rejected {% else %} Approved {% endif %}</div>
+                                    {% empty %}
+                                    <div>---</div>
+                                {% endfor %}
+
+                    </td>
+                    <td class="date-center text-wrap">
+                        {%for costinvoice in invoice.id|getinvoices %}
+                        <div>{% if costinvoice.approval_date == "" or costinvoice.approval_date == None %} N/A {% else %} {{costinvoice.approval_date|confulldate:costinvoice.invoice.company.id}}{% endif %}</div>
+                        {% empty %}
+                        <div>---</div>
+                        {% endfor %}
+                    </td>
+                    <td class="vin_left text-wrap">
+                        {%for costinvoice in invoice.id|getinvoices %}
+                        {% get_payment_detail invoice.id costinvoice.id as payment_count %}
+                        <div>{% if costinvoice.payment_status == 1 and payment_count == 0 %} Unpaid {% elif costinvoice.payment_status == 1 and payment_count == 1 %} Confirmed for Payment {% else %} Paid {% get_payment_percentage invoice.id costinvoice.id as payment_percentage %}{% if payment_percentage  %}-{{payment_percentage}}% {% endif %} {% endif %}</div>
+                        {% empty %}
+                        <div>---</div>
+                        {% endfor %}
+                    </td>
+                    <td >
+                        {%for costinvoice in invoice.id|getinvoices %}
+                        <div>{% if costinvoice.payment_date == "" or costinvoice.payment_date == None %} N/A {% else %} {{costinvoice.payment_date|confulldate:costinvoice.invoice.company.id}}{% endif %}</div>
+                        {% empty %}
+                        <div>---</div>
+                        {% endfor %}
+                    </td>
+                    <td class="vin_left text-wrap">
+                        {% if invoice.invoice_status == 1 %}
+                            Draft
+                        {% else %}
+                            Submitted
+                        {% endif %}
+                    </td>
+                    <td class="eye_test text-wrap">
+
+                        <a class="btn px-1" href="{% url 'invoice:invoiceview' invoice.id %}">
+                              <i class="fa fa-eye" title="View"></i>
+                        </a>
+                        {% if invoice.invoice_status == 4 %}
+                        {% if request.user.roles.id == 3 or request.user.roles.id == 2 %}
+                        {% checkpermission_invoiceapproval_dispute invoice userid '' as haspermission_invoicerecipt %}
+                        {% if haspermission_invoicerecipt > 0 %}  
+                          <a href="{% url 'invoice:invoicequeryhistory' pk=invoice.id %}" class="btn his-oty px-1"><i class="fa fa-history" title="History" aria-hidden="true"></i></a>
+                          {% endif %}
+                          {% else %}
+                          {% if vendorid.active_status == 1 %}
+                            {% get_returned_invoice_count invoice.id '' as inv_count %}
+                            {% if inv_count == 0 %}
+                                <a href="{% url 'invoice:invoicequeryhistory' pk=invoice.id %}" class="btn his-oty px-1"><i class="fa fa-history" title="History" aria-hidden="true"></i></a>
+                            {% endif %}
+                          {% endif %}
+                        {% endif %}
+                        {% comment %} <a href="{% url 'invoice:invoicequeryhistory' pk=invoice.id %}" class="btn his-oty px-1"><i class="fa fa-history" title="History" aria-hidden="true"></i></a> {% endcomment %}
+                        {% endif %}
+
+                        {% if vendorid.active_status == 1 %}
+                            {% if vendor_status == True %}
+                            {% if invoice.invoice_status == 1 %} 
+                            <a class="btn px-1" href="{% url 'invoice:editinvoiceform' invoice.id 1 %}{% if invoice.wcc_id %}?wcc_id={{invoice.wcc_id}}{% endif %}">
+                            
+                                <i class="fa fa-edit" ></i>
+                            </a>
+                            {% endif %}
+                            {% endif %}
+                        {% endif %} -->
+                        
+                        <!-- <a class="btn p-0" href="#">
+                        <i class="fa fa-trash-o"></i>
+                        </a> -->
+                    <!-- </td>
+                </tr>
+                {% endfor %}
+                {% endif %} -->
+
+
+                <!-- insert recored using invoicelist.js ajax method  -->
+            </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script type="text/javascript" src="{% static 'js/invoice/invoicelist.js' %}"></script>
+<script>
+    // $( document ).ready(function() {
+    //     var notyf = new Notyf({
+    //         duration: 2000,
+    //         position: {
+    //           x: 'right',
+    //           y: 'top',
+    //         },
+    //         types: [
+    //           {
+    //             type: 'success',
+    //             background: '#D3D3D',
+    //             icon: {
+    //               className: 'fa fa-check-circle',
+    //               tagName: 'i',
+    //               color: '#000',
+    //             },
+    //           },
+    //         ]
+    //       });
+      
+    //     var msg=$('.msg-cls').text();
+    //     if (msg){
+    //       notyf.open({
+    //       type: 'success',
+    //       message: msg,
+    //     }); 
+    //     }
+    //   })
+</script>
+
+{% endblock %}

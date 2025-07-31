@@ -1,0 +1,259 @@
+.heading-name {
+    /* color: #017474; */
+    color: #8D1636;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    padding: 5px;
+}
+
+.wcc-name td {
+    padding: 5px 5px;
+}
+
+.wcc-name td:nth-child(1){
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+    /* width: 100px; */
+}
+
+.wcc-name td:nth-child(2){
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.wcc-name td:nth-child(3){
+    color: #017474;
+    font-size: 15px;
+    font-weight: 600;
+    width: 250px;
+}
+
+.input-wid {
+    /* justify-content: center; */
+}
+
+.input-wid input {
+    width: 30%;
+    margin: 0px auto 10px;
+    text-align: center;
+}
+
+.station_per_div select {
+    /* width: 75%; */
+    margin: 0px auto 10px;
+    /* text-align: center; */
+}
+
+.check-label {
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+
+}
+
+.check-label.demo input {
+    margin-right: 5px;
+    margin-left: 5px !important;
+}
+
+.check-label input {
+    margin: 0px 5px;
+    /* margin-left: 5px; */
+}
+
+.check-label label {
+    margin-bottom: 0px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #8D1636;
+}
+
+.station input {
+    width: 30%;
+    text-align: center;
+}
+
+
+.check-label-view {
+    border-right: 1px solid #c7c7c7;
+}
+
+.check-label-view span {
+    margin-bottom: 0px;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* .demo {
+     border-right: 1px solid #c7c7c7;
+} */
+
+.station-view {
+    text-align: center;
+    border-right: 1px solid #c7c7c7;
+    /* line-height: 3; */
+    margin-left: -1px;
+}
+
+.station-view span {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.heading-border {
+    border: 1px solid #c7c7c7;
+    margin: 0px 10px;
+}
+
+.heading-border-col {
+    border-right: 1px solid #c7c7c7;
+}
+
+.heading-border2 {
+    border-top: none;
+}
+
+.table-data {
+    border: 1px solid #c7c7c7;
+    border-top: none !important;
+    border-right: none !important;
+    /* margin: 0px 10px; */
+    margin: 0px 9.7px -1px 10px;
+}
+
+.col-6.new_cls {
+    border-right: 1px solid #c7c7c7;
+}
+
+.h6-margin {
+    /* padding: 7px 0px 5px 0px !important; */
+    margin-bottom: 0px;
+    /* line-height: 3; */
+}
+
+.input-wid-view {
+    height: 100%;
+}
+
+.role-view {
+    text-align: center;
+    border-right: 1px solid #c7c7c7;
+}
+
+.role-view span {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.user-view {
+    text-align: center;
+    border-right: 1px solid #c7c7c7;
+}
+
+.user-view span {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.user-details {
+    text-align: left;
+    border-right: 1px solid #c7c7c7;
+    margin-left: 1px;
+}
+
+
+@media (min-width:1337px) {
+    .first-border {
+        line-height: 3;
+    }
+
+    .new_cls.second-border {
+        line-height: 3;
+    }
+
+    .h6-margin {
+        /* line-height: 3; */
+        line-height: 2;
+    }
+
+}
+
+@media (max-width: 1336px) {
+    .col-6.new_cls {
+        /* display: table-cell; */
+        /* padding: 25px 0px; */
+    }
+
+    .station-view {
+        /* line-height: 4.5; */
+    }
+    
+    .first-border {
+        line-height: 4.5;
+    }
+
+    .new_cls.second-border {
+        line-height: 4.5;
+    }
+
+    .h6-margin {
+        padding: 18px 0px 10px 0px !important;
+    }
+}
+.user_list{
+    text-align: left;
+}
+
+/* new sa */
+.station-widt {
+    width: 22.3%;
+    /* max-width:205px;
+    margin-right: 28px; */
+    line-height: 3;
+}
+
+.ruu-view {
+    width: 77.8%;
+    border-right: 1px solid #c7c7c7;
+}
+.first-border {
+    border-right: 1px solid #c7c7c7;
+    /* max-width: 186px;
+    width: 100%; */
+    width: 28.6%;
+    text-align: center;
+    /* line-height: 3; */
+}
+
+.first-border span {
+    font-size: 15px;
+    font-weight: 500;
+}
+.new_cls.second-border {
+    border-right: 1px solid #c7c7c7;
+    /* width: 100%;
+    max-width:213px; */
+    width: 28.6%;
+    text-align: center;
+    /* line-height: 3; */
+}
+
+.new_cls.second-border span {
+    font-size: 15px;
+    font-weight: 500;
+}
+.just-style{
+    justify-content: end;
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1023px) {
+    .invoice-appo-work{
+        overflow: scroll;
+    }
+.invoice-appo-work .heading-border {
+    width: 150%;
+}
+}

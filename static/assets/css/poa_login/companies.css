@@ -1,0 +1,359 @@
+/********** list Table **********/
+
+.tab-head th {
+    border-right: 1px solid #e3e3e3 !important;
+    border-bottom: 2px solid #e3e3e3 !important;
+}
+
+.tab-head td:nth-child(4) {
+    text-align: left !important;
+}
+
+/* .tab-head td {
+    width: 15%;
+} */
+
+.tab-head tbody td:nth-child(1) {
+    text-align: center !important;
+}
+
+div#company_list_length {
+    color: #951739;
+    font-weight: 600;
+    padding-bottom: 20px !important;
+}
+
+div#company_list_filter {
+    color: #941839;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.reg-comlist td:nth-child(2),
+.reg-comlist td:nth-child(5),
+.reg-comlist td:nth-child(6) {
+    text-align: center !important;
+}
+
+.reg-comlist td:nth-child(4) {
+    text-align: left !important;
+}
+
+.reg-comlist tr {
+    border-bottom: 1px solid #e3e3e3 !important;
+}
+
+span.bck-appo {
+    background: #009f00;
+    padding: 2px 5px;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: 500;
+}
+
+span.bck-appo-r {
+    background: red;
+    padding: 2px 5px;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: 500;
+}
+
+span.bck-appo-p {
+    background: #bb5f00;
+    padding: 2px 5px;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: 500;
+}
+
+.reg-act-icc {
+    text-align: center;
+}
+
+.reg-act-icc a {
+    padding: 0px 4px;
+    text-decoration: none;
+}
+
+.table>:not(:first-child) {
+    border-top: 0px solid currentColor;
+    }
+
+    .creat-head th {
+    border-top: 1px solid #e3e3e3  !important;
+}
+
+#company_list_length select:focus-visible {
+    outline: none; 
+}
+
+#company_list_filter input:focus-visible {
+    outline: none; 
+}
+
+.maroon {
+    border-color: #8D1636 !important;
+    background-color: #8D1636 !important;
+    color: #fff !important;
+}
+
+.maroon:active {
+    border-color: #8D1636 !important;
+    background-color: #8D1636 !important;
+    color: #fff !important;
+}
+
+.maroon:hover {
+    border-color: #8D1636 !important;
+    background-color: #8D1636 !important;
+    color: #fff !important;
+    box-shadow: 0 8px 25px -8px #8D1636 !important;
+}
+
+.maroon:focus {
+    border-color: #8D1636 !important;
+    background-color: #8D1636 !important;
+    color: #fff !important;
+}
+
+.paginate_button:hover {
+    border: 1px solid #979797 !important;
+    background: linear-gradient(to bottom, white 0%, #dcdcdc 100%) !important;
+}
+
+.paginate_button:active {
+    border: 1px solid #979797 !important;
+    background: linear-gradient(to bottom, white 0%, #dcdcdc 100%) !important;
+}
+
+.tab-head td:nth-child(3) {
+    word-break: break-word !important;
+}
+
+.tab-com {
+    width: 212.672px !important;
+}
+
+div.dataTables_wrapper div.dataTables_length select {
+    width: auto !important;
+}
+
+/********** list Table **********/
+
+
+
+/********** View - EYE **********/
+.bto-spa {
+    margin-bottom: 15px;
+}
+
+button.key-lic-btn {
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    float: right;
+    background: #aa2045;
+}
+
+button.key-lic-btn:hover {
+    background: #008b6a !important;
+}
+
+button.key-lic-btn a {
+    color: #fff;
+    text-decoration: none;
+}
+
+button.key-lic-btn a:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+.admin-listhead {
+    font-size: 18px !important;
+    color: #af2b50;
+}
+
+.admin-listhead-li {
+    font-size: 18px !important;
+    color: #af2b50;
+    font-weight: 600;
+}
+
+.colo-cllr {
+    color: #af2b50;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.company-cls-li {
+    font-size: 17px;
+    font-weight: 600;
+    padding-left: 8px;
+    color: #008068;
+}
+
+.admin-status {
+    border: 1px solid #b9c4e1;
+    box-shadow: 0px 0px 5px #8080808a;
+    width: 100%;
+}
+
+.admin-status td {
+    width: 50%;
+    border: 1px solid #efd7dd;
+    padding: 10px;
+    word-break: break-word !important;
+}
+
+.admin-status tr:nth-child(even) {
+    background: #efefef75;
+}
+
+.admin-head {
+    color: #af2b50;
+    font-size: 16px;
+    /* font-weight: 500 !important;
+    padding-bottom: 15px; */
+}
+
+.admin-detail {
+    font-weight: 400;
+    font-size: 15px;
+    color: #000;
+}
+
+.chip-text {
+    font-weight: 400;
+    font-size: 15px;
+}
+
+.pay-hy {
+    position: relative;
+}
+
+.pay-topbot {
+    margin: 10px 0px 10px 0px !important;
+}
+
+.lic-re-sd {
+    background: #009f00 !important;
+    color: #fff !important;
+    margin-right: 5px !important;
+}
+
+.lic-re-sd:hover {
+    background: #028169 !important;
+    color: #fff !important;
+}
+
+.lic-re-sd:focus {
+    box-shadow: 0px 0px 4px #028169;
+}
+
+.lic-re-rj {
+    background: red !important;
+    color: #fff !important;
+    margin-left: 5px;
+}
+
+.lic-re-rj:hover {
+    background: #028169 !important;
+    color: #fff !important;
+}
+
+.lic-re-rj:focus {
+    box-shadow: 0px 0px 4px #028169;
+}
+
+.yes-btn {
+    background: #850000 !important;
+    border: none !important;
+    color: #fff !important;
+}
+
+.yes-btn:focus {
+    box-shadow: none !important;
+}
+
+.resen-d {
+    background: #850000 !important;
+    border: none !important;
+}
+
+/* .resen-d:hover {
+    box-shadow: none !important;
+} */
+
+
+/********** View - EYE **********/
+
+
+/********** key generator Resubmit **********/
+
+.pay-ent {
+    margin-bottom: 20px !important;
+    font-size: 30px;
+}
+
+.py-hd {
+    font-weight: 600 !important;
+    font-size: 16px !important;
+}
+
+.gen-submid {
+    text-align: center;
+}
+
+.btn-sublic {
+    background: #aa2045 !important;
+}
+
+.btn-sublic input {
+    color: #fff;
+}
+
+.btn-sublic:hover {
+    background: #008b6a !important;
+}
+
+.reg-form.field-spacing input {
+    height: 35px !important;
+}
+
+/********** key generator Resubmit**********/
+
+/********** View responsive **********/
+@media (min-width:768px) and (max-width:778px) {
+    .red-green {
+        padding-left: 0px;
+    }
+}
+
+@media (min-width:768px) and (max-width:1199px) {
+    .pay-topbot {
+        text-align: start !important;
+    }
+    
+    .tab-head {
+        width: 125vw !important;
+    }
+}
+
+@media (min-width:768px) and (max-width:1023px) {
+    .new-dd-pay {
+        top: -2px;
+    }
+    .reg-company td span{
+        font-size: 13px;
+    }
+    .reg-company .action{
+        padding: 5px !important;
+    }
+}
+
+/********** View responsive **********/
+
+
+

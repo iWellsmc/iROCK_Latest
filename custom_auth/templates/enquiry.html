@@ -1,0 +1,343 @@
+{% load static %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html class="loading" lang="en" data-textdirection="ltr">
+<!-- BEGIN: Head-->
+ 
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+   <title>Enquiry</title>
+   <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600" rel="stylesheet">
+   <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/logo/irock.png' %}">
+ 
+   <!-- BEGIN: Vendor CSS-->
+   <link rel="stylesheet" type="text/css" href="{% static 'vendors/css/vendors.min.css' %}">
+   <!-- END: Vendor CSS-->
+ 
+   <!-- BEGIN: Theme CSS-->
+   <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-extended.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/colors.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/components.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/themes/dark-layout.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/themes/semi-dark-layout.css' %}">
+
+  <!-- BEGIN: Page CSS-->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/core/menu/menu-types/vertical-menu.css' %}">
+  <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/core/colors/palette-gradient.css' %}"> -->
+  <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/pages/authentication.css' %}"> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+   <!-- END: Page CSS-->
+   <!-- BEGIN: Custom CSS-->
+   <!-- <link rel="stylesheet" type="text/css" href="{% static 'vendors/css/forms/select/select2.min.css' %}"> -->
+   <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+   <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+
+   <!-- END: Custom CSS-->
+ 
+</head>
+<!-- END: Head-->
+ 
+<!-- BEGIN: Body-->
+ 
+<body class="vertical-layout vertical-menu-modern 1-column  navbar-floating footer-static bg-full-screen-image  menu-collapsed blank-page blank-page" data-open="click" data-menu="vertical-menu-modern" data-col="1-column">
+   <!-- BEGIN: Content-->
+   <div class="app-content content">
+       <div class="content-overlay"></div>
+       <div class="header-navbar-shadow"></div>
+       <div class="content-wrapper">
+           <div class="content-header row">
+           </div>
+           <div class="content-body rg-bk">
+               <section class="row flexbox-container">
+                   <div class="col-xl-8 col-10 d-flex justify-content-center">
+                       <div class="card bg-authentication m-0 reg-box">
+                           <div class="row">
+
+                               <div class="col-lg-12 col-12">
+                                   <div class="reg-card">
+                                       <!-- <div class="card-header"> -->
+                             
+                            
+
+                                           <div class="card-title">
+                            
+                                               <h1 class="reg-head text-center">Enquiry</h1>
+                                   
+                                           </div>
+                                       <!-- </div> -->
+                                       
+                                       <div class="card-content ">
+                                            <div class="row">
+                                                <div class="col-9">
+                                                </div>
+                                                <div class="col-3">
+                                                    <!-- <button type="button" class="btn btn-color btn-enq" style="float: right;margin-right: 21px;"><a href="{% url 'custom_auth:login' %}" >Back</a></button> -->
+                                                    <a class=" btn-enq" href="{% url 'custom_auth:login' %}" >Back</a>
+                                                </div>
+                                            </div>
+                                           <div class="card-body pt-0">
+                                               <form method="POST" name="registerform" id="register_form_id" class="reg-form enq-pro" enctype="multipart/form-data" >
+                                                {% csrf_token %}
+                             
+                                                <div class="row">
+                                                    <div class="col-sm-2">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                            <label for="inputCompanyName">Title<span class="star-clr">*</span></label> 
+                                                            {% comment %} <input type="text" name="title" id="title" class="form-control" placeholder="Company Name"> {% endcomment %}
+                                                            {{form.title}}
+                                                           </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-10">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                            <label for="inputCompanyName">{{form.companyname.label}}<span class="star-clr">*</span></label> 
+                                                            {{form.companyname}}
+                                                           </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                               <label for="inputName">{{form.email.label}}<span class="star-clr">*</span></label>
+                                                               {{form.email}} 
+                                                               </div>
+                                                           </div>
+                                                    </div>
+                                                </div>
+                                              
+                                                <div class="row">
+                                                    <div class="col-12 txt-msg">
+                                                        <label for="inputLastName">Message<span class="star-clr"></span></label>
+                                                        <!-- {{form.message}} -->
+                                                        <textarea id="summernote" name="message" class="msgcls"></textarea>
+                                                    
+                                                    </div>
+                                                </div>
+
+                                                 <div class="text-center spacing-button">
+                                                    <button type="submit" id="idsubmit" class="btn btn-inline mb-50 btn-color btn-enq-sub">Submit</button>
+                                                </div>
+                                               </form>
+                                           </div>
+                                       </div>
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+               </section>
+ 
+           </div>
+       </div>
+   </div>
+   <!-- END: Content-->
+ 
+   <!-- BEGIN: Vendor JS-->
+   <script src="{% static 'vendors/js/vendors.min.js' %}"></script>
+   <!-- BEGIN Vendor JS-->
+   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+   <!-- BEGIN: Page Vendor JS-->
+   <!-- END: Page Vendor JS-->
+ 
+   <!-- BEGIN: Theme JS-->
+   <!-- <script src="{% static 'js/core/app-menu.js' %}"></script>
+
+   <script src="{% static 'js/core/app.js' %}"></script>
+   <script src="{% static 'js/custom.js' %}"></script>
+
+
+   <script src="{% static 'js/scripts/components.js' %}"></script>
+   <!-- END: Theme JS-->
+   <!-- <script src="{% static 'vendors/js/forms/validation/jquery.validate.min.js' %}"></script> -->
+   <!-- <script src="{% static 'vendors/js/forms/select/select2.full.min.js' %}"></script> -->
+   <!-- <script src="{% static 'js/scripts/forms/select/form-select2.js' %}"></script> --> -->
+
+   <!-- BEGIN: Page JS-->
+   <!-- END: Page JS-->
+
+
+</body>
+<!-- END: Body-->
+<style>
+ .card
+ {
+     width:100%;
+ }
+ /* body {
+    {% comment %} background-image: url("{% static 'images/iwells-map.jpg' %}"); {% endcomment %}
+    background-size: cover;
+    background-position: center;
+}    */
+.totalusersdiv,.operatorsubtype,.operatortype
+{
+    display: none;
+}
+
+.txt-msg .note-editable {
+    color: #000 !important;
+    font-weight: 400 !important;
+    font-size: 15px !important;
+}
+</style>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://jqueryvalidation.org/files/dist/jquery.validate.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+<script>
+
+
+// $('.msgcls').summernote(
+//         {
+//         toolbar: false,
+
+
+//     });
+
+$(document).ready(function() {
+  $('#summernote').summernote({
+    toolbar: false,
+  });
+});
+
+
+
+
+$(document).on('keyup','#id_companyname',function(){
+    
+    // var val=$(this).val()
+    // str = val.replace(/\s{2,}/g, ' ');
+    // $(this).val(str)
+    // remove_dot = str.replace(/\.{2,}/g, '');
+    // $(this).val(remove_dot)
+    var $th = $(this);
+    $th.val($th.val().replace(/([-,€~!@#$%^&*()_+=`{}\[\]\|\\:;'<>])+/g, ''))
+    $th.val($th.val().replace(/\d+/g, ''))
+    $th.val($th.val().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+    // $th.val($th.val().replace(/^\s*/, ''));
+    remove_dot = $th.val().replace(/\.{2,}/g, '.');
+    $(this).val(remove_dot)
+   });
+   
+// $(document).on('click','#idsubmit',function(e){})
+
+// $(document).on('click','#idsubmit',function(e){
+//     // alert('a')
+//     var count=0
+//     var type=$('.titlecls').find(':selected').val()
+//     var companyname=$('.comcls').val()
+//     var email=$('mailcls').val()
+//     var msg =  $($("#summernote").summernote("code")).text()
+//     if (type == "" || companyname == "" || email == "" || msg == ""){
+//         count ++;
+//     }
+//     // alert(count)
+//     if (count > 0){
+//         e.preventDefault()
+//     }
+//     else{
+//         Swal.fire({
+//         position: 'top',
+//         icon: 'success',
+//         title: 'Enquiry Submitted Successfully',
+//         showConfirmButton: true,
+//         timer:12000
+//         })
+//         return true
+//     }
+//     // console.log(html);
+// })
+
+// $(document).on('keyup','#id_email',function(){
+//     var inputvalue = $('input[name="email"]').val();
+
+// inputvalue = inputvalue.trim();
+
+// $('input[name="email"]').val(inputvalue);
+// })
+
+var field = document.querySelector('input[name="email"]');
+
+field.addEventListener('keypress', function ( event ) {  
+   var key = event.keyCode;
+    if (key === 32) {
+      event.preventDefault();
+    }
+});
+
+
+    $.validator.addMethod(
+        "regex",
+        function(value, element, regexp) {
+            return this.optional(element) || regexp.test(value);
+        },
+        "Please check your input."
+    );
+        $("#register_form_id").validate({
+        rules: {
+            email: {
+            required: true,
+            email: true,
+            regex:/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
+            },
+            name:{
+                required:true,
+                regex:/^[a-zA-Z ]+\.*$/,
+            },
+            title:{
+                required:true,
+            },
+            companyname:{
+                required:true,
+                // regex: /^[a-zA-Z ]*$/,
+            },
+        },
+        messages: {
+            companyname:{
+                required:"Please Provide a Name",
+                regex:"Accept Only Alphabets",
+            },
+            name:{
+                required:"Please Provide a First Name",
+                // regex:"Should Accept Only Characters",
+            },
+            title:{
+                required:"This Field is Required",
+            },
+            email:{
+              required:"Please Provide an Email ID",
+              email: "Please Provide a Valid Email ID",
+              regex:"Please Provide a Valid Email ID",
+            },
+            errorElement : 'span',
+            },
+        submitHandler: function(form) {
+            Swal.fire({
+                    position: 'top',
+                    icon: 'success',
+                    title: 'Enquiry Submitted Successfully',
+                    showConfirmButton: true,
+                    timer:12000
+                    })
+            form.submit();
+          
+
+
+        }
+    });
+
+</script> 
+</html>

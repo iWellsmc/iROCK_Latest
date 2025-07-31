@@ -1,0 +1,1287 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/vendorinfo.css' %}">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<div>
+{% comment %} <h4 class="from-head">Edit User Details</h4>  {% endcomment %}
+{% check_vendor request.user.cin_number as vendor %}       
+
+
+{% if vendor %}
+        <h4 class="from-head">Edit User Details</h4> 
+    {%else%}
+        <h4 class="from-head">Edit Vendor Details</h4> 
+    {%endif%}   
+<form  class="form-txt" id="edituserid" method="POST" enctype="multipart/form-data" runat="server">
+<input value="{{request.user.roles.id}}" name="roleid" class="roleid" type="hidden">
+        {% csrf_token %}
+        {% for hidden in form.hidden_fields %}
+            {{hidden}}
+        {% endfor %}
+    
+        <div class="row">
+            <div class="row">
+                <div class="col-9">
+                </div>
+                
+                {% comment %} {% if data.userfirsttimelogin == %} {% endcomment %}
+                <div class="col-3">
+                    <button type="button" class="btn btn-clr btn-master"><a href="{% url 'custom_auth:userdetails' pk=request.user.id%}">Back</a></button>
+                </div>
+                {% comment %} {% endif %} {% endcomment %}
+            </div>
+            <div class="col-lg-6 col-md-12">
+                <div class="row creat-user-bottom">
+                    <div class="col-2">
+                        <label for="staticEmail" class="col-form-label">Title<span class="star-clr">*</span></label>
+                        {% if request.user.roles.id == 4 %}
+                            <input type="hidden" name="title" value="{{datas.Title}}"> 
+                        <!-- (% elif request.user.roles.id == 3 %} -->
+                            <input type="hidden" name="titles" value="{{datas.Title}}"> 
+                        {% endif%}
+                        <select name="title" class="form-control" {% if request.user.roles.id == 4 %} disabled {% elif request.user.roles.id == 3 %} disabled {% endif %}>
+                            <option value="" selected>-Select-</option>
+                                {% for title in titles%}
+                                    <option {% if datas.Title == title %} selected {% endif %} {{data.userfirsttimelogin}} value={{title}}>
+                                        {{title}}
+                                    </option>
+                                {% endfor %}
+    
+                        </select>
+                    </div>
+                    <div class="col-10">
+                        <label for="staticEmail" class="col-form-label">{{ form.name.label }}<span class="star-clr">*</span></label>
+                        {% if request.user.roles.id == 4 and request.user.roles.id == 3  %}  
+                            {% render_field form.name class="form-control" %}
+                        {% else %}
+                                {% render_field form.name|add_class:"form-control"|attr:"readonly" %}
+                        {% endif %}
+                    </div>
+                </div>
+    
+                <div class="creat-user-bottom">
+                <label for="staticEmail" class="col-form-label">{{ form.email.label }}<span class="star-clr">*</span></label>
+                        {% if request.user.roles.id == 4 and request.user.roles.id == 3  %}  
+                    {% render_field form.email class="form-control" %}
+                {% else %}
+                    {% render_field form.email|add_class:"form-control"|attr:"readonly" %}
+                {% endif %}
+                </div>
+                <div class="row creat-user-bottom">
+                    <div class="col-2">
+                        <label for="staticEmail" class="col-form-label user_phn_cls">{{form.phone_countrycode.label}}{% if request.user.roles.id == 3 %}{% endif %} </label>
+                        <select name="phone_countrycode" placeholder="Country Code" class="form-control">
+                            <option  value="" selected="selected">---Select---</option>
+                            {% for code in phone%}
+                            <option {% if user.phone_countrycode == code.id %} selected {% endif %}  value="{{code.id}}">{{code.iso}} </option> 
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-2"> 
+                        <label for="staticEmail" class="col-form-label area-cd-wd">{{form.areacode.label}}{% if request.user.roles.id == 3 %}{% endif %}</label>
+                        {% if request.user.roles.id == 4 and request.user.roles.id == 3  %}  
+                            {% render_field form.areacode class="form-control" %}
+                        {% else %}
+                            {% render_field form.areacode|add_class:"form-control" %}
+                        {% endif %}
+                    </div>
+                    <div class="col-4">
+                        <label for="staticEmail" class="col-form-label">{{ form.phone.label }} {% if request.user.roles.id == 3 %}{% endif %}</label>
+                        {% if request.user.roles.id == 4 and request.user.roles.id == 3  %}  
+                            {% render_field form.phone class="form-control" %}
+                        {% else %}
+                            {% render_field form.phone|add_class:"form-control"%}
+                        {% endif %}                    </div>
+                    <div class="col-3">
+                        <label for="staticEmail" class="col-form-label">{{ form.phone_number_extenstion.label }}{% if request.user.roles.id == 3 %}{% endif %}</label>
+                        {% if request.user.roles.id == 4 and request.user.roles.id == 3 %} 
+                        {% render_field form.phone_number_extenstion class="form-control" %}
+                    {% else %}
+                        {% render_field form.phone_number_extenstion|add_class:"form-control" %}
+                    {% endif %}                    </div>
+                    
+                </div>
+                <div class="row creat-user-bottom">
+                <div class="col-12">
+                    {% if request.user.image == '' or request.user.image == 'None'%}
+                    <img id="image-preview" src="{% static 'images/icons/Character_icon.svg' %}" class="company-img-cls"><br>
+                    {% else %}
+                    <img id="image-preview" src="{{image}}" class="company-img-cls"><br>
+                    {% endif %}
+                    
+                    <label for="staticEmail" class="col-form-label edit-com-hd" >User Photo<span class="star-clr"></span></label>
+
+                    <input type="file" name="image" id="file-input" accept="image, .png, .jpeg, .jpg," class="form-control edit-com-input filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                    <br>
+                    <span id="file-size-error" style="color: red; display: none;">File size exceeds the limit of 25MB.</span>
+                    <br>
+                    </div>
+                    </div>
+            </div>
+            <div class="col-lg-6 col-md-12">
+                <div class="creat-user-bottom">
+                <label for="staticEmail" class="col-form-label">{{ form.lastname.label }}<span class="star-clr">*</span></label>
+                {% if request.user.roles.id == 4 and request.user.roles.id == 3 %} 
+                    {% render_field form.lastname class="form-control" %}
+                {% else %}
+                    {% render_field form.lastname|add_class:"form-control"|attr:"readonly" %}
+                {% endif %}
+                </div>
+                <div class="creat-user-bottom">
+                <label for="staticEmail" class="col-form-label">{{ form.designation_role.label }}<span class="star-clr">*</span></label>
+                {% if request.user.roles.id == 4 and request.user.roles.id == 3 %} 
+                    {% render_field form.designation_role class="form-control" %}
+                {% else %}
+                    {% render_field form.designation_role|add_class:"form-control"|attr:"readonly" %}
+                {% endif %}
+                </div>
+    
+                <div class="row creat-user-bottom">
+                    <div class="col-4">
+                        <label for="staticEmail" class="col-form-label countr_break">{{form.mobile_countrycode.label}} {% if request.user.roles.id == 4 or request.user.roles.id == 3 %} <span class="star-clr">*</span>{% endif %}</label>
+                        <select name="mobile_countrycode" placeholder="Country Code" class="form-control">
+                            <option  value="" selected="selected">---Select---</option>
+                            {{datas.mobile_countrycode}}
+                            {% for code in phone%}
+                            <option {% if user.mobile_countrycode == code.id %} selected {% endif %} value="{{code.id}}">{{code.iso}} {{code.phonecode}}</option> 
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-8">
+                        <label for="staticEmail" class="col-form-label countr_break">{{ form.mobile.label }}{% if request.user.roles.id == 4 or request.user.roles.id == 3 %}<span class="star-clr">*</span>{% endif %}</label>
+                            {% if request.user.roles.id == 4 and request.user.roles.id == 3  %}  
+                                {% render_field form.mobile class="form-control" %}
+                            {% else %}
+                                {% render_field form.mobile|add_class:"form-control" %}
+                            {% endif %}                          </div>
+                </div>
+                {% if request.user.roles.id == 3 or request.user.bankuserstatus == 1 %}
+                {% if request.user.signature_type != NULL %}
+                <div class="row creat-user-bottom">
+                    <div class="col-12">
+                        <label for="staticEmail" class="col-form-label countr_break sign_group">User Signature (Choose Only One){% if request.user.roles.id == 3 %}<span class="star-clr">*</span>{% endif %}</label> 
+                        <span class="waring-err signaturewrg"></span>          
+                    </div>
+                    <input value="{{request.user.signature_type}}" class="sign_type" name="sign_type" type="hidden">
+                    <div class="col-12 pt-3">
+                        <ul id="myTabs" class="nav nav-pills nav-justified new-tab" role="tablist" data-tabs="tabs">
+                            {% if request.user.signature_type == 'font' %}
+                          <li class="font"><a class="prjlist-menu1" data-toggle="tab"><input value="font" type="hidden" >CHOOSE</a></li>
+                            {%endif%}
+                            {% if request.user.signature_type == 'signature' %}
+                          <li class="signature"><a class="prjlist-menu1" data-toggle="tab"><input value="signature" type="hidden">DRAW </a></li>
+                           {%endif%}
+                           {% if request.user.signature_type == 'file' %}
+                          <li  class="file"><a class="prjlist-menu1" data-toggle="tab"><input value="file" type="hidden">UPLOAD</a></li>
+                           {%endif%}  </ul>
+                    </div>
+                    <div class="col-12 pt-2">
+                           <div class="file-div-sign" {% if request.user.signature_type == "signature" %}style="display:none" {% endif %}>
+                            
+                            <img id="sign-image-preview" src="{% if request.user.signature_type == "file" %}{{request.user.signature_image.url}}{% endif %}" class="" style="height: 168px;"><br>
+                           
+                            </div>
+                        </div>
+                        
+                        <div class="can-sign pt-4" style="display:none">
+                            <input type="hidden" class="sign_draw" name="sign_draw" value="" id="hdn_sign_draw">
+                            <canvas id="signature" class="canva" width="450" height="150" style="border: 1px solid #ddd;"></canvas>
+                            <div class="spanclass_error">
+                                <span class="waring-err invoicenumspn"> </span>
+                            </div>
+                            <br>
+                            <button class="btn-clr12" type="button" id="save-signature">Save</button>
+                            <button class="btn-clr12" type="button" id="clear-signature">Clear</button>
+                            <!-- <button class="btn-clr12" type="button" id="cancel-signature">Cancel</button> -->
+                            </div>
+
+                        <div class="font-sign pt-4" style="display: none;" >
+                            <input name="inputfield" class="inputfield" placeholder=" Type Name "       value="{{request.user.signature_fontname}}" id='signature_font' style="font-family:'{{request.user.signature_fontfamily.font_name}}';"  >
+                            <input name="fontfamily" class="fontfamily" type="hidden" value="{{request.user.signature_fontfamily_id}}" id="{{request.user.signature_fontfamily.font_name}}" readonly>
+                            <div class="selectfiled col-grd" style="display: none;" >
+                              
+                            </div>
+                         </div>
+
+                         <div class="show-sign-div saved-draw"{% if request.user.signature_type == "file" %}style="display:none" {% endif %}>
+                            <div class="show-file-div">
+                                {% if request.user.signature_type == "signature" %}
+                                <img class ="canva-div"src="{% if request.user.signature_image != '' and request.user.signature_type == "signature" %}{{request.user.signature_image.url}}{% endif %}" id="show-img-sign"></div>
+                                {% elif request.user.signature_type == "file" %}
+                                <img id="canva-div" src="{{request.user.signature_image.url}}" class="" style="height: 168px;" id="show-img-sign">
+                                {% else %}
+                                <input type="hidden" name="find_font" id="find_font" value="{{request.user.signature_fontfamily.font_name}}">
+                                <h1 id="fix_font" style="font-family:'{{request.user.signature_fontfamily.font_name}}';">{{request.user.signature_fontname }}</h1>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                </div>
+                    {%else%}
+                <div class="row creat-user-bottom">
+                    <div class="col-12">
+                        <label for="staticEmail" class="col-form-label countr_break sign_group">User Signature (Choose Only One){% if request.user.roles.id == 3 %}<span class="star-clr">*</span>{% endif %}</label> 
+                        <span class="waring-err signaturewrg"></span>          
+                    </div>
+                    <input value="{{request.user.signature_type}}" class="sign_type" name="sign_type" type="hidden">
+                    <div class="col-12 pt-3">
+                        <ul id="myTabs" class="nav nav-pills nav-justified new-tab" role="tablist" data-tabs="tabs">
+                            <li class="font"><a class="prjlist-menu1" data-toggle="tab"><input value="font" type="hidden" >CHOOSE</a></li>
+                           <li class="signature"><a class="prjlist-menu1" data-toggle="tab"><input value="signature" type="hidden">DRAW </a></li>
+                           <li  class="file"><a class="prjlist-menu1" data-toggle="tab"><input value="file" type="hidden">UPLOAD</a></li>
+                         </ul>
+                    </div>
+                    <div class="col-12 pt-2">
+                           <div class="file-div-sign" {% if request.user.signature_type == "signature" %}style="display:none" {% endif %}>
+                            
+                            <img id="sign-image-preview" src="{% if request.user.signature_type == "file" %}{{request.user.signature_image.url}}{% endif %}" class="" style="height: 168px;"><br>
+                            <input type="file" name="sign_file" accept="image, .png, .jpeg,  .jpg," class="form-control mt-2" id="signfile_id"><br><p class="filenote"><strong>Note:</strong> Max file size is 2 MB and file type should be JPG,PNG,JPEG,GIF</p>
+                            </div>
+                        </div>
+                        
+                        <div class="can-sign pt-4" style="display:none">
+                            <input type="hidden" class="sign_draw" name="sign_draw" value="" id="hdn_sign_draw">
+                            <canvas id="signature" class="canva" width="450" height="150" style="border: 1px solid #ddd;"></canvas>
+                            <div class="spanclass_error">
+                                <span class="waring-err invoicenumspn"> </span>
+                            </div>
+                            <br>
+                            <button class="btn-clr12" type="button" id="save-signature">Save</button>
+                            <button class="btn-clr12" type="button" id="clear-signature">Clear</button>
+                            <!-- <button class="btn-clr12" type="button" id="cancel-signature">Cancel</button> -->
+                            </div>
+
+                        <div class="font-sign pt-4" style="display: none;" >
+                            <input name="inputfield" class="inputfield font_signature" placeholder=" Type Name " {%if request.user.signature_fontname == None %} {% else %}value="{{request.user.signature_fontname}}" {%endif%}  style="font-family:'{{request.user.signature_fontfamily.font_name}}';" >
+                            <input name="fontfamily" class="fontfamily" type="hidden" value="{{request.user.signature_fontfamily_id}}" id="{{request.user.signature_fontfamily.font_name}}">
+                            <div class="selectfiled col-grd" style="display: none;" >
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <p class="preview"><strong>Preview</strong></p>
+                                        {% for font in fontfamily%}
+                                        <div class="font">
+                                            <td> <input class="user-font" type="radio" id="html" name="fav_language" value="HTML" style="cursor: pointer;">
+                                        </td>
+                                        <td>
+                                            <input class="fontstyle" style="font-family:'{{font.font_name}}'"  value="{{font.id}}" style="cursor: pointer;"readonly>
+                                        </td>
+                                    </tr>
+                                </div>
+                                        {% endfor %}
+                                    
+                                    </tbody>
+                                </table>
+                            </div>
+                         </div>
+                         
+                         <div class="show-sign-div saved-draw" style="display:none" >
+                            <div class="show-file-div"> <img class ="canva-div"src="{% if request.user.signature_image != '' and request.user.signature_type == "signature" %}{{request.user.signature_image.url}}{% endif %}" id="show-img-sign"></div>
+                           
+                                <button class="btn btn-clr text-center" type="button"   id="edit-signature" style="margin-top: 50px;">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                </div>
+                {%endif%}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+        <div class="text-center spacing-button">
+            <button type="submit" class="btn btn-clr text-center submit-cls" data-id="1">Submit</button>
+        </div>
+    
+    </form>
+</form>
+</div>
+{% endblock %}
+
+
+
+{% block scripts %}
+{{ block.super }}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
+  <script type="text/javascript" src="./js/sig_pad.js"></script>
+ 
+<script>
+// $('#signfile_id').on(function(){
+//     alert('file')
+//         var val=$(this).val()
+//         if (val != ''){
+//             var splitval=val.split('.')
+//             strFile = splitval[splitval.length-1];
+//             var s = ["jpeg","jpg","gif","png"];
+//             z=0
+//             $.each(s, function( index, value ) {
+//                 if (strFile == value){
+//                     z=+1
+//                 }
+//             });
+//                 console.log(z)
+//                 if (z == 1){
+//                     $('.submit-cls').attr('disabled', false);
+//                     z=0
+
+//                 }
+//                 else{
+//                     swal.fire("Please Provide a Proper Image Format")
+//                     $('.submit-cls').attr('disabled', 'disabled');
+//                 }
+//         }
+
+//     })
+$('.inputfield').keyup(function(){
+    $('.selectfiled').show()
+    // alert($('.inputfield').val())
+    $('.fontstyle').val( $(".inputfield").val())
+    if ($(this).val() == ''){
+        $('.selectfiled').hide()
+    }
+})
+$('.fontstyle').click(function(){
+    let fontFamily = $(this).closest('tr').find('.fontstyle').val()
+   $('.inputfield').val(fontFamily)
+   $('.inputfield').css("font-family",$(this).closest('tr').find('.fontstyle').css("font-family"))
+   $('.fontfamily').val($(this).closest('tr').find('.fontstyle').attr('value'))
+   $(this).closest('tr').find('.user-font').attr('checked', true);
+})
+$('.user-font').click(function(){
+    let fontFamily = $(this).closest('tr').find('.fontstyle').val()
+   $('.inputfield').val(fontFamily)
+   $('.inputfield').css("font-family",$(this).closest('tr').find('.fontstyle').css("font-family"))
+   $('.fontfamily').val($(this).closest('tr').find('.fontstyle').attr('value'))  
+   $('#signfile_id').val('')
+   $('#sign-image-preview').removeAttr('src')
+   $('.canva-div').attr('src','')
+   $('.sign_type').val('font')
+   signaturePad.clear();
+   $('.invoicenumspn').html("")
+})
+// var userid="{{request.user.roles.id}}"
+var signaturePad;
+$(document).ready(function(){
+   
+    var val=$('.sign_type').val();
+    // alert(val)
+    if(val == 'font')
+    {
+        $('.font-sign').show()
+        $('.file-div-sign').hide();
+        $('.can-sign').hide();
+        $('.show-sign-div').hide();
+        $('.font').addClass('active')
+        $('.font').find('a').addClass('active')
+       
+    }
+    else if(val == 'None'){
+        $('.file-div-sign').show();
+        $('.can-sign').hide();
+        $('.show-sign-div').hide();
+        $('.font-sign').hide()
+        $('.file').addClass('active')
+        $('.file').find('a').addClass('active')
+      
+    }
+    else if(val == 'file'){
+        $('.filenote').hide()
+        console.log({'file':$('.file').find('a')})
+        $('.file').addClass('active')
+        $('.file').find('a').addClass('active')
+      
+    }
+    else{
+        $('.file-div-sign').hide()
+        $('.font-sign').hide()
+        // $('.inputfield').val('')
+       var get_length=$('#show-img-sign').attr('src').length;
+       if (get_length > 0){
+            $('.show-sign-div').show();
+        }
+        else{
+            $('.can-sign').show();
+        }
+        $('.signature').addClass('active')
+        $('.signature').find('a').addClass('active')
+       }
+       
+    $('.inputfield').css("font-family",$('.fontfamily').attr('id'))
+   
+})
+
+
+$('.file').click(function(){
+  
+    $('.file-div-sign').show();
+    $('.can-sign').hide();
+    $('.show-sign-div').hide();
+    $('.font-sign').hide()
+    $('#hdn_sign_draw').val('')
+    $('#signfile_id').click(function()
+    {
+       $('.sign_type').val('file')
+       console.log('file',$('.sign_type').val())
+       $('.inputfield').val('')
+       $('.selectfiled').hide()
+       $('.canva-div').attr('src','')
+       $('.filenote').hide()
+       signaturePad.clear();
+       $('.invoicenumspn').html("")
+       
+    })
+})
+
+$('.signature').click(function(){
+    
+    var get_length=$('#show-img-sign').attr('src').length;
+        if (get_length > 0){
+            $('.show-sign-div').show();
+        }
+        else{
+            $('.can-sign').show();
+        }
+        
+        $('.file-div-sign').hide();
+        $('.font-sign').hide()
+        $('#save-signature').click(function(){
+            $('#sign-image-preview').removeAttr('src')
+            $('#signfile_id').val('')
+            $('.inputfield').val('')
+            $('.selectfiled').hide()
+        })
+
+    //     $('#save-signature').click(function(){
+    //        if($('.sign_draw').val == ''){
+    //         $('.invoicenumspn').html("<p>Save Your Signature</p>")
+    //         return false
+    // }
+    // else{
+    //     $('.invoicenumspn').html("")
+    //     $('.submit-cls').attr('disabled',false)
+    // }
+    //        }
+    //     })
+})
+$('.font').click(function(){
+
+    $('.font-sign').show()
+    $('.file-div-sign').hide();
+    $('.can-sign').hide();
+    $('.show-sign-div').hide();
+    
+})
+$('.fontstyle').click(function(){
+       $('#signfile_id').val('')
+       $('#sign-image-preview').removeAttr('src')
+       $('.canva-div').attr('src','')
+        $('.sign_type').val('font')
+        console.log('font',$('.sign_type').val())
+        signaturePad.clear();
+        $('.invoicenumspn').html("")
+    })
+
+$(document).ready(function($){
+    var canvas = document.getElementById("signature");
+    signaturePad = new SignaturePad(canvas);    
+});
+
+$(document).on('click','#edit-signature', function(){
+    var data = signaturePad.toDataURL('image/png');
+    console.log('sad',data)
+    $('.can-sign').show(500);
+    $('.show-sign-div').hide(500);
+});
+
+$(document).on('click','#clear-signature', function(){
+    signaturePad.clear();
+})
+
+$(document).on('click','#save-signature', function(){
+    $('#edit-signature').removeAttr('style')
+    var data = signaturePad.toDataURL('image/png');
+    $('#hdn_sign_draw').val(data)
+    $('.can-sign').hide(500);
+    $('.show-sign-div').show(500);
+    $('#show-img-sign').attr("src",data);
+});
+
+$(document).on('click','.fontstyle',function(){
+    $('.fontstyle').removeClass('active')
+    $(this).addClass('active')
+})
+
+$(document).on('click','#cancel-signature', function(){
+    // signaturePad.clear();
+    $('.can-sign').hide(500);
+    $('.show-sign-div').show(500);
+});
+   
+// $(document).on('click','.waves-button-input',function(){
+//     var token = '{{csrf_token}}';
+//     $.ajax({
+//         headers: { "X-CSRFToken": token },
+//         type:"POST",
+//         url:'../clearusersign/',
+//         data:{},
+//         success: function(data)
+//             {}
+//         ,})
+//     var c = document.getElementsByClassName("jSignature");
+    
+//     $('[name="signature"]').val('[]');
+//     $('#jsign_signature').attr('data-initial-value','[]')
+//     var ctx = c[0].getContext("2d")
+//     ctx.save();
+//     ctx.setTransform(1, 0, 0, 1, 0, 0);
+//     ctx.clearRect(0, 0, 639, 160);
+//     ctx.restore();
+// })
+// // alert(userid)
+// $(document).on('change','#file-input',function(){
+//     var val=$(this).val()
+//     if (val != ''){
+//         var splitval=val.split('.')
+//         strFile = splitval[splitval.length-1];
+//         var s = ["jpeg","jpg","gif","png"];
+//         z=0
+//         $.each(s, function( index, value ) {
+//             if (strFile == value){
+//                 z=+1
+//             }
+//         });
+//             console.log(z)
+//             if (z == 1){
+//                 $('.submit-cls').attr('disabled', false);
+//                 z=0
+    
+//             }
+//             else{
+//                 swal.fire("Please Provide a Proper Image Format")
+//                 $('.submit-cls').attr('disabled', 'disabled');
+//             }
+//     }
+
+
+// })
+
+function readURL(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            $('#image-preview').attr('src', e.target.result);
+            $('#image-preview').hide();
+            $('#image-preview').fadeIn(650);
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+$("#file-input").change(function() {
+    // Check file size before reading it
+    if (this.files[0].size > 25 * 1024 * 1024) { // 25 MB in bytes
+        $('#file-size-error').show();  // Display the error message
+        this.value = ''; // Clear the input field
+    } else {
+        $('#file-size-error').hide();  // Hide the error message if it was previously shown
+        readURL(this);
+    }
+});
+
+$('.fileupload').click(function() {
+    $('.sign_type').val('file')
+});
+
+function reaSignURL(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        $('#sign-image-preview').attr('src', e.target.result);
+        $('#sign-image-preview').hide();
+        $('#sign-image-preview').fadeIn(650);
+      }
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  $(document).on('click','.font_signature',function(){
+    $('.sign_type').val('font')
+  })
+  
+  $("#signfile_id").change(function() {
+    $('.sign_type').val('file')
+    var val=$(this).val()
+        if (val != ''){
+            var splitval=val.split('.')
+            strFile = splitval[splitval.length-1];
+            var s = ["jpeg","jpg","gif","png"];
+            chkextension=0
+            $.each(s, function( index, value ) {
+                if (strFile == value){
+                    chkextension=+1
+                }
+            });
+                
+                if (chkextension == 1){
+                   
+                    $('.submit-cls').attr('disabled', false);
+                    chkextension=0
+
+                }
+                else{
+                    
+                    swal.fire("Please Provide a Proper Image Format")
+                    $(this).val('')
+                    $('.submit-cls').attr('disabled', 'disabled');
+                }
+        }
+        var file = this.files[0];
+       if (file) {
+      var fileSize = file.size; // Get the file size in bytes
+      var maxSizeInBytes = 2000000; // Specify the maximum file size in bytes (e.g., 1MB)
+
+      if (fileSize > maxSizeInBytes) {
+        swal.fire("Please Provide a Image Size Within 2MB")
+        $(this).val('')
+      }
+    }
+    reaSignURL(this);
+  });
+
+
+//   $.validator.addMethod("valid_name", function(value, element) {
+
+//         var number= $('#firstnameid').val();
+//         if(number!='')
+//         {
+//         var text = value.replace(/[^A-Za-z]/g, '');
+//         $('#firstnameid').val(text);
+//         return true;
+//         }
+//         else 
+//         {
+//         return false;
+//         }
+
+//         });	  
+
+
+
+
+//  $.validator.addMethod("valid_lastname", function(value, element) {
+
+//         var number= $('#lastnameid').val();
+//         if(number!='')
+//         {
+//         var text = value.replace(/[^A-Za-z]/g, '');
+//         $('#lastnameid').val(text);
+//         return true;
+//         }
+//         else 
+//         {
+//         return false;
+//         }
+
+//         });	  
+
+    $.validator.addMethod(
+        "regex",
+        function(value, element, regexp) {
+            return this.optional(element) || regexp.test(value);
+        },
+    )
+
+
+
+
+    $('#id_name').keyup(function() {
+            var $th = $(this);
+            $th.val($th.val().replace(/\d+/g, ''))
+            $th.val($th.val().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+            // $th.val($th.val().replace(/^\s*/, ''));
+            remove_dot = $th.val().replace(/\.{2,}/g, '.');
+            $(this).val(remove_dot)
+            });
+
+
+    $('#id_lastname').keyup(function() {
+            var $th = $(this);
+            $th.val($th.val().replace(/\d+/g, ''))
+            $th.val($th.val().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+            // $th.val($th.val().replace(/^\s*/, ''));
+            remove_dot = $th.val().replace(/\.{2,}/g, '.');
+            $(this).val(remove_dot)
+            });
+
+
+$.validator.addMethod("valid_contactno", function(value, element) {
+
+            var number= $('#id_phone').val();
+            if(number!='')
+            {
+                var text = value.replace(/[^0-9\-_\s]/g,'');
+            $('#id_phone').val(text);
+            return true;
+            }
+            else 
+            {
+                return false;
+            }
+
+            });
+                    
+
+$(document).on('keyup','#id_phone',function(){
+   
+    let value=$(this).val();
+    // var text = value.replace(/[^0-9\-_\s]/g,'');
+    var text = value.replace(/(\s{2,})|[^0-9\.'']/g, ' ');
+$('#id_phone').val(text);
+//     if (/\D/g.test(this.value))
+//   {
+//     this.value = this.value.replace(/\D\s/g, '');
+//     this.value = this.value.replace(/(\s{2,})']/g, ' ')
+//     // this.value = (this.value().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+//   }
+})
+// $(document).on('change','.edit-com-input',function(){
+//     rules: { inputimage: { required: true, accept: "png|jpe?g|gif", filesize: 1048576  }},
+//     messages: { inputimage: "File must be JPG, GIF or PNG, less than 1MB" }
+
+// });
+// $('#formid').validate({
+//     rules: { inputimage: { required: true, accept: "png|jpe?g|gif", filesize: 1048576  }},
+//     messages: { inputimage: "File must be JPG, GIF or PNG, less than 1MB" }
+// })
+
+$.validator.addMethod("valid_extenstion", function(value, element) {
+
+var number= $('#id_phone_number_extenstion').val();
+if(number!='')
+{
+    var text = value.replace(/[^0-9\-_\s]/g,'');
+$('#id_phone_number_extenstion').val(text);
+return true;
+}
+else 
+{
+    return false;
+}
+
+});
+        
+
+$(document).on('keyup','#id_phone_number_extenstion',function(){
+let value=$(this).val();
+var text = value.replace(/(\s{2,})|[^0-9\.'']/g, ' ');
+$('#id_phone_number_extenstion').val(text);
+// if (/\D/g.test(this.value))
+// {
+// this.value = this.value.replace(/\D\s/g, '');
+// this.value = this.value.replace(/(\s{2,})']/g, ' ')
+// // this.value = (this.value().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+// }
+})
+
+
+$.validator.addMethod("valid_mobile", function(value, element) {
+
+var number= $('#id_mobile').val();
+if(number!='')
+{
+    var text = value.replace(/[^0-9\-_\s]/g,'');
+$('#id_mobile').val(text);
+return true;
+}
+else 
+{
+    return false;
+}
+
+});
+        
+
+$(document).on('keyup','#id_mobile',function(){
+    let value=$(this).val();
+    var text = value.replace(/(\s{2,})|[^0-9\.'']/g, ' ');
+$('#id_mobile').val(text);
+// if (/\D/g.test(this.value))
+// {
+// this.value = this.value.replace(/\D\s/g, '');
+// this.value = this.value.replace(/(\s{2,})']/g, ' ')
+// // this.value = (this.value().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+// }
+})
+
+    //    $('#id_designation_role').keyup(function() {
+    //         var $th = $(this);
+    //         $th.val($th.val().replace(/\d+/g, ''))
+    //         $th.val($th.val().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+    //         // $th.val($th.val().replace(/^\s*/, ''));
+    //         remove_dot = $th.val().replace(/\.{2,}/g, '.');
+    //         $(this).val(remove_dot)
+    //         });
+
+
+
+
+$(document).on('keyup','#id_areacode',function(){
+let value=$(this).val();
+var text = value.replace(/(\s{2,})|[^0-9\.'']/g, ' ');
+$('#id_areacode').val(text);
+// if (/\D/g.test(this.value))
+// {
+// this.value = this.value.replace(/\D\s/g, '');
+// this.value = this.value.replace(/(\s{2,})']/g, ' ')
+// // this.value = (this.value().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+// }
+})
+
+if ($('.roleid').val() == '3'){
+    $("#edituserid").validate({ 
+            rules:{
+                title:{
+                    required:true,
+                },
+                name:{
+                    required: true,
+                    // regex:/^[a-zA-Z ]+$/,
+                    
+                },
+                lastname:{
+                    required: true,
+                    // regex:/^[a-zA-Z ]+$/,
+                },
+                designation_role:{
+                    required:true,
+                    // regex:/^[a-zA-Z ]+$/,
+                },
+                email: {
+                    required: true,
+                    email: true,
+                    regex:/^\b[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b$/i,
+                },
+               // phone_countrycode:{
+                //    required:true,
+                
+                //},
+                //areacode:{
+                //    required:true,
+                //    regex:/^[0-9]+$/,
+                //}, 
+                //phone:{
+                //    required:true,
+                //   minlength:5,
+                //    maxlength:20,
+                //    valid_contactno:true,
+                    // regex:/^[0-9]+$/,
+                //},
+               //phone_number_extenstion:{
+                //    required:true,
+                    // minlength:4,
+                //    maxlength:10,
+                    // valid_extenstion:true,
+                    // regex:/^[0-9]+$/,
+                //},
+                mobile_countrycode:{
+                    required:true,
+                    regex:/^[0-9]+$/,
+                },
+                mobile:{
+                    required:true,
+                    minlength:5,
+                    maxlength:20,
+                    valid_mobile:true,
+                    // regex:/^[0-9]+$/,
+                },
+                
+
+            },
+            messages:{ 
+                title:{
+                    required:"Please Provide a Title",
+                }, 
+                name:
+                    {
+                    required:"Please Provide a First Name",
+                    //    regex:"Accept Only Alphabets",
+
+                    
+                    },
+                lastname:
+                    {
+                    required:"Please Provide a last Name",
+                    //    regex:"Accept Only Alphabets",
+
+                    },
+                    designation_role : {
+                        required : "Please Provide a Designation",
+                        regex:"Accept Only Alphabets",
+                },
+                email:{
+                        required:"Please Provide a Email ID",
+                        email: "Please Provide a Valid Email ID",
+                        regex:"Please Provide a Valid Email ID",
+                },
+                //phone_countrycode:{
+                //        required:"Please Select Country Code",
+                //
+                //},
+                    //areacode:{
+                    //    required:"Please Select Area Code",
+                    //    regex :"Accept only Numbers",
+                    //},
+                    //phone:{
+                    //    required:"Please Enter Landline Number",
+                    //    valid_contactno:"Accept Only Numbers",
+                    //    minlength:"Enter minimum 5 Numbers",
+                    //    maxlength:"Allows Only 20 Numbers",
+                    //    // regex :"Accept only Numbers",
+
+                    //},
+                    //phone_number_extenstion:{
+                    //    required:"Please Enter Landline Extenstion",
+                    //    // valid_extenstion :"Accept Only Numbers",
+                    //    // minlength:"Enter minimum 4 Numbers",
+                    //    maxlength:"Allows Only 10 Numbers",
+                    //    // regex :"Accept only Numbers",
+
+                    //},
+                    //mobile_countrycode:{
+                    //    required:"Please Select Country Code for Mobile Number",
+                    //    regex :"Accept only Numbers",
+
+                    //},
+                    mobile:{
+                        required:"Please Enter Mobile Number",
+                        valid_mobile:"Accept Only Numbers",
+                        minlength:"Enter minimum 5 Numbers",
+                        maxlength:"Allows Only 20 Numbers",
+                        // regex :"Accept only Numbers",
+
+                    },
+            
+                    errorElement : 'span',
+
+
+                },
+                
+                submitHandler: function(form) {
+                $('#submit').attr('disabled','disabled')
+                form.submit();
+            },
+        
+        });
+}
+else{
+    $("#edituserid").validate({ 
+            rules:{
+                title:{
+                    required:true,
+                },
+                name:{
+                    required: true,
+                    // regex:/^[a-zA-Z ]+$/,
+                    
+                },
+                lastname:{
+                    required: true,
+                    // regex:/^[a-zA-Z ]+$/,
+                },
+                designation_role:{
+                    required:true,
+                    // regex:/^[a-zA-Z ]+$/,
+                },
+                email: {
+                    required: true,
+                    email: true,
+                    regex:/^\b[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b$/i,
+                },
+                mobile_countrycode:{
+                    required:true,
+                    regex:/^[0-9]+$/,
+                },
+                mobile:{
+                    required:true,
+                    minlength:5,
+                    maxlength:20,
+                    valid_mobile:true,
+                    // regex:/^[0-9]+$/,
+                },
+                
+
+            },
+            messages:{ 
+                title:{
+                    required:"Please Provide a Title",
+                }, 
+                name:
+                    {
+                    required:"Please Provide a First Name",
+                    //    regex:"Accept Only Alphabets",
+
+                    
+                    },
+                lastname:
+                    {
+                    required:"Please Provide a last Name",
+                    //    regex:"Accept Only Alphabets",
+
+                    },
+                    designation_role : {
+                        required : "Please Provide a Designation",
+                        regex:"Accept Only Alphabets",
+                },
+                email:{
+                        required:"Please Provide a Email ID",
+                        email: "Please Provide a Valid Email ID",
+                        regex:"Please Provide a Valid Email ID",
+                },
+                mobile_countrycode:{
+                    required:"Please Select Country Code for Mobile Number",
+                    regex :"Accept only Numbers",
+
+                },
+                mobile:{
+                    required:"Please Enter Mobile Number",
+                    valid_mobile:"Accept Only Numbers",
+                    minlength:"Enter minimum 5 Numbers",
+                    maxlength:"Allows Only 20 Numbers",
+                  },
+            
+                    errorElement : 'span',
+
+
+                },
+                
+                submitHandler: function(form) {
+                $('#submit').attr('disabled','disabled')
+                form.submit();
+            },
+        
+        });
+}
+
+
+// $("#edituserid").validate({ 
+//     rules:{
+//         title:{
+//             required:true,
+//         },
+//         name:{
+//             required: true,
+//             // regex:/^[a-zA-Z ]+$/,
+                    
+//         },
+//         lastname:{
+//             required: true,
+//             // regex:/^[a-zA-Z ]+$/,
+//         },
+//         designation_role:{
+//             required:true,
+//             // regex:/^[a-zA-Z ]+$/,
+//         },
+//         email: {
+//             required: true,
+//             email: true,
+//             regex:/^\b[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b$/i,
+//         },
+//         phone_countrycode:{
+//             required:true,
+//         },
+//         areacode:{
+//             required:true,
+//             regex:/^[0-9]+$/,
+//         },
+//         phone:{
+//             required:true,
+//             minlength:5,
+//             maxlength:20,
+//             valid_contactno:true,
+//             // regex:/^[0-9]+$/,
+//         },
+//         phone_number_extenstion:{
+//             required:true,
+//             // minlength:4,
+//             maxlength:10,
+//             // valid_extenstion:true,
+//             // regex:/^[0-9]+$/,
+//         },
+//         mobile_countrycode:{
+//             required:true,
+//             regex:/^[0-9]+$/,
+//         },
+//         mobile:{
+//             required:true,
+//             minlength:5,
+//             maxlength:20,
+//             valid_mobile:true,
+//             // regex:/^[0-9]+$/,
+//         },
+//     },
+//     messages:{ 
+//         title:{
+//             required:"Please Provide a Title",
+//         }, 
+//         name:{
+//             required:"Please Provide a First Name",
+//             // regex:"Accept Only Alphabets",
+//         },
+//         lastname:{
+//             required:"Please Provide a last Name",
+//             // regex:"Accept Only Alphabets",
+//         },
+//         designation_role : {
+//             required : "Please Provide a Designation",
+//             regex:"Accept Only Alphabets",
+//         },
+//         email:{
+//             required:"Please Provide an Email ID",
+//             email: "Please Provide a Valid Email ID",
+//             regex:"Please Provide a Valid Email ID",
+//         },
+//         phone_countrycode:{
+//             required:"Please Select Country Code",
+//         },
+//         areacode:{
+//             required:"Please Select Area Code",
+//             regex :"Accept only Numbers",
+//         },
+//         phone:{
+//             required:"Please Enter Landline Number",
+//             valid_contactno:"Accept Only Numbers",
+//             minlength:"Enter a minimum of 5 Numbers",
+//             maxlength:"Allows Only 20 Numbers",
+//             // regex :"Accept only Numbers",
+//         },
+//         phone_number_extenstion:{
+//             required:"Please Enter Landline Extension",
+//             // valid_extenstion :"Accept Only Numbers",
+//             // minlength:"Enter minimum 4 Numbers",
+//             maxlength:"Allows Only 10 Numbers",
+//             // regex :"Accept only Numbers",
+//         },
+//         mobile_countrycode:{
+//             required:"Please Select Country Code for Mobile Number",
+//             regex :"Accept only Numbers",
+//         },
+//         mobile:{
+//             required:"Please Enter Mobile Number",
+//             valid_mobile:"Accept Only Numbers",
+//             minlength:"Enter a minimum of 5 Numbers",
+//             maxlength:"Allows Only 20 Numbers",
+//             // regex :"Accept only Numbers",
+//         },
+//         errorElement : 'span',
+//     },
+//     submitHandler: function(form) {
+//         $('#submit').attr('disabled','disabled');
+//         form.submit();
+//     },
+// });
+
+
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script>
+    
+     $(window).scroll(function() {
+      var sticky = $('.fancytext'),
+        scroll = $(window).scrollTop();
+      if (scroll >= 100) sticky.addClass('fixed');
+      else sticky.removeClass('fixed');
+    });
+
+let canvacount = 0;
+$('.canva').click(function(){
+    canvacount++;
+    $('.sign_type').val('signature')
+    console.log('type',$('.sign_type').val())
+})
+
+let signaturecount = 0;
+let editsignaturecount = 0;
+$('#save-signature').click(function
+(){
+    $('.sign_type').val('signature')
+    signaturecount =1
+   
+    if( canvacount == 0 ){
+       $('.invoicenumspn').html("<p>Draw your sign</p>")
+       
+        return false
+    }
+    else{
+        
+      $('#save-signature').attr('disabled',false) 
+    }
+})
+
+$('#edit-signature').click(function(){
+    canvacount=0
+    signaturecount = 0
+    editsignaturecount = 1
+   $('.invoicenumspn').html("")
+    })
+    $('.canva').click(function(){
+        editsignaturecount = 1
+    })
+$('#clear-signature').click(function(){
+    canvacount = 0
+    $('.sign_draw').val('')
+})
+
+$('.submit-cls').click(function(){
+    // roleid
+   
+    // if($('.sign_type').val() == 'None' && $('.roleid').val() == 3 ){
+    //     $('.sign_group').after('<span class="waring-err">Choose any one</span>')
+    //     return false
+    // }
+//    if($('.sign_type').val() == 'None'){
+//     $('.fontfamily').val(1)
+//    }
+    if($('.inputfield').val() == '' && $('.sign_draw').val() == '' && $('#signfile_id').val() == ''){
+       
+        $('.signaturewrg').html("<p class='ptag'>Please Enter Signature</p>")
+        return false
+    }
+    else{
+       $('.signaturewrg').html("")
+    }
+   if($('.sign_type').val() == 'signature')
+   {
+//    alert(editsignaturecount)
+//    alert(signaturecount)
+//    alert(canvacount) 
+    if(editsignaturecount == 1){
+    if(signaturecount == 0 || canvacount == 0)
+      {
+        $('.invoicenumspn').html("<p>Save Your Signature</p>")
+        // alert('1')
+        return false
+    }
+    else{
+        $('.invoicenumspn').html("")
+        $('.submit-cls').attr('disabled',false)
+    }
+}
+    }
+})
+
+</script>
+
+{% endblock %}

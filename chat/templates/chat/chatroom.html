@@ -1,0 +1,3539 @@
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load chat_tags %}
+
+<!DOCTYPE html>
+<html>
+<title></title>
+
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script> -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
+  integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css"
+  integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw=="
+  crossorigin="anonymous" referrerpolicy="no-referrer" />
+<!-- <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script> -->
+<!-- <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
+
+<body id="iframebody">
+
+  <!-- Sidebar -->
+  <div class="w3-sidebar w3-light-grey w3-bar-block chat-sidebar">
+    <div class="w3-bar-item user-list-nme p-0">
+      <!-- <div class="head-us-li"><span class="u-ser-hov"><i class="fa fa-user user-chat-list"></i>User list</span></div>  -->
+      <div class="head-us-li">
+        <h1><img class="peo-img-logo msg-home" src="/static/images/icons/irock.png"><span class="ch-at-name">CHAT</span>
+        </h1>
+      </div>
+      <!-- <button class="msg-home" id="msg-home"><i class="fa fa-home"></i></button> -->
+      <!-- <div class="lil-icons">
+  <div class="new-chat-li tool-tip"><button type="button" class="btn btn-add-gr" data-toggle="modal" data-target="#myModal"><span class="add-pluss tooltipText" >Add Group</span><i class="fa fa-user-plus add-plus-gr"></i></button></div>
+  <div class="new-chat-li tool-tip"><button type="button" class="btn btn-add-gr" data-toggle="modal" data-target="#add_new_msger"><span class="add-pluss tooltipText">Direct Message</span><i class="fa fa-paper-plane-o add-plus-gr"></i></button></div>
+  <div class="new-chat-li tool-tip"><button type="button" class="btn btn-add-gr" data-toggle="modal" data-target="#group_msg"><span class="add-pluss tooltipText">Group Message</span><i class="fa fa-users add-plus-gr"></i></button></div> -->
+      <!-- <i class="fa fa-bell" style="font-size:3px;color:red"></i> -->
+      <!-- <button type="button" class="btn noti-box position-relative">
+  
+    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill count-no">
+      <span class="visually-hidden">unread</span>
+    </span>
+  </button> -->
+      <!-- </div> -->
+    </div>
+
+    <div class="lil-icons">
+      {% if request.user.roles_id != 4 %}
+      <div class="new-chat-li tool-tip"><button type="button" class="btn btn-add-gr" data-toggle="modal"
+          data-target="#myModal"><span class="add-pluss tooltipText">Add Group</span><i
+            class="fa fa-user-plus add-plus-gr"></i></button></div>
+      {% endif %}
+      <div class="new-chat-li tool-tip"><button type="button" class="btn btn-add-gr" data-toggle="modal"
+          data-target="#add_new_msger"><span class="add-pluss tooltipText">Direct Message</span><i
+            class="fa fa-paper-plane-o add-plus-gr"></i></button></div>
+
+      <!-- <div class="new-chat-li tool-tip"><button type="button" class="btn btn-add-gr" data-toggle="modal"
+        data-target="#add_contract_user"><span class="add-pluss tooltipText">Contract Message</span><i
+          class="fa fa-paper-plane-o add-plus-gr"></i></button></div> -->
+
+      <div class="new-chat-li tool-tip"><button type="button" class="btn btn-add-gr ajaxgrouplist" data-toggle="modal"
+          data-target="#group_msg"><span class="add-pluss tooltipText">Group Message</span><i
+            class="fa fa-users add-plus-gr"></i></button></div>
+    </div>
+    <!-- <div><button type="button" name="addgroup" id="add-group">Add Group</button></div> -->
+
+
+
+
+    <input type="hidden" class="senderid" id="senderid" value="{{current_user|replacecommaid}}">
+    <input type="hidden" class="receiverid" id="receiverid" value="{{i.id|replacecommaid}}">
+
+    <div class="see-arch">
+      <input type="text" placeholder="Search" id="usersearch" class="se-ar-ch">
+      <i class="fa fa-search see-icon"></i>
+    </div>
+    <div class="people-list" id="people-list">
+
+      <ul class="list user-li-nnme">
+
+        {% for i in filterusers %}
+
+        <li>
+
+          <input type="hidden" class="receiverid" id="receiverid" value="{{i.id|replacecommaid}}">
+
+          <button type="button" class="room-createe w3-bar-item w3-button name-chat-list" data="{{i.type}}"
+            value="{{i.id|replacecommaid}}">
+            <h5><img class="peo-img" src="/static/images/icons/user-ic.png"><span class="peo-name">{{i.name}}
+                {{i.lastname|default_if_none:"---"}}</span></h5>
+            <i class="ficon feather icon-bell"></i>
+            <span id="latestnotificationcount{{i.id|replacecommaid|replacecommaid}}_{{i.type}}" class="emptynotify"
+              value="{{i.id|replacecommaid}}">
+            </span>
+          </button>
+          <!-- <button class="delete" data="{{i.type}}" value="{{i.id}}">
+            <i class="fa fa-trash" aria-hidden="true"></i></button> -->
+          <!-- <span>{{i.count}}</span> -->
+          {% endfor %}
+        </li>
+
+    </div>
+
+    <!-- <ul class="menu-list chat-side-li">
+  <li>
+    <a href="#">Direct Message</a>
+    
+    <ul class="sub-chat">
+      
+          {% for i in userlist %}
+        <li>
+          <input type="hidden" class="receiverid" id="receiverid" value="{{i.id}}">
+            <button type="button" class="room-creat w3-bar-item w3-button name-chat-list" value="{{i.id}}">{{i.name}}</button>
+          {% endfor %}
+      </li>
+      
+    </ul>
+  </li>
+  <li>
+    <a href="#">Group Message</a>
+    
+    <ul class="sub-chat">
+      <li>{% for i in grouplist %}
+          
+                
+        <button type="button" class="redirectroom w3-bar-item w3-button name-chat-list" value="{{i.groupid}}" class="w3-bar-item w3-button chatsend">{{i.groupname}}</button>
+      
+
+      {%endfor%}
+      </li>
+      
+    </ul>
+  </li> -->
+
+    </ul>
+
+
+
+
+
+  </div>
+
+  <!-- Page Content -->
+
+  <input type="hidden" id="active_groupmember_ids" value="">
+  <div class="w3-container w3-teal irock-chat">
+    <div class="hd-name-ct">
+      {% comment %}
+      <!-- <h3 class="iro-chat-hed"><a class="bck-ct-close" href="{% url 'dashboard:dashboard' %}"><i class="fa fa-close"></i></a> -->
+      {% if showusername|length > 1 %}
+      <div id="showgrpname"><a class="bck-chat msg-home"><i class="fa fa-arrow-left" title="Back"></i></a><a><i
+            class='fas fa-user-alt'></i></a>{{getgrpname.name}}</div>
+      {%endif%}
+      {% for j in showusername %}
+      {% if showusername|length > 1 %}
+      {{j.name}} {{j.lastname|default_if_none:"---"}},
+      {%else%}
+      <a class="bck-chat msg-home"><i class="fa fa-arrow-left"></i></a><a><i class='fas fa-user-alt'></i></a><label
+        id="showusername">{{j.name}} {{j.lastname|default_if_none:"---"}}<br>{{j.designation_role}}
+
+      </label>
+      {%endif%}
+      {% endfor %}
+      {% if showusername|length > 1 %}
+      You
+      {% endif %}
+      {% if showusername|length > 1 %}
+      <button class="editgrp" id="editgrp" data-toggle="modal" data-target="#group_edit"><i
+          class="fa fa-pencil-square-o" title="Edit" aria-hidden="true" style="font-size:24px"></i></button>
+
+      {%endif%}
+      </h3>
+      {% endcomment %}
+    </div>
+  </div>
+
+
+
+  <!-- //modal for add new messager -->
+  <div class="add_new_msger modal" id="add_new_msger" tabindex="-1" role="dialog">
+    <div class="modal-dialog dialog-box-width" role="document" >
+      <div class="modal-content">
+        <div class="modal-header">
+          <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close"> -->
+          <!-- <span aria-hidden="true">&times;</span> -->
+          </button>
+          <h5 class="modal-title title-pop-chat">Direct Message</h5>
+        </div>
+        <div class="modal-body">
+          <p class="lab-tilt-chat">Users</p>
+          <div class="sel-new">
+            <select name="new_mssger" id="addnewmemcls" placeholder="Select Users"
+              class="form-control full-width-selv addnewmemcls pop-in-clr">
+              <option value="">Select</option>
+              <!--Command user to user msg allow 20-9-22 mageshwari-->
+              {% if request.user.roles_id == 2 %}
+                {% for key,user_data in grouped_objects.items %}
+                <optgroup class="chat-dir-head"  label="{{key}}">
+                  
+                  {%for user in user_data %}
+                    <option class="room-creat name-chat-list chatsend" value="{{user.id}}" dataid="{{user.type}}">{{user.name}} {{user.lastname}} - ({% if user.roles_id == 4 %}{% if user.is_primary == 1 and user.contactpersonstatus == 1 %}Contact Person/Primary Personnel{% elif user.is_secondary == 1 and user.contactpersonstatus == 1 %} Contact Person/Secondary Personnel {% elif user.is_secondary == 1 %}Secondary Personnel{% elif user.is_primary == 1%}Primary Personnel{% elif user.contactpersonstatus == 1 %}Contact Person{% endif %}{% else %}{{user.designation_role}}{% endif %})</option>
+                  {% endfor %}
+                </optgroup>
+                {% endfor %}
+                <!-- {% for i in userlistdata %}
+                  {% if i.type == 'single' %}
+                    <option class="room-creat name-chat-list chatsend" dataid="{{i.type}}"
+                      title="{% if i.roles_id == 4 %} {% if i.is_primary == 1 and i.contactpersonstatus == 1 %} Contact Person/Primary Personnel {% elif i.is_secondary == 1 and i.contactpersonstatus == 1 %} Contact Person/Secondary Personnel {% elif i.is_secondary == 1 %} Secondary Personnel {% elif i.is_primary == 1 %} Primary Personnel {% elif i.contactpersonstatus == 1 %}Contact Person{% endif %}{% endif %}"
+                        value="{{i.id|replacecommaid}}">{{i.name}} {{i.lastname|default_if_none:"---"}} {% if i.roles_id == 4 %} ({% get_vendorname i.cin_number %}) {%else%} ({{i.designation_role}}) {% endif %} 
+                    </option>
+                   {%endif%}
+                {%endfor%}-->
+              {% elif request.user.roles_id == 4 %}
+                {% for i in userlistdata %}
+                  {% if i.type == 'single' %}
+                    <option class="room-creat name-chat-list chatsend" dataid="{{i.type}}"
+                    title="{% if i.roles_id == 4 %} {% if i.is_primary == 1 and i.contactpersonstatus == 1 %} Contact Person/Primary Personnel {% elif i.is_secondary == 1 and i.contactpersonstatus == 1 %} Contact Person/Secondary Personnel {% elif i.is_secondary == 1 %} Secondary Personnel {% elif i.is_primary == 1 %} Primary Personnel {% elif i.contactpersonstatus == 1 %}Contact Person{% endif %}{% endif %}"
+                    value="{{i.id|replacecommaid}}">{{i.name}} {{i.lastname|default_if_none:"---"}} {% if i.roles_id == 4 %} ({% get_vendorname i.cin_number %}) {%else%} ({{i.designation_role}}) {% endif %} </option> 
+                  {%endif%}
+                {%endfor%}
+              {% else %}
+                {% for key,user_data in grouped_objects.items %}
+                <optgroup class="chat-dir-head" label="{{key|default_if_none:"Administration"}}">
+                  {%for user in user_data %}
+                    <option class="room-creat name-chat-list chatsend" value="{{user.id}}" dataid="{{user.type}}">{{user.name}} {{user.lastname}} - ({% if user.roles_id == 4 %}{% if user.is_primary == 1 and user.contactpersonstatus == 1 %}Contact Person/Primary Personnel{% elif user.is_secondary == 1 and user.contactpersonstatus == 1 %} Contact Person/Secondary Personnel {% elif user.is_secondary == 1 %}Secondary Personnel{% elif user.is_primary == 1%}Primary Personnel{% elif user.contactpersonstatus == 1 %}Contact Person{% endif %}{% else %}{{user.designation_role}}{% endif %})</option>
+                  {% endfor %}
+                </optgroup>
+                {% endfor %}
+              {% endif %}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn d-m-msg" data-dismiss="modal">Close</button>
+         
+          <!-- <button type="button" class="btn d-m-msg" id="add_newmssger_chat">Message</button> -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="add_new_msger modal" id="group_msg" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span> -->
+          </button>
+          <h5 class="modal-title title-pop-chat">Group Message</h5>
+
+        </div>
+        <div class="modal-body">
+          <p class="lab-tilt-chat">Group</p>
+          <div class="sel-new">
+            <select name="new_mssger_grp" id="grp_msgr" placeholder="Select Users"
+              class="form-control full-width-selv grp_msgr">
+              {% comment %}
+              <option value="">Select</option>
+              {% for i in grouplist %}
+              <option class="room-creat name-chat-list chatsend" dataid="{{i.type}}" value="{{i.id|replacecommaid}}">
+                {{i.name}}
+              </option>
+              {%endfor%}
+              {% endcomment %}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn d-m-msg" data-dismiss="modal">Close</button>
+          <!-- <button type="button" class="btn d-m-msg" id="add_newmssger_chat">Message</button> -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+  <div class="add_new_msger modal" id="group_member_view" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span> -->
+          </button>
+          <h5 class="modal-title title-pop-chat">Group Members</h5>
+
+        </div>
+        <div class="modal-body">
+          <!-- sample lists -->
+          <div class="group_lists">
+            <ul class="group_members group-member-new">
+            </ul>
+          </div>
+          <!-- end lists -->
+          <div class="sel-new">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn d-m-msg" data-dismiss="modal">Close</button>
+          <!-- <button type="button" class="btn d-m-msg" id="add_newmssger_chat">Message</button> -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+
+
+
+  <!-- Modal -->
+  <div id="group_edit" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content pop-up-boxbor">
+        <div class="modal-header">
+          <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+          <h4 class="modal-title title-pop-chat">Edit Group</h4>
+        </div>
+        <div class="modal-body">
+          <!-- <p>Some text in the modal.</p> -->
+
+          <!-- //form for creating group -->
+
+          <!-- <form id="groupcreation-form" method="POST"> -->
+          <!-- {% csrf_token %} -->
+          <!-- 
+          <div class="form-group">
+            <label class="lab-tilt-chat" for="exampleInputEmail1">Group Name</label>
+            <input type="text" class="form-control edit_groupname pop-in-clr" name="groupname" id="edit_groupname" aria-describedby="emailHelp" placeholder="Enter GroupName">
+            
+          </div> -->
+          <div class="form-group">
+            <label class="lab-tilt-chat" for="exampleInputPassword1">Edit Group Members</label>
+            <div class="sel-chat sel-chats">
+              <input type="hidden" id="geteditroomid" value="{{room_name}}">
+              <select name="groupmembersedit" id="groupmembersedit" placeholder="Select Users"
+                class="form-control  room-groupmembersedit full-width-sel" multiple>
+                <option value="">Select</option>
+                {% comment %}
+                {%for grpdtls in getmembers%}
+
+
+                <option value="{{grpdtls.id|replacecommaid}}" dataid="{{grpdtls.status}}" {%if grpdtls.status==1
+                  %}selected {% endif %}>{{grpdtls.name}} {{grpdtls.lastname}}</option>
+
+                {%endfor%}
+                {% endcomment %}
+              </select>
+            </div>
+
+          </div>
+          <div class="form-check">
+
+          </div>
+          <!-- </form> -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn editgrpdetails btn-add-group">Save & Close</button>
+          <button type="button" class="btn btn-default btn-add-group close-editgroup-model"
+            data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+  <!-- //edit modal for group -->
+
+
+
+
+
+
+
+
+
+
+  <!-- Modal -->
+  <div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content pop-up-boxbor">
+        <div class="modal-header">
+          <!-- <button type="button" class="close" data-dismiss="modal">&times;</button> -->
+          <h4 class="modal-title title-pop-chat">Create Group</h4>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="lab-tilt-chat" for="exampleInputEmail1">Group Name</label>
+            <input type="text" class="form-control room-groupname pop-in-clr" name="groupname" id="groupname"
+              aria-describedby="emailHelp" placeholder="" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label class="lab-tilt-chat" for="exampleInputPassword1">Select Group Members</label>
+            <div class="sel-chat">
+              <select name="groupmembers" id="groupmembers" placeholder="Select Users"
+                class="form-control select2 room-groupmembers full-width-sel" multiple>
+                {% for groupmembers in userlist %}
+                {% if groupmembers.email != '' %}
+                <option value="{{groupmembers.id|replacecommaid}}" title="{% if groupmembers.roles_id == 4 %} {% if groupmembers.is_primary == 1 and groupmembers.contactpersonstatus == 1 %} Contact Person/Primary Personnel {% elif groupmembers.is_secondary == 1 and groupmembers.contactpersonstatus == 1 %} Contact Person/Secondary Personnel {% elif groupmembers.is_secondary == 1 %} Secondary Personnel {% elif groupmembers.is_primary == 1 %} Primary Personnel {% elif groupmembers.contactpersonstatus == 1 %}Contact Person{% endif %}{% endif %}">{{groupmembers.name}}
+                  {{groupmembers.lastname|default_if_none:"---"}}
+                  {% if groupmembers.roles_id == 4 %}
+                  ({% get_vendorname groupmembers.cin_number %})
+                  {% elif groupmembers.roles_id == 3 %}
+                  ({{groupmembers.designation_role}})
+                  {% elif groupmembers.roles_id == 2 %}
+                  (Client Administrator)
+                  {% endif %}</option>
+                {%endif%}  
+                {%endfor%}
+              </select>
+            </div>
+
+          </div>
+          <div class="form-check">
+
+          </div>
+          <button type="button" class="btn btn-add-group room-creat">Create Group</button>
+          <!-- </form> -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default btn-add-group close-group-model"
+            data-dismiss="modal">Close</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- start here contract based user message -->
+  <!-- <div class="add_contract_user modal" id="add_contract_user" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          </button>
+          <h5 class="modal-title title-pop-chat">Contract Based Message</h5>
+        </div>
+        <div class="modal-body">
+          <p class="lab-tilt-chat">Users</p>
+          <div class="sel-new">
+            <select name="new_mssger" id="addnewmemcls" placeholder="Select Users"
+              class="form-control full-width-selv addnewmemcls pop-in-clr">
+              <option value="">Select</option>
+              {% for i in userlistdata %}
+                {% if i.type == 'single' %}
+                  {% if i.roles_id != 2 %}
+                    {% check_create_edit_delete i.id 4 as check_rights %}
+                      {% if check_rights >  0 %}
+                        <option class="room-creat name-chat-list chatsend" d="a" dataid="{{i.type}}" title="{% if i.roles_id == 4 %} {% if i.is_primary == 1 and i.contactpersonstatus == 1 %} Contact Person/Primary Personnel {% elif i.is_secondary == 1 and i.contactpersonstatus == 1 %} Contact Person/Secondary Personnel {% elif i.is_secondary == 1 %} Secondary Personnel {% elif i.is_primary == 1 %} Primary Personnel {% elif i.contactpersonstatus == 1 %}Contact Person{% endif %}{% endif %}" value="{{i.id|replacecommaid}}">{{i.name}} {{i.lastname|default_if_none:"---"}} {% if i.roles_id == 4 %} ({% get_vendorname i.cin_number %}) {%else%} ({{i.designation_role}}) {% endif %} </option> 
+                      {%endif%}
+                  {%endif%}
+                {%endif%}
+              {%endfor%}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn d-m-msg" data-dismiss="modal">Close</button>         
+        </div>
+      </div>
+
+    </div>
+  </div> -->
+  <!-- end here contract based user message -->
+
+
+  <input type="hidden" value="{{request.user.id|replacecommaid}}" class="loginuser">
+  <input type="hidden" id="start" value="0">
+  <input type="hidden" id="rowperpage" value="10">
+  <input type="hidden" id="totalrecords" value="0">
+  <div class="conteiner chat-contain-con" id="conteiner" data-id="2">
+    <div class="scroll-cht" id="test" data-id="1">
+      <!-- {%for previouschat in lastchat%}
+    
+
+     <div class="message theres" id="message-theres">{{previouschat.chats}}</div> 
+
+    {%endfor%} -->
+      {% comment %}
+
+      {%for sent in lastchat%}
+
+      {% if sender == sent.user.id %}
+
+      <div class="message-sent" id="message-theres">
+        <div class="sed-cht">
+          {%if sent.chats %}
+
+          <pre class="bk-cont"><p class="word-bk-you">you</p><p class="word-bk">{{sent.chats}}</p></pre>
+          {%endif%}
+
+
+          <!-- {{sent.file}} -->
+          {%for filedata in sent.file|filecomma %}
+          <!-- {{filedata}} -->
+          <div><a class="hov-att-clr" href="{{filedata.document.url}}" value="{{filedata.document.file}}" download>
+              {{filedata.document.name}}</a></div>
+          {% endfor %}
+
+
+        </div>
+        <div class="time cht-time utctolocal"> {{sent.timestamp}}</div>
+      </div><br>
+      {% else %}
+      <div class="message-receive" id="message-theres">
+        <div class="rec-cht">
+          <pre
+            class="bk-cont"><p class="word-bk-send">{{sent.user_id|showsendername}}</p><p class="word-bk">{{sent.chats}}</p></pre>
+
+
+          {%for filedata in sent.file|filecomma %}
+          <!-- {{filedata}} -->
+          <div><a class="hov-att-clr" href="{{filedata.document.url}}" value="{{filedata.document.file}}" download>
+              {{filedata.document.name}}</a></div>
+          {% endfor %}
+
+
+        </div>
+        <div class="time rec-time utctolocal"> {{sent.timestamp}}</div>
+      </div>
+
+      {% endif %}
+
+      {%endfor%}
+      <div class="filepreview newcls" id="filepreview_id">
+
+      </div>
+      {% endcomment %}
+
+    </div>
+
+  </div>
+  <div class="inputpad">
+    <input type="hidden" name="room" id="roomid" value="0">
+    <input type="hidden" name="receiver" id="receiver_id" value="{{room_name}}">
+    <input type="hidden" name="receiver" id="getreceive" value="{{request.GET.receiver_id|replacecommaid}}">
+
+    <input type="hidden" name="sender" id="sender_id" value="{{sender|replacecommaid}}">
+
+
+    <div class="same-chat-txt send-input-box">
+      <!-- <div class="input-widc"><input id="chat-message-input"  class="message-chat msg-chat-box" name="sample" type="text" placeholder=" Type Something...."></div> -->
+      <div class="input-widc">
+        <textarea autocomplete="off" rows="1" id="chat-message-input" class="message-chat msg-chat-box" name="sample"
+          placeholder=""></textarea>
+        <div class="att-file-chat file-upload">
+          <i class="fa fa-paperclip atta-ch"></i>
+          <!-- <img src="https://i.stack.imgur.com/dy62M.png" /> -->
+          <form enctype="multipart/form-data" id="id_ajax_upload_form" method="POST" novalidate="">
+            {% csrf_token %}
+            <span>{{ form.document }}</span>
+            <!-- <button id="attachementclear">clear</button> -->
+          </form>
+        </div>
+        <input type="hidden" name="chatfile" class="attache" id="chatattachement" dataid="" value="" multiple>
+        <div class="ssen-ic"><i class="material-icons"><input id="chat-message-submit" type="button"
+              class="msger-send-btn" value="send"></i></div>
+      </div>
+
+
+      <!-- for scroll top -->
+
+      <!-- <button onclick="totop()" class="totop hidetop"></button> -->
+
+
+      <!-- for scroll top -->
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+
+
+    <!-- <i class="icon send fa fa-paper-plane-o clickable"></i> -->
+
+    <!-- //second form for filleupload -->
+
+
+  </div>
+
+  </div>
+
+  <style>
+    .w3-bar-item.user-list-nme.p-0 {
+      /* padding: 0px !important; */
+      height: 100%;
+      max-height: 75px;
+    }
+
+    .btn-add-gr:focus {
+      outline: none !important;
+    }
+
+    .modal-open .btn-add-gr {
+      color: #4c0d1e !important;
+    }
+
+    a.bck-ct-close i {
+      font-size: 22px;
+      padding: 0px 20px !important;
+      margin-right: 300px !important;
+      float: right !important;
+    }
+
+    a.bck-ct-close i:hover {
+      color: #00ad8d;
+      transform: scale(1.5);
+      transition: 0.5s;
+    }
+
+    .pop-in-clr:focus {
+      border-color: #551022 !important;
+      box-shadow: 0px 0px 2px #551022 !important;
+    }
+
+    .sel-chat span.select2-selection__choice__remove {
+      color: #fff !important;
+    }
+
+    .sel-chat li.select2-selection__choice {
+      background: #bd2753 !important;
+      color: #fff;
+      border: 1px solid #bd2753 !important;
+    }
+
+    .close-ichat {
+      font-size: 18px;
+      color: red;
+    }
+
+
+    a.hov-att-clr {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    a.hov-att-clr:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+    p.word-bk-you {
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+
+    p.word-bk-send {
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+
+    .sed-cht a {
+      word-break: break-word;
+    }
+
+    .sed-cht a:hover {
+      color: #fff !important;
+    }
+
+    /* chat select option name */
+
+    [label]
+{
+color: #af2b50;
+font-weight: 800;
+
+}
+
+option.room-creat.name-chat-list.chatsend {
+    color: #000 !important;
+}
+/* end */
+   .group-member-new
+{
+    padding-left: 0px !important;
+} 
+
+    /* *:not(i){
+      font-family: 'Font-Awesome' !important;
+}   */
+
+    .file-upload {
+      /* height:100px;
+	width:100px;
+	margin:40px auto; */
+      /* border:1px solid #f0c0d0; */
+      /* border-radius:100px; */
+      overflow: hidden;
+      /* position:relative; */
+      position: absolute;
+      /* right: 85px; */
+      right: 66px;
+      top: -11px;
+      /* height: 60px; */
+    }
+
+    .file-upload input {
+      position: absolute;
+      /* height:400px;
+	width:400px;
+	left:-200px;
+	top:-200px; */
+      height: 34px;
+      width: 35px;
+      bottom: 50px;
+      /* right: 15px; */
+      right: 10px;
+      background: transparent;
+      opacity: 0;
+      -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+      filter: alpha(opacity=0);
+    }
+
+    .file-upload .atta-ch {
+      height: 50px;
+      width: 30px;
+      /* margin:15px; */
+      margin: 30px 15px;
+    }
+
+
+    i.fa.fa-paperclip.atta-ch {
+      font-size: 22px;
+      color: #a1a1a1e8;
+      padding: 2px;
+    }
+
+    .msg-chat-box {
+      width: 100%;
+      padding: 5px 25px;
+      border-radius: 20px;
+
+      /* margin-top: 20px; */
+      border: 1px solid #dfdfdf;
+      box-shadow: 0px 0px 5px lightgrey;
+    }
+
+    /*3-06-22*/
+    .chat-contain-con {
+      margin-left: 305px !important;
+    }
+
+
+    .scroll-cht {
+      overflow-y: auto;
+      /* height: 100vh;  */
+      padding-top: 70px;
+      /* padding-bottom: 70px; */
+      padding-bottom: 140px;
+      background-color: white;
+    }
+
+    .scroll-cht::-webkit-scrollbar {
+      width: 0px;
+    }
+
+    /* Track */
+    .scroll-cht::-webkit-scrollbar-track {
+      background: #ffffff;
+    }
+
+    /* Handle */
+    .scroll-cht::-webkit-scrollbar-thumb {
+      background: #ffffff;
+    }
+
+    /* Handle on hover */
+    .scroll-cht::-webkit-scrollbar-thumb:hover {
+      background: #f8f6f6;
+    }
+
+    .send-input-box {
+      margin-left: 300px;
+      /* display:flex; */
+      /* position: relative; */
+      position: fixed;
+      bottom: 59px;
+      width: calc(100% - 270px);
+      background: #fff;
+      padding: 15px 15px;
+    }
+
+    .time.cht-time {
+      margin-right: 40px;
+      margin-top: 5px;
+      text-transform: uppercase !important;
+    }
+
+    .time.rec-time {
+      margin-left: 40px;
+      margin-top: 5px;
+      color: #00ad8d;
+    }
+
+    .message-sent {
+      display: flex;
+      align-items: flex-end !important;
+      flex-direction: column !important;
+
+    }
+
+    .message-receive {
+      display: flex;
+      align-items: flex-start !important;
+      flex-direction: column !important;
+    }
+
+    .sed-cht {
+      border: 1px solid white;
+      /* width: 100%;
+    max-width: 60px; */
+      background: #a92044;
+      /* background: #128C7E; */
+      color: #fff;
+      max-width: 75%;
+      padding: 6px 6px;
+      /* border-top-right-radius: 20px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 20px; */
+      margin-right: 40px;
+      margin-top: 20px;
+      border-radius: 5px;
+    }
+
+    .rec-cht {
+      border: 1px solid white;
+      /* width: 100%;
+    max-width: 60px; */
+      max-width: 75%;
+      /* background: #00ad8d; */
+      background: #128C7E;
+      color: #fff;
+      padding: 6px 6px;
+      /* border-top-right-radius: 20px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 20px; */
+      margin-left: 40px;
+      margin-top: 20px;
+      border-radius: 5px;
+    }
+
+    a.bck-chat i:hover {
+      color: #00ad8d;
+      transform: scale(1.5);
+      transition: 0.5s;
+    }
+
+    a.bck-chat i {
+      font-size: 22px;
+      padding: 0px 20px;
+    }
+
+    .bck-chat-close i:hover {
+      color: #00ad8d;
+      transform: scale(1.5);
+      transition: 0.5s;
+    }
+
+    .bck-chat-close i {
+      font-size: 22px;
+      padding: 0px 20px;
+      margin-right: 0px;
+      float: right;
+    }
+
+
+
+    .msger-send-btn {
+      color: #00ad8d;
+      border: none;
+      background: none;
+      /* border: 1px solid #c1c1c1; */
+      padding: 0px 35px 0px 15px;
+      /* font-size: 18px; */
+      /* border-radius: 15px; */
+    }
+
+    .msger-send-btn:hover {
+      color: #911737;
+      /* background: #00ad8d; */
+      border-radius: 15px;
+
+    }
+
+    .ssen-ic i {
+      font-size: 30px;
+    }
+
+    .fa.fa-plus-circle.add-plus-gr {
+      font-size: 18px;
+      padding: 0px 5px;
+    }
+
+    .user-chat-list {
+      font-size: 22px;
+      padding: 5px 5px;
+    }
+
+
+    .iro-chat-hed {
+      font-size: 25px;
+    }
+
+
+    .irock-chat {
+      position: fixed;
+      width: 100%;
+      padding: 16px 10px;
+      margin-left: 300px;
+      background-image: linear-gradient(182deg, #8b1434, #ce2e58) !important;
+      height: 100%;
+      max-height: 80px;
+    }
+
+    .user-list-nme {
+      /* display: flex !important; */
+      margin: 5px 0px;
+      /* padding: 19px 10px !important; */
+      border-bottom: 1px solid #a81f43 !important;
+    }
+
+    .head-us-li {
+      color: #96183a;
+      font-size: 20px;
+      margin: 2px 15px;
+      font-weight: 500;
+    }
+
+
+    .menu-label {
+      color: #222;
+    }
+
+    .menu-list .menu-label {
+      padding-left: 1em;
+    }
+
+    .menu-list>li,
+    .menu-list>li a,
+    .menu-list>li .menu-label,
+    .menu-list>li ul {
+      transition-duration: 0.3s;
+      transition-timing-function: cubic-bezier(1, 0, 1, 0);
+      transition-property: margin, max-height, opacity, background-color, color;
+    }
+
+    .menu-list>li,
+    .menu-list>li.is-active .menu-label,
+    .menu-list>li.is-active ul {
+      height: auto;
+      max-height: 500px;
+      opacity: 1;
+    }
+
+    .menu-list>li.is-invisible,
+    .menu-list>li .menu-label,
+    .menu-list>li ul {
+      height: auto;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+    }
+
+    .menu-list>li:not(.is-active) .menu-label,
+    .menu-list>li:not(.is-active) ul {
+      margin: 0;
+    }
+
+    .menu-list>li.is-hidden2,
+    .menu-list>li.is-hidden2 a,
+    .menu-list>li.is-hidden2 .menu-label,
+    .menu-list>li.is-hidden2 ul {
+      transition-timing-function: cubic-bezier(0, 1, 0, 1);
+    }
+
+    .btn-add-group {
+      background: #00ad8d;
+      color: #fff !important;
+    }
+
+    .btn.btn-add-group:hover {
+      color: #fff;
+    }
+
+    .btn-add-group:focus {
+      outline: none !important;
+    }
+
+    .chat-side-li li {
+      list-style: none !important;
+      background: #a92044;
+      color: #fff;
+      padding: 10px 10px;
+      margin: 10px 10px;
+      border-radius: 5px;
+      /* width: 100%;
+    max-width: 180px;  */
+    }
+
+    .chat-side-li li a:hover {
+      text-decoration: none !important;
+      color: #fff;
+    }
+
+    .chat-side-li li a:focus {
+      text-decoration: none !important;
+      color: #fff;
+    }
+
+    .chat-side-li {
+      padding: 20px 25px;
+    }
+
+    ul.sub-chat li {
+      margin: 0px !important;
+    }
+
+    ul.sub-chat {
+      padding: 0px !important;
+    }
+
+    .name-chat-list:hover {
+      background: #00ad8d !important;
+      border-radius: 10px;
+      width: 100%;
+      color: #fff !important;
+    }
+
+    .name-chat-list {
+      position: relative;
+    }
+
+
+    .sub-chat {
+      overflow-y: auto !important;
+      height: 460px !important;
+    }
+
+    .sub-chat::-webkit-scrollbar {
+      width: 5px;
+      height: 10px;
+    }
+
+    /* Track */
+    .sub-chat::-webkit-scrollbar-track {
+      /* background: #f1f1f1;  */
+      background: #991a3c;
+    }
+
+    /* Handle */
+    .sub-chat::-webkit-scrollbar-thumb {
+      background: #cdcdcd;
+
+    }
+
+    /* Handle on hover */
+    .sub-chat::-webkit-scrollbar-thumb:hover {
+      /* background: #cdcdcd;   */
+      background: #017474;
+    }
+
+    a.is-active {
+      color: #fff !important;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .title-pop-chat {
+      color: #810022;
+      font-weight: 500;
+      font-size: 20px;
+      text-align: center;
+    }
+
+    .title-pop-chat:hover {
+      color: #007661;
+      font-weight: 400;
+      font-size: 20px;
+    }
+
+    .lab-tilt-chat {
+      color: #008062;
+      font-weight: 500 !important;
+      font-size: 16px;
+    }
+
+    .btn-add-group:hover {
+      background: #aa2044;
+    }
+
+    .full-width-sel .select2-container {
+      display: block !important;
+    }
+
+    .pop-up-boxbor {
+      box-shadow: 0px 0px 5px #5a3c3c;
+    }
+
+    .chat-contain-con {
+      /* background-color: #d5d5d585; */
+      background-color: white;
+      color: black;
+    }
+
+
+    .chattingpad {
+
+      height: 600px;
+      /* background: lightcyan; */
+      text-decoration-color: #181718;
+    }
+
+    /* .iro-chat-hed {
+    font-size: 25px;
+} */
+
+
+    .time {
+      font-size: 12px;
+      color: #ab002d;
+    }
+
+    .currenttime {
+      margin-right: 40px;
+      margin-top: 5px;
+      color: #ab002d;
+    }
+
+    .right {
+      border: 1px solid white;
+      background: #a92044;
+      color: #fff;
+      max-width: 75%;
+      padding: 10px 10px;
+      border-top-right-radius: 20px;
+      border-bottom-right-radius: 0px;
+      border-bottom-left-radius: 20px;
+      margin-right: 40px;
+      margin-top: 20px;
+    }
+
+    .btn.dropdown-toggle:focus {
+      outline: none !important;
+    }
+
+    .select2 {
+      width: 335px;
+    }
+
+    .full-scr-chat {
+      padding: 0px;
+    }
+
+    .input-widc {
+      display: flex;
+      width: 100%;
+      margin-left: 10px;
+    }
+
+    .msg-chat-box {
+      width: 100%;
+      padding-left: 15px;
+      resize: none;
+    }
+
+    .msg-chat-box:focus-visible {
+      outline: 1px solid #a70000;
+    }
+
+
+    .msg-chat-box::-webkit-scrollbar {
+      width: 0px;
+    }
+
+    /* Track */
+    .msg-chat-box::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    /* Handle */
+    .msg-chat-box::-webkit-scrollbar-thumb {
+      background: #cdcdcd;
+    }
+
+    /* Handle on hover */
+    .msg-chat-box::-webkit-scrollbar-thumb:hover {
+      background: #cdcdcd;
+    }
+
+
+    .chat-sidebar {
+      width: 100% !important;
+      max-width: 315px !important;
+    }
+
+
+    .btn-add-group {
+      background: #00ad8d;
+      color: #fff !important;
+    }
+
+    .btn.btn-add-group:hover {
+      color: #fff;
+    }
+
+    .btn-add-group:hover {
+      background: #aa2044;
+    }
+
+    .btn-add-group:focus {
+      outline: none !important;
+    }
+
+    .send-icon:hover {
+      color: #9f1c3f;
+    }
+
+    .send-icon {
+      color: #00ad8d;
+      font-size: 30px;
+    }
+
+    .lab-tilt-chat {
+      color: #008062;
+      font-weight: 500 !important;
+      font-size: 16px;
+    }
+
+    .title-pop-chat {
+      color: #810022;
+      font-weight: 400;
+      font-size: 20px;
+    }
+
+    .title-pop-chat:hover {
+      color: #007661;
+      font-weight: 400;
+      font-size: 20px;
+    }
+
+    span.select2.select2-container.select2-container--default {
+      width: 100% !important;
+    }
+
+    span.select2.select2-container.select2-container--default.select2-container--focus {
+      width: 100% !important;
+      border-color: #8b1434 !important;
+    }
+
+    .gn-input:focus {
+      border-color: #4e0e1f;
+      box-shadow: none;
+    }
+
+
+
+
+
+    .head-us-li {
+      color: #96183a;
+      font-size: 20px;
+      margin: 2px 15px;
+      font-weight: 500;
+    }
+
+
+    .menu-label {
+      color: #222;
+    }
+
+    .menu-list .menu-label {
+      padding-left: 1em;
+    }
+
+    .menu-list>li,
+    .menu-list>li a,
+    .menu-list>li .menu-label,
+    .menu-list>li ul {
+      transition-duration: 0.3s;
+      transition-timing-function: cubic-bezier(1, 0, 1, 0);
+      transition-property: margin, max-height, opacity, background-color, color;
+    }
+
+    .menu-list>li,
+    .menu-list>li.is-active .menu-label,
+    .menu-list>li.is-active ul {
+      height: auto;
+      max-height: 500px;
+      opacity: 1;
+    }
+
+    .menu-list>li.is-invisible,
+    .menu-list>li .menu-label,
+    .menu-list>li ul {
+      height: auto;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+    }
+
+    .menu-list>li:not(.is-active) .menu-label,
+    .menu-list>li:not(.is-active) ul {
+      margin: 0;
+    }
+
+    .menu-list>li.is-hidden2,
+    .menu-list>li.is-hidden2 a,
+    .menu-list>li.is-hidden2 .menu-label,
+    .menu-list>li.is-hidden2 ul {
+      transition-timing-function: cubic-bezier(0, 1, 0, 1);
+    }
+
+    .btn-add-group {
+      background: #00ad8d;
+      color: #fff !important;
+    }
+
+    .btn.btn-add-group:hover {
+      color: #fff;
+    }
+
+    .btn-add-group:focus {
+      outline: none !important;
+    }
+
+    .chat-side-li li {
+      list-style: none !important;
+      background: #a92044;
+      color: #fff;
+      padding: 10px 10px;
+      margin: 10px 10px;
+      border-radius: 5px;
+      /* width: 100%;
+max-width: 180px;  */
+    }
+
+    .chat-side-li li a:hover {
+      text-decoration: none !important;
+      color: #fff;
+    }
+
+    .chat-side-li li a:focus {
+      text-decoration: none !important;
+      color: #fff;
+    }
+
+    .chat-side-li {
+      padding: 20px 25px;
+    }
+
+    ul.sub-chat li {
+      margin: 0px !important;
+    }
+
+    ul.sub-chat {
+      padding: 0px !important;
+    }
+
+
+    .sub-chat {
+      overflow-y: auto !important;
+      height: 460px !important;
+    }
+
+    .sub-chat::-webkit-scrollbar {
+      width: 5px;
+      height: 10px;
+    }
+
+    /* Track */
+    .sub-chat::-webkit-scrollbar-track {
+      /* background: #f1f1f1;  */
+      background: #991a3c;
+    }
+
+    /* Handle */
+    .sub-chat::-webkit-scrollbar-thumb {
+      background: #cdcdcd;
+
+    }
+
+    /* Handle on hover */
+    .sub-chat::-webkit-scrollbar-thumb:hover {
+      /* background: #cdcdcd;   */
+      background: #017474;
+    }
+
+    a.is-active {
+      color: #fff !important;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .title-pop-chat {
+      color: #810022;
+      font-weight: 500;
+      font-size: 20px;
+    }
+
+    .title-pop-chat:hover {
+      color: #007661;
+      font-weight: 400;
+      font-size: 20px;
+    }
+
+    .lab-tilt-chat {
+      color: #008062;
+      font-weight: 500 !important;
+      font-size: 16px;
+    }
+
+    .btn-add-group:hover {
+      background: #aa2044;
+    }
+
+    .full-width-sel .select2-container {
+      display: block !important;
+    }
+
+    .pop-up-boxbor {
+      box-shadow: 0px 0px 5px #5a3c3c;
+    }
+
+    .lil-icons {
+      display: flex;
+      padding: 25px 0px 0px 0px;
+      align-items: center;
+      justify-content: space-evenly;
+    }
+
+    span.u-ser-hov {
+      padding: 0px 10px;
+    }
+
+    .btn-add-gr {
+      color: #00ad8d !important;
+      font-size: 18px;
+    }
+
+    button.btn.btn-add-gr:hover {
+      color: #ac2146;
+      font-weight: 600;
+
+    }
+
+    button.btn.btn-add-gr .add-plus-gr:hover {
+      transform: scale(1.5);
+      transition: 0.5s;
+    }
+
+    .se-ar-ch {
+      border: none;
+      width: 100%;
+      max-width: 290px;
+      padding: 10px 15px;
+      margin-left: 10px;
+      margin-right: 10px;
+      border-radius: 8px;
+    }
+
+
+    .se-ar-ch:focus-visible {
+      outline: 2px solid #a61e42;
+      border-radius: 5px;
+    }
+
+    .see-arch {
+      position: relative;
+      margin: 15px 0px;
+    }
+
+    i.fa.fa-search.see-icon {
+      position: absolute;
+      right: 40px;
+      top: 12px;
+      color: #af2247;
+    }
+
+    .user-li-nnme li {
+      list-style: none;
+      color: black;
+      font-weight: 500;
+      font-size: 15px;
+      padding: 5px 5px;
+      height: 60px;
+    }
+
+    .user-li-nnme {
+      padding: 0px;
+    }
+
+    .d-m-msg {
+      background: #00ad8d;
+      color: #fff;
+    }
+
+    .d-m-msg:hover {
+      background: #aa2044;
+      color: #fff;
+    }
+
+    .noti-box {
+      background: #b02348 !important;
+      margin-bottom: 5px;
+    }
+
+    .noti-box:focus {
+      outline: none !important;
+    }
+
+
+    .count-no {
+      background: #fff;
+      color: #00835e;
+    }
+
+    .tool-tip {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* margin-right: 40px; */
+      cursor: pointer;
+    }
+
+    .tooltipText {
+      background-color: #fff;
+      position: absolute;
+      bottom: 70%;
+      left: -36px;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      opacity: 0;
+      transition: all .5s;
+    }
+
+    .tooltipText::after {
+      content: '';
+      border-width: 5px;
+      border-style: solid;
+      border-color: #fff transparent transparent transparent;
+      position: absolute;
+      top: 100%;
+      left: 40%;
+      margin-left: 5%;
+    }
+
+    .tool-tip:hover .tooltipText {
+      opacity: 1;
+      transform: translateY(-10px);
+    }
+
+
+
+    /* .indexpage{
+  background: #00326c;
+} */
+    .msg-count {
+      background: #6c0000;
+      border-radius: 50%;
+      height: 18px;
+      width: 18px;
+      padding: 4px 4px;
+      margin-top: -15px;
+      font-size: 10px;
+    }
+
+    .samme-rw {
+      display: flex;
+    }
+
+
+    .del-te {
+      border: none;
+      color: #f00;
+      font-size: 18px;
+    }
+
+    .word-bk {
+      word-break: break-word !important;
+      width: 100%;
+      padding: 0px;
+      margin-bottom: 2px;
+    }
+
+    .bk-cont {
+      overflow-x: auto !important;
+      white-space: pre-wrap !important;
+      padding: 0px;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    pre {
+
+      background-color: transparent;
+      color: white;
+      border: 0;
+    }
+
+    .file-nnam {
+      color: #700000;
+      font-weight: 500;
+      font-size: 12px;
+      /* border: 1px solid #e1e1e1; */
+      padding: 10px 10px;
+      display: flex;
+      align-items: center;
+      margin: 10px 10px 10px 10px;
+      box-shadow: 0px 0px 2px;
+      justify-content: space-between;
+      margin: 15px auto;
+      width: 100%;
+      max-width: 260px;
+      word-break: break-word;
+      /* margin-left:401px; */
+
+    }
+
+    .rec-cht a {
+      word-break: break-all;
+    }
+
+    /* div#filepreview_id {
+    position: fixed;
+    bottom: 125px;
+    background: #ffff;
+} */
+
+    .newcls {
+      /* display: flex; */
+      width: 98%;
+      align-items: center;
+      /* overflow-x: auto; */
+      justify-content: space-evenly;
+      /* overflow-y: auto; */
+      /* height: 300px;   */
+    }
+
+    .peo-name {
+      color: #000 !important;
+      font-size: 16px !important;
+      font-weight: 500 !important;
+      padding-left: 12px;
+
+    }
+
+    .peo-img {
+      width: 30px;
+      height: 30px;
+      border: 1px solid #b9b6b6;
+      border-radius: 50%;
+    }
+
+    img.peo-img-logo {
+      height: 50px;
+      width: 80px;
+      border: 1px solid #dbdbdb;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    span.ch-at-name {
+      padding-left: 10px;
+      font-weight: 500;
+      font-size: 20px;
+    }
+
+    .hd-name-ct {
+      position: relative;
+      margin-left: 20px;
+    }
+
+    .water-bg {
+      background-image: url("/static/images/icons/chat-bg.jpg") !important;
+      background-size: cover;
+      background-repeat: no-repeat;
+      height: 340px !important;
+      width: 100%;
+      opacity: 0.2;
+      margin-left: 10px;
+      margin-top: 60px;
+      background-position: center;
+    }
+
+    button#msg-home {
+      border: none;
+      padding-left: 12px;
+      font-size: 25px;
+    }
+
+    .clear_pfa {
+      border: none;
+      background: transparent;
+    }
+
+    .noti-cir {
+      position: absolute;
+      top: 22px;
+      right: 6px;
+      background: #870000;
+      font-size: 14px;
+    }
+
+    .view2-cls {
+      background: none;
+      border: none;
+      position: absolute;
+      right: 40%;
+      top: 5px;
+    }
+
+    .view2-cls i {
+      color: #Ffff !important;
+      font-size: 18px;
+
+    }
+
+    .group_lists ul li {
+      list-style: none;
+      color: #000;
+      font-size: 16px;
+      font-weight: 500;
+      background: maroon;
+      margin-bottom: 7px;
+      color: #fff;
+      text-align: left;
+      width: 98%;
+      border-radius: 8px;
+      padding: 2px 15px;
+      font-size: 15px;
+      /* overflow-y: scroll; */
+    }
+
+
+
+    .group_lists {
+      overflow-y: auto;
+      height: 164px;
+    }
+
+    .group-list-mem {
+      display: none;
+    }
+
+    .text-member {
+      margin-left: 60px;
+      margin-top: 3px;
+    }
+
+    .dialog-box-width {
+    width: 100%;
+    max-width:700px;
+}
+
+
+    /* forscroll top */
+    /* 
+.totop
+	border none
+	outline none
+	position fixed
+	right 0
+	bottom 30px
+	background none
+	padding 30px 30px
+	border-radius 50%
+	&:before
+		font-family FontAwesome
+		content "\f106"
+		font-size 70px
+		color #fff
+		padding 0px 15px 3px
+		display block
+		vertical-align middle
+		align-content center
+		position fixed
+		right 0
+		bottom 30px
+		background blue
+		border none
+		border-radius 50%
+		transition right .5s ease
+.hidetop:before
+	right -200px */
+
+
+    #showgrpname {
+      font-size: 147%;
+    }
+
+    #editgrp {
+      background: #00000000;
+      border: none;
+      position: absolute;
+      top: 5px;
+      right: 0px;
+      left: 125px;
+    }
+  </style>
+  {{ room_name|json_script:"room-name" }}
+
+  <!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.js"></script>
+<script src="javascript/common.js" type="text/javascript"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" ></script> -->
+  <script type="text/javascript">
+    var user_data = "{{request.user.id|replacecommaid}}"
+    var user_id = parseInt(user_data)
+    var scheme = "{{request.scheme}}"
+    var gethost = "{{request.get_host}}"
+    var currentdomain = scheme + '://' + gethost
+    $(document).ready(function () {
+      // $('.message-chat').summernote(
+      //       {
+      //       toolbar: false,
+
+
+      //   });
+      //alert('')
+      window.scrollTo(0, document.body.scrollHeight);
+
+
+      //$(document).on('click','#floating-msg',function(){
+      //  $('#messageframe')
+      //})
+      //   $('#chat-message-submit').on('click',function(e){ 
+
+
+
+      // let input=$('#chat-message-input').val();
+      // if(input=='')
+      // {
+
+      // e.preventDefault();
+      // }
+
+
+      //   });
+
+    })
+
+    // $(function() {
+
+
+    $("textarea").each(function () {
+
+      this.setAttribute("style", "height:" + "35px;overflow-y:scroll;");
+    }).on("input", function () {
+      console.log('a')
+      this.style.height = "35px";
+      var hval = this.scrollHeight
+      if (hval > 78) {
+        this.style.height = "78px";
+      }
+      else {
+        let textlen = this.value
+        if (textlen.length <= 1) {
+          this.style.height = "35px";
+        }
+        else {
+          this.style.height = (hval) + "px";
+        }
+
+      }
+      //
+    });
+
+    //   console.log('searchcheck')
+    //   setInterval(function(){
+
+
+    //   var searchval=$('#usersearch').val()
+
+    // if(searchval =='')
+    // {
+
+
+    //      var userid='{{request.user.id}}'
+    //      var roomid=
+    //   //    alert(userid)
+    // var url=currentdomain+/chat/showlastestmsg
+    // $.ajax({
+    // type: "GET",
+    // url: "https://irockinfo.mo.vc/chat/showlastestmsg",
+    //url: "http://127.0.0.1:8000/chat/showlastestmsg",
+    // utl:url,
+    // data: {'userid':userid},
+    // success: function(data) {
+    //   console.log(data.data)
+    //   var html ="";
+    //"
+    //html+='<ul class="list user-li-nnme">'
+    // $.each(data.data,function(index,value){
+    //   html+='<li><input type="hidden" class="receiverid" id="receiverid" value="'+value.id+'">'
+    //   html+='<button type="button" class="room-createe w3-bar-item w3-button name-chat-list" data="'+value.type+'" value="'+value.id+'"><h5><img class="peo-img" src="/static/images/icons/user-ic.png"><span class="peo-name">'+value.name+'</span></h5>'
+
+    //               if(value.count >0)
+    //               {
+
+    //                html+= '<i class="ficon feather icon-bell"></i><span class="badge badge-pill badge-primary badge-up totalnotification noti-cir">'+value.count+'</span>'
+
+    //               }
+    //           html +='</button></li>'
+    //           })
+    //           //html+='</ul>'
+    //           // console.log(html)
+    //           $(".list").html(html)
+
+    // },
+    //       complete: function(success) {
+
+    // }
+    // });}}, 5000);
+    // }); currentdomain
+/*
+    $(document).on('click', '.redirectroom', function () {
+      var val = $(this).attr('value')
+      var current_url = $(location).attr("href")
+      replace_url = replace_url = 'http://127.0.0.1:800/0/chat/' + val
+      // replace_url=replace_url='https://irockinfo.mo.vc/chat/'+val
+
+      //  replace_url=replace_url='http://127.0.0.1:800/0/chat/'+val
+      replace_url = replace_url = 'https://irockinfo.mo.vc/chat/' + val
+      // 6e2fdd2ed26cdec9ebaf7ea556fbad2ec2a2c02a
+      window.location.href = replace_url
+    })
+*/
+    $(document).on('click', '#attachementclear', function () {
+      // var link=$(this).attr('link')
+      // var fieldid=$(this).attr('fileid')
+      $(this).val('')
+    })
+
+
+    $('#groupmembers').select2({
+      // maximumSelectionLength: 4
+    });
+
+    $('#groupmembersedit').select2({
+      // maximumSelectionLength: 4
+    });
+
+
+    $('#new_mssger').select2({
+      // maximumSelectionLength: 4
+    });
+
+
+
+
+
+    mainarray = []
+    var url = "{% url 'chat:download' 1%}"
+    //var roomName = JSON.parse(document.getElementById('roomid').value);
+    //var moment_date = moment(new Date()).format("DD-MM-YYYY hh:mm a")
+    function capitalizeFirstLetter(string) {
+      return string.slice(0, -2) + string.slice(-2).toUpperCase();
+    }
+    //console.log(capitalizeFirstLetter('foowefrgthgyjkl'));
+    var ws_scheme = window.location.protocol == "https:" ? "wss://" : "ws://";
+    var chatSocket;
+    var group_status;
+    function connect() {
+      //var ws = new WebSocket('ws://localhost:8080');
+      var roomName = $('#roomid').val();
+      console.log('m', roomName)
+      console.log({
+        'ws_scheme': ws_scheme,
+        'host': window.location.host,
+        'roomname': roomName
+      });
+      // var wss
+      // if(window.location.protocol=='https:')
+      // {
+      //   wss=':8443'
+      // }
+      // else{
+      //   wss=''
+      // }
+      // if (mainarray.length > 0){
+      //   $.each( mainarray, function( key, value ) {
+      //     value.onclose = function () {}; // disable onclose handler first
+      //     value.close()
+      //   });
+      // }
+
+      chatSocket = new WebSocket(
+        ws_scheme
+        + window.location.host
+        // + wss
+        + '/ws/chat/'
+        + roomName
+        + '/'
+      );
+      mainarray.push(chatSocket)
+      // if connection is open, send message
+      chatSocket.onopen = function (e) {
+        console.log('Connected to chat server');
+        console.log(e);
+      };
+
+      chatSocket.onmessage = function (e, self) {
+        var roomName = $('#roomid').val();
+        //alert('a',room_name)
+        // var getreceiver=window.location;
+        // console.log('getid',getreceiver)
+
+
+        var server_message = e.data;
+
+        let currentDate = new Date();
+        let time = currentDate.getHours() + ":" + currentDate.getMinutes();
+        //console.log(time);
+        const data = JSON.parse(e.data);
+        console.log('abc', data)
+        console.log('server-message', server_message);
+        // alert()
+        const file = document.getElementById('chatattachement').value;
+        var check = document.getElementById("chatattachement").getAttribute('fileid')
+        getreceive = document.getElementById('getreceive').value;
+        var sender_id = document.getElementById("sender_id").value
+        console.log('987', roomName)
+        console.log('me', data.roomid)
+        if (parseInt(data.roomid) == roomName) {
+          if (data.message != '' || data.file != '') {
+            var html = ""
+            $('.currenttime').val('')
+            $('.currenttimere').val('')
+            let room_type;
+            let definyourself;
+            room_type = username_rommtype(data.roomid, data.sender)
+            if (room_type.room_type == 'group') {
+              definyourself = 'You'
+            }
+            else {
+              definyourself = ''
+            }
+            if (data.msguserid == sender_id) {
+              var container = document.createElement('div');
+              container.id = 'message-theres';
+              container.className = "message-sent";
+              if (data.file == null || data.file == '') {
+                console.log('no file')
+                html += "<pre class='bk-cont'><p class='word-bk-send'>" + definyourself + "</p>"
+                console.log((data.message).length)
+                if (data.message != "") {
+                  html += "<p class='word-bk'>" + data.message + "</p>"
+                }
+                html += '</pre>'
+                container.innerHTML = '<div class="sed-cht">' + html + '</div> <div class="time cht-time utctolocal">' + capitalizeFirstLetter(moment(new Date()).format("DD-MM-YYYY hh:mm a")) + '</div>'
+                // $('html, body').animate({
+                //         scrollTop: $(".send-input-box").offset().top
+                //     }, 1500);
+              }
+              else {
+                console.log('file present')
+                var datafile = data.file
+                var splitfile = datafile.split(",")
+                //el != null &&
+                var myArrayNew = splitfile.filter(function (el) {
+                  return el != "";
+                });
+                var pk_id = data.ids
+                console.log('splitid', myArrayNew)
+                var splitids = pk_id.split(",")
+                html += "<pre class='bk-cont'><p class='word-bk-send'>" + definyourself + "</p><p class='word-bk'>" + data.message + '</p></pre>'
+                console.log('datamessage', data.message)
+                console.log('n', myArrayNew)
+                for (var i = 0; i < myArrayNew.length; i++) {
+                  replcaeurl = url.replace('1', splitids[i])
+                  console.log(replcaeurl)
+                  repalcename = myArrayNew[i].replace("documents/", "")
+                  html += '<a href="' + replcaeurl + '" value="' + myArrayNew[i] + '">' + repalcename + "<br>" + '</a>';
+                }
+                container.innerHTML = '<div class="sed-cht">' + html + '</div> <div class="time cht-time">' + capitalizeFirstLetter(moment(new Date()).format("DD-MM-YYYY hh:mm a")) + '</div>'
+              }
+              var element = document.getElementsByClassName('scroll-cht')[0]
+              console.log('abadb')
+              console.log(container)
+              element.appendChild(container)
+
+              // $('html, body').animate({
+              //       scrollTop: $(".send-input-box").offset().top
+              //   }, 1500);
+
+            }
+            else {
+              //reciver
+              //user_notification()
+              //let room_type;
+              let name;
+              //room_type = username_rommtype(data.roomid,data.sender)  
+              console.log('Socket room_type', room_type.room_type)
+              console.log('Socket name', room_type.data[0].name)
+              if (room_type.room_type == 'group') {
+                name = room_type.data[0].name
+                lastname = ''
+                if (room_type.data[0].lastname != null) {
+                  name = room_type.data[0].name + ' ' + room_type.data[0].lastname
+                }
+                else {
+                  name = room_type.data[0].name
+                }
+              }
+              else {
+                name = ''
+              }
+              var container = document.createElement('div');
+              container.id = 'message-theres';
+              container.className = "message-receive";
+              if (data.file == null || data.file == '') {
+                console.log('no file')
+                html += '<pre class="bk-cont"><p class="word-bk-send">' + name + '</p><p class="word-bk">' + data.message + '</p></pre>'
+                container.innerHTML = '<div class="rec-cht">' + html + '</div> <div class="time rec-time">' + capitalizeFirstLetter(moment(new Date()).format("DD-MM-YYYY hh:mm a")) + '</div>'
+                // $('html, body').animate({
+                //     scrollTop: $(".send-input-box").offset().top
+                // }, 1500);
+              }
+              else {
+                console.log('file present')
+                var datafile = data.file
+                var splitfile = datafile.split(",")
+                var pk_id = data.ids
+                var splitids = pk_id.split(",")
+                var myArrayNew = splitfile.filter(function (el) {
+                  return el != "";
+                });
+                html += '<pre class="bk-cont"><p class="word-bk-send">' + name + '</p><p class="word-bk">' + data.message + '</p></pre>'
+                console.log(html)
+                for (var i = 0; i < myArrayNew.length; i++) {
+                  replcaeurl = url.replace('1', splitids[i])
+                  repalcename = myArrayNew[i].replace("documents/", "")
+                  html += '<a href="' + replcaeurl + '" value="' + myArrayNew[i] + '">' + repalcename + "<br>" + '</a>';
+                }
+                container.innerHTML = '<div class="rec-cht">' + html + '</div> <div class="time rec-time">' + capitalizeFirstLetter(moment(new Date()).format("DD-MM-YYYY hh:mm a")) + '</div>'
+              }
+              var element = document.getElementsByClassName('scroll-cht')[0]
+              console.log(container)
+              element.appendChild(container)
+
+            }
+          }
+        }
+        // $('html, body').animate({
+        //         scrollTop: $(".send-input-box").offset().top
+        //     }, 1500);
+        window.scrollTo(0, document.body.scrollHeight);
+      };
+
+      chatSocket.onclose = function (e) {
+        console.log(e);
+        console.error('Chat socket closed unexpectedly');
+        console.log('Trying to Reconnect....')
+        setTimeout(function () {
+          if (group_status == true) {
+            connect();
+          }
+        }, 1000);
+      };
+
+      chatSocket.onerror = function (err) {
+        //console.error('Socket encountered error: ', err.message, 'Closing socket');
+        chatSocket.close();
+      };
+      document.querySelector('#chat-message-submit').onclick = function (e) {
+        $('.filepreview').css('height', '0px')
+        $('.filepreview').html('')
+        var groupids = $('#groupmembersedit').select2().val()
+        console.log('sd', groupids)
+        // var roomid =document.getElementById("roomid").value
+        // alert('1') 
+        var sender_id = document.getElementById("sender_id").value
+        var messageInputDom = document.querySelector('#chat-message-input');
+
+        var message = messageInputDom.value;
+        var current_url = $(location).attr("href")
+        console.log(current_url)
+        // var fileInputDom=document.querySelector('#chatattachement');
+        var get_file = $('#chatattachement').attr('link')
+        if (get_file != undefined) {
+          file = get_file
+          // alert('aa')
+          console.log('lin', get_file)
+        }
+        else {
+          file = ''
+          // alert('bb')
+
+        }
+        var get_file_ids = $('#chatattachement').attr('fileid')
+        if (get_file_ids != undefined) {
+          check = get_file_ids
+        }
+        else {
+          check = ''
+        }
+        //alert(file)
+
+        // var  file = fileInputDom.value;
+        var roomid = $('#roomid').val()
+        console.log('socket', roomName)
+        // console.log({
+        //   'message': message,
+        //   'file' : file,
+        //   'ids':check,
+        //   'sender':sender_id,
+        //   'uid':uuidv4(),
+        //   'roomid':roomName
+        // });
+        // if message is not empty then send message
+        //alert('asd')
+        //if (message!=''){
+        //alert('files')
+        message = message.trim()
+        if (message != '' || file) {
+          chatSocket.send(JSON.stringify({
+            'message': message,
+            'file': file,
+            'ids': check,
+            'sender': sender_id,
+            'uid': uuidv4(),
+            'roomid': roomName,
+            'groupids': groupids,
+            'group_chatmember': $('#active_groupmember_ids').val()
+          }));
+          console.log('check', {
+            'message': message,
+            'file': file,
+            'ids': check,
+            'sender': sender_id,
+            'uid': uuidv4(),
+            'roomid': roomName,
+            'groupids': groupids,
+            'group_chatmember': $('#active_groupmember_ids').val()
+          })
+        }
+        // else if (file )
+
+        //}
+        //messageInputDom.value = '';  
+        $('#chat-message-input').val('')
+        $('#chat-message-input').focus()
+        $('#chat-message-input').height('')
+        //file='';
+
+        document.getElementById("id_document").value = ""
+        document.getElementById("chatattachement").value = ""
+        document.getElementById("chatattachement").setAttribute('link', '')
+        document.getElementById("chatattachement").setAttribute('fileid', '')
+        document.getElementById("chatattachement").setAttribute('placeholder', '')
+      };
+
+      //document.querySelector('#chat-message-input').keypress = function(event) {
+      // $("#chat-message-input").keypress(function(event){
+      //   var keycode=event.keyCode
+      //   if (event.keyCode == 13 && event.shiftKey) {
+      //   console.log('ifcondition')
+      //   }
+      //   else if(keycode==13)
+      //     {
+      //       $('.filepreview').css('height','0px')
+      //       $('.filepreview').html('')
+      //         var roomid =document.getElementById("roomid").value
+      //         alert('2') 
+      //         var sender_id =document.getElementById("sender_id").value
+      //         var messageInputDom = document.querySelector('#chat-message-input');
+      //         var  message = messageInputDom.value;
+      //         var current_url=$(location).attr("href")
+      //         console.log(current_url)
+      //         // var fileInputDom=document.querySelector('#chatattachement');
+      //         var get_file=$('#chatattachement').attr('link')
+      //         if (get_file != undefined){
+      //             file=get_file
+      //             alert('cc')
+      //         }
+      //         else{
+      //           file=''
+      //           alert('dd')
+      //         }
+      //         var get_file_ids=$('#chatattachement').attr('fileid')
+      //         if (get_file_ids != undefined){
+      //           check=get_file_ids
+      //         }
+      //         else{
+      //           check=''
+      //         }
+      //         //alert(file)
+
+      //         // var  file = fileInputDom.value;
+      //         var roomid=$('#roomid').val()
+      //         console.log({
+      //           'message': message,
+      //           'file' : file,
+      //           'ids':check,
+      //           'sender':sender_id,
+      //           'uid':uuidv4(),
+      //           'roomid':roomName
+      //         });
+      //         // if message is not empty then send message
+      //         //alert('asd')
+      //         //if (message!=''){
+      //           //alert('files')
+      //         // console.log('socket',roomName)
+      //         // chatSocket.send(JSON.stringify({
+
+      //         //     'message': message,
+      //         //     'file' : file,
+      //         //     'ids':check,
+      //         //     'sender':sender_id,
+      //         //     'uid':uuidv4(),
+      //         //     'roomid':roomName
+      //         // }));
+      //       $('.msger-send-btn').trigger('click');
+      //       //$('.filepreview').css('height','0px')
+      //       //$('#chatattachement').attr('fileid','')
+      //       //$('#chatattachement').attr('link','')
+      //       //$('#chatattachement').attr('placeholder','')
+      //       $('#chat-message-input').val('')
+      //       $('#chat-message-input').focus()
+      //       $('#chat-message-input').height('')
+      //       document.getElementById("id_document").value=""
+      //       document.getElementById("chatattachement").value=""
+      //       document.getElementById("chatattachement").setAttribute('link','')
+      //       document.getElementById("chatattachement").setAttribute('fileid','')
+      //       document.getElementById("chatattachement").setAttribute('placeholder','')
+      //     }
+      // });
+      //}
+
+
+
+      function uuidv4() {
+        return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+          (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+        );
+      }
+
+
+    }
+    connect();
+
+    $("#chat-message-input").keypress(function (event) {
+      var keycode = event.keyCode
+      if (event.keyCode == 13 && event.shiftKey) {
+        console.log('ifcondition')
+      }
+      else if (keycode == 13) {
+        $('.filepreview').css('height', '0px')
+        $('.filepreview').html('')
+        $('.msger-send-btn').trigger('click');
+        // $('#chat-message-input').val('')
+        // $('#chat-message-input').focus()
+        // $('#chat-message-input').height('')
+        // document.getElementById("id_document").value=""
+        // document.getElementById("chatattachement").value=""
+        // document.getElementById("chatattachement").setAttribute('link','')
+        // document.getElementById("chatattachement").setAttribute('fileid','')
+        // document.getElementById("chatattachement").setAttribute('placeholder','')
+      }
+    });
+    $(document).on('change', '.room-groupmembers', function () {
+      let group_members_length = groupmembers = $('.room-groupmembers').select2().val().length;
+      if (group_members_length >= 1) {
+        $('#groupmembers').next('span').next('.waring-err').remove()
+      }
+      if (group_members_length == 0) {
+        $('#groupmembers').next('span').after('<span class="waring-err" style="color: red;">Group have minimum 1 member</span>')
+      }
+    })
+    $(document).on('click', '.room-creat', function () {
+      console.log('group create')
+      var sender_id = $('#senderid').attr('value')
+      var receiver_id = $(this).attr('value')
+      var groupname = $('#groupname').val()
+      var groupmembers = $('.room-groupmembers').select2().val()
+      $("active").removeClass();
+      $(this).addClass('active')
+      console.log(groupmembers)
+      var myJSON = JSON.stringify(groupmembers);
+      console.log('myJSON', myJSON)
+      $('#groupname').next('span').remove()
+      $('#groupmembers').next('span').next('.waring-err').remove()
+      // $('#groupmembers').next('span').remove()
+      console.log('length of groupname', groupmembers.length)
+      if (groupname != '' && groupmembers.length >= 1) {
+        $.ajax({
+          url: "/chat/createroom",
+          type: 'GET',
+          data: { 'sender_id': sender_id, 'receiver_id': myJSON, 'groupname': groupname },
+          success: function (response) {
+            console.log('response', response)
+            if (response.roomid == 'exists') {
+              $('#groupname').after('<span class="waring-err" style="color: red;">Group Name already exists</span>')
+            }
+            else {
+              $('#myModal').modal('hide');
+              $('#groupname').val('')
+
+              $("#groupmembers").val('').trigger('change');
+              $('.waring-err').remove()
+
+              //var current_url=$(location).attr("href")
+              //replace_url=current_url.replace('message',response.roomid)
+
+              //window.location.href = replace_url
+            }
+
+          }
+
+        });
+      }
+      else {
+        if (groupname == '') {
+          $('#groupname').after('<span class="waring-err" style="color: red;">Group Name is required</span>')
+        }
+        else {
+          console.log('members is required')
+          $('#groupmembers').next('span').after('<span class="waring-err" style="color: red;">Group have minimum 1 member</span>')
+        }
+      }
+      // close model popup
+    });
+
+
+    $(document).on('change', '#groupname', function () {
+      $(this).next('span').remove()
+      $('.room-creat').attr('disabled', false)
+      var val = $(this).val()
+      if (val.length > 25) {
+        $('#groupname').after('<span class="waring-err" style="color: red;">Maximum 25 Characters</span>')
+        $('.room-creat').attr('disabled', true)
+      }
+    })
+
+
+    // ajax for file upload
+    // id_document
+    // $('#id_document').change(function(){
+    // check if file is selected or not
+    //$.each('.file-nnam', function(index, value) {
+    // get file name and id
+    //  console.log({'Previous File name': $(value).val()})
+    //li.push(value.id)
+    //lin.push(value.name)
+    //  });
+    //});
+    $('#id_document').change(function (e) {
+      // length of the file
+      //file-nnam
+      //console.log($(".filepreview").find('.file-nnam').length)
+      //if ($(".filepreview").find('.file-nnam').length == 0) {
+      //console.log('no file')
+      //$(".element").removeAttr("style").hide();
+      //}
+      //else
+      //{
+      // each function
+      //$.each('.file-nnam', function(index, value) {
+      // get file name and id
+      //console.log({'Previous Files name': $(value).val()})
+      //console.log(value.id)
+      //console.log(value.name)
+      //});
+      //}	
+      // e.preventDefault();
+      var formData = new FormData($('#id_ajax_upload_form')[0]);
+      $.ajax({
+        url: "/chat/file_upload_ajax",
+        type: 'POST',
+        data: formData,
+        success: function (response) {
+          console.log('success')
+          console.log(response)
+          console.log(response.data.length)
+          var getfileids = document.getElementById("chatattachement").getAttribute('fileid')
+          var getfilenames = document.getElementById("chatattachement").getAttribute('link')
+          var li = []
+          var lin = []
+          if (getfileids == null && getfileids == undefined) {
+          }
+          else {
+            console.log('li', getfileids)
+            li = getfileids.split(',')
+            lin = getfilenames.split(',')
+          }
+          console.log('a', response.data)
+
+          ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+          // ajax get file name and id
+          // jquery for each loop
+          // $.ajax({
+          // url: "/chat/get_file_name_id",
+          //  type: 'GET',
+          //  data:{'fileid':getfileids,'filenames':getfilenames},
+          // success: function (response) {
+          //   console.log('success')
+          //   console.log(response)
+          //  for(var i=0;i<response.data.length;i++)
+          //  {
+          //    li.push(response.data[i].id)
+          //   lin.push(response.data[i].filename)
+          //}
+          //  console.log(li)
+          // console.log(lin)
+          // var fileids=li.join(",")
+          // var filenames=lin.join(",")
+          // console.log(fileids)
+          // console.log(filenames)
+          //document.getElementById("chatattachement").setAttribute('fileid',fileids)
+          // document.getElementById("chatattachement").setAttribute('link',filenames)
+          // document.getElementById("chatattachement").setAttribute('placeholder','')
+          // }
+          //  });
+          ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+          for (var i = 0; i < response.data.length; i++) {
+            li.push(response.data[i].id)
+            lin.push(response.data[i].file)
+
+            // document.getElementById("chatattachement").value = response.data[i].file;
+
+            // document.getElementById("chatattachement").setAttribute('fileid',response.data[i].id);
+            // document.getElementById("chatattachement").setAttribute('link',response.data[i].file);
+
+          }
+
+          var convert_str = li.toString();
+          if (convert_str.charAt(0) == ',') {
+            convert_str = convert_str.substring(1)
+          }
+          var link_str = lin.toString();
+          console.log({ 'convert_str': convert_str, 'link_str': link_str })
+          //document.getElementById("chatattachement").value =convert_str;
+          document.getElementById("chatattachement").setAttribute('fileid', convert_str);
+          document.getElementById("chatattachement").setAttribute('link', link_str);
+          document.getElementById("chatattachement").setAttribute('placeholder', link_str);
+          var html = ''
+          // console.log(li)sssss
+          for (var i = 0; i < li.length; i++) {
+            //li.push(response.data[i].id)
+            //lin.push(response.data[i].file)
+            if (li[i]) {
+              html += '<div class="file-nnam">' + lin[i] + '<button class="clear_pfa" id=' + li[i] + ' value=' + lin[i] + '><i class="fa fa-close close-ichat"></i></button></div>'
+            }
+            // document.getElementById("chatattachement").value = response.data[i].file;
+            // console.log('idd',response.data[i].id)
+            // html+='<div class="file-nnam">'+lin[i]+'<button class="clear_pfa" id='+li[i]+' value='+lin[i]+'><i class="fa fa-close" style="font-size:24px;color:red"></i></button></div>'
+            // html+='<i class="fa fa-trash" aria-hidden="true" datais="'+response.data[i].id+'"></i></div>';
+            // document.getElementById("chatattachement").setAttribute('link',response.data[i].file);
+
+          }
+          var li = li.filter(function (el) {
+
+            return el != null && el != "";
+
+          });
+          // alert(li.length)
+          if (li.length == 1) {
+            // alert('assd')
+            $('.filepreview').css('height', '72px')
+            $('.filepreview').css('overflow-y', '')
+          }
+          else if (li.length == 2) {
+            $('.filepreview').css('height', '135px')
+            $('.filepreview').css('overflow-y', '')
+          }
+          // if (li.length == 3){
+          //   $('.filepreview').css({'height':'193px','overflow-y':'scroll'})
+          // }
+          else {
+            $('.filepreview').css({ 'height': '195px', 'overflow-y': 'scroll' })
+          }
+          // var get_height_div= $('.filepreview').height();
+          // alert(get_height_div)
+          $('.filepreview').html(html)
+          //filepreview
+          $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+        },
+        cache: false,
+        contentType: false,
+        processData: false
+      });
+    });
+
+
+
+    const links = document.querySelectorAll(".menu-list > li > a");
+    for (const link of links) {
+      link.addEventListener(
+        "click",
+        e => {
+          const curr = e.srcElement;
+          [...links].forEach(link => {
+            if (link !== curr) {
+              link.classList.remove("is-active");
+              link.parentNode.classList[
+                curr.classList.contains("is-active") ? "remove" : "add"](
+                  "is-invisible");
+            }
+          });
+          curr.parentNode.classList.remove("is-invisible");
+          curr.parentNode.classList.toggle("is-active");
+          curr.classList.toggle("is-active");
+        },
+        false);
+    }
+
+    // ready function
+
+
+    $(document).on('click', '#id_document', function () {
+      // get file name and id
+      $("#filepreview_id").remove();
+      $('#test').append('<div></div>');
+      $('#test div:last').after('<div class="filepreview newcls" id="filepreview_id"></div>')
+    });
+
+
+    // on click
+
+    //user search 
+
+
+    $(document).on('keyup', '#usersearch', function () {
+      var val = $(this).val();
+
+      if (val == '') {
+        //window.location.reload();
+      }
+      $.ajax({
+        type: "GET",
+        url: "/chat/userserarching",
+        data: { 'value': val },
+        cache: false,
+        success: function (data) {
+          console.log(data)
+          if (data.data.length > 0) {
+            var html = '<li>'
+
+            $(data.data).each(function (key, val) {
+              var lname = val.lastname == undefined ? '' : val.lastname;
+              html += '<button type="button" class="room-createe w3-bar-item w3-button name-chat-list" value=' + val.id + '><h5><img class="peo-img" src="/static/images/icons/user-ic.png"><span class="peo-name">' + val.name + ' ' + lname + '</button>'
+
+            })
+            html += '</li>'
+            $('.list').html(html)
+
+          }
+
+
+
+          else {
+            console.log('data')
+            html = '<li>'
+            html += ''
+            html += '<span>Not Found</span>'
+            $('.list').html(html)
+
+
+          }
+
+
+
+        }
+
+
+      })
+    })
+
+    // onchange Direct chat
+    $(document).on('change', '.addnewmemcls', function () {
+      $('.inputpad').css('display', 'unset')
+      var element = $(this).find('option:selected');
+      var type = element.attr("dataid");
+      console.log()
+      value = element.attr("value");
+      var sender_id = $('#sender_id').val()
+      var receiver_id = $(this).val()
+      $("active").removeClass();
+      $(this).addClass('active')
+      console.log(sender_id)
+      $('#roomid').val('')
+      fetch_data(value, type)
+      $('#add_new_msger').modal('hide');
+      $('#add_contract_user').modal('hide');
+
+    });
+    $(document).on('change', '.grp_msgr', function () {
+      $('#roomid').val('')
+      fetch_data($(this).val(), 'group')
+      $('#roomid').val($(this).val())
+      let status = $(this).find('option:selected').attr('status');
+      console.log(typeof status)
+      if (status == 'false') {
+        $('.inputpad').css('display', 'none')
+        $('#test').append('<div class="text-center" style="margin-top: 20px;"><h5>You have been removed from the group</h5></div>')
+      }
+      else {
+        $('.inputpad').css('display', 'unset')
+      }
+      // close modal popup
+      $('#group_msg').modal('hide')
+      //history.pushState(null, null, currentdomain+'/chat/'+$(this).val());
+    });
+
+    //get ajax data for filter users
+
+
+
+    //setTimeout(function() {
+    //function user_notification(){
+
+    $(function () {
+      setInterval(function () {
+        $.ajax({
+          type: "GET",
+          url: currentdomain + "/chat/update_notify",
+          success: function (data) {
+            console.log('---------------------------------------')
+            console.log(data)
+            $(data.data).each(function (key, val) {
+              userid = (val.id)
+              if (val.count > 0 && val.type == 'single') {
+                $('#latestnotificationcount' + userid + '_single').addClass("badge badge-pill badge-primary badge-up  notification-individual noti-cir");
+                $('#latestnotificationcount' + userid + '_single').text(val.count)
+              }
+              if (val.count == 0 && val.type == 'single') {
+                $('#latestnotificationcount' + userid + '_single').text('')
+              }
+              if (val.count > 0 && val.type == 'group') {
+                $('#latestnotificationcount' + userid + '_group').addClass("badge badge-pill badge-primary badge-up  notification-individual noti-cir");
+                $('#latestnotificationcount' + userid + '_group').text(val.count)
+              }
+              if (val.count == 0 && val.type == 'group') {
+                $('#latestnotificationcount' + userid + '_group').text('')
+              }
+            })
+          },
+          complete: function (success) {
+          }
+        })
+      },
+        5000);
+    });
+
+    //}
+    //user_notification();
+    //}, 2000);
+
+
+
+
+    $(document).on('click', '.room-createe', function () {
+      // $('.inputpad').css('display','unset')
+      //$('.inputpad').append(file)
+      //$('.input-widc').css('display','unset')
+      var type = $(this).attr("data")
+      //console.log('type',type)
+      //$('#roomid').val('')
+      var value;
+      value = $(this).val()
+      if (type == 'single') {
+        var sender_id = $('#sender_id').val()
+        var receiver_id = $(this).val()
+        $("active").removeClass();
+        $(this).addClass('active')
+        console.log(sender_id)
+        /*  $.ajax({
+          url: "/chat/createroom",
+          type: 'GET',
+          data:{'sender_id':sender_id,'receiver_id':receiver_id,'type':type},
+          success: function (response) {
+          console.log(response.roomid)
+          $('#roomid').val('')
+          fetch_data(value,type)
+          $('#roomid').val(value)
+          history.pushState(null, null, currentdomain+'/chat/'+value);
+          var current_url=$(location).attr("href")
+          }
+          }) */
+        // call fetch_data function
+        $('#roomid').val('')
+        fetch_data(value, type)
+        //$('#roomid').val(value)
+        //history.pushState(null, null, currentdomain+'/chat/'+value);
+        var current_url = $(location).attr("href")
+        //ajax for message read status
+        $.ajax({
+          url: "/chat/messageview_status",
+          type: 'GET',
+          data: { 'sender_id': sender_id, 'receiver_id': receiver_id, 'type': type },
+          success: function (response) {
+            console.log(response)
+          }
+        })
+      }
+      else {
+        $('#roomid').val('')
+        fetch_data(value, type)
+        $('#roomid').val(value)
+        //history.pushState(null, null, currentdomain+'/chat/'+value);
+        var current_url = $(location).attr("href")
+        replace_url = currentdomain + '/chat/' + value
+        $.ajax({
+          url: "/chat/groupmessageview_status",
+          type: 'GET',
+          data: { 'value': value, 'type': type },
+          success: function (response) {
+            console.log(response)
+          }
+        })
+      }
+      //user_notification()
+      // modify the URL without reloading the page replace with chat/roomid
+      //replace_url=currentdomain+'/chat/'+value
+    });
+    // new function for user notification
+    function fetch_data(value, type) {
+      $('.inputpad').css('display', 'unset')
+      $('#test').html('');
+      $('.hd-name-ct').html('');
+      var non_groupadmin
+      $.ajax({
+        url: "/chat/get_chatmessages_by_room_id",
+        type: "GET",
+        async: false,
+        data: {
+          'room_id': value,
+          'type': type
+        },
+        success: function (data) {
+          $('#active_groupmember_ids').val('')
+          $('#active_groupmember_ids').val(data.chat_memberid)
+          console.log('Group name or person name', data.getgrpname.name)
+          non_groupadmin = []
+          console.log('Group Owner', data.group_owner)
+          console.log('is_active', typeof data.is_active)
+          $('#rowperpage').val(10)
+          $('#start').val(0)
+          $('#totalrecords').val(0)
+          $('#totalrecords').val(data.total_messages)
+          $('#roomid').val(data.current_room_id)
+          history.pushState(null, null, currentdomain + '/chat/' + data.current_room_id + '/');
+          //$('#room-name').text(data.current_room_id.toString())
+          var room = $('#roomid').val(data.current_room_id)
+          if (mainarray.length > 0) {
+            $.each(mainarray, function (key, value) {
+              value.onclose = function () { }; // disable onclose handler first
+              value.close()
+            });
+          }
+          group_status = true
+          if (data.is_active == false) {
+            group_status = false
+          }
+          //console.log('m',$('#roomid').val())
+          //var ws_scheme = window.location.protocol == "https:" ? "wss://" : "ws://";
+          //var chatSocket = new WebSocket(ws_scheme+window.location.host+'/ws/chat/'+room+'/');
+          connect()
+          console.log('totalrecords', data.total_messages)
+          if (data) {
+            $('#mydiv').remove();
+          }
+          var header_name;
+          console.log("Response", data)
+          // for each loop for chat messages
+          // Object of type QuerySet is not JSON serializable
+          //var html='';
+          console.log('data length', data.data.length)
+          var count = 0
+          console.log('showusername', data.showusername[0].name)
+          if (data.room_type == "group") {
+            $('.hd-name-ct').append('<div id="showgrpname"><a class="bck-chat msg-home"><i class="fa fa-arrow-left" title="Back"></i></a><a><i class="fas fa-user-alt"></i></a>' + data.getgrpname.name + '</div><div class="group-list-names"></div><div class="group-list-mem"></div>')
+          }
+          for (var j = 0; j < data.showusername.length; j++) {
+            if (data.showusername[j].lastname != null) {
+              header_name = data.showusername[j].name + " " + data.showusername[j].lastname
+            }
+            else {
+              header_name = data.showusername[j].name
+            }
+            if (data.room_type == "group") {
+              $('.group-list-mem').append(header_name + ', ')
+              non_groupadmin.push(`${header_name} (${data.showusername[j].designation_role})`)
+            }
+            else {
+              $('.hd-name-ct').append('<a class="bck-chat msg-home"><i class="fa fa-arrow-left"></i></a><a><i class="fas fa-user-alt"></i></a><label id="showusername">' + header_name + '<br>' + data.showusername[j].designation_role + '</label>')
+            }
+          }
+          if (data.room_type == "group") {
+            if (data.group_owner == true) {
+              $('.hd-name-ct').append('<button class="editgrp" id="editgrp" data-toggle="modal" data-target="#group_edit"><i class="fa fa-pencil-square-o" title="Edit" aria-hidden="true" style="font-size:24px"></i></button>')
+            }
+            else {
+              $('.hd-name-ct').append('<button type="button" class="view-cls view2-cls view-cls3" data-toggle="modal" data-target="#group_member_view"><i class="fa fa-info-circle" title="View" style="font-size:17px; color:#95183a;"></i></button>')
+            }
+            $('.group-list-mem').append('You')
+            $('.hd-name-ct').append('<h6 class="text-member">' + Number(non_groupadmin.length + 1) + ' Members' + '</h6>')
+          }
+          //$(data.data).each(function(key,val){  
+          var room_type
+          var others_name
+          for (var i = data.data.length - 1; i >= 0; i--) {
+            //console.log('data.data[i]',data.data[i].id)
+            // $(data.data).each(function(key,val){ to normal for loop
+            //count++
+            //console.log('val',data.data[i].id)
+            //console.log('val',val.user_id)
+            // if (data.all_messages[i].file_data.length >=1){
+            // console.log('file data',data.all_messages[i].file_data[0].document)
+            //console.log('user_id',data.chat_members_name
+            // }
+            if (data.room_type == "group") {
+              room_type = "You"
+              if (data.data[i].lastname != null) {
+                others_name = data.data[i].name + " " + data.data[i].lastname
+              }
+              else {
+                others_name = data.data[i].name
+              }
+            }
+            else {
+              room_type = ""
+              others_name = ''
+            }
+            console.log('type of ids', typeof (data.data[i].id))
+            if (user_id == parseInt(data.data[i].id)) {
+              let html = ''
+              html += '<div class="message-sent" id="message-theres"><div class="sed-cht">'
+              if (data.data[i].chat != undefined || data.data[i].chat != '') {
+                html += '<pre class="bk-cont"><p class="word-bk-you">' + room_type + '</p>'
+                if (data.data[i].chat != '') {
+                  html += '<p class="word-bk">' + data.data[i].chat + '</p>'
+                }
+                html += '</pre>'
+              }
+              if (data.data[i].file_data.length > 0) {
+                for (var k = 0; k < data.data[i].file_data.length; k++) {
+                  let file_name = data.data[i].file_data[k].document
+                  let remove_str = file_name.replace('documents/', '')
+                  html += '<div><a class="hov-att-clr" href="/media/' + data.data[i].file_data[k].document + '" download>' + remove_str + '</a></div>'
+                }
+              }
+              html += '</div>'
+              if (data.data[i].created_at) {
+                let utc_time = data.data[i].created_at;
+                let local_time = moment.utc(utc_time).toDate();
+                html += '<div class="time cht-time utctolocal">' + moment(local_time).local().format('DD-MM-YYYY hh:mm A') + '</div></div><br>'
+              }
+              $('#test').append(html);
+
+            }
+            else {
+              let htmls = ''
+              htmls += '<div class="message-receive" id="message-theres"><div class="rec-cht">'
+              if (data.data[i].chat != undefined || data.data[i].chat != '') {
+                htmls += '<pre class="bk-cont"><p class="word-bk-send">' + others_name + '</p><p class="word-bk">' + data.data[i].chat + '</p></pre>'
+              }
+              if (data.data[i].file_data.length >= 1) {
+                for (var k = 0; k < data.data[i].file_data.length; k++) {
+                  let file_name = data.data[i].file_data[k].document
+                  let remove_str = file_name.replace('documents/', '')
+                  htmls += '<div><a class="hov-att-clr" href="/media/' + data.data[i].file_data[k].document + '" download="">' + remove_str + '</a></div>'
+                }
+              }
+              htmls += '</div>'
+              if (data.data[i].created_at) {
+                let utc_time = data.data[i].created_at;
+                let local_time = moment.utc(utc_time).toDate();
+                htmls += '<div class="time rec-time utctolocal">' + moment(local_time).local().format('DD-MM-YYYY hh:mm A') + '</div></div>'
+              }
+              $('#test').append(htmls);
+              count++
+            }
+            window.scrollTo(0, document.body.scrollHeight);
+          }
+          console.log("count", count)
+          if (data.is_active == false) {
+            $('.inputpad').css('display', 'none')
+            $('#test').append('<div class="text-center" style="margin-top: 20px;"><h5>You have been removed from the group</h5></div>')
+            $('#roomid').val('001')
+            document.getElementById("roomid").value = "ABCD"
+            chatSocket.close();
+          }
+        },
+      });
+      if (non_groupadmin) {
+        $('.group_members').html('')
+        $.each(non_groupadmin, function (index, value) {
+          $('.group_members').append('<li>' + value + '</li>')
+        });
+        $('.group_members').append('<li>You</li>')
+      }
+      $('.emptynotify').text('')
+    }
+    ///////////////////////////////////////////////////////////////
+    $(window).scroll(function () {
+      var old_height = $(document).height();
+      var old_scroll = $(window).scrollTop();
+      var position = $(window).scrollTop();
+      if (position == 0) {
+        console.log('top');
+        var start = Number($('#start').val());
+        var allcount = Number($('#totalrecords').val());
+        var rowperpage = Number($('#rowperpage').val());
+        start = start + rowperpage;
+        if (start <= allcount) {
+          $('#start').val(start);
+          console.log('up');
+          var count = 10
+          var value = $('#roomid').val()
+          console.log('start', start)
+          console.log('allcount', allcount)
+          console.log('rowperpage', rowperpage)
+          if (start <= allcount) {
+            $.ajax({
+              url: "/chat/get_chatmessages_by_room_id",
+              type: "GET",
+              data: {
+                'room_id': value,
+                'start': start,
+                'rowperpage': rowperpage,
+                'type': 'scroll',
+              },
+              success: function (data) {
+                if (data) {
+                  $('#mydiv').remove()
+                }
+                console.log("Response", data)
+                console.log('data length', data.data.length)
+                //$(data.data).each(function(key,val){
+                var room_type
+                var others_name
+                for (var i = 0; i < data.data.length; i++) {
+                  if (data.room_type == "group") {
+                    room_type = "You"
+                    if (data.data[i].lastname != null) {
+                      others_name = data.data[i].name + " " + data.data[i].lastname
+                    }
+                    else {
+                      others_name = data.data[i].name
+                    }
+                  }
+                  else {
+                    room_type = ""
+                    others_name = ''
+                  }
+                  // if (data.all_messages[i].file_data.length >=1){
+                  // console.log('file data',data.all_messages[i].file_data[0].document)
+                  //console.log('user_id',data.chat_members_name
+                  // }
+                  if (user_id == parseInt(data.data[i].id)) {
+                    let html = ''
+                    html += '<div class="message-sent" id="message-theres"><div class="sed-cht">'
+                    if (data.data[i].chat != undefined || data.data[i].chat != '') {
+                      html += '<pre class="bk-cont"><p class="word-bk-you">' + room_type + '</p><p class="word-bk">' + data.data[i].chat + '</p></pre>'
+                    }
+                    if (data.data[i].file_data.length > 0) {
+                      for (var k = 0; k < data.data[i].file_data.length; k++) {
+                        let file_name = data.data[i].file_data[k].document
+                        let remove_str = file_name.replace('documents/', '')
+                        html += '<div><a class="hov-att-clr" href="/media/' + data.data[i].file_data[k].document + '" download="">' + remove_str + '</a></div>'
+                      }
+                    }
+                    html += '</div>'
+                    if (data.data[i].created_at) {
+                      let utc_time = data.data[i].created_at;
+                      let local_time = moment.utc(utc_time).toDate();
+                      html += '<div class="time cht-time utctolocal">' + moment(local_time).local().format('DD-MM-YYYY hh:mm A') + '</div></div><br>'
+                    }
+                    $('#test').prepend(html)
+                    $(document).scrollTop(old_scroll + $(document).height() - old_height);
+                    //$("#test").before(html).show().fadeIn("slow");
+                  }
+                  else {
+                    let = html = ''
+                    html += '<div class="message-receive" id="message-theres"><div class="rec-cht">'
+                    if (data.data[i].chat != undefined || data.data[i].chat != '') {
+                      html += '<pre class="bk-cont"><p class="word-bk-send">' + others_name + '</p><p class="word-bk">' + data.data[i].chat + '</p></pre>'
+                    }
+                    if (data.data[i].file_data.length >= 1) {
+                      for (var k = 0; k < data.data[i].file_data.length; k++) {
+                        let file_name = data.data[i].file_data[k].document
+                        let remove_str = file_name.replace('documents/', '')
+                        html += '<div><a class="hov-att-clr" href="/media/' + data.data[i].file_data[k].document + '" download="">' + remove_str + '</a></div>'
+                      }
+                    }
+                    html += '</div>'
+                    if (data.data[i].created_at) {
+                      let utc_time = data.data[i].created_at;
+                      let local_time = moment.utc(utc_time).toDate();
+                      html += '<div class="time rec-time utctolocal">' + moment(local_time).local().format('DD-MM-YYYY hh:mm A') + '</div></div>'
+                    }
+                    $('#test').prepend(html);
+                    $(document).scrollTop(old_scroll + $(document).height() - old_height);
+                    //$('#test').prepend(html).show().fadeIn("slow")
+                    //$("#test").before(html).show().fadeIn("slow");
+                    count++
+                  }
+                }
+                count += 10
+                console.log("count", count)
+                //$("#test:before").after(data).show().fadeIn("slow");
+              },
+            });
+          }
+        }
+      }
+    })
+    //////////////////////////////////////////////////////////////
+    // click back button hide all chat messages and header and footer
+    $(document).on('click', '.msg-home', function () {
+      $('#roomid').val('')
+      $('.inputpad').css('display', 'none')
+      $('#test').html('');
+      $('.hd-name-ct').html('');
+      $('#test').append('<div id="mydiv" class="mydivclass water-bg"></div>');
+      history.pushState(null, null, currentdomain + '/chat/' + 0);
+    });
+    //////////////////////////////////////////////////////////////
+    $(document).on('keypress', '.message-chat', function () {
+      var url = window.location.pathname;
+      // alert(url)
+      // var id = url.substring(url.lastIndexOf('/') -0); 
+      // alert(id)
+      var stuff = url.split('/');
+
+      var id = stuff[stuff.length - 2];
+
+      if (id == '0') {
+        //$(this).attr('readonly','readonly');
+      }
+    });
+
+
+    // delete the group 
+
+    $(document).on('click', '.delete', function () {
+
+
+
+      grp_roomid = $(this).val();
+      type = $(this).attr('data')
+
+      // alert(type)
+
+      if (type == 'group') {
+        // alert(grp_roomid)
+
+        $.ajax({
+          url: "/chat/grp_delete",
+          type: 'GET',
+          data: { 'id': grp_roomid, 'type': type },
+          success: function (response) {
+            console.log(response)
+            swal.fire('Group Deleted')
+            var current_url = $(location).attr("href")
+            //replace_url='http://127.0.0.1:8000/chat/'+0
+            replace_url = currentdomain + '/chat/' + 0
+
+
+
+
+            //  console.log('mesgurl',replace_url)
+            window.location.href = replace_url
+          }
+        });
+
+      }
+
+      else {
+
+        swal.fire('No permission to delete the direct messagers')
+      }
+
+    });
+
+
+    //               $('#chat-message-submit').click(function(){
+    //                 alert()
+    //     $('#message-theres').animate({
+    //         scrollTop: 340
+    //     }, 1000);
+    // });
+
+    // $('textarea').on('keypress', function(e) {
+    //     var code = e.keyCode || e.which;
+    //     if(code==13){
+    //       if ($(this).val() == ''){
+    //         $(this).val('')
+    //       }
+
+    //       $('#chat-message-input').css('height','35px !important')
+    //         // Enter pressed... do anything here...
+    //     }
+    // });
+
+
+    // $("#chat-message-submit").click(function() {
+    // $('#chat-message-input').css('height','35px')
+    // $('.filepreview').css('height','0px')
+    // $('#chatattachement').attr('fileid','')
+    // $('#chatattachement').attr('link','')
+    // $('#chatattachement').attr('placeholder','')
+    //  $('html, body').animate({
+    //      scrollTop: $(".send-input-box").offset().top
+    //  }, 1500);
+    //sdsdadasdasdasdad
+    // asdasd
+    // window.scrollTo(0,document.body.scrollHeight);
+    //  });
+    $(document).ready(function () {
+
+      var current_url = $(location).attr("href")
+      const url = current_url;
+
+      const last = url.split("/")
+
+      // console.log(last[last.length-2]); // "tutorial"
+      var parameter = last[last.length - 2]
+
+
+      if (parameter == 0) {
+
+        // alert()
+        $(".conteiner").append('<div id="mydiv" class="mydivclass water-bg"></div> ');
+
+      }
+
+
+      // $('#mydiv').remove()
+
+
+    });
+
+
+    //group edit 
+    $("#groupmembersedit").change(function () {
+      $('.grouperror-message').remove()
+      let = group_members_length = $('.room-groupmembersedit').select2().val().length;
+      if (group_members_length < 1) {
+        $('.sel-chats').after('<span class="grouperror-message error waring-err" style="color: red;">Group have minimum 1 member</span>')
+      }
+    });
+
+    $(".close-group-model").click(function () {
+      $('#groupname').val('')
+      $('#groupmembers').val('')
+    })
+    $('.close-editgroup-model').click(function () {
+      $('.grouperror-message').remove()
+    })
+    $(".editgrpdetails").click(function () {
+      //let editedname=$('#edit_groupname').val()
+      let groupmembers = $('.room-groupmembersedit').select2().val()
+
+      let editedmemb = JSON.stringify(groupmembers);
+      console.log('group members', editedmemb)
+      console.log('roomid', $('#roomid').val())
+      let geteditroomid = $("#geteditroomid").val()
+      $('.grouperror-message').remove()
+      if (groupmembers.length >= 1) {
+        $.ajax({
+          url: currentdomain + "/chat/groupchat_edit",
+          type: 'GET',
+          data: { 'roomid': $('#roomid').val(), 'group_members': editedmemb },
+          success: function (response) {
+            console.log('Group Edit Response', response)
+            $('#group_edit').modal('hide');
+            $('#test').html('');
+            $('.hd-name-ct').html('');
+            fetch_data($('#roomid').val(), 'group')
+          }
+        });
+      }
+      else {
+        $('.sel-chats').after('<span class="grouperror-message error waring-err" style="color: red;">Group have minimum 1 member</span>')
+      }
+      // close model popup
+      // $('#group_edit').modal('hide');
+      // $('#test').html('');
+      // $('.hd-name-ct').html('');
+      // fetch_data($('#roomid').val(),'group')  
+    });
+
+
+
+    $(document).on('click', '.clear_pfa', function () {
+
+      var attachemet_id = $(this).attr('id')
+      var filename = $(this).val()
+      // get attachment length
+      // get lenth of class .file-nnam
+      let file_length = $('.file-nnam').length
+      console.log('attachment_length', file_length)
+      // if (file_length-1 > 3){
+      //   $('.filepreview').css('height','265px')
+      // }
+      //else{
+      //  $('.filepreview').css('height','0px')
+      //}
+      $(this).closest('div').remove()
+      var divlen = $(".filepreview").children().length;
+      //  alert(divlen)
+      if (divlen == 0) {
+        $('.filepreview').css('height', '0px')
+        $('.filepreview').css('overflow-y', '')
+      }
+      else if (divlen == 1) {
+        $('.filepreview').css('height', '72px')
+        $('.filepreview').css('overflow-y', '')
+      }
+      else if (divlen == 2) {
+        $('.filepreview').css('height', '135px')
+        $('.filepreview').css('overflow-y', '')
+      }
+      else {
+        $('.filepreview').css({ 'height': '195px', 'overflow-y': 'scroll' })
+      }
+      // if (file_length-1 == 3){
+      //   $('.filepreview').css('height','193px')
+      // }
+      var getfieldid = $('#chatattachement').attr('fileid').split(',')
+      var getlink = $('#chatattachement').attr('link').split(',')
+
+      bal_id = jQuery.grep(getfieldid, function (value) {
+        return value != attachemet_id;
+      });
+
+      bal_name = jQuery.grep(getlink, function (value) {
+        return value != filename;
+      });
+
+      document.getElementById("chatattachement").setAttribute('fileid', bal_id);
+
+      document.getElementById("chatattachement").setAttribute('link', bal_name);
+
+
+
+
+      //  var divlen=$(".filepreview").children().length;
+      //  console.log("divlen",divlen)
+      //  if(divlen == 0){
+      //   $('.filepreview').css('height','0px')
+      //  }
+      //  else if (divlen < 3){
+      //   $('.filepreview').css({'height':'155px','overflow-y':'scroll'})
+
+      //  }
+      //  else{
+      //   $('.filepreview').css({'height':'195px','overflow-y':'scroll'})
+      //  }
+      // set individual notification number
+      //  $.ajax({              
+      //               url: "http://127.0.0.1:8000/chat/removeattachementdfile",          
+      //               type: 'GET',
+      //               data:{'id':val},
+      //               success: function (response) {
+      //                 console.log('response',response)
+      //                 }
+      //               });
+    });
+
+    // window.scroll function for scroll to top
+    /*$('#test').scroll(function(){
+      var position = $(window).scrollTop();
+      if( position == 0 ){
+         console.log('top')
+      }
+    }); */
+
+
+    //sending message by control enter and enter button
+
+    // class="utctolocal"
+    // change all values to local timezone
+    /*
+    $(document).ready(function(){
+      $('.utctolocal').each(function(){
+        console.log('utctolocal') 
+        var utc_time = $(this).text();
+        var local_time = moment.utc(utc_time).toDate();
+        //  local_ time with format dd-mm-yy hh:mm A onlly
+        var local_time_format = moment(local_time).local().format('DD-MM-YYYY hh:mm A');
+        $(this).text(local_time_format);
+      });
+    });
+    */
+    $(document).ready(function () {
+      //user_notification()
+      // get full url of current page
+      var current_url = $(location).attr("href")
+      const url = current_url;
+      console.log('current_url', current_url);
+      if (current_url == 'http://127.0.0.1:8000/chat/0/' || current_url == 'https://irockinfo.mo.vc/chat/0/') {
+        $('.inputpad').css('display', 'none')
+      }
+    });
+    /*
+    $('textarea').on('keypress', function(e) {
+        var code = e.keyCode || e.which;
+        if(code==13){
+          if ($(this).val() == ''){
+            $(this).val('')
+          }
+         
+          $('#chat-message-input').css('height','35px !important')
+            // Enter pressed... do anything here...
+        }
+    });
+    */
+    $(document).on('click', '.ch-at-name', function () {
+      $.ajax({
+        url: currentdomain + "/chat/recentchat_members",
+        type: 'GET',
+        success: function (response) {
+          console.log('response', response)
+        }
+      });
+    });
+  </script>
+  <script type="text/javascript">
+    // This function for add or remove group members
+    $(document).on('click', '#editgrp', function () {
+      $.ajax({
+        url: "/chat/get_group_members",
+        type: 'GET',
+        data: { 'room_id': $('#roomid').val() },
+        success: function (response) {
+          console.log('group members', response)
+          $('#groupmembersedit').empty()
+          var group_members_name;
+          for (let i = 0; i < response.data.length; i++) {
+            console.log('response[i]', response.data[i].id)
+            let html = ''
+            console.log('response[i].status', response.data[i].status)
+            html += '<option value="' + response.data[i].id + '"" dataid="' + response.data[i].status + '"'
+            if (response.data[i].status == 1) {
+              html += 'selected'
+            }
+            if (response.data[i].lastname != null) {
+              group_members_name = `${response.data[i].name} ${response.data[i].lastname} (${response.data[i].designation_role})`
+            }
+            else {
+              group_members_name = `${response.data[i].name} (${response.data[i].designation_role})`
+            }
+            if (response.data[i].roles_id == 4) {
+              html += ` title="${response.data[i].vendor_role}"`
+            }
+            html += '>' + group_members_name + '</option>'
+            $('#groupmembersedit').append(html)
+          }
+        }
+      });
+      //$('#groupmembersedit').empty().append(' "{%for grpdtls in getmembers%}" <option value="{{grpdtls.id}}" dataid="{{grpdtls.status}}" {%if grpdtls.status == 1 %}selected {% endif %}>{{grpdtls.name}}</option>"{%endfor%}" ')
+    });
+    //ajaxgrouplist
+    // on click 
+    $(document).on('click', '.ajaxgrouplist', function () {
+      $.ajax({
+        url: "/chat/get_grouplist",
+        type: 'GET',
+        success: function (response) {
+          console.log('group list', response)
+          $('#grp_msgr').empty()
+          $('#grp_msgr').append('<option value="">Select</option>')
+          for (let i = 0; i < response.data.length; i++) {
+            console.log('response[i]', response.data[i].id)
+            let html = ''
+            html += '<option value="' + response.data[i].id + '" dataid="' + response.data[i].type + '" status="' + response.data[i].is_active + '"'
+            html += 'class="room-creat name-chat-list chatsend"'
+            html += '>' + response.data[i].name + '</option>'
+            $('#grp_msgr').append(html)
+          }
+        }
+      });
+    });
+    function username_rommtype(room_id, sender_id) {
+      var data;
+      $.ajax({
+        url: "/chat/get_username",
+        type: 'GET',
+        async: false,
+        data: { 'room_id': room_id, 'sender_id': sender_id },
+        success: function (response) {
+          //console.log('sender name onschatsocket',response)
+          data = response
+          console.log('Ajax1', data)
+        }
+      });
+      console.log('Ajax2', data)
+      return data
+    }
+
+    $(document).on('click', '.pop-in-clr"', function () {
+      $(".room-groupmembers").select2("val", "");
+
+    })
+
+    $(document).on('keyup', '.pop-in-clr', function () {
+      if (groupname == '') {
+        ('#groupname').remove()
+      }
+
+    })
+
+
+
+  </script>
+</body>
+
+</html>

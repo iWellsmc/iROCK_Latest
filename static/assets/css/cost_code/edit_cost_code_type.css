@@ -1,0 +1,60 @@
+.cost-code-format {
+    display: flex;
+    align-items: center;
+}
+
+.cost-code-format label {
+    /* width: 200px !important; */
+    margin-right: 5px;
+    margin-bottom: 0;
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.cost-code-format span {
+    color: #000 ;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.cost-code-table {
+    /* width: 100%; */
+    width: 50%;
+    margin: auto;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px;
+}
+
+.cost-code-table th {
+    color: #017474;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    width: 19%;
+    padding: 15px 0 0;
+}
+
+.cost-code-table td {
+    padding: 10px 0px;
+    vertical-align: baseline;
+}
+
+.cost-code-table .ptag {
+    margin-bottom: 0px;
+    margin-left: 15px;
+}
+
+.cost-code-table th:first-child {
+    /* width: 5%; */
+}
+
+.cost-code-table select {
+    width: 90%;
+    margin: 8px auto;
+}
+
+.cost-code-table input {
+    width: 90%;
+    margin: 8px auto;
+}

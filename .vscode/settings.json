@@ -1,0 +1,10 @@
+{
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "python.formatting.provider": "none",
+    // "sonarlint.connectedMode.project": {
+    //     "connectionId": "sonarqube-mo-vc",
+    //     "projectKey": "development_irock-dev_AYrLqRSbhMhza8VL7b2d"
+    // }
+}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+<h4 class="from-head">Create Well</h4>
+<form method="POST" class="form-txt" id="create-well">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col">
+            <h3 class="head-master ">Country</h3>
+            <div class="project_country">
+                <p class="txt-name">{{project.country.name}}</p>
+            </div>
+        </div>
+        <div class="col">
+            <h3 class="head-master">Project Name</h3>
+            <div class="project_name">
+            <input type="hidden" id="project_id" name="project_id" value={{project.id}}>
+            <p class="txt-name">{{project.name}}</p>
+            </div>
+        </div>
+        <div class="col">
+            <h3 class="head-master">Block Name</h3>
+            <div class="show-checked-block" >
+                {% for block in blocks %}
+                    {% if block.status == 1 %}
+                    <p class="txt-name">{{block.block_name}}</p><br>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col">
+            <h3 class="head-master">Field Name</h3>
+            <div class="field-show-cls">
+            {% for field in fields %}
+                {% if field.status == 1 %}
+                    <p class="txt-name">{{field.field_name}}</p>
+                {% endif %}
+            {% endfor %}
+            </div>
+        </div>  
+        <div class="col">
+            <h3 class="head-master">Cluster</h3>
+            <div class="sub_sub_check_cls txt-name">
+            {% for cluster_sub in clustersub %}
+                <input type="checkbox" name="sub_checkbox" data-id="{{cluster_sub.cluster_subname}}{{cluster_sub.id}}" class="sub_sub_field_cls" value="{{cluster_sub.cluster_subname}}">&emsp;{{cluster_sub.cluster_subname}}<br>
+            {% endfor %}
+            </div>
+        </div>
+        <div class="col">
+            <div class="well_cls">
+            <h3 class="head-master">Wells</h3>
+            </div>
+        </div>
+        </div>
+        <div class="text-center">
+        <button type="button" class="btn btn-clr save-draft text-center submit-cls" project_id="{{project.id}}" data-id="5">Save</button>
+        <button type="button" class="btn btn-clr save-draft text-center back-cls" data-id="5">Back</button>
+        </div>
+</form>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/projects/createmasterproject.js' %}"></script>
+{% endblock %}

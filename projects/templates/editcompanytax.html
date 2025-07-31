@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+
+<div>
+    <div class="row">
+        <div class="col-12 text-end">
+            <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'projects:taxlist' %}">Back</a></button>
+        </div>
+    </div>
+
+    <h3 class="from-head">Edit Tax/Levy</h3>
+    
+    <div class="row">
+        <div class="col-3 col-md-2 col-lg-3">
+        </div>
+
+        <div class="col-6 col-md-8 col-lg-6">
+        <div class="invite-cards">
+            <form  class="form-txt" id="addtaxformid" method="POST">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-12">
+                        <div>
+                            <label class="vend-appor-hd">Type : </label>
+                            <span class="taxtypeclass">{{getdata.Tax_Type}}</span>
+                        </div>
+                            
+                    </div>
+                    <div class="col-12">
+                        <label class="vend-appor-hd">Tax/Levy Name<span class="star-clr">*</span></label>
+                        <input type="text" autocomplete="off" name="taxname" id="taxnameid0" class="form-control taxnamecls" value="{{getdata.Tax_Name}}" placeholder="Tax/Levy Name">
+                    </div>
+                </div>
+                <div class="text-center phase-vendor" id="btn">
+                    <button type="submit" class="final-cls btn btn-clr text-right">Submit</button>
+                </div>
+
+            </form>
+        </div>
+        </div>
+
+        <div class="col-3 col-md-2 col-lg-3">
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script>
+var global=$('.taxnamecls').val();
+$(document).ready(function(){
+
+    $('#addtaxformid').validate();
+    $("[name=taxname]").rules("add", {
+        required: true,
+        });   
+});
+
+//$(document).on('keyup','.taxnamecls',function(){
+    var ajaxData = false;
+    $(".taxnamecls").focusout(function(){
+        var val=$(this).val()
+        if (global != val){
+            $('.waring-err').remove()
+            var currentelement=$(this)
+            $.ajax({
+                type: "GET",
+                url: "/projects/checktaxname",
+                async:false,
+                data: {'taxname':$.trim(val),'pk':'{{pk}}'},
+                success: function(data){
+                    console.log({'checktaxname':data.data})
+                    if (data.data == "exists"){
+                        ajaxData = true;
+                        currentelement.after('<span class="waring-err">Tax Already Exists</span>')
+                        $('.final-cls').prop('disabled',true)
+                    }
+                    else{
+                        ajaxData = false;
+                        $('.final-cls').prop('disabled',false)
+                    }
+                }
+            });
+        }
+    })
+    $('.taxnamecls').keyup(function() {
+        var $th = $(this);
+        $th.val($th.val().replace(/(\s{2,})/g, ' '));
+        $th.val($th.val().replace(/^\s*/, ''));
+        });
+
+$('.final-cls').click(function(e){
+    console.log({'ajaxData':ajaxData})
+    if (ajaxData){
+e.preventDefault();
+}
+})
+
+</script>
+
+{% endblock %}

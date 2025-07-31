@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/bankdetails.css' %}">
+<section id="data-list-view" class="data-list-view-header">
+ <div>
+  
+    <h4 class="from-head">Bank Users</h4>
+    <div class="row justify-content-center">
+        <div class="col-9">
+        </div>
+       
+        <div class="col-3 text-end">
+          {% if request.user.roles_id == 3 %}
+              {% if rights.create == '1' %} 
+              <a class="btn btn-clr chck-tst" href="{% url 'finance:createcompanybank' %}">Add Bank Users</a>
+              {% endif %}
+          {% else %}
+          <a class="btn btn-clr chck-tst" href="{% url 'finance:createcompanybank' %}">Add Bank Users</a>
+          {% endif %}
+      </div>
+      <div class="d-flex my-4 justify-content-between">
+            <div class="show-noti p-0">
+                <label>Show <select id="datafilters" class="changevalue select-style">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select> entries</label>
+        </div>
+        <form method="get">
+          <input type="text" id="myInput" class="search-f-inf" name="q" placeholder="Search Bank Name" value="{{query}}">
+          <!-- <button type="submit" class="search lens"><i class="fa fa-search sea-rch-clr"></i></button> -->
+        </form>
+    </div>
+      </div>
+      <!-- <div class="col-3 text-end">
+          <form method="get">
+          <input type="text" id="myInput" class="search-f-inf" name="q" placeholder="Search Bank Name" value="{{query}}">
+          <button type="submit" class="search lens"><i class="fa fa-search sea-rch-clr"></i></button>
+        </form>
+    </div> -->
+      <div class="row">
+        <div class="col-12">
+          <div class="table-responsive text-nowrap">
+            <table class="table settings-data-list-view creat-head data-list-view project_master all-tbl-hd list-user-table-width tab-res irock-table"
+            id="master_project_list">
+            <thead class="list-user">
+              <tr>
+                <th>S/N</th>
+                <th style="width: 20%;">Currency <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>
+                <th>Bank Name <button class="filter-btn" data-filter="last-name"> <i class="fas fa-sort"></i></button></th>
+                <th>Account No <button class="filter-btn" data-filter="designation"> <i class="fas fa-sort"></i></button></th>
+                <!-- <th>Payment Instruction Addressed</th> -->
+             
+                {% if request.user.roles_id == 3 %}
+                {% if rights.delete == '1' or rights.edit == '1' %}
+                    <th style="width: 10%;">Actions</th>
+                {% endif %}
+            {% else %}
+                <th style="width: 10%;">Actions</th>
+            {% endif %}
+              </tr>
+            </thead>
+            <tbody class="table-list">
+                {% for i in list_bank %}
+              <tr>
+                <td class="sno-center">{{list_bank.start_index|add:forloop.counter0 }}</td>
+                
+                <td>
+                  <!-- {{i.currency.currency}} -->
+                  {{i.currency.currency_symbol}}-{{i.currency.currency}} ({{i.currency.name}})
+              </td>
+                <td class="td-left">{{i.bank_name.bank_name|default_if_none:''}}</td>
+                <td>{{i.account_number.accountno|default_if_none:''|safe}}</td>
+              <!-- <td class="td-left paymentinstructer">
+                {{i.instructortitle}} {{i.instructorfirstname}} {{i.instructorlastname}}</td> -->
+                
+                {% if request.user.roles_id == 3 %}
+                {% if rights.delete == '1' or rights.edit == '1' %}
+                <td>
+                  {% if request.user.roles_id == 3 %}
+                  <a class="text-decoration-none px-1" href="{% url 'finance:viewbankinfo' pk=i.id %}">
+                    <span class="action-eye"><i class="fa fa-eye" title="View"></i></span>
+                  </a>
+                  {% if rights.edit == '1' %} 
+                 
+                      <a class="text-decoration-none px-1" href="{% url 'finance:editcompanybank' pk=i.id %}">
+                          <span class="action-edit"><i class="fa fa-edit" title="Edit"></i></span>
+                      </a>
+                  {% endif %}
+              {% else %}
+                
+                  <a class="text-decoration-none px-1" href="{% url 'finance:editcompanybank' pk=i.id %}">
+                      <span class="action-edit"><i class="fa fa-edit" title="Edit"></i></span>
+                  </a>
+              {% endif %}
+
+              {% if request.user.roles_id == 3 %}
+              {% if rights.delete == '1' %} 
+
+                    <a class="delete_bank px-1" data-id="{{i.id}}" bank_name="{{i.bank_name}}" href="{% url 'finance:companybankdelete' pk=i.id %}">
+                        <span class="action-delete"><i class="fa fa-trash" title="Delete" style="font-size:15px; color:#95183a;"></i></span>
+                    </a>
+
+                    {% endif %}
+                    {% else %}
+                    <a class="delete_bank px-1" data-id="{{i.id}}" bank_name="{{i.bank_name}}">
+                      <span class="action-delete"><i class="fa fa-trash" title="Delete" style="font-size:15px; color:#95183a;"></i></span>
+                  </a>
+                  {% endif %}
+                </td>
+                {%endif%}
+              {% else %}
+              <td>
+                <a class="text-decoration-none px-1" href="{% url 'finance:viewbankinfo' pk=i.id %}">
+                  <span class="action-eye"><i class="fa fa-eye" title="View"></i></span>
+              </a>
+                <a class="text-decoration-none px-1" href="{% url 'finance:editcompanybank' pk=i.id %}">
+                  <span class="action-edit"><i class="fa fa-edit" title="Edit"></i></span>
+              </a>
+              <a class="delete_bank px-1" data-id="{{i.id}}" bank_name="{{i.bank_name.bank_name}}">
+                <span class="action-delete"><i class="fa fa-trash" title="Delete" style="font-size:15px; color:#95183a;"></i></span>
+            </a>
+              </td>
+                {%endif%}
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="9" id="empty_class">---</td>
+              </tr>
+              {% endfor %}
+              </tbody>
+              </table>
+
+              <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                {% if list_bank.has_previous %}
+                    <li class="page-item">
+                    <a class="btn-clr page-link" href="{{ request.META.HTTP_REFERER }}">Previous</a>
+                  </li>
+                {% else %}
+                    <li class="page-item disabled">
+                    <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Previous</a>
+                  </li>
+                {% endif %}
+        
+                {% if list_bank.number|add:'-4' > 1 %}
+                    <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ list_bank.number|add:'-5' }}">&hellip;</a></li>
+                {% endif %}
+        
+                {% for i in list_bank.paginator.page_range %}
+                    {% if list_bank.number == i %}
+                        <li class="page-item pg-count active" aria-current="page">
+                      <span class="btn-clr pg-circle page-link">
+                        {{ i }}
+                        <span class="sr-only">(current)</span>
+                      </span>
+                    </li>
+                    {% elif i > list_bank.number|add:'-5' and i < list_bank.number|add:'5' %}
+        
+                      {% if request.GET.vendor %}
+                    <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&page={{ i }}">{{ i }}</a></li>
+                      {% elif request.GET.vendor and request.GET.sortname %}
+                      <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+                      {% elif request.GET.vendor and request.GET.sortvendorname %}
+                      <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+                      {% elif request.GET.sortname %}
+                      <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+                      {% elif request.GET.sortvendorname %}
+                      <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+                      {% else %}
+                        <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?page={{ i }}">{{ i }}</a></li>
+                      {% endif %}
+                    {% endif %}
+              {% endfor %}
+                {% if list_bank.paginator.num_pages > list_bank.number|add:'4' %}
+                  <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ list_bank.number|add:'5' }}">&hellip;</a></li>
+                {% endif %}
+        
+                {% if list_bank.has_next %}
+                    <li class="page-item pg-count">
+                    <a class="btn-clr page-link" href="?page={{ list_bank.next_page_number }}">Next</a>
+                  </li>
+                {% else %}
+                    <li class="page-item disabled">
+                    <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Next</a>
+                  </li>
+                {% endif %}
+              </ul>
+            </nav>
+              </div>
+</div> 
+</section>
+{% block scripts %}
+{{ block.super }}
+<script type="text/javascript" src="{% static 'js/projects/userslist.js' %}"></script>
+<script>
+  var scheme = '{{scheme}}'
+  var gethost = '{{gethost}}'
+  var csrf_token = '{{csrf_token}}'
+</script>
+<script src="{% static 'js/finance/list_bank.js' %}"></script>
+
+{% endblock%}
+
+<script>  
+
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% load cost_code_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/cost_code/import_cost_code_generate.css' %}">
+
+<div id="uparrow"></div>
+
+<div class="text-end">
+  <button type="button" class="btn btn-clr"><a href="{% url 'cost_code:costcodelist' %}">Back</a></button>
+</div>
+<form method="POST"  id="costcodeform">
+  {% csrf_token %}
+
+<div class="container">
+
+  <h3 class="from-head">Imported Cost Code Items</h3>
+
+
+    <div class="row">
+      <div class="col-2"></div>
+      <div class="col-8">
+        <form method="POST">
+          <!--accordion starts here -->
+          <div id="accordion">
+            {% for new_component_data in main_list %}
+            <div class="card">
+                <div class="card-header" id="headingTwo">
+                  <h5 class="mb-0">
+                    <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo{{forloop.counter}}" aria-expanded="false" aria-controls="collapseTwo{{forloop.counter}}">
+                      Level {{forloop.counter|get_by_Levels}} - {{new_component_data.level_master_name}}
+                    </button>
+                  </h5>
+                </div>
+
+                <div id="collapseTwo{{forloop.counter}}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                  <div class="card-body">
+                    <input type="hidden" name="code_code_master_id" value="{{new_component_data.code_code_master_id}}">
+                    <label>New Components</label>
+                    {% for component_name in new_component_data.values %}
+                      <div>
+                        <input type="text" class="form-control" value="{{component_name}}" readonly="true">
+                        <input type="hidden" name="new_level_{{new_component_data.code_code_master_id}}" class="form-control new_level_cls" value="{{component_name}}" data_id="{{new_component_data.code_code_master_id}}">
+                      </div>
+                      <br>
+                      {% increment_value_func new_component_data.get_last_value new_component_data.sequence_gap new_component_data.no_digits forloop.counter as value_data %}
+                      <input type="hidden" name="cost_code_preview_{{new_component_data.code_code_master_id}}" value="{{value_data}}">
+                    {% endfor %}
+                  </div>
+                </div>
+            </div>
+            {% endfor %}
+          </div>
+      <!--accordion ends here -->
+        <!-- {% for new_component_data in main_list %}
+        <div class="col-4">
+          <h5>{{new_component_data.level_master_name}}</h5>
+          <input type="hidden" name="code_code_master_id" value="{{new_component_data.code_code_master_id}}">
+          {% for component_name in new_component_data.values %}
+            <div>
+              <input type="text" name="new_level_{{new_component_data.code_code_master_id}}" class="form-control new_level_cls" value="{{component_name}}" data_id="{{new_component_data.code_code_master_id}}"></div>
+            <br>
+            {% increment_value_func new_component_data.get_last_value new_component_data.sequence_gap new_component_data.no_digits forloop.counter as value_data %}
+            <input type="hidden" name="cost_code_preview_{{new_component_data.code_code_master_id}}" value="{{value_data}}">
+          {% endfor %}
+        </div>
+        {% endfor %} -->
+          <div class="text-center btn-cls">
+            <button type="submit" class="btn btn-clr text-left final-cls waves-effect waves-float waves-light">Submit</button>
+          </div>
+        </form>
+      </div>
+    
+      <a href="#uparrow">
+        <button type="button" class="scroll-top-proj"></button>
+      </a>
+      <div class="col-2"></div>
+    </div>
+</div>
+       
+
+{% endblock %}
+  
+{% block scripts %}
+{{ block.super }}
+<script>
+  var csrf_token = '{{csrf_token}}'
+</script>
+<script src="{% static 'js/cost_code/import_cost_code_generate_one.js' %}"></script>
+{% endblock %}

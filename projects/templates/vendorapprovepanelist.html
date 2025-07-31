@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+
+<div>
+    <h3 class="from-head">Vendor Approval Panel</h3>
+    <div class="table-responsive">
+        <table class="table settings-data-list-view data-list-view project_master proj-lists master-pro" id ="master_project_list">
+
+            <thead >
+                <tr >
+                    <!-- <th></th> -->
+                    <th>S/N</th> 
+                    <th>Panel Name</th>     
+                    <th>Primary Member</th>
+                    <th>Secondary Member</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody class=" table-list">
+                <tr>
+                    <td>1</td>
+                    <td>Vendor Approval Panel </td>
+                    <td>{{primary.name}} {{primary.lastname}}</td>
+                    <td>{{secondary.name}} {{secondary.lastname}}</td>
+                    <td>
+                        <a href="{% url 'projects:editvendorapprovepanel' companyid=user.company.id%}">
+                            <span class="action-edit align-icons">
+                                <i class="fa fa-edit" title="Edit" style="font-size:17px; color:#95183a;"></i>
+                            </span>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+</div>
+
+{% endblock %}

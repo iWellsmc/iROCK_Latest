@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+{% load custom_tags %}
+
+
+<form class="form-txt" id="addmembers" method="POST">
+  {% csrf_token %}
+<table style='width:100%'>
+  <thead>
+  <tr>
+    <th>User Name</th>
+    <th>Designation</th>
+    <th>Department</th>
+    <th>Group</th>
+    <th class="wid-email">Email</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>
+        <select name='get_users' class='edit_users_committee'>
+          <option value=''>--Select User--</option>
+          {% for user in users %}
+          <option value='{{user.id}}' {% if user_data.id == user.id %}Selected{% endif %}>{{user.name}} {{user.lastname}}</option>
+          {% endfor %}
+        </select>
+    </td>
+    <td class='design'>
+      <input type='text' value="{{user_data.designation_role|default_if_none:"---"}}" class='designation' readonly >
+    </td>
+    <td class='design dep'>
+      <input type='text' value="{{user_data.user_department|default_if_none:"---"}}" class='dep' readonly>
+    </td>
+    <td class='design grp'>
+      <input type='text' value="{{user_data.user_group|default_if_none:"---"}}" class='grp' readonly>
+    </td>
+    <td class='design email'>
+      <input type='text' value="{{user_data.email|default_if_none:"---"}}" class='email' readonly>
+    </td>
+  </tr>
+</tbody>
+</table>
+
+<div class="save_button text-center">
+  <button id="mainsave" class='btn btn-clr add-btn pha-sebtn mt-3 mainsave' type="submit">Submit</button> 
+</div>
+</form>
+
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    var csrftoken='{{csrf_token}}'
+    var scheme='{{request.scheme}}'
+    var gethost='{{request.get_host}}'
+    var currentdomain=scheme+'://'+gethost
+    var pk='{{user_data.id}}'
+</script>
+<script type="text/javascript" src="{% static 'js/custom_auth/creditdispute.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/contractinfo.css' %}">
+<div>
+    <div class="row">
+        <div class="col-12 text-end">
+            <button type="button" class="btn btn-clr"><a href="{% url 'projects:newcontractlist' %}">Back</a></button>
+        </div>
+    </div>
+
+    <h4 class="from-head">Add Missing Contract</h4>
+
+    <form method="POST"  id="newcontractid" enctype="multipart/form-data">
+        {% csrf_token %}
+        <select id="contracts_id" class="comp_currency">
+            {% for original_contract in original_contracts %}
+                {% if original_contract != '' %}
+                    <option value="{{ original_contract }}">{{ original_contract }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <div class="table-responsive text-nowrap">
+        <table class="addnewcontracttable new-vin-addnew addmissing-table">
+            <thead>
+                <tr>
+                    <th>Contract Type*</th> 
+                    <th>Name of Service*</th>
+                    <th>Contract Ref No*</th>
+                    <th>Amendment/Addendum Contract Ref No*</th>
+                    <th>Upload Documents*</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    
+                    <td>
+                        <input type="hidden" name="totalrowcount" value="0">
+                        <select name="contracttype0" class="form-control form-select new-ad-newcontra type">
+                            <option value="" selected>--Select--</option>
+                            <option value="Original">Original</option>
+                            <option value="Amendment">Amendment</option>
+                            <option value="Addendum">Addendum</option>
+                        </select>
+                    </td>
+                    <td>
+                        <textarea type="text" name="nameservice0" row="3" col="50" class="form-control n_service new-ad-newcontra text-cls1"></textarea>
+                    </td>
+                    <td>
+                        <textarea type="text" name="refnum0" class="form-control c_refnum new-ad-newcontra text-cls2"></textarea>
+                    </td>
+                    <td>
+                        <textarea type="text" name="amendmentrefnum0" class="form-control amendemntcls new-ad-newcontra text-cls3"></textarea>
+                    </td>
+                    <td>
+                        <input type="file"  accept="image, .png,.jpeg, .pdf, .jpg" name="contractfile0" class="form-control cfile new-ad-newcontra filesize" /><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                    </td>
+                    <td>
+                        <div class="add-miss-contraven">
+                            <button id="add-row" class="btn btn-clr add-btn mr-2" type="button" value="plus"><i class="fa fa-plus"></i></button>
+                            <button id="delete-row" class="btn btn-clr add-btn" type="button" value="minus"><i class="fa fa-minus"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+        <div class="text-center spacing-button">
+            <button type="submit" class="btn btn-clr text-center submit-cls">Submit</button>
+    </form>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+{{block.super}}
+
+
+<script>
+    var list=[];
+    $.each($("#contracts_id option"), function(){            
+        list.push($(this).val());
+    });
+    console.log(list);
+
+    $(document).on('change','.type',function(){
+        var val=$(this).val()
+        console.log(val)
+        $(this).removeClass('con_error')
+        if (val == 'Original'){
+            var count_number=$(this).closest('tr').find('td:eq(0)').find('input[type=hidden]').val();
+            $(this).closest('tr').find('td:eq(3)').find('.amendemntcls').val('').attr('readonly', true).removeClass('con_error')
+            $(this).closest('tr').find('td:eq(2)').find('.c_refnum').remove();
+            $(this).closest('tr').find('td:eq(2)').append('<textarea  name="refnum'+count_number+'" class="form-control c_refnum new-ad-newcontra text-cls2"></textarea>');  
+            //$(this).closest('tr').find('td:eq(2)').find('.c_refnum')
+            // $(this).closest('tr').find('td:eq(3)').find('.amendemntcls').rules('add',{required:true,messages:{required:'Field Required'}})
+            $(this).closest('tr').find('td:eq(3)').find('.amendemntcls').next('label').show();
+            
+
+        }
+        else if (val == 'Amendment'){
+            $(this).closest('tr').find('td:eq(3)').find('.amendemntcls').attr('readonly', false); 
+            var count_number=$(this).closest('tr').find('td:eq(0)').find('input[type=hidden]').val();
+            $(this).closest('tr').find('td:eq(2)').find('.c_refnum').remove();
+            $(this).closest('tr').find('td:eq(2)').append('<select name="refnum'+count_number+'" class="form-control form-select c_refnum new-ad-newcontra"></select>');
+            $('.c_refnum').append('<option value="">--Select</option>');
+            $.each(list, function(i, el){
+                // if($.inArray(el, list) === -1) list.push(el);
+                $('.c_refnum').append('<option value="'+el+'">'+el+'</option>');
+            });
+            // $(this).closest('tr').find('td:eq(2)').find('.c_refnum').html('');
+            $(this).closest('tr').find('td:eq(3)').find('.amendemntcls').rules('remove', 'required');
+
+            $(this).closest('tr').find('td:eq(3)').find('.amendemntcls').removeClass('error')
+
+            $(this).closest('tr').find('td:eq(3)').find('.amendemntcls').next('label').hide();
+        }
+        else if (val == 'Addendum'){
+            $(this).closest('tr').find('td:eq(3)').find('.amendemntcls').attr('readonly', false); 
+            var count_number=$(this).closest('tr').find('td:eq(0)').find('input[type=hidden]').val();
+            $(this).closest('tr').find('td:eq(2)').find('.c_refnum').remove();
+            $(this).closest('tr').find('td:eq(2)').append('<select name="refnum'+count_number+'" class="form-control form-select c_refnum new-ad-newcontra"></select>');
+            $('.c_refnum').append('<option value="">--Select</option>');
+            $.each(list, function(i, el){
+                // if($.inArray(el, list) === -1) list.push(el);
+                $('.c_refnum').append('<option value="'+el+'">'+el+'</option>');
+            });
+            // $(this).closest('tr').find('td:eq(2)').find('.c_refnum').html('');
+            $(this).closest('tr').find('td:eq(3)').find('.amendemntcls').rules('remove', 'required');
+
+            $(this).closest('tr').find('td:eq(3)').find('.amendemntcls').removeClass('error')
+
+            $(this).closest('tr').find('td:eq(3)').find('.amendemntcls').next('label').hide();
+        }
+
+    })
+
+     $(document).on('click','#add-row',function(){
+        var tablelen=$('.addnewcontracttable tbody tr').length;
+        var html='<tr><td><input type="hidden" name="totalrowcount" value="'+tablelen+'"><select name="contracttype'+tablelen+'" class="form-control form-select new-ad-newcontra type"><option value="" selected>--Select--</option> <option value="Original">Original</option><option value="Amendment">Amendment</option><option value="Addendum">Addendum</option></select></td><td><textarea row="3" col="50" name="nameservice'+tablelen+'" class="form-control n_service new-ad-newcontra text-cls1"></textarea></td><td><textarea type="text" name="refnum'+tablelen+'" class="form-control c_refnum new-ad-newcontra text-cls2"></textarea></td><td><textarea type="text" name="amendmentrefnum'+tablelen+'" class="form-control amendemntcls new-ad-newcontra text-cls3"></textarea></td><td><input type="file"  accept="image, .png, .jpeg, .pdf, .jpg" name="contractfile'+tablelen+'" class="form-control cfile new-ad-newcontra filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></td><td><button id="add-row" class="btn btn-clr add-btn mr-2" type="button" value="plus"><i class="fa fa-plus"></i></button><button id="delete-row" class="btn btn-clr add-btn" type="button" value="minus"><i class="fa fa-minus"></i></button></td></tr>'
+        $(this).closest('tr').after(html)
+
+        $(this).closest('tr').next('tr').find('td:eq(0)').find('.type').rules('add',{required:true,messages:{required:'Field Required'}})
+
+        $(this).closest('tr').next('tr').find('td:eq(1)').find('.n_service').rules('add',{required:true,messages:{required:'Field Required'}})
+
+        $(this).closest('tr').next('tr').find('td:eq(2)').find('.c_refnum').rules('add',{required:true,messages:{required:'Field Required'}})
+
+        $(this).closest('tr').next('tr').find('td:eq(3)').find('.amendemntcls').rules('add',{required:true,messages:{required:'Field Required'}})
+
+        $(this).closest('tr').next('tr').find('td:eq(4)').find('.cfile').rules('add',{required:true,messages:{required:'Field Required'}})
+
+    })
+
+    $(document).on('click','#delete-row',function(){
+        var tablelen=$('.addnewcontracttable tbody tr').length;
+        console.log(tablelen)
+        var count =0
+        if (tablelen > 1){
+            $(this).closest('tr').remove()
+            $('table > tbody  > tr').each(function(index, tr) { 
+                var contract_type=$(this).find('td:eq(0)').find('.type').attr('name','contracttype'+count)
+                var name_service=$(this).find('td:eq(1)').find('.n_service').attr('name','nameservice'+count)
+                var ref_num=$(this).find('td:eq(2)').find('.c_refnum').attr('name','refnum'+count)
+                var amendment=$(this).find('td:eq(3)').find('.amendemntcls').attr('name','amendmentrefnum'+count)
+                var con_file=$(this).find('td:eq(4)').find('.cfile').attr('name','contractfile'+count)
+            count++;
+            })
+        }
+
+    })
+
+
+
+
+    
+    // $("#newcontractid").validate({
+    //     rules: {
+    //         contracttype0: {
+    //         required: true,
+    //         },
+    //         nameservice0: {
+    //             required: true,
+    //         },
+    //         refnum0: {
+    //             required: true,
+    //         },
+    //         amendmentrefnum0: {
+    //             required: true,
+    //         },
+    //         contractfile0: {
+    //             required: true,
+    //         },
+    //     },    
+    //     messages: {
+    //         contracttype0:{
+    //             required:"Required Field",
+    //         },
+    //         nameservice0:{
+    //             required:"Required Field",
+    //         },
+    //         refnum0:{
+    //             required:"Required Field",
+    //         },
+    //         amendmentrefnum0:{
+    //             required:"Required Field",
+    //         },
+    //         contractfile0:{
+    //             required:"Required Field",
+    //         },
+    //     }
+    // })    
+    
+
+
+$(document).on('click','.submit-cls',function(e){
+    var count=0
+    $('select').each(function(){
+        var val=$(this).find(':selected').val()
+        
+        if (val == ''){
+            count ++;
+            // console.log($(this))
+            $(this).addClass('con_error')
+            // console.log('a')
+        }
+    })
+    $(".text-cls1").each(function(){
+       
+       var val=$(this).val()
+       if (val == ''){
+           count ++;
+           // console.log($(this))
+           $(this).addClass('con_error')
+       }
+      
+   });
+   $(".text-cls2").each(function(){
+       
+       var val=$(this).val()
+       if (val == ''){
+           count ++;
+           // console.log($(this))
+           $(this).addClass('con_error')
+       }
+      
+   });
+   $(".text-cls3").each(function(){
+       let contract_type=$(this).closest('tr').find('.type').find(':selected').val() || ''
+       var val=$(this).val()
+       if (contract_type != 'Original' || contract_type == '')
+        if (val == ''){
+            count ++;
+            // console.log($(this))
+            $(this).addClass('con_error')
+        }
+      
+   });
+   $("input:file").each(function(){
+       
+       var val=$(this).val()
+       if (val == ''){
+           count ++;
+           // console.log($(this))
+           $(this).addClass('con_error')
+       }
+      
+   });
+   console.log('sad',count)
+   if (count > 0){
+    e.preventDefault()
+   }
+})
+
+$(document).on('change','.con_error',function(){
+    $(this).removeClass('con_error')
+    
+})
+</script>
+
+{% endblock %}

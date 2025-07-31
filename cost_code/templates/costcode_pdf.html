@@ -1,0 +1,92 @@
+{% load static %}
+{% block content %}
+{% load cost_code_tags %}
+
+<div class="row parent">
+<title>Cost Codes</title>
+    <header>
+        <div class="row row_border_header d-flex align-items-center">
+            <div class="logo">     
+            </div>
+        <div class="company-details">
+                <h4 class="head-inv-pre">{{request.company.company_name|safe}}</h4>
+                <p>{{request.company.address|safe}}</p>  
+            </div>
+        </div>
+    </header>
+
+    <footer style="width: 100%;">
+        <div style="border: 1px solid #e3e3e3; height: 0px; margin-bottom: 5px;"></div>
+    </footer>
+    
+    <div class="row">
+        <!-- <h3 class="from-head">Cost Code Generate</h3> -->
+        <div class="col-6">
+        </div>
+       
+    </div>
+    <div class=""> <!-- class removed -> table-responsive text-nowrap inv-table_wid -->
+        {% for costcode in allcostcode %}
+
+        <table class="cost-code-pdf-table">
+         
+            <tbody class=""> <!-- class removed -> table-list -->
+                   
+                    {% for subcode in costcode %}
+                        {% if forloop.counter == 1 %}
+                        <tr>
+                            <td colspan="2" class="td-green">{{subcode.level1}}</td>
+                            <td colspan="{{get_remaining_level_count}}" class="td-green">{{subcode.level2}}</td>
+                
+                        </tr>
+                        <tr>
+                            <th style="width: 5%;">S/N</th> 
+                            <th style="width: 15%;">Cost Code</th>     
+                            <!-- <th style="width: 15%;">Category</th> -->
+                            <th style="width: 50%;" colspan="{{get_remaining_level_count}}">Code Category Path</th>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            {% for level in subcode.remaining_levels %}
+                            {% for key, value in level.items %}
+                                <th style="width: 14%;">
+                                <p class="s_no">{{key}}</p>
+                                </th>
+                            {% endfor %}
+                            {% empty %}
+                            <td></td>
+                            {% endfor %}
+                        </tr>
+                        {% endif %}
+                        <tr data-id='{{subcode.main_costcode_id}}'>
+                        <td style="width: 5%;">
+                            <p class="s_no">{{forloop.counter}}</p>
+                        </td>
+                        <td style="width: 10%;">
+                            <p class="s_no">{{subcode.allcostcode}}</p>
+                        </td>
+                        {% for level in subcode.remaining_levels %}
+                            {% for key, value in level.items %}
+                            
+                            <td style="width: 10%; text-align: left;">
+                                <p class="s_no">{{value}}</p>
+                            </td>
+                            {% endfor %}
+                        {% empty %}
+                        <td>---</td>
+                        {% endfor %}
+                        </tr>
+                    {% endfor %}
+            </tbody>
+        </table>
+        {% endfor %}
+
+    </div>
+</div>
+        
+
+{% endblock %}
+
+
+

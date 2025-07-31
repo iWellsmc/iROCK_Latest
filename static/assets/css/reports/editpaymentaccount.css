@@ -1,0 +1,67 @@
+.vin-no {
+    margin: 10px auto;
+}
+
+.vin-no td {
+    border: none !important;
+}
+
+.vin-no td:first-child {
+    padding-left: 0px !important;
+}
+
+.vin-no td:last-child {
+    padding-left: 0px !important;
+}
+
+.ven-name td {
+    border: none !important;
+}
+
+.ven-name td:first-child {
+    padding-left: 0px !important;
+}
+
+.ven-name td:last-child {
+    padding-left: 0px !important;
+}
+
+.vin-no label {
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 0px;
+    width: 140px;
+}
+
+.dot-colon {
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.vin-no span {
+    color: #000 !important;
+    font-size: 15px;
+    font-weight: 500;
+    padding-left: 5px;
+}
+
+.ven-name {
+    margin: 10px auto;
+}
+
+.ven-name label {
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 0px;
+    width: 140px;
+}
+
+.ven-name span {
+    color: #000 !important;
+    font-size: 15px;
+    font-weight: 500;
+    padding-left: 5px;
+}

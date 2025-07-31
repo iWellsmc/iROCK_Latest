@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-12 text-end">
+        <button class="btn btn-clr chck-tst waves-effect waves-float waves-light" ><a href="{% url 'projects:listmaster'%}">Back</a></button>
+    </div>
+</div>
+
+<h3 class="from-head">Create Masters for Project</h3>
+
+<div class="row">
+
+  <div class="row"> 
+   
+
+  <form method="POST" class="form-txt" id="create-masterproject">
+     {% comment %} <input type="hidden" id="csrf_token_id" name="csrf_token" value={% csrf_token %} > {% endcomment %}
+     {% csrf_token %}
+  <div class="col step-1">
+    
+        <div class="row">
+            <div class="col-3"></div>
+        <div class="col-sm-6">
+            <label for="staticEmail" class="col-6 col-form-label pad-pp">Country</label>
+            {% render_field form.country class="form-control form-select" id="country"  %}
+            <span id="countryempty" class="waring-err"></span>
+        </div>
+        <div class="col-3"></div>
+        </div>
+        <div class="row">
+            <div class="col-3"></div>
+        <div class="col-sm-6 col-form-label">
+            <label for="inputAddress" class="col-6 col-form-label pad-pp">{{ form.name.label }}</label>
+            {% render_field form.name class="form-control" oninput="validateInputNotChar(this)" placeholder="Project Name"  id="projectname" %}
+            <span id="nameempty" class="waring-err"></span>
+        </div>
+        <div class="col-3"></div>
+        </div>
+        <div class="text-center spacing-button">
+            <button type="button" class="btn btn-clr text-center draft-cls" data-id="1">Save as Draft</button>
+            <button type="button" class="btn btn-clr text-center submit-cls" data-id="1">Create</button>
+        </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<!-- <script src="{% static 'js/projects/createmasterproject.js' %}"></script> -->
+<script>
+    function validateInputNotChar(input) {
+        input.value = input.value.replace(/[^a-zA-Z0-9\s]/g, '');
+    }
+    
+
+    /*$('#country').change(function(){
+        $('#country').removeClass("error")
+        if ($('#country').val() == ""){
+            $('#countryempty').text("Select Country")
+        }else{
+            $('#countryempty').text("")
+        }
+    })*/
+    $('#projectname').change(function(){
+        $('#projectname').removeClass("error")
+    })
+
+    var project_id='';
+    $('.draft-cls').click(function(){
+        var form=$("#create-masterproject");
+        var data_id=$(this).attr('data-id');
+        var country=$('#country').val();
+        var projectname=$('#projectname').val();
+        var is_filled=true;
+
+        if (!country && projectname){
+            $('#countryempty').text("Select Country")
+            $('#country').addClass("error")
+            is_filled=false;
+        }
+        else if(!projectname && country) {
+            $('#projectname').addClass("error")
+            is_filled=false;
+            }
+        else if(!projectname && !country) {
+            $('#countryempty').text("Select Country")
+            $('#projectname').addClass("error")
+            $('#country').addClass("error")
+            is_filled=false;
+            console.log(projectname)
+            console.log(country)
+            // alert(is_filled)
+            }
+        else{
+            $('#country').removeClass("error")
+            $('#projectname').removeClass("error")
+            is_filled=true;
+        }
+        if(is_filled == false){
+
+        }
+        else{
+            $(this).prop('disabled', true);
+            
+            $.ajax({
+            type:"POST",
+            container:"#create-masterproject",
+            url:'/projects/masterprojectcreate',
+            data:form.serialize(),
+            success: function(data){
+                if(data.status=="success"){
+
+                    var url = "{% url 'projects:listmaster'%}";
+                    document.location.href = url;
+                }
+                else if (data.duplicate=="duplicate"){
+                    Swal.fire("Project name already exists")
+                }
+            }
+            })
+            
+    }
+
+    })
+
+    $(".submit-cls").click(function(){
+       
+
+        var form=$("#create-masterproject");
+        var data_id=$(this).attr('data-id');
+        var country=$('#country').val();
+        var projectname=$('#projectname').val();
+        var is_filled=true;
+        // alert(country)
+        if (!country && projectname){
+            $('#countryempty').text("Select Country")
+            $('#nameempty').text("")
+            is_filled=false;
+            // alert('1')
+    
+        }
+        else if(!projectname && country) {
+            $('#countryempty').text("")
+            $('#nameempty').text("Enter Project Name")
+            is_filled=false;
+            // alert('2')
+            
+            }
+        else if(!projectname && !country) {
+
+            $('#countryempty').text("Select Country")
+            $('#nameempty').text("Enter Project Name")
+            is_filled=false;
+            // alert('3')
+            }
+            else{
+                $('#countryempty').text("")
+                 $('#nameempty').text("")
+                 is_filled=true;
+            }
+
+
+        if(is_filled == false){
+
+        }
+        else{
+            // $(this).prop('disabled', true);
+        $.ajax({
+            type:"POST",
+            container:"#create-masterproject",
+            url:'/projects/masterprojectcreate',
+            data:form.serialize(),
+            success: function(data){
+                console.log(data)
+                project_id = data.project_id;
+                if(data.status=="success"){
+                   if (data_id=="1"){
+                        Swal.fire({
+                            text: 'Do you want to add  Block(s) to this project?',
+                            showDenyButton: true,
+                            confirmButtonColor: '#77d61f',
+                            allowOutsideClick:false,
+                            denyButtonColor:'#AF2B50',
+                            confirmButtonText: 'Yes',
+                            denyButtonText: 'No',
+                            customClass: {
+                              actions: 'my-actions',
+                              confirmButton: 'order-2',
+                              denyButton: 'order-3',
+                            }
+                          }).then((result) => {
+                            if (result.isConfirmed) {
+                                var url = "{% url 'projects:createmasterblock' 123 %}";
+                                document.location.href = url.replace('123', data.project_id);
+                            } else if (result.isDenied) {
+                                var current_url=$(location).attr("href")
+                                var replace_url=current_url.replace("createmaster","listmaster")
+                                window.location.href = replace_url;
+                            }
+                          })
+                    } 
+                }
+                else if (data.duplicate=="duplicate"){
+                    
+                    Swal.fire("Project Name Already Exists")
+                    $('#nameempty').text("Project Name Already Exists")
+                   // var url = "{% url 'projects:createmasterblock' 123 %}";
+                   // document.location.href = url.replace('123', data.project_id);
+        // $(this).prop('disabled',false);
+                }
+            }
+        })
+    }
+
+    })
+
+
+
+
+$(document).on('keyup','#projectname',function(){
+    // alert()
+var projectname=$(this).val()
+if(projectname=="")
+{
+
+    $('#nameempty').text("Enter Project Name")
+}
+
+else{
+    $('#nameempty').text("")
+
+}
+});
+
+$(document).on('change','#projectname',function(){
+    projectname=$(this).val()
+    currentval=$(this)
+    $.ajax({
+        type: "GET",
+        url:"/projects/projectnameduplications",
+        data: {
+          "projectname":projectname,
+        },
+        cache: false,
+        success: function(data)
+        { 
+            console.log('val',data.status)
+         if(data.status==true){
+           swal.fire("Project Name Exists")
+           currentval.val('')
+         }
+          }
+    })
+})
+
+$(document).on('click','#country',function(){
+
+var countryname=$(this).val()
+// alert(countryname)
+//if(countryname=="")
+//{
+
+   // $('#countryempty').text("Select Country")
+//}
+
+if(!countryname){
+    $('#countryempty').text("")
+
+}
+
+
+});
+
+
+
+</script>
+{% endblock %}

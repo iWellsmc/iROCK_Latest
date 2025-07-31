@@ -1,0 +1,346 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+<section>
+    <h3 class="from-head">Create Field</h3>
+    <form method="POST" class="form-txt" id="edit-masterfield">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-3">
+                <label class="txt-name unique-colr">Country:</label>
+                <span class="txt-detail uniq-name">{{project_details.country.nicename}}</span>
+            </div>
+            <div class="col-9">
+                <label class="txt-name unique-colr">Project Name:</label>
+                <span class="txt-detail uniq-name">{{project_details.name}}</span>
+            </div>
+        </div>
+                <div class="row">
+                    <div class="col-4">
+                <label class="txt-name">Block Name</label>
+                </div>
+                <div class="col-4">
+                    <label class="txt-name">Field Name</label>
+                    </div>
+                <div class="col-4">
+                    <label class="txt-name">Field Environment</label>
+                    </div>
+                </div>
+            
+                {% for block in project_block %}
+                <div class="row block-row spacing-top">
+                    <div class="col-4">
+                        <input type="checkbox" name="block_name" data-id={{block.id}} value="{{block.id}}" class="block_name" {% if block.id|checkbolckhasfield:block > 0 %} checked=checked {% endif %}><span class="checkbox-text txt-detail">{{block.block_name}}</span>
+                    
+                    </div>
+                    <div class="col-8">
+                        {% if forloop.counter == 1 %}
+                            <!-- <label class="col-form-label">Field Name</label> -->
+                        {% endif %}
+                        <table id="field_table{{block.id}}" class="create_field">
+                            <tbody>
+                                {% for field in block.id|get_field:block%}
+                                <tr>
+                                    <td><input type="hidden" name="fieldid{{block.id}}" class="fieldid" value="{{field.id}}"><input list="browsers" autocomplete="off" type="text" name="fieldname{{block.id}}" value="{{field.field_name}}" class="form-control field-class" data-id="{{block.id}}"><datalist id="browsers"><option value="Not Applicable"></datalist></td>
+                                    <td class="same-line">
+                                        <button id="field-add-row" class="btn btn-clr add-btn waves-effect waves-float waves-light max-min" data-id="{{block.id}}" type="button" value="Add"><i class="fa fa-plus"></i></button>
+                                        <button id="field-delete-row" class="btn btn-clr add-btn waves-effect waves-float waves-light max-min" data-id="{{block.id}}"  type="button" value="Add"><i class="fa fa-minus"></i></button>
+                                    </td>
+                                    
+                                    <td class="fld-enver">
+                                     <input type="checkbox" name="project_environment-{{block.id}}-{{forloop.counter0}}" data-id="{{block.id}}" class="environment-cls" id="id_project_environment" value="Onshore-Standalone" {% if field.id|checkfieldenvironment:"Onshore-Standalone" > 0 %} checked=checked {% endif %}>&emsp;<label>Onshore-Standalone</label><br>
+                                     
+                                     <input type="checkbox" name="project_environment-{{block.id}}-{{forloop.counter0}}" data-id="{{block.id}}" class="environment-cls" id="id_project_environment" value="Onshore-Pad Type"
+                                     {% if field.id|checkfieldenvironment:"Onshore-Pad Type" > 0 %} checked=checked  {% endif %}>&emsp;<label>Onshore-Pad Type</label><br>
+                                     
+                                     <input type="checkbox" name="project_environment-{{block.id}}-{{forloop.counter0}}" data-id="{{block.id}}" class="environment-cls" id="id_project_environment" value="Offshore-Swamp" {% if field.id|checkfieldenvironment:"Offshore-Swamp" > 0 %} checked=checked  {% endif %}>&emsp;<label>Offshore-Swamp</label><br>
+
+                                     <input type="checkbox" name="project_environment-{{block.id}}-{{forloop.counter0}}" data-id="{{block.id}}" class="environment-cls" id="id_project_environment" value="Offshore-Shallow Water"  {% if field.id|checkfieldenvironment:"Offshore-Shallow Water" > 0 %} checked=checked  {% endif %}>&emsp;<label>Offshore-Shallow Water</label><br>
+
+                                     <input type="checkbox" name="project_environment-{{block.id}}-{{forloop.counter0}}" data-id="{{block.id}}" class="environment-cls" id="id_project_environment" value="Offshore-Deepwater" {% if field.id|checkfieldenvironment:"Offshore-Deepwater" > 0 %} checked=checked  {% endif %}>&emsp;<label>Offshore-Deepwater</label><br>
+                                     
+                                     <input type="checkbox" name="project_environment-{{block.id}}-{{forloop.counter0}}" data-id="{{block.id}}" class="environment-cls" id="id_project_environment" value="Others" {% if field.id|checkfieldenvironment:"Others" > 0 %} checked=checked {% endif %}>&emsp;<label>Others</label>
+                                     {% if field.id|checkfieldenvironment:"Others" > 0 %}
+                                     <table id="others{{block.id}}-{{forloop.counter0}}">
+                                        <tbody>
+                                            {%for  others in field.id|Otherenvironment:"Others" %}
+                                            <tr>
+                                            <td><input type="hidden" name="environmentid-{{block.id}}-Others-{{forloop.parentloop.counter0}}" class="others-cls" value="{{others.id}}">
+                                            <input list="browsers" autocomplete="off" type="text" name="environment-{{block.id}}-Others-{{ forloop.parentloop.counter0 }}" id="environment_id" data-id="{{block.id}}" index="{{ forloop.parentloop.counter0 }}" data-type="Others" class="form-control others-env-cls" value="{{others.project_environment_subtype}}"><datalist id="browsers"><option value="Not Applicable"></datalist></td>
+                                           <td class="same-line"> <button id="environment-add-row" data-id="{{block.id}}" index="{{ forloop.parentloop.counter0 }}" data-type="Others" class="btn-clr environment-add-row btn max-min" type="button" value="add"><i class="fa fa-plus"></i></button>
+                                            <button id="environment-delete-row" data-id="{{block.id}}" data-type="Others" class="btn-clr environment-delete-row btn max-min" type="button" value="delete"><i class="fa fa-minus"></i></button>
+                                            </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                     </table>
+                                     {% endif %}
+
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                             
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                </div>
+                {% endfor %}
+               
+
+        </div>
+        <div class="text-center spacing-button">
+            <button type="button" class="btn btn-clr text-center submit-cls" data-type='3'>Save & Next</button>
+
+        </div>
+    
+    </form>
+</section>
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+var is_filled = true;
+var lenfield=true;
+var duplicate=true;
+var project_id="{{project_details.id}}"
+$(document).on("change",".block_name",function(){
+    var block_id=$(this).attr('data-id')
+    if (this.checked){
+        var new_row='<tr><td><input type="hidden" name="fieldid'+block_id+'" value=""><input list="browsers" autocomplete="off" name="fieldname'+block_id+'" type="text" class="form-control field-class" data-id='+block_id+'><datalist id="browsers"><option value="Not Applicable"></datalist></td>'
+        new_row +='<td class="same-line"><button id="field-add-row" data-id='+block_id+' class="btn-clr field-delete-row btn max-min" type="button" value="delete"><i class="fa fa-plus"></i></button><button id="field-delete-row" class="btn-clr field-delete-row btn max-min" type="button" value="delete"><i class="fa fa-minus"></i></button></td>'
+        new_row+='<td class="fld-enver"><input type="checkbox" name="project_environment-'+block_id+'-0" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Onshore-Standalone">&emsp;<label>Onshore-Standalone</label><br><input type="checkbox" name="project_environment-'+block_id+'-0" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Onshore-Pad Type">&emsp;<label>Onshore-Pad Type</label><br><input type="checkbox" name="project_environment-'+block_id+'-0" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Offshore-Swamp">&emsp;<label>Offshore-Swamp</label><br><input type="checkbox" name="project_environment-'+block_id+'-0" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Offshore-Shallow Water">&emsp;<label>Offshore-Shallow Water</label><br><input type="checkbox" name="project_environment-'+block_id+'-0" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Offshore-Deepwater">&emsp;<label>Offshore-Deepwater</label><br><input type="checkbox" name="project_environment-'+block_id+'-0" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Others">&emsp;<label>Others</label></td>/tr>'
+        $("#field_table"+block_id).append(new_row); 
+    }
+    else{
+        $('#field_table'+block_id+' tr').remove();
+    }
+    
+}) 
+ 
+$(document).on("click","#field-add-row", function(){
+    if (is_filled == true && lenfield == true){
+    var block_id=$(this).attr('data-id')
+
+    var environment = $('table#field_table'+block_id+' tr:last').index() + 1;
+    var new_row='<tr><td><input type="hidden" name="fieldid'+block_id+'" class="fieldid" value=""><input list="browsers" autocomplete="off" name="fieldname'+block_id+'" block_id="'+block_id+'" type="text" class="form-control field-class"><datalist id="browsers"><option value="Not Applicable"></datalist></td><td><button id="field-add-row" class="btn btn-clr add-btn waves-effect waves-float waves-light max-min" data-id='+block_id+' type="button" value="Add"><i class="fa fa-plus"></i></button><button id="field-delete-row" class="btn-clr field-delete-row btn max-min" type="button" value="delete"><i class="fa fa-minus"></i></button></td>'
+        new_row+='<td class="fld-enver"><input type="checkbox" name="project_environment-'+block_id+'-'+environment+'" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Onshore-Standalone">&emsp;<label>Onshore-Standalone</label><br><input type="checkbox" name="project_environment-'+block_id+'-'+environment+'" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Onshore-Pad Type">&emsp;<label>Onshore-Pad Type</label><br><input type="checkbox" name="project_environment-'+block_id+'-'+environment+'" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Offshore-Swamp">&emsp;<label>Offshore-Swamp</label><br><input type="checkbox" name="project_environment-'+block_id+'-'+environment+'" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Offshore-Shallow Water">&emsp;<label>Offshore-Shallow Water</label><br><input type="checkbox" name="project_environment-'+block_id+'-'+environment+'" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Offshore-Deepwater">&emsp;<label>Offshore-Deepwater</label><br><input type="checkbox" name="project_environment-'+block_id+'-'+environment+'" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Others">&emsp;<label>Others</label></td>/tr>'
+        $("#field_table"+block_id).append(new_row);
+    }
+    else{
+        //Swal.fire("field name already exists")
+    }
+
+})
+$(document).on("click", "#field-delete-row", function () {
+    var field_val=$(this).closest('td').prev('td').find('.field-cls').val()
+    if (field_val == ''){
+        $(this).closest('tr').remove()
+        is_filled=true
+    }
+    else{
+        if (is_filled == true && lenfield==true){
+        $(this).closest('tr').remove()
+        }
+    }
+})
+
+
+$(document).on("change",".environment-cls",function(){
+    var block_id=$(this).attr('data-id')
+    var index = $(this).closest('tr').index();
+    var value=$(this).val()
+    if (value=="Others"){
+    if ($(this).is(':checked')){
+   var new_row = '<tr><td><input type="hidden" name="environmentid-'+block_id+'-'+value+'-'+index+'" index="'+index+'" data-id="'+block_id+'" data-type="'+value+'" class="others-cls" value=" "><input list="browsers" autocomplete="off" type="text" name="environment-'+block_id+'-'+value+'-'+index+'" index="'+index+'" data-id="'+block_id+'" data-type="'+value+'" id="environment_id" class="form-control others-env-cls"><datalist id="browsers"><option value="Not Applicable"></datalist></td><td><button id="environment-add-row" data-id="'+block_id+'" data-type="'+value+'" class="btn-clr environment-add-row btn max-min" index="'+index+'" type="button" value ="add"><i class="fa fa-plus"></i><button id="environment-delete-row" data-id="'+block_id+'" data-type="'+value+'" class="btn-clr environment-delete-row btn max-min" type="button" value ="delete"><i class="fa fa-minus"></i></button></td></tr>'
+    // $(this).closest('td').append(new_row);
+    $('#others'+block_id+'-'+index+'').append(new_row)
+    // console.log({'chk$':('#others'+block_id+'-'+index+'')})
+    }
+    else{
+        // $(this).closest('td').find('#others'+block_id+'-'+index+'').remove()
+        console.log({'chk$':$(this).closest('td')})
+        $(this).closest('td').find('tbody').remove()
+    }
+    }
+})
+ 
+$(document).on("click","#environment-add-row",function(){
+    if (is_filled == true && lenfield == true && duplicate== true){
+    var block_id=$(this).attr('data-id')
+    var value=$(this).attr('data-type')
+    var index=$(this).attr('index')
+    var new_row = '<tr><td><input type="hidden" name="environmentid-'+block_id+'-'+value+'-'+index+'" index="'+index+'" data-id="'+block_id+'" data-type="'+value+'" class="others-cls" value=" "><input list="browsers" autocomplete="off" type="text" name="environment-'+block_id+'-'+value+'-'+index+'" index="'+index+'" data-id="'+block_id+'" data-type="'+value+'" id="environment_id" class="form-control others-env-cls"><datalist id="browsers"><option value="Not Applicable"></datalist></td><td><button id="environment-add-row" data-id="'+block_id+'" data-type="'+value+'" class="btn-clr environment-add-row btn max-min" index="'+index+'" type="button" value ="add"><i class="fa fa-plus"></i><button id="environment-delete-row" data-id="'+block_id+'" data-type="'+value+'" class="btn-clr environment-delete-row btn max-min" type="button" value ="delete"><i class="fa fa-minus"></i></button></td></tr>'
+
+    $('#others'+block_id+'-'+index+'').append(new_row)
+    }
+    else{
+
+    }
+})
+
+$(document).on("click", "#environment-delete-row", function () {
+    var field_env=$(this).closest('td').prev('td').find('.others-env-cls').val()
+    var tr_len = $(this).closest('tbody').find('tr').length-1
+    var checkbox_status = $(this).closest('table').prev().prev()
+    console.log({'1':checkbox_status})
+    // alert(tr_len)
+    if (field_env == ''){
+        $(this).closest('tr').remove()
+        is_filled=true;
+        
+    }
+    else{
+        if (is_filled == true && lenfield==true && duplicate== true){
+        $(this).closest('tr').remove()
+        }
+    }
+    if(tr_len== 0 ){
+                checkbox_status.prop('checked',false)
+            }
+    console.log(is_filled)
+    
+})
+
+$(document).on("keyup",".field-class",function(){
+    var x=$(this).val().toLowerCase();
+    var blockid=$(this).attr('block_id')
+    var spanid=$(this).closest('tr').index()
+    if (x.length <= 14){
+        $('#field'+blockid+'-'+spanid+'').remove()
+        lenfield = true;
+    }
+    else {
+        $('#field'+blockid+'-'+spanid+'').remove()
+        $(this).closest('tr').find('td:first').append('<span class="waring-err" id=field'+blockid+'-'+spanid+'>Maximum 14 Characters Only</span>')
+        lenfield = false;
+    }
+    var z=0;
+    $(".field-class").each(function(){
+        if (x != 'not applicable'){
+            var y=$(this).val().toLowerCase();
+            if(x==y && y !=''){
+                z=z+1;
+            }
+        }
+    });
+    if(z>1){
+        $('#fieldspan'+blockid+'-'+spanid+'').remove()
+        $(this).addClass("error")
+        is_filled = false;
+        $(this).closest('tr').find('td:first').append('<span class="waring-err" id=fieldspan'+blockid+'-'+spanid+'>Field Name Already Exists</span>')
+    }
+    else{
+        $(this).removeClass("error")
+        is_filled = true;
+        $('#fieldspan'+blockid+'-'+spanid+'').remove()
+    }
+})
+
+$(document).on("keyup",".others-env-cls",function(){
+    var other_value=$(this).val().toLowerCase();
+    var blockid=$(this).attr('data-id')
+    var indexes=$(this).attr('index')
+    var value=$(this).attr('data-type') 
+    
+    if (other_value.length <= 25){
+        $('#otherspanduplicate'+value+'-'+blockid+'-'+indexes+'').remove()
+        duplicate = true;
+    }
+    else {
+
+        $('#otherspanduplicate'+value+'-'+blockid+'-'+indexes+'').remove()
+        //$(this).addClass("waring-err")
+        $(this).closest('tr').find('td:first').append('<span class="waring-err" id="otherspanduplicate'+value+'-'+blockid+'-'+indexes+'">Maximum Character 25 Character Only</span>')
+        //$(this).closest('tr').find('td:first').append('<span class="waring-err" id=otherspan'+value+'-'+blockid+'-'+indexes+'>Maximum 25 Characters only</span>')
+        duplicate = false;
+    }
+    var val_count=0;
+    $(".others-env-cls").each(function(){
+        if (x != 'not applicable'){
+            var cur_val=$(this).val().toLowerCase();
+            if(other_value==cur_val && cur_val !=''){
+                val_count=val_count+1;
+            }
+        }
+    });
+    if(val_count>1){
+        $('#otherspan'+value+'-'+blockid+'-'+indexes+'').remove()
+        $(this).addClass("error")
+        is_filled = false;
+        $(this).closest('tr').find('td:first').append('<span class="waring-err" id=otherspan'+value+'-'+blockid+'-'+indexes+'>Field Environment Already Exists</span>')
+    }
+    else{
+        $(this).removeClass("error")
+        is_filled = true;
+        $('#otherspan'+value+'-'+blockid+'-'+indexes+'').remove()
+    }
+})
+
+$(".submit-cls").click(function(){
+    var data_type=$(this).attr('data-type')
+    var form=$("#edit-masterfield");
+    var block_count=0;
+    $('.block_name').each(function(){
+        if ($(this).is(":checked")) {
+            block_count++;
+        }
+    })
+    if (block_count == 0){
+        is_filled = false;
+        Swal.fire({
+              icon: 'error',
+              title: 'Error...',
+              text: 'Atleast Select one Block',
+              })
+    }
+    
+    $('.field-class').each(function(){
+        if ($(this).val()=='') {
+            is_filled = false;
+           Swal.fire({
+              icon: 'error',
+              title: 'Error...',
+              text: 'The Field is required',
+              })
+       }
+    })
+
+    $('.others-env-cls').each(function(){
+        if ($(this).val()=='') {
+            is_filled = false;
+           Swal.fire({
+              icon: 'error',
+              title: 'Error...',
+              text: 'The Field environment is required',
+              })
+       }
+    })
+    
+    console.log(is_filled)
+    console.log(lenfield)
+    if (is_filled==false || lenfield == false || duplicate== false){
+        console.log('not create')
+    }
+    else{
+        $(this).prop('disabled', true);
+        $.ajax({
+          type:"POST",
+          container:"#edit-masterfield",
+          url:'/projects/editprojectmasterfield/'+project_id,
+          data:form.serialize(),
+          success: function(data){
+
+            var url = "{% url 'projects:createmastercluster' 123 %}";
+            document.location.href = url.replace('123', project_id);
+          }
+
+        })
+    }
+})
+ 
+</script>
+{% endblock %}

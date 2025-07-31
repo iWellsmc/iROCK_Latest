@@ -1,0 +1,303 @@
+.cost-code-format td {
+    padding: 5px 5px;
+}
+
+.cost-code-format td:nth-child(1) {
+    /* width: 75px; */
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.cost-code-format td:nth-child(2) {
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.cost-code-format td:nth-child(3) {
+    color: #000;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+
+
+
+.cost-code-table {
+    border: 1px solid var(--tableborder-color);
+    border-collapse: collapse;
+}
+
+.cost-code-table th {
+    background-color: #fff !important;
+    border: 1px solid var(--tableborder-color) !important;
+    border-bottom: 2px solid var(--tableborder-color) !important;
+    padding: 10px 10px !important;
+}
+
+.cost-code-table td {
+    border: 1px solid var(--tableborder-color) !important;
+    padding: 10px 10px !important;
+}
+
+.code-width {
+    width: 35%;
+}
+
+.actions-width {
+    width: 15% !important;
+}
+
+/* .cost-code-table th:nth-child(1) {
+    width: 5%;
+}
+
+.cost-code-table th:nth-child(2) {
+    width: 15%;
+}
+
+.cost-code-table th:nth-child(3) {
+    width: 15%;
+}
+
+.cost-code-table th:nth-child(5) {
+    width: 10%;
+} */
+/* .cost-code-table th:nth-child(1) {
+    width: 5%;
+}
+
+.cost-code-table th:nth-child(2) {
+    width: 20%;
+} */
+
+/* .cost-code-table th:nth-child(3) {
+    width: 15%;
+} */
+
+/* .cost-code-table th:nth-child(5) {
+    width: 10%;
+} */
+
+.cost-code-table td {
+    /* text-align: center !important; */
+}
+
+.cc-list-table td:nth-child(1) {
+    text-align:  var(--centertext-align);
+}
+
+.cc-list-table td:nth-child(2) {
+    text-align:  var(--centertext-align);
+}
+
+.cc-list-table td:nth-child(4) {
+    text-align:  var(--centertext-align);
+}
+
+/* .cost-code-table td:nth-child(3) {
+    text-align: left !important;
+} */
+
+/* .cost-code-table td:nth-child(4) {
+    text-align: left !important;
+} */
+
+#empty_class {
+    /* padding-left: 100px; */
+}
+
+.search-f-inf {
+    border: 1px solid #96183a;
+    border-radius: 3px;
+    padding: 5px;
+}
+
+.search-f-inf::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+}
+
+.s_no {
+    margin-bottom: 0px;
+}
+
+/********** import cost code **********/
+.pos-rel {
+    position: relative;
+}
+
+.down-arrow-sig img {
+    position: absolute;
+    right: 18px;
+    top: 45px;
+}
+
+.src-style {
+    color: #000;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(212, 208, 208, 0.8);
+    z-index: 999;
+    opacity: 1;
+    transition: all 0.5s;
+}
+
+.lds-dual-ring.hidden {
+    display: none;
+}
+
+.lds-dual-ring {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+}
+
+.lds-dual-ring:after {
+    content: " ";
+    display: block;
+    width: 64px;
+    height: 64px;
+    margin: 5% auto;
+    border-radius: 50%;
+    border: 6px solid #fff;
+    border-color: #fff transparent #fff transparent;
+    animation: lds-dual-ring 1.2s linear infinite;
+}
+
+.td-center {
+    text-align: var(--centertext-align);
+}
+
+.td-left {
+    text-align: var(--lefttext-align);
+}
+
+@keyframes lds-dual-ring {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+h5.head_cls {
+    color: white !important;
+    position: absolute;
+    right: 46%;
+    bottom: 500px !important;
+}
+
+.new_component {
+    color: #b6254b;
+}
+
+.old_component {
+    color: #b6254b;
+}
+
+/********** import cost code **********/
+
+
+/********** cost code list pagination **********/
+#costcodelist_table_info {
+    color: #96183a;
+    font-weight: 600;
+}
+
+#costcodelist_table_paginate a {
+    margin-top: 10px !important;
+    color: #96183a !important;
+    font-weight: 600 !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: linear-gradient(to bottom, white 0%, #dcdcdc 100%) !important;
+    border: 1px solid #979797 !important;
+}
+
+.add_sequence_form {
+    padding: 10px 10px;
+}
+
+.remaining_level_inputs {
+    padding: 10px 10px;
+}
+
+.remaining_level_inputs div {
+    padding: 10px 0px;
+}
+
+.remaining_level_inputs h4 {
+    color: #000;
+    font-size: 15px;
+    font-weight: 600;
+}
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 17px;
+    margin-bottom: 0px !important;
+    /* font-size: 17px; */
+}
+
+input:checked+.slider {
+    background-color: #8d0000;
+  }
+  
+  input:focus+.slider {
+    box-shadow: 0 0 1px #8d0000;
+  }
+  
+  input:checked+.slider:before {
+    -webkit-transform: translateX(13px);
+    -ms-transform: translateX(13px);
+    transform: translateX(13px);
+  }
+  
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 34px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
+  .cc-width {
+    width: 20% !important;
+    }
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 13px;
+    width: 13px;
+    left: 1px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top:3px ;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    background-color: #a9adac;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+
+/********** cost code list pagination **********/

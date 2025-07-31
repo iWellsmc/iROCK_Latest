@@ -1,0 +1,358 @@
+{% extends "base.html" %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}    
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/setting/generalsetting.css' %}">
+
+{% if general_settings %}
+        <button type="button" class="mr-0 btn btn-clr btn-master chck-tst waves-effect waves-float waves-light" ><a href="{% url 'dashboard:dashboard' %}">Back</a></button>   
+    {% endif %} 
+<h4 class="from-head">General Settings</h4>
+
+<div class="row">
+
+    <form action="" method="post" id="generalcompanyform">
+    
+        {% csrf_token %}
+        
+    <div class="row">
+
+        <div class="col-sm-6">
+            <label for="staticEmail" class="col-form-label gener-hd">Date Format<span class="star-clr">*</span></label>
+            <select id="id_dateformat" name="dateformat" class="form-control form-select gener-hd-input" placeholder="Date Format">
+                {% comment %} <option value='' selected>--Select Date Format--</option> {% endcomment %}
+                    <option {% if general_settings.dateformat == 'dd-M-yy' %} selected {% endif %} selected value="dd-M-yy">DD-MMM-YYYY</option>
+                    <option {% if general_settings.dateformat == 'dd-mm-yy' %} selected {% endif %} value="dd-mm-yy">DD-MM-YYYY</option> 
+                    <option  {% if general_settings.dateformat == 'dd/mm/yy' %} selected {% endif %} value="dd/mm/yy">DD/MM/YYYY</option> 
+                    <option  {% if general_settings.dateformat == 'mm-dd-yy' %} selected {% endif %} value="mm-dd-yy">MM-DD-YYYY</option>
+                    <option  {% if general_settings.dateformat == 'mm/dd/yy' %} selected {% endif %} value="mm/dd/yy">MM/DD/YYYY</option>
+                    <option  {% if general_settings.dateformat == 'yy-mm-dd' %} selected {% endif %} value="yy-mm-dd">YYYY-MM-DD</option>
+                    <option  {% if general_settings.dateformat == 'yy/mm/dd' %} selected {% endif %} value="yy/mm/dd">YYYY/MM/DD</option>
+
+            </select><br>
+            {% comment %}
+            <label for="staticEmail" class="col-form-label gener-hd">Time Zone<span class="star-clr">*</span></label>
+            <select id="id_Time Zone" name="timezone" class="form-controlform-select gener-hd-input timezonecls" placeholder="Time Zone">
+                <option value='' selected>--Select Time Zone--</option>
+                {% for timezone  in timezones %}
+                    <option {% if general_settings.timezone == timezone.country_code %} selected {% endif %} value="{{timezone.country_code}}">{{timezone.zone_name}}</option>
+                {% endfor %}
+            </select><br>
+            {% endcomment %}
+            {% comment %}
+            <label for="staticEmail" class="col-form-label gener-hd">Units<span class="star-clr">*</span></label>
+            {% endcomment %}
+            <select id="id_units" name="units" class="form-control form-select gener-hd-input d-none" placeholder="Units">
+                <option value='' selected>--Select Unit--</option>
+                {% for units in Units %}
+                    <option {% if general_settings.unit == units %} selected {% endif %} value={{units}}>{{units|category_replace}}</option>
+                {% endfor %}
+            </select><br>
+            {% comment %} <label for="staticEmail" class="col-form-label gener-hd">Vendor Invite Link Valid Time<span class="star-clr">*</span></label>  {% endcomment %}
+            {% comment %} <div class="row">
+                <div class="col-5">
+                    <input type="text" id="time_id" name="vendoremailtime" value="{{general_settings.vendor_invite_time|default_if_none:"---"}}" class="form-control gener-hd-input" placeholder=""><br>
+                </div>
+                <div class="col-7">
+                    <select id="id_emailtimeunit" name="vendoremailtimeunit" class="form-control form-select gener-hd-input" placeholder="">
+                        <option value='' selected>--Select Units--</option>
+                        {% for dateunits in date_units %}
+                            <option {% if general_settings.vendor_invite_unit == dateunits%} selected {% endif %} value={{dateunits}}>{{dateunits}}</option>
+                        {% endfor %}
+                    </select><br>
+                </div>
+            </div> {% endcomment %}
+        </div>
+        <div class="col-6">
+            <label for="staticEmail" class="col-form-label gener-hd">Revised Invoice Submission Days<span class="star-clr">*</span></label>
+            <input type="text" id="revisedinvoice" name="vendor_registartion_time" value="{{general_settings.vendor_registartion_time|default_if_none:''}}" class="form-control gener-hd-input">
+            <br>
+            {% comment %}
+            <label for="staticEmail" class="col-form-label gener-hd">Time Format<span class="star-clr">*</span></label>
+            <select id="id_timeformat" name="timeformat" class="form-control form-select gener-hd-input" placeholder="Time Format">
+                <option value='' selected>--Select Time--</option>
+                {% for time in timeformat%}
+                    <option {% if general_settings.timeformat == time %} selected {% endif %} value={{time}}>{{time}} Hours</option>
+                {% endfor %}
+            </select><br>
+            {% endcomment %}
+            <label for="staticEmail" class="col-form-label gener-hd">Currency<span class="star-clr">*</span></label> 
+                {% if general_settings.currency != ''%}
+                    <input type="hidden"  {% convert_json general_settings.currency as list_currency %} value="{{list_currency}}" id="hdn_currency">
+                {%else%}
+                <input type="hidden" value="" id="hdn_currency">
+                {% endif%}
+            <select multiple="multiple" id="id_currency" name="currency" class="form-control form-select currency-cls gener-hd-input" placeholder="Currency" >
+                {%for country in basecountry %}
+               <option value="{{country.id}}">{{country.currency_symbol}}-{{country.currency}} ({{country.name}})</option>
+                {% endfor %}
+            </select><br>
+        </div>
+        <div>
+            <label class="col-form-label gener-hd"><label>Bank User</label> <i class="fa fa-info-circle" title= "Addition of bank users to Approval workflow" aria-hidden="true"></i></label>
+            <input type="checkbox" name="bank_user_check" class="inpt" {% if general_settings.bank_user == 1 %} checked  {% endif %} value="{% if general_settings.bank_user == 1 %}1{% else %}0{% endif %}">
+            <span class="slider round" id="input1" title='{% if general_settings.bank_user == 1 %}Active{% else %}Inactive{% endif %}'></span>
+        </div>
+        <!-- <label for="staticEmail" class="col-form-label gener-hd">Units<span class="star-clr">*</span></label>
+        <select id="id_units" name="units" class="form-control gener-hd-input" placeholder="Units">
+            <option value='' selected>--Select Unit--</option>
+            {% for units in Units %}
+                <option {% if general_settings.unit == units %} selected {% endif %} value={{units}}>{{units|category_replace}}</option>
+            {% endfor %}
+        </select><br> -->
+        <div>
+            <label for="staticEmail" class="col-form-label gener-hd">Company Exchange Rate Url</label>
+            <input name="urlfield" id="urlfield" class="form-control gener-hd-input" value="{{general_settings.urlfield|default_if_none:''}}" class="urlfield"><br>
+        </div>
+    </div>
+    <div class="text-center spacing-button">
+        <button type="submit" class="btn btn-clr text-center">Save</button>
+    </div>
+</form>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+ 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" ></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>  
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+<script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"
+     
+    ></script>
+<script>
+
+
+    $(document).ready(function() {
+        var data=$('#hdn_currency').val()
+        $('.timezonecls').select2();
+        $('.select2-selection__arrow').remove()
+        console.log(data)
+        if (data != ''){
+            data = data.replace("[",'');
+            data = data.replace("]",'');
+            data = data.replaceAll("'",'');
+            data = data.replaceAll(" ",'');
+            console.log(data);        
+            var convert_list = data.split(',');
+            console.log(convert_list)
+            $(".currency-cls").val(convert_list)
+        }
+        $('.currency-cls').select2({
+            placeholder: "Select Currency"
+        });
+        //$('.select2').find('.select2-selection__choice__remove').find('span').remove();
+        // $('.select2').on('select2:open', function () {
+        //   $('.select2-selection__choice__remove').find('span').html(' ');
+        // });
+
+    });
+    $('#urlfield').change(function(){
+        $(this).next('span').remove();
+        $(this).removeClass('con_error')
+        let url = $(this).val()
+       
+        var htppstring = "https://"
+        var chkurl = url.includes('https://');
+        if(chkurl == true){
+           
+        var urlhttps =  url
+        var properurl = url.replace(htppstring,'')
+         $('#urlfield').val(properurl)
+         url = $('#urlfield').val() 
+        }
+        else{
+            var urlhttps = `${htppstring}${url}`
+           
+        }
+       let boolfield = validateUrl(url)
+       if(boolfield == false){
+        $(this).after('<span class="waring-err">Enter valid Url</span>')
+        $(this).addClass('con_error')
+        $('.btn-clr').attr('disabled',true)
+       }
+       else{
+        $('.btn-clr').attr('disabled',false)
+       }
+       var urlboxfield = $(this)
+       savebtb = $('.btn-clr')
+    //    $.ajax({
+    //        type: "POST",
+    //        headers: { "X-CSRFToken": "{{ csrf_token }}"},
+    //        url: "{% url 'custom_auth:urlchkforiframe' %}",
+    //        data: {'url':urlhttps},
+    //        success: function(data){
+    //            if (data.status == true){ 
+    //               urlboxfield.after('<span class="waring-err">Your Url Is Not Supported </span>')
+    //               savebtb.attr('disabled','disabled')
+    //             }
+    //             else{
+                   
+    //               savebtb.attr('disabled',false)
+    //             }
+    //         }
+    //    });
+   
+    })
+    
+   function validateUrl(url){
+    if(url != '')
+        // return !!url.match(/^([A-Za-z0-9\-]+\.)+[A-Za-z]{2,}(?::\d+)?(?:\/[\w$\-_.+!*'(),]*)*(?:\?(?:[A-Za-z0-9$\-_.+!*'(),=]|(?:%[A-Fa-f0-9]{2}))*|\#[A-Za-z0-9$\-_.+!*'(),=]*)?$/i); 
+        return !!url.match(/(^|\s)((https?:\/\/)?[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi); 
+    }
+
+
+        $('.select2').on('select2:open', function () {
+          $('.select2-selection__choice__remove').find('span').remove();
+        });
+
+//     $('.select2').on('select2:open', function () {
+//   $('.select2-selection__choice__remove').addClass('select2-remove-right');
+// });
+
+$(document).on('change','#id_currency',function(){
+    $('#id_currency-error').remove()
+})
+    /*
+    $(document).on('click','#id_dateformat',function(){
+        var today = new Date();
+        var dd = today.getDate();
+        
+        var mm = today.getMonth()+1; 
+        var yyyy = today.getFullYear();
+        let shortMonth = today.toLocaleString('en-us', { month: 'short' });
+        //alert(shortMonth)
+        if(dd<10) 
+        {
+            dd='0'+dd;
+        } 
+        
+        if(mm<10) 
+        {
+            mm='0'+mm;
+        } 
+        data = '<option value='+mm+'-'+dd+'-'+yyyy+'>'+mm+'-'+dd+'-'+yyyy+'</option>';
+        data += '<option value='+mm+'/'+dd+'/'+yyyy+'>'+mm+'/'+dd+'/'+yyyy+'</option>';
+        data += '<option value='+dd+'-'+mm+'-'+yyyy+'>'+dd+'-'+mm+'-'+yyyy+'</option>';
+        data += '<option value='+dd+'/'+mm+'/'+yyyy+'>'+dd+'/'+mm+'/'+yyyy+'</option>';
+        data += '<option value='+dd+'-'+shortMonth+'-'+yyyy+'>'+dd+'-'+shortMonth+'-'+yyyy+'</option>';    
+        $('#id_dateformat').html(data)
+        //alert(data)
+    })
+    */
+
+
+$.validator.addMethod("valid_mobileno", function(value, element) {
+
+var number= $('#revisedinvoice').val();
+if(number!='')
+{
+    var text = value.replace(/[^0-9]/g, '');
+$('#revisedinvoice').val(text);
+return true;
+}
+else 
+{
+    return false;
+}
+
+});	  
+
+
+
+    $(function() {
+    
+      $("form[id='generalcompanyform']").validate({ 
+          
+        rules: {
+        
+            dateformat:{
+                required: true,
+                
+            }, 
+            timezone:{
+                required: true,
+                
+            },
+            units:{
+                required: true,
+                
+            },
+            vendor_registartion_time:{
+                required: true,
+                valid_mobileno: true,
+                
+            },
+            timeformat:{
+                required: true,
+                // validaddress:true,
+                
+            },
+            currency:{
+                required: true,
+                
+            },
+            
+        },
+      messages: {  
+        dateformat:
+               {
+                   required :"Select Date",
+                
+               },
+               timezone:
+               {
+                   required :"Select Timezone",
+                
+               },
+               units:
+               {
+                   required :"Select Units",
+                
+               },
+               vendor_registartion_time:
+               {
+                   required :"Enter Revised Invoice Submission Days",
+                   valid_mobileno:"Enter Numbers only",
+                
+                
+               },
+               timeformat:
+               {
+                   required :"Select timeformat",
+                //    validaddress:"Enter valid Address",
+                
+               },
+               currency:
+               {
+                   required :"Select Currency",
+                
+               },
+               
+         
+
+            },
+            submitHandler: function(form) {
+               form.submit();
+           },
+      
+       });
+});
+
+$(document).on('change','.inpt',function(){
+    if($(this).is(":checked")){
+        $(this).val(1)
+    }
+    else{
+        $(this).val(0)
+    }
+})
+</script>
+
+{% endblock %}

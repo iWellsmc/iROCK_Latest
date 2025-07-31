@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load credit_custom_tags %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/creditnote.css' %}">
+
+    <div class="row">
+        <div class="col-12">
+            <div class="text-end"> 
+                <button class="btn btn-clr waves-effect waves-float waves-light" onclick="goBack()">
+                    Back
+                </button>
+           </div>
+        </div>
+    </div>
+
+    <div>
+        <h3 class="from-head">Credit Note Submitted to Date</h3>
+        <div class="row">
+            
+        <div>
+
+        <div class="table-responsive text-nowrap cred-table_wid">
+        <table class="table prj-back_clr settings-data-list-view data-list-view invoicelist tot-in irock-table" id="master_project_list">
+            <thead >
+                <tr >
+                    <th>S/N</th> 
+                    <th class="">Credit Note No.</th>     
+                    <th>Date</th>
+                    <th>Ref.Invoice</th>
+                    <th>Approval Status</th>
+                    <th>Approval/Disputed Date</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="table-list">
+                {% if credit_note_count == 0 %}
+                <tr>
+                    <td colspan="9" class="cls-nil">
+                      ---
+                    </td>
+                  </tr>   
+                  {%else%}
+                {% for credit in credit_note %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        
+                            <td>
+                                {% for credit_invoice in credit.id|get_credit_invoices %}
+                                    <div>{{credit_invoice.credit_note_no}}</div>
+                                {% endfor %}
+                            </td>
+                            <td class="text-center">
+                                {% for credit_invoice in credit.id|get_credit_invoices %}
+                                    <div>{{credit_invoice.date|convert_credit_date:credit_invoice.credit.company.id}}</div>
+                                {% endfor %}
+                            </td>
+                            <td >
+                                {% for credit_invoice in credit.id|get_credit_invoices %}
+                                    <div>
+                                        {% for invoice in credit_invoice.credit.id|credit_contract_invoices:"inv" %}
+                                                {{invoice}}{% if not forloop.last %},{% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                            </td>
+                            <td class="ref_left">
+                                {% for credit_invoice in credit.id|get_credit_invoices %}
+                                    <div>
+                                        {% if credit_invoice.credit.approval_status == 1 %}
+                                            Pending
+                                        {% elif credit_invoice.credit.approval_status == 2 %}
+                                            Rejected
+                                        {% elif credit_invoice.credit.approval_status == 3 %}
+                                            Returned
+                                        {% else %}
+                                            Approved
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </td>
+                            <td class="text-center">
+                                {% for credit_invoice in credit.id|get_credit_invoices %}
+                                    <div>{{credit_invoice.credit.approval_date|default_if_none:"---"|convert_credit_date:credit_invoice.credit.company.id}}</div>
+                                {% endfor %}
+                            </td>
+                        <td>
+                            <a class="btn px-1" href="{% url 'credit:credit_view' pk=credit.id %}">
+                                <i class="fa fa-eye" title="View"></i>
+                            </a>
+                            {% checkpermission_creditnoterecipt credit request.user.id "1" as haspermission_invoicerecipt %}
+                                {% if haspermission_invoicerecipt > 0 %}
+                                {% check_for_flow credit request.user.id '1' as run_flow %}
+                                {% if run_flow == 0 %}
+                                <a class="btn px-1 null_data">
+                                    <i class="fa-solid fa-list-check" title='Invoice Receipt'></i>
+                                </a>
+                                {% else %}
+                                    <a class="btn px-1 inv_app_cls check_sign all-icon-same-clr" href="{% url 'credit:creditnotechecklist' credit.id %}" data_id="{{credit.id}}">
+                                        <i class="fa-solid fa-list-check" title='Credit Note Receipt'></i>
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+
+                            {% checkpermission_creditnoterecipt credit request.user.id "2" as haspermission_invoicerecipt %}
+                                {% if haspermission_invoicerecipt > 0 %}   
+                                {% check_for_flow credit request.user.id '2' as run_flow %}
+                                {% if run_flow == 0 %}
+                                <a class="btn px-1 null_data" >
+                                    <i class="fa-solid fa-file-invoice" title='Credit Note Approval'></i>
+                                </a>
+                                {% else %}
+                                    <a class="btn px-1 inv_app_cls check_sign all-icon-same-clr" href="{% url 'credit:crditapprovallist' credit.id %}" data_id="{{credit.id}}">
+                                        <i class='fa-solid fa-file-invoice' title='Credit Note Approval'></i>
+                                    </a>    
+                                {% endif %}
+                                {% endif %}
+                            {% comment %} {% checkpermission_creditnoterecipt credit request.user.id "1" as haspermission_invoicerecipt %}
+                                {% if haspermission_invoicerecipt > 0 %}
+                                    <a class="btn px-1 inv_app_cls check_sign all-icon-same-clr" href="{% url 'credit:creditnotechecklist' credit.id %}" data_id="{{credit.id}}">
+                                        <i class="fa-solid fa-list-check" title='Credit Note Receipt'></i>
+                                    </a>
+                                {% endif %} {% endcomment %}
+{% comment %} 
+                            {% checkpermission_invoiceoverride invoice userid "2" as haspermission_invoiceoverride %}
+                            {% if haspermission_invoiceoverride > 0 %}   
+                                <a class="btn px-1 inv_app_cls assign-user all-icon-same-clr" href="{% url 'invoice:invoiceoverrideusers' invoice.id %}" data_id="{{invoice.id}}">
+                                    <!-- <i class='fa-solid fa-file-invoice'></i> -->
+                                    <!-- <i class='fas fa-user-alt'></i> -->
+                                    <!-- Assign Users -->
+                                    <img src="{% static 'images/over-ride-user.png' %}" title="Override Users"/>
+                                </a>    
+                            {% else %} {% endcomment %}
+                                {% comment %} {% checkpermission_creditnoterecipt credit request.user.id "2" as haspermission_invoicerecipt %}
+                                {% if haspermission_invoicerecipt > 0 %}   
+                                    <a class="btn px-1 inv_app_cls check_sign all-icon-same-clr" href="{% url 'credit:crditapprovallist' credit.id %}" data_id="{{credit.id}}">
+                                        <i class='fa-solid fa-file-invoice' title='Credit Note Approval'></i>
+                                    </a>    
+                                {% endif %} {% endcomment %}
+                            {% comment %} {% endif %} {% endcomment %}
+    
+                           
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+            </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/credit_note/approvedcreditnotes.js' %}"></script>
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
+{% endblock %}

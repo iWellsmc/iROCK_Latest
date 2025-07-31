@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+{% load static %}
+{% load notifications_tags %} 
+{% load app_filters %}
+
+<html class="loading" lang="en" data-textdirection="ltr">
+<!-- BEGIN: Head-->
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <title>ICAPP</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600" rel="stylesheet">
+
+    <!-- BEGIN: Vendor CSS-->
+
+    <link rel="stylesheet" type="text/css" href="{% static 'vendors/css/vendors.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'vendors/css/charts/apexcharts.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'vendors/css/extensions/tether-theme-arrows.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'vendors/css/extensions/tether.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'vendors/css/extensions/shepherd-theme-default.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'vendors/css/forms/select/select2.min.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-flexdatalist/2.3.0/jquery.flexdatalist.min.css" integrity="sha512-feX1WY95JHQ//uffCG42xy0PofA6DAZSEgIQMMOmRBbSmmOoz/J52azXXLM3kYa9EkQ5PlOHFFCgqpnPJ1oYpg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- END: Vendor CSS-->
+    <!-- BEGIN: Theme CSS-->
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-extended.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/colors.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/themes/dark-layout.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/themes/semi-dark-layout.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'vendors/css/extensions/toastr.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <!-- BEGIN: Page CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/core/menu/menu-types/vertical-menu.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/core/colors/palette-gradient.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/pages/dashboard-analytics.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/pages/card-analytics.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/plugins/tour/tour.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/jquery.steps.css' %}">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/pages/data-list-view.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/plugins/extensions/toastr.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.16.9/sweetalert2.min.css" integrity="sha512-/D4S05MnQx/q7V0+15CCVZIeJcV+Z+ejL1ZgkAcXE1KZxTE4cYDvu+Fz+cQO9GopKrDzMNNgGK+dbuqza54jgw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- END: Page CSS-->
+    <!-- BEGIN: Custom CSS-->
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+
+    <!-- END: Custom CSS-->
+
+</head>
+<!-- END: Head-->
+
+<!-- BEGIN: Body-->
+
+<body class="vertical-layout vertical-menu-modern 2-columns navbar-floating footer-static pace-done menu-expanded {% if request.user.is_superadmin %}superadmin{% else %}normaluser{% endif %}" data-open="click" data-menu="vertical-menu-modern" data-col="2-columns">
+    <!-- END: Header-->
+
+
+    <!-- BEGIN: Main Menu-->
+    <!-- END: Main Menu-->
+
+    <!-- BEGIN: Content-->
+    <div class="app-content content">
+        <div class="content-wrapper">
+            <div class="content-header row">
+                {% autoescape off %}
+
+                {% get_logo request=request %}
+                {% endautoescape %}
+
+            </div>
+            <div class="content-body">
+
+        
+        {% block content %}{% endblock %}
+
+    </div><!--End of content body-->
+</div>
+
+    </div>
+    <!-- END: Content-->
+
+    <div class="sidenav-overlay"></div>
+    <div class="drag-target"></div>
+
+    <!-- BEGIN: Footer-->
+    <footer class="footer footer-static footer-light">
+        <p class="clearfix blue-grey lighten-2 mb-0"><span class="float-md-left d-block d-md-inline-block mt-25">COPYRIGHT &copy; 2021<a class="text-bold-800 grey darken-2" href="http://www.iwellsmc.com" target="_blank">iWells Integrated Management Consultants DMCC,</a>All rights Reserved</span>
+            <button class="btn btn-primary btn-icon scroll-top" type="button"><i class="feather icon-arrow-up"></i></button>
+        </p>
+    </footer>
+    <!-- END: Footer-->
+    {% block scripts %}
+
+    <script src="{% static 'vendors/js/vendors.min.js' %}"></script>
+    <script src="{% static 'vendors/js/extensions/toastr.min.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.maskedinput/1.4.1/jquery.maskedinput.min.js" integrity="sha512-d4KkQohk+HswGs6A1d6Gak6Bb9rMWtxjOa0IiY49Q3TeFd5xAzjWXDCBW9RS7m86FQ4RzM2BdHmdJnnKRYknxw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{% static 'vendors/js/charts/apexcharts.min.js' %}"></script>
+    <script src="{% static 'vendors/js/extensions/tether.min.js' %}"></script>
+    <script src="{% static 'vendors/js/extensions/shepherd.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script src="{% static 'vendors/js/extensions/dropzone.min.js' %}"></script>
+    <script src="{% static 'vendors/js/tables/datatable/datatables.min.js' %}"></script>
+    <script src="{% static 'vendors/js/tables/datatable/datatables.buttons.min.js' %}"></script>
+    <script src="{% static 'vendors/js/tables/datatable/datatables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'vendors/js/tables/datatable/buttons.bootstrap.min.js' %}"></script>
+    <script src="{% static 'vendors/js/tables/datatable/dataTables.select.min.js' %}"></script>
+    <script src="{% static 'vendors/js/tables/datatable/datatables.checkboxes.min.js' %}"></script>
+    <script src="{% static 'vendors/js/forms/validation/jquery.validate.min.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.16.9/sweetalert2.min.js" integrity="sha512-X3wD60uGlp9V2EHEo0SjzEQTZefgXmJTSd2GbA4fqdV3/9evPGNTam1nNJJYRpx9/VdnOu8lxwzkmJ2tz9t8Bg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- BEGIN: Theme JS-->
+    <script src="{% static 'vendors/js/forms/select/select2.min.js' %}"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-flexdatalist/2.3.0/jquery.flexdatalist.min.js" integrity="sha512-JEX6Es4Dhu4vQWWA+vVBNJzwejdpqeGeii0sfiWJbBlAfFzkeAy6WOxPYA4HEVeCHwAPa+8pDZQt8rLKDDGHgw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <script src="{% static 'js/core/app-menu.js' %}"></script>
+    <script src="{% static 'js/core/app.js' %}"></script>
+    <script src="{% static 'js/scripts/components.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-steps/1.1.0/jquery.steps.min.js" integrity="sha512-bE0ncA3DKWmKaF3w5hQjCq7ErHFiPdH2IGjXRyXXZSOokbimtUuufhgeDPeQPs51AI4XsqDZUK7qvrPZ5xboZg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- END: Theme JS-->
+    <script src="{% static 'vendors/js/extensions/moment.min.js' %}"></script>
+    <script src="{% static 'vendors/js/extensions/moment-timezone-with-data.js' %}"></script>
+    <!-- BEGIN: Page JS-->
+    
+    <script src="{% static 'js/scripts/pages/dashboard-analytics.js' %}"></script>
+    <script src="{% static 'js/scripts/ui/data-list-view.js' %}"></script>
+    <script src="{% static 'js/custom.js' %}"></script>
+    {% endblock %}
+
+    <script>
+        function updatenotification(data)
+        {
+            
+            $(".totalnotification").html( data.unread_list.length)
+            var notifications='';
+            for (var i=0; i < data.unread_list.length; i++) 
+            {
+                msg = data.unread_list[i];
+                console.log(msg);
+                url='';
+                if(msg.action_object_content_type==7)
+                {
+                    var company_id=msg.action_object_object_id;
+                    var url = "{% url 'custom_auth:companyview' id=123 %}?msgid="+msg.id;
+                    url= url.replace('123', company_id);
+                }
+                var timesince=timeSince(msg.timestamp);
+                notifications+='<a class="d-flex justify-content-between" href="'+url+'"><div class="media d-flex align-items-start"><div class="media-left"><i class="feather icon-plus-square font-medium-5 '+msg.level+'"></i></div><div class="media-body"><h6 class="'+msg.level+' media-heading">'+msg.verb+'</h6><small class="notification-text"> '+msg.description+'</small></div><small><time class="media-meta" datetime="2015-06-11T18:29:20+08:00">'+timesince+'</time></small></div></a>';
+
+            }
+            $('.notification-list').html(notifications);
+        }
+
+        function timeSince(timeStamp) {
+  var date = new Date(timeStamp); // some mock date
+  var timeStampmilli=date.getTime(); 
+  var now = new Date(),
+    secondsPast = (now.getTime() - timeStampmilli) / 1000;
+  if (secondsPast < 60) {
+    return parseInt(secondsPast) + ' seconds ago';
+  }
+  if (secondsPast < 3600) {
+    return parseInt(secondsPast / 60) + ' minutes ago';
+  }
+  if (secondsPast <= 86400) {
+    return parseInt(secondsPast / 3600) + ' hours ago';
+  }
+  if (secondsPast > 86400) {
+    day = date.getDate();
+    month = date.toDateString().match(/ [a-zA-Z]*/)[0].replace(" ", "");
+    year = date.getFullYear() == now.getFullYear() ? "" : " " + date.getFullYear();
+    return day + " " + month + year;
+  }
+}
+
+    </script>
+    <script src="{% static 'notify.js' %}" type="text/javascript"></script>
+    {% register_notify_callbacks callbacks='fill_notification_list,updatenotification' %}
+
+    <!-- END: Page JS-->
+    {% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success'%}
+            <script type=text/javascript>toastr.{{ message.tags }}('{{ message }}')</script>
+        {% elif message.tags == 'info' %}
+            <script type=text/javascript>toastr.{{ message.tags }}('{{ message }}')</script>
+        {% elif message.tags == 'warning' %}
+            <script type=text/javascript>toastr.{{ message.tags }}('{{ message }}')</script>
+        {% elif message.tags == 'error' %}
+            <script type=text/javascript>toastr.{{ message.tags }}('{{ message }}')</script>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+<style>
+    html body .content
+    {
+      margin-left: 0px;
+    }
+    html body .content .content-wrapper {
+    padding: calc(2.2rem - 0.4rem) 2.2rem 0;
+    margin-top: 0px;
+}
+.content-header
+{
+margin-bottom: 10px;
+}
+body {
+    background-image: url(/static/images/iwells-map.jpg);
+    background-size: cover;
+    background-position: center;
+}
+</style>
+</body>
+<!-- END: Body-->
+
+</html>

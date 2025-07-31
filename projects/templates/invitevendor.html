@@ -1,0 +1,126 @@
+ {% extends "base.html" %} 
+{% load widget_tweaks %}
+ {% load static %}
+ {% block content %} 
+{% load custom_tags %}
+
+
+<div class="row">
+  <div class="row">
+    <div class="col-9">
+    </div>
+    <div class="col-3">
+        <button class="btn btn-clr btn-master waves-effect waves-float waves-light" ><a href="{% url 'projects:invitevendorlist'%}">Back</a></button>
+    </div>
+</div>
+    <div class="col-3">
+    </div>
+    <div class="col-6">
+      <div class="invite-cards">
+        <h3 class="from-head">Invite Vendor for Online Registration</h3>
+      <form  class="form-txt" id="vendorinvite" method="POST">
+        {% csrf_token %}
+        <div>
+          <input type="hidden" id="company_id" name="companyid" value={{companyid}}>
+         
+          {% comment %} <input type="hidden" value= {{url}}>  {% endcomment %}
+
+          <label for="staticEmail" class=" col-form-label">Company Name<span class="star-clr">*</span></label>
+          <input type="text" id="company_name" name="companyname" class="form-control" placeholder="Company Name">
+        </div>
+        <div class = "row">
+          <div class="col-2">
+            <label for="staticEmail"    class=" col-form-label" >Title<span class="star-clr">*</span></label>
+            <select name="Tile" id="Tile"  class="form-control">
+              <option  value="" selected="selected">-Select-</option>
+                <option value="Mr">Mr</option>
+                <option value="Mrs">Mrs</option>
+                <option value="Ms">Ms</option>
+            </select>
+          </div>
+          <div class="col-10">
+          <label for="staticEmail" class=" col-form-label">Contact Person Name<span class="star-clr">*</span></label>
+          <input type="text" name="personname"  class="form-control"  id="personname" placeholder="Contact Person Name">
+        </div>
+      </div>
+        <div>
+          <label for="staticEmail" class=" col-form-label">Email Address<span class="star-clr">*</span></label> 
+          <input type="email" name="emailaddress"  class="form-control"  id="emailaddress" placeholder="Email Address">
+        </div>
+
+        <div class="text-center phase-vendor" id="btn">
+          
+          <button type="reset" class="btn btn-clr text-right">Discard</button>
+          <button type="submit" id="idsubmit" class="btn invite-btn text-right submit-cls">Invite</button>
+        </div>
+      </form>
+      </div>
+    </div>
+    <div class="col-3">
+    </div>
+
+</div>
+{%endblock%}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script>
+
+
+
+  $.validator.addMethod(
+    "regex",
+    function(value, element, regexp) {
+        return this.optional(element) || regexp.test(value);
+    },
+    "Please check your input."
+);
+  $("#vendorinvite").validate({
+    rules: {
+        companyname:{
+            required:true,  
+        },
+        Tile:{
+            required:true,  
+        },
+        personname:{
+            required:true,  
+        },
+        emailaddress: {
+          required: true,
+          email: true,
+          regex:/^[.-\w]+@[\w\-]{3,}((.)\w{2,})+$/
+          },
+    },
+    messages: {
+        companyname:{
+            required:"Please Provide a Company Name",   
+        },
+        Tile:{
+            required:"This Field is Required",   
+        },
+        personname:{
+          required:"Please Select a Contact Person Name",
+        },
+        emailaddress:{
+          required:"Please Provide an Email id",
+          email: "Please Provide an Valid Email id",
+          regex:"Please Provide an Valid Email id",
+        },
+        errorElement : 'span',
+        },
+      submitHandler: function(form) {
+        $("#idsubmit").attr('disabled','disabled');
+          form.submit();
+      }
+    })
+    $('.submit-cls').submit(function()
+    {
+       $("input[type='submit']", this)
+         .attr('disabled', 'disabled');
+   
+       return true;
+     });
+</script>
+{%endblock%}

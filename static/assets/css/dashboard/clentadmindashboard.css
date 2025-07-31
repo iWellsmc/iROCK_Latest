@@ -1,0 +1,142 @@
+.client-tab .nav-link.active {
+    background-image: linear-gradient(182deg, #8b1434, #ce2e58) !important;
+    border: none !important;
+    background-color: #8b1434;
+}
+
+.client-tab .nav-link{
+    font-size: 18px;
+    width: 100%;
+    gap: 10px;
+    padding-right: 20px;
+    justify-content: space-evenly;
+}
+
+.client-tab{
+    gap: 30px;
+    margin-top: 50px !important;
+    margin-bottom: 50px !important;
+}
+
+.client-tab .nav-link .menu-svg{
+    width: 30px;
+    height: 30px;
+    margin-left: -10px;
+}
+
+
+
+@media only screen and (max-width:1300px){
+    .client-tab{
+        gap: 20px;
+    }
+
+    .client-tab .nav-link{
+        font-size: 15px;
+    }
+
+    .from-side-head{
+        color: #AF2B50;
+        font-weight: 600;
+        font-size: 18px;
+    }
+    
+        
+}
+
+.body-dash{
+    padding: 20px;
+    border: 1px solid #8b1434;
+    border-radius: 8px;
+}
+
+.from-side-head{
+    color: #AF2B50;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.body-dash span {
+    font-size: 18px;
+    font-weight: 500;
+    margin-left: 5px;
+}
+
+.left-icon-big{
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+    filter: invert(26%) sepia(21%) saturate(4651%) hue-rotate(313deg) brightness(91%) contrast(97%);
+}
+
+.left-icon-small{
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    filter: invert(26%) sepia(21%) saturate(4651%) hue-rotate(313deg) brightness(91%) contrast(97%);
+}
+.manage-ul{
+    padding: 0;
+    width: 25%;
+}
+.manage-ul li{
+    list-style: none;
+    font-size: 15px;
+    color: #5e5873;
+}
+
+.manage-ul li a{
+    list-style: none;
+    font-size: 15px;
+    color: #5e5873;
+}
+
+.manage-ul li:hover img{
+    filter: invert(26%) sepia(21%) saturate(4651%) hue-rotate(313deg) brightness(91%) contrast(97%);
+}
+
+.manage-ul li:hover{
+    color: #ce2e58;
+}
+
+.manage-ul li a:hover{
+    color: #ce2e58;
+}
+
+.new-ul{
+    width: auto !important;
+}
+
+fieldset {
+    width: 300px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid black;
+  }
+  
+legend {
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+
+  .client-tab .nav-link .menu-svg {
+    width: 30px;
+    height: 30px;
+    margin-left: -10px;
+}
+.active .menu-svg {
+    filter: invert(93%) sepia(99%) saturate(2%) hue-rotate(91deg) brightness(114%) contrast(100%);
+    margin-left: 10px;
+}
+
+  .new-svg{
+    filter: invert(26%) sepia(21%) saturate(4651%) hue-rotate(313deg) brightness(91%) contrast(97%);
+}
+
+.active .new-svgs{
+    filter: invert(26%) sepia(21%) saturate(4651%) hue-rotate(313deg) brightness(91%) contrast(97%);
+}
+
+.active>.new-svgs{
+    filter: invert(93%) sepia(99%) saturate(2%) hue-rotate(91deg) brightness(114%) contrast(100%);
+}

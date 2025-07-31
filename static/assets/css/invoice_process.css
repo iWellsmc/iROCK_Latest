@@ -1,0 +1,9 @@
+table#master_project_list {
+    border: 1px solid green !important;
+}
+table#master_project_lists {
+    border: 1px solid green !important;
+}
+.ff {
+    text-decoration: underline !important;
+}

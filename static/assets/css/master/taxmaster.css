@@ -1,0 +1,48 @@
+.table>:not(:first-child) {
+    border-top: 0px solid currentColor;
+    }
+
+ .creat-head th {
+    border-right:1px solid var(--tableborder-color) !important;
+}  
+
+.bor-bot {
+    border-bottom: 1px solid #e3e3e3 !important;
+}
+#empty_class{
+    text-align: var(--centertext-align);
+  }
+
+.search-f-inf {
+    border: 1px solid #96183a;
+    border-radius: 3px;
+    padding: 5px;
+}
+
+.search-f-inf:hover {
+    border: 1px solid #96183a;
+}  
+
+.search-f-inf:active {
+    border: 1px solid #96183a;
+}  
+
+.sno-center {
+    text-align: var(--centertext-align);
+}
+
+.action-center {
+    text-align: var(--centertext-align);
+}
+
+.td-left {
+    text-align: var(--lefttext-align);
+}
+
+/********** Media query **********/
+@media (min-width: 768px) and (max-width: 1024px) {
+    .search-f-inf {
+        width: 100%;
+    }
+}
+/********** Media query **********/

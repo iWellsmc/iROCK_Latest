@@ -1,0 +1,60 @@
+Dear {{full_name}},<br><br>
+Please note that the WCC submitted by you has been received by us on {{date}}.<br>
+You can login as per your credentials to our Invoice Processing Portal to monitor the progress of your WCC
+approval.<br><br>
+Regards,<br>
+<!-- The {{contract_data.projectdiscipline}} Team,<br> -->
+<table style="margin-top:10px;font-family:arial,helvetica,sans-serif;max-width:800px;">
+  <tr>
+    <td>
+     <!-- <img  src="https://irockinfo.mo.vc{{image}}" alt="Image" title="Image" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 100%;max-width: 100px; height:100px; padding: 12px 0px;"/> -->
+     {% if image == '' %}
+      <img  src="{{url}}/static/images/icons/Character%20icon.svg" width="100" height="150" alt="Image" title="Image" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 100%;max-width: 100px; height:100px; padding: 12px 0px;"/>
+      {% else %}
+     <img  src="{{url}}{{image}}" width="100" height="150" alt="Image" title="Image" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 100%;max-width: 100px; height:100px; padding: 12px 0px;"/>
+     {% endif %}
+
+    </td>
+    <td>
+      <table style="margin-top:10px;font-family:arial,helvetica,sans-serif;width:100%;">
+        <tbody>
+      <tr><td>
+        <div style="margin-bottom: 0px;"><span style="color:#000 !important; font-size:15px !important; font-weight:400 !important;font-family:arial,helvetica,sans-serif;">{{companyusername}}</span></div>
+      </td></tr>
+      <tr><td>
+        <div style="margin-bottom: 4px;"><span style="color:#000 !important; font-size:15px !important; font-weight:400 !important;font-family:arial,helvetica,sans-serif;">{{role}}</span></div>
+      </td></tr>
+      <tr><td>
+        <div style="margin-bottom: 0px;"><span style="color:#000 !important; font-size:15px !important; font-weight:400 !important;font-family:arial,helvetica,sans-serif;">{{companyname}}</span></div>
+      </td></tr>
+      <tr><td>
+        <div style="margin-bottom: 0px;"><label style="color:#000 !important; font-size:15px !important; font-weight:400 !important;font-family:arial,helvetica,sans-serif;"><span style="color:#000; font-weight: 600; padding-right: 5px; font-size:18px;">L:</span>{{landline_countrycode}}-{{areacode}}-{{lanline}}</label><span class="pipe-line" style="color:#000; font-weight: 600; font-size:18px;">|</span><label style="color:#000 !important; font-size:15px !important; font-weight:400 !important;"><span style="color:#000; font-weight: 600; padding-right: 5px;">M:</span>{{mobile_countrycode}}-{{mobile}}</label></div>
+      </td></tr>
+      <tr><td>
+        <div style="margin-bottom: 0px;"><label style="color:#000 !important; font-size:15px !important; font-weight:400 !important;font-family:arial,helvetica,sans-serif;"><span style="color:#000; font-weight: 600; padding-right: 5px; font-size:18px;">E:</span>{{email}}</label><span class="pipe-line" style="color:#000; font-weight: 600; font-size:18px;">|</span><label style="color:#000 !important; font-size:15px !important; font-weight:400 !important;"><span style="color:#000; font-weight: 600; padding-right: 5px;">W:</span>{{website}}</label></div>
+      </td></tr>
+      <!-- <tr> -->
+        <!-- <td>
+       <div style="margin-bottom: 0px;"><label style="color:#000 !important; align-items: baseline; margin-top: -14px; font-size:15px !important; font-weight:400 !important;"><span style="color:#000; font-weight: 600; padding-right: 5px;">Address:</span>{{address|safe}}</label></div>
+        
+      </td> -->
+     
+    <!-- </tr> -->
+     
+      </tbody>
+      </table>
+      <table style="font-family:arial,helvetica,sans-serif;">
+        <tbody>
+          <!-- <td style="color:#000; font-weight: 600; padding-right: 5px; font-size:18px;vertical-align:baseline;" valign="baseline"><span style="font-weight:600;color:#000;">A:</span></td>
+          <td style="vertical-align: baseline !important;color:#000; font-weight: 600;" valign="baseline">{{address|safe}}</td>  -->
+          <td style="font-family:arial,helvetica,sans-serif;font-size: 14px;margin: 0px;padding: 0px 0 0 0;margin-top: 0;font-weight: 600;vertical-align:top" valign="top">
+            <span style="font-weight:600;color:#000;font-size:18px;">A:</span>
+        </td>
+          <td style="font-family:arial,helvetica,sans-serif;font-size: 15px;margin: 0px;padding: 0px 0 0 0;margin-top: 0;font-weight:400;vertical-align:top" valign="top" >
+            {{address|safe}}
+        </td>
+        </tbody>
+      </table>
+    </td>
+  </tr>
+</table>

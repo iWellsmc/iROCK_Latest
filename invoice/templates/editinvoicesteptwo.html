@@ -1,0 +1,474 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+{% load wcc_custom_tags %}
+{% load invoice_custom_tags %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/invoice.css' %}">
+ <div>
+        <form  method="POST" id="invoiceform2"> 
+
+            <div class="row">
+                <div class="col-12 text-end">
+                    <button class="btn btn-clr waves-effect waves-float waves-light" ><a href="{% url 'invoice:editinvoiceform' pk=pk status=1 %}{% if wcc_id != None %}?wcc_id={{wcc_id}}{% endif %}">Back</a></button>
+                </div>
+            </div>
+
+            {% csrf_token %}
+            <h3 class="from-head">Standard Information Form</h3>
+            <h3 class="from-head">Invoice Cost Information</h3>
+            <div class="row">
+
+                <select id="id_count" style="display:none">
+                {% for i in range %}
+                <option value={{ i }}>{{ i }}</option>
+                {% endfor %}
+                </select>
+
+                <select id="id_tax" style="display:none">
+                    {% for inclusive in inclusivetaxlist%}
+                    <option value="{{inclusive.id}}" dataid="{{inclusive.taxpercentage}}">{{inclusive.tax.Tax_Name}}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="id_bank" style="display:none">
+                    {% for bank in bankdetails %}
+                    <option value={{bank.id}} dataid={{bank.bankcurrency.id}}>{{bank.bankname}}-{{bank.accountnumber}}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="id_exclusivetax" style="display:none">
+                    {% for exclusive in exclusivetaxlist %}
+                    <option value={{exclusive.id}} dataid="{{exclusive.taxpercentage}}">{{exclusive.vendortax.tax.Tax_Name}}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="id_companycurrency" style="display:none">
+                    {% for currency in companycurrency %}
+                    <option value={{currency.id}}>{{currency.currency_symbol}}-{{currency.currency}}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="id_payment" style="display:none">
+                    {% for payment in vendorpayment %}
+                    <option value={{payment.id}} type="{{payment.payment_type}}" percentage="{{payment.payment_percentage}}" day="{{payment.payment_day}}"></option>
+                    {% endfor %}
+                </select>
+                <div class="includetaxes"style="display:none" >
+                    {% for inclusive in inclusivetaxlist%}
+                         {{inclusive.taxpercentage}},
+                     {% endfor %}.
+                     <input type="number" name="incpercentage" id="incpercentage" class="incpercentage">
+                     
+                </div>
+                <input type="text" name="grossamout" id="grossamout" class="grossamout"  value="{{invoicedetail.total_invoice_value|remove_commas}}"
+
+                style="display: none;">
+
+                <input type="hidden" name="dateformat" id="companydateformat" value={{company.dateformat}}>
+                <input type="hidden" name="fromdate" id="id_fromdate" value={{invoice.fromdate|date:'Y-m-d'}}>
+                <input type="hidden" name="todate" id="id_todate" value={{invoice.todate|date:'Y-m-d'}}>
+                <input type="hidden" name="companycurrency"  dataid="{% if contracttype == "original" %}{{contractmaster.currency.currency_symbol}}{% else %}{{contractmaster.amendment_currency.currency_symbol}}{% endif %}" id="hdncomcurid" value="{% if contracttype == "original" %}{{contractmaster.currency.id}}{% else %}{{contractmaster.amendment_currency.id}}{% endif %}">
+
+                <div class="row de-bottom"><div><label class="contractfilehead curr-ency">Currency As Per Contract :<span class="currency-clr">{% if contracttype == "original" %}{{contractmaster.currency.currency_symbol}}-{{contractmaster.currency.currency}}{% else %}{{contractmaster.amendment_currency.currency_symbol}}-{{contractmaster.amendment_currency.currency}}{% endif %}</span></label></div></div>
+                
+                <div class="row de-bottom">
+                        <div class="row">
+                                <div class="col-4 sm-lin">  
+                                    
+                                    <label class="contractfilehead">Total Value of Invoice<i class="fa fa-info-circle paymentcurcls i-con-clr-to" title="Total value before discount & taxes/levies" ></i></label>
+                                    <!--taxes/levies not included in invoice Prices as per contract-->
+                                </div>
+                                 <div class="col-5">
+                                    <input type="hidden" name="hdninvcost" value="{{invoicedetail.id}}">
+                                    <input type="text" name="totalvalue" id="id_totalvalue" class="form-control in-bor-clr-start inp-ut-wid wid-to-box custom_validation cur_symbol" autocomplete="off" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');" placeholder="Total Value" {% if wcc_id %} {% getwccvalues wcc_id as wccvalues %} value="{% if contracttype == 'original' %}{{contractmaster.currency.currency_symbol}}{% else %}{{contractmaster.amendment_currency.currency_symbol}}{% endif %} {{wccvalues.wcc_amount|wccvalues}}" readonly {% else %} value="{% if contracttype == 'original' %}{{contractmaster.currency.currency_symbol}}{% else %}{{contractmaster.amendment_currency.currency_symbol}}{% endif %} {{invoicedetail.total_invoice_value}}"{% endif %}>
+                                </div>
+                                <div class="maincls" {% if wcc_id == None %} {% if invoicedetail == "" %} style="display:none" {% endif %} {% endif %}>
+                                    {% comment %} <div class="row de-bottom"><div class="col-6"><label class="contractfilehead">Gross Amount After Discount</div><div class="col-3"><input type="text" name="grossamountwithdis" id="id_grossamountwithdis" readonly value="" class="grossamountwithdiscls inv-val"></div></div> {% endcomment %}
+
+                                {% comment %} <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Others</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Description</th>
+                                            <th>Amount</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input type="text" class="form-control in-bor-clr width-decc"> </td>
+                                            <td><input type="text" class="form-control in-bor-clr width-decc" oninput="$(this).val(($(this).val().replace(/[^0-9]/g,'')))"> </td>
+                                            <td><button class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> <button class="btn btn-clr add-btn" type="button" value="minus"><i class="fa fa-minus"></i></button></td>
+                                        </tr>
+                                    </tbody>
+                                </table> {% endcomment %}
+    
+                                <table id="discounttableid" class="in-amo distblcls"><thead><tr><th class="in-sub-hd new-colr">Discounts :</th><th class="in-sub-hd new-colr">Type :</th><th class="in-sub-hd"></th></tr></thead><tbody>
+                                    {% if other_data_count > 0 %}
+
+                                    {% for dis in invoice_discount %}
+                                    <tr><td class="brif-wid"><input type="hidden" name="hdninvdis" value="{{dis.id}}"><input type="text" name="discountname" class="form-control disdesclsedit in-bor-clr" value="{{dis.discount_name}}"></td><td class="am-wid"><select name="discounttype" class="form-control in-bor-clr amounttypeclsedit"> <option value="Not Applicable" {% if dis.discount_type == 'Not Applicable' %}selected{% endif %}>Not Applicable</option> <option value="percentage" {% if dis.discount_type == 'percentage' %}selected{% endif %}>Percentage</option><option value="amount" {% if dis.discount_type == 'amount' %}selected{% endif %}>Fixed Amount</option></select></td><td class="am-wid"><input type="text" name="discountamount" class="form-control disamountclsedit in-bor-clr custom_validation" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');" value="{{dis.discount_value}}"></td><td class="in-btn-wid"><button style="display:none" id="add_dis" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> <button id="minus_dis" class="btn btn-clr add-btn" type="button" value="minus"><i class="fa fa-minus"></i></button></td><td class="dis-wid"><input type="hidden" name="discount_value" class="discountvaluecls"><p class="disvalcls"></p></td></div></tr>
+                                    {% endfor %}
+
+                                    {% else %}
+                                    <tr><td class="brif-wid"><input type="hidden" name="hdninvdis" value=""><input type="text" name="discountname" class="form-control disdesclsedit in-bor-clr" readonly></td><td class="am-wid"><select name="discounttype" class="form-control in-bor-clr amounttypeclsedit"> <option value="Not Applicable" selected>Not Applicable</option> <option value="percentage">Percentage</option><option value="amount">Fixed Amount</option></select></td><td class="am-wid"><input type="text" name="discountamount" class="form-control disamountclsedit in-bor-clr custom_validation" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');" readonly></td><td class="in-btn-wid"><button style="display:none" id="add_dis" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> <button id="minus_dis" class="btn btn-clr add-btn" type="button" value="minus"><i class="fa fa-minus"></i></button></td><td class="dis-wid"><input type="hidden" name="discount_value" class="discountvaluecls"><p class="disvalcls"></p></td></div></tr>
+                                    {% endif %}
+                                </tbody></table>
+
+                                <div class="row de-bottom"><div class="col-6"><label class="contractfilehead">Gross Amount After Discount</div><div class="col-3"><input type="text" name="grossamountwithdis" id="id_grossamountwithdis" readonly value="" class="grossamountwithdiscls inv-val"></div></div>
+                               
+
+                                    <table id="otherstable" class="in-amo Others_amount_table"><thead><tr><th class="in-sub-hd new-colr">Others :</th></tr><tr><th class="in-sub-hd new-colr">Description</th><th class="in-sub-hd new-colr">Amount</th><th class="in-sub-hd"></th></tr></thead><tbody>
+                                        {% if other_data_count > 0%}
+                                        {% for other in otherdetails %}
+                                        <tr>
+                                            <td class="brif-wid"><input type="hidden" name="hdninvother" value="{{other.id}}"><input type="text" name="others_name" class="form-control others_name in-bor-clr" value="{{other.description}}"></td><td class="am-wid"><input type="text" name="others_amount" class="form-control others_amount in-bor-clr" value="{{other.amount|default_if_none:0}}"></td><td class="in-btn-wid"><button  id="add_others" class="btn btn-clr add-other" type="button" value="add"><i class="fa fa-add"></i></button> <button id="del_others" class="btn btn-clr add-btn del_others" type="button" value="minus"><i class="fa fa-minus"></i></button></td><td class="dis-wid"><input type="hidden" name="other_value" class="discountvaluecls"><h5 class="other_dis_val"></h5></td></div>
+                                        </tr>
+                                        {% endfor %}
+                                        {% else %}
+                                        <tr>
+                                            <td class="brif-wid"><input type="hidden" name="hdninvother" value=""><input type="text" name="others_name" class="form-control others_name in-bor-clr" ></td><td class="am-wid"><input type="text" name="others_amount" class="form-control others_amount in-bor-clr" readonly></td><td class="in-btn-wid"><button  id="add_others" class="btn btn-clr add-other" type="button" value="add"><i class="fa fa-add"></i></button> <button id="del_others" class="btn btn-clr add-btn del_others" type="button" value="minus"><i class="fa fa-minus"></i></button></td><td class="dis-wid"><input type="hidden" name="other_value" class="discountvaluecls"><h5 class="other_dis_val"></h5></td></div>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody></table>
+    
+                                    <div class="row de-bottom"><div class="col-6"><label class="contractfilehead">Gross Amount After Discount and Others</div><div class="col-3"><input type="text" name="grossamountwithother" id="id_grossamountwithother" readonly value="" class="grossamountwithother inv-val new-clrr"></div></div>
+
+
+                                    <div class="row"> <div><label class="tax-lev">Taxes and Levies</label></div >
+                                        
+                                            <div class="col-12"> <div class="col-hed">Inclusive Taxes:  <span class="in-clu">
+                                        {% if inclusivetaxcount > 0 %}
+                                            {% for inclusive in inclusivetaxlist%}
+                                                {{inclusive.vendortax.tax.Tax_Name}} {{inclusive.taxpercentage}}%,
+                                            {% endfor %}
+                                            (already included in Total value above)</span></div></div>
+                                        {% else %}
+                                        <br><b>not applicable</b></span></div></div>
+                                        {% endif %}
+                                    </div>
+
+                                
+                                <!--Exclusive Table starts-->
+                                    {% if exclusivetaxcount > 0 %}
+                                    <table class="exclusivetable"> <thead><tr><th class="in-sub-hd">Exclusive Taxes  <i class="fa fa-info-circle paymentcurcls i-con-clr" title ="taxes/levies not included in invoice Prices as per contract." style="color:#000000"></i>* :</th></tr>
+                                        {% if exclusivetaxValues != 0 %}
+                                        <tr><input type="hidden" class="tax_type" name="tax_types" value="0"><th><input type="radio" class="tax_cls cls1" name="tax_type" value="1" {% if invoice.tax_type == 1 %}checked{% endif %}>
+                                              <label class="radiobtn_class" for="tax_cls">Same Taxes for all line items</label><br>
+                                        </th>
+                                        <th>
+                                             <input type="radio" class="tax_cls cls2" name="tax_type " value="2" {% if invoice.tax_type == 2 %}checked{% endif %}>
+                                              <label class="radiobtn_class" for="tax_cls">Multiple Taxes for different line items</label><br>
+                                        </th>
+                                         <tr><th class="in-sub-hd new-taxx">Tax Name</th>  <th class="in-sub-hd new-taxx">Tax Amount</th></tr>  
+                                    </thead> 
+                                    <tbody> 
+
+                                    {% if tax_count == 0 %}  
+                                      
+                                        <tr> <td class="cat-wid"> <select name="exclusive" class="form-control exclusivecls in-bor-clr">
+                                            <option value=""  dataid="">-Select Tax-</option>
+                                            <!-- {% comment %} {% for exclusive in exclusivetaxlist %}
+                                                <option value="{{exclusive.id}}">{{exclusive.tax.Tax_Name}}</option>
+                                            {% endfor %} {% endcomment %} -->
+                                            {% for exclusive in exclusivetaxlist %}
+                                            <option value={{exclusive.id}}  dataid="{{exclusive.taxpercentage}}">{{exclusive.vendortax.tax.Tax_Name}} -{{exclusive.taxpercentage}}%</option>
+                                            {% endfor %}
+                                        </select></td> 
+                                        <td class=""><input type="hidden" name="hdninvexcl" value="{{exclusive.id}}"><input type="text" name="" class="form-control exclusivepercls in-bor-clr width-decc" readonly></td><td><input type="hidden" class="exclusive_percentage" readonly><input type="hidden" name="exclusive_percentage" value="" class="percentage_in_num"></td><td class=""> <button id="add-row" class="btn-clr add-row btn add-btn" type="button" value="add" disabled><i class="fa fa-plus"></i></button> <button id="delete-row" class="btn-clr delete-row btn add-btn" type="button" value="delete"><i class="fa fa-minus"></i></button> </td> <td class="per-wid"><input type="hidden" name="exclusive_value" class="exclusivevalcls"> <p class="taxvalcls"></p></td>
+                                     </tr> 
+                                    {% else %}
+                                        {% for exclusive in added_taxes %}
+                                            <tr> 
+                                                <input type="hidden" name="exclusive" value="{{exclusive.exclusive_id}}">
+                                                <input type="hidden" name="hdninvexcl" value="{{exclusive.id}}">
+                                                <td class="cat-wid"> 
+                                                    <select class="form-control exclusivecls in-bor-clr" disabled >
+                                                        <option value=""  dataid="">-Select Tax-</option>
+                                                        {% for exclusives in exclusivetaxlist %}
+                                                        <option value="{{exclusives.id}}" {% if exclusive.exclusive_id == exclusives.id %}selected{% endif %}>{{exclusives.vendortax.tax.Tax_Name}} -{{exclusives.taxpercentage}}%</option>
+                                                        {% endfor %}
+                                                </select>
+                                                </td> 
+                                                <td class=""><input type="text" name="" class="form-control exclusivepercls in-bor-clr width-decc" oninput="$(this).val(($(this).val().replace(/[^0-9.]/g,'')))" value="{{exclusive.exclusive_calculated_value|newamount_convertion}}"></td> 
+                                                <td><input type="hidden" class="exclusive_percentage" value="{{exclusive.tax_percentage}}%" readonly>
+                                                <input type="hidden" name="exclusive_percentage" value="{{exclusive.tax_percentage}}" class="percentage_in_num"></td>
+                                                <td class="" > <button id="add-row" class="btn-clr add-row btn add-btn" type="button" value="add" ><i class="fa fa-plus"></i></button> </td> 
+
+                                                <td class="per-wid">
+                                                    <input type="hidden" name="exclusive_value" class="exclusivevalcls" value="{{contractmaster.currency.currency_symbol}} {{exclusive.exclusive_calculated_value|amount_convertion}}">
+                                                    <p class="taxvalcls">{{contractmaster.currency.currency_symbol}} {{exclusive.exclusive_calculated_value|newamount_convertion}}</p></td>
+                                            </tr> 
+                                        {% endfor %}
+                                    {% endif %}
+                                    </tbody>
+                                {% else %}
+                                <tr><th>not applicable</th></tr>
+                                {% endif %}
+                                </table>
+
+                                    <!-- End Exclusive Table-->
+
+                                    <div class="row de-bottom"><div class="col-6"><label class="contractfilehead thin-tt">Total Exclusive Taxes and Levies</div><div class="col-3"><input type="text" name="totalexclusivetax" id="id_totalexclusivetax" value="+{% if contracttype == "original" %}{{contractmaster.currency.currency_symbol}}{% else %}{{contractmaster.amendment_currency.currency_symbol}}{% endif %} {% if wcc_id != None %}0{% else %}0{% endif %}" class="totalexclusivetaxcls inv-val new-clrr"></div></div>
+
+                                {% endif %}
+
+                                <!---->
+    
+                                <div class="row de-bottom grossalltaxcls bot-bor"><div class="col-6"><label class="contractfilehead">Gross Total Inclusive of all Taxes</div><div class="col-3 "><input type="text" name="totalalltax" id="id_totalalltax" value="{% if contracttype == "original" %}{{contractmaster.currency.currency_symbol}}{% else %}{{contractmaster.amendment_currency.currency_symbol}}{% endif %} {% if wcc_id != None %}{{wccvalues.wcc_amount|wccvalues}} {% else %}0{% endif %}" readonly  class="totalalltaxcls inv-val boorder-bb"></div></div>
+                                
+                                <div class="row de-bottom"><div class="col-4 sm-lin"><label class="contractfilehead">Payment Terms :</label>
+                                    {% if vendorpaymentcount <= 1 %}
+                                    <div class="col-7 selectedpaymentcls">
+                                        {% for payment in vendorpayment %}
+                                            <!-- <input type="hidden" name="" readonly class=""><span>{{payment.payment_percentage}}%</span> -->
+
+                                            <!-- <input type="hidden" name="" class=""><span>{% if payment.payment_type == '1'%} Advance Payment{% else%}Due in {% endif %}</span> -->
+                                            <!-- <input type="hidden" name="" readonly class=""><span>{% if payment.payment_type == '1'%} {% else%} {{payment.payment_day}} Days{% endif %}</span> -->
+
+                                              <input type="hidden" name="paymentterm" readonly class="" value="{{payment.id}}">
+                                              <span>Due in {{payment.payment_day}} Days</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% else %}
+                                        <!-- <table id="paytableid">
+                                            <thead>
+                                                <tr>
+                                                    <th>Payment Type</th>
+                                                    <th>Payment Days</th>
+                                                    <th>Payment Percentage</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>                                         -->
+                                                        
+                                                        <select name="paymentterm" class="duecls form-control form-select in-bor-clr wid-inad payment-cls">
+                                                            <option value="">-Select-</option>
+                                                            {% for payment in vendorpayment %}
+                                                                <option value="{{payment.id}}" type="{{payment.payment_type}}" day="{{payment.payment_day}}" {% if payment.id == invoicedetail.payment_terms.id %} selected {% endif%} percentage="{{payment.payment_percentage}}">{% if payment.payment_type == '1' %} Advance Payment {% elif payment.payment_type == '2' %} Regular Payment {% elif payment.payment_type == '3' %}Milestone Payment{% endif %}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    <!-- </td>
+                                                    <td><input type="text" name="" class="form-control payday" ></td>
+                                                    <td><input type="text" name="" class="form-control payper" readonly></td>
+                                                    <td style="display:none;">
+                                                        <button type="button" class="payadd"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                                                        <button type="button" class="payminus" readonly><i class="fa fa-minus" aria-hidden="true"></i></button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table> -->
+                                    {% endif %}
+                                </div>
+                                <div class="col-8 paymentdiv selectedpaymentcls">
+                                    {% if invoicedetail.payment_terms_id != None %}
+                                    <div>
+                                        {% for payment in vendorpayment %}
+                                            {% if payment.id == invoicedetail.payment_terms.id %}
+                                            {% if payment.payment_type == '1' %} Advance Payment {% elif payment.payment_type == '2' %} Regular Payment {% elif payment.payment_type == '3' %}Milestone Payment{% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+
+                                </div>
+                                <!-- <label class="contractfilehead">Days</label> -->
+                            </div>
+                        </div> 
+                        <div class="wrapper addinvoicecls btnsumcls" {% if wcc_id == None %} {% if invoicedetail == "" %} style="display:none" {% endif %} {% endif %}>
+                            <button type="button" class="addinvoiceclsbtn button btn-clr btn">Add Invoice Details</button>
+                        </div>
+                </div>
+            </div>
+            
+            <table class="con_invoice" style="display:none;"><thead> 
+                <th class="contractfilehead">Select Invoice split from Contract :</th> 
+                <!-- <th class="contractfilehead">Invoice Date</th> <th class="contractfilehead">Percentage</th> <th class="contractfilehead">Bank Details</th>
+                <th class="contractfilehead">Payment Currency</th>
+                <th class="contractfilehead">Exchange Rate</th> 
+                <th class="contractfilehead">Amount</th>  -->
+                </thead><tbody>
+                {% if vendorinvoicecount > 0 %}
+                <tr>
+                    <td>
+                        <select name="contractinvoice"  class="form-control form-select in-bor-clr coninvcls inv-sel-wid ml-2" index="{{forloop.counter0}}" placeholder="Invoice">
+                            <option value="">--Select--</option>
+                            
+                                {% for invoice in vendorinvoice %}
+                                    <option value="{{invoice.id}}" percentage="{{invoice.percentage}}" currency="{{invoice.currency.currency_symbol}}" currencyid="{{invoice.currency.id}}" exchangetype="{{invoice.exchange_rate|default_if_none:"---"}}">{{invoice.currency.currency_symbol}}-{{invoice.percentage}}%</option>
+                                {% endfor %}
+
+                         </select>
+                    </td>
+                    
+                            <!-- <td><input type="text" name="invoicedate" class="form-control dateformat-cls in-bor-clr date-cls" index="{{forloop.counter0}}"></td> <td><input type="text" name="percentage"  readonly class="form-control percls in-bor-clr" value="{{invoice.percentage}}" index="{{forloop.counter0}}"></td> 
+                        
+                            <td><select name="bank" class="form-control bankdetailcls in-bor-clr" index="{{forloop.counter0}}"></select></td> 
+
+                            <td><input type="text" name="paymentcurrency" id="id_paymentcurrency" class="paymentcurrencycls form-control in-bor-clr" dataid="{{invoice.currency.id}}" value="{{invoice.currency.currency_symbol}}" index="{{forloop.counter0}}" exchangetype="{{invoice.exchange_rate}}" readonly></td>
+
+                            <td>
+                                {% if contracttype == "original" %}
+                                    {% if invoice.currency_id !=  contractmaster.currency.id %}
+                                        {% if invoice.exchange_rate != '2'%}
+                                            <input type="text" name="exchangerate" id="id_exchangerate" class="exchangeratecls form-control in-bor-clr" dataid="{{invoice.exchange_rate}}" dataid="{{invoice.exchange_rate}}" value="" index="{{forloop.counter0}}">
+                                        {% endif %}
+                                    {% endif %}
+                                {% else %}
+                                    {% if invoice.currency_id !=  contractmaster.amendment_currency.id %}
+                                        {% if invoice.exchange_rate != '2'%}
+                                            <input type="text" name="exchangerate" id="id_exchangerate" class="exchangeratecls form-control in-bor-clr" dataid="{{invoice.exchange_rate}}" dataid="{{invoice.exchange_rate}}" value="" index="{{forloop.counter0}}">
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+
+                            <!-- {% if contracttype == "original" %}
+                                {% if invoice.currency_id !=  contractmaster.currency.id %}
+                                    {% if invoice.exchange_rate != '2'%}
+                                       <td><input type="text" name="exchangerate"></td>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif%} -->
+
+                            <!-- <td><input type="text" name="amount" id="id_amount" class="amountcls form-control in-bor-clr" placeholder="" readonly index="{{forloop.counter0}}"></td>  -->
+                </tr>
+                {% else %}
+                    <tr>
+                        <td><select name="invoicenum"  class="coninvcls form-control form-select in-bor-clr invnumcls inv-sel-wid ml-2" index="0" placeholder="Invoice Number">
+                            <option value="">--Select--</option>
+                        </select></td> 
+                    </tr>
+                {% endif %}
+                </tbody>
+                </table>
+                <div class="row de-bottom hd_con_cls" style="display:none;">
+                    <div><label class="contractfilehead curr-ency">Currency As Per Contract :<span class="currency-clr">{% if contracttype == "original" %}{{contractmaster.currency.currency_symbol}}-{{contractmaster.currency.currency}}{% else %}{{contractmaster.amendment_currency.currency_symbol}}-{{contractmaster.amendment_currency.currency}}{% endif %}</span></label></div>
+                </div>
+                <div class="col-12">
+                    <div class="table-responsive text-nowrap">
+                <table class="invoicetblcls tab-one"  {% if created_invoice_count == 0 %} style="display:none;" {% endif %}>
+                    <thead>
+                    {% if created_invoice_count > 0 %}
+                    <th class="contractfilehead">Payment Currency-Split</th>
+                    <th class="contractfilehead">Invoice No</th>
+                    <th class="contractfilehead">Invoice Date</th>
+                    <th class="contractfilehead" style="display:none;">Percentage</th>
+                    <th style="display: none;" class="contractfilehead">Payment Currency</th>
+                    <th class="contractfilehead">Amount in Base Currency</th>
+                    <th class="contractfilehead hide_head_cls" {% if exchangetype == '2' %} style="display:none" {% endif %}>Exchange Rate</th>
+                    <th class="contractfilehead hide_head_cls" {% if exchangetype == '2' %} style="display:none" {% endif %} >Amount in Payment Currency</th>
+                    <th class="contractfilehead">Bank Details</th>
+                    <th></th>
+                    {% else %}
+                    <!-- <th class="contractfilehead" ></th>
+                    <th class="contractfilehead" ></th>
+                    <th class="contractfilehead" ></th>
+                    <th class="contractfilehead" ></th>
+                    <th class="contractfilehead" ></th>
+                    <th class="contractfilehead" ></th>
+                    <th class="contractfilehead hide_head_cls" ></th>
+                    <th class="contractfilehead hide_head_cls" ></th>
+                    <th class="contractfilehead" colspan="2"></th> -->
+                    <!-- <th class="contractfilehead" ></th> -->
+                    <th class="contractfilehead">Payment Currency-Split</th>
+                    <th class="contractfilehead">Invoice No</th>
+                    <th class="contractfilehead">Invoice Date</th>
+                    <th class="contractfilehead" style="display:none;">Percentage</th>
+                    <th style="display: none;" class="contractfilehead">Payment Currency</th>
+                    <th class="contractfilehead">Amount in Base Currency</th>
+                    <th class="contractfilehead hide_head_cls" {% if exchangetype == '2' %} style="display:none" {% endif %}>Exchange Rate</th>
+                    <th class="contractfilehead hide_head_cls" {% if exchangetype == '2' %} style="display:none" {% endif %} >Amount in Payment Currency</th>
+                    <th class="contractfilehead">Bank Details</th>
+                    <th></th>
+                    {% endif %}
+                    </thead>
+                    <tbody>
+                        {% for invoice in created_invoice %}
+                        <tr>
+                            <td><input type="hidden" name="hdnveninv" value="{{invoice.id}}"> <input type="hidden" name="contractinvoiceid" value="{{invoice.vendor_invoice.id}}" ><input type="hidden" name="invoicecurrencyid" value="{{invoice.currency.id}}"><input type="text" name="splitinvoice" class="form-control in-bor-clr" value="{{invoice.invoice_payment}}" readonly></td>
+                            <td><input type="text" name="invoicenum" class="form-control in-bor-clr invnumcls" index="{{invoice.vendor_invoice.id}}" percentage="{{invoice.invoice_percentage}}" companycurrency="{% if contracttype == "original" %}{{contractmaster.currency.currency_symbol}}{% else %}{{contractmaster.amendment_currency.currency_symbol}}{% endif %}" currencyid="{% if contracttype == "original" %}{{contractmaster.currency.id}}{% else %}{{contractmaster.amendment_currency.id}}{% endif %}" placeholder="Invoice Number" value="{{invoice.invoice_number}}"></td> 
+                            <td><input type="text" name="invoicedate" class="form-control dateformat-cls in-bor-clr date-cls" index="{{invoice.vendor_invoice.id}}" value="{{invoice.invoice_date|convertinvoicedate:invoice.vendor.company.id}}">
+                            </td> 
+                            <td style="display:none;"><input type="text" name="percentage"  exchangetype="{{exchangetype}}" readonly class="form-control percls in-bor-clr" value="{{invoice.invoice_percentage}}" index="{{invoice.vendor_invoice.id}}"></td> 
+                            <td><input type="text" name="basecurrencyamount" class="form-control baseamountcls" value="{{invoice.invoice_base_amount}}" readonly></td>
+                            <td style="display:none;"><input type="text" name="paymentcurrency" id="id_paymentcurrency" class="paymentcurrencycls form-control in-bor-clr" dataid="{{invoice.currency.id}}" value="{{invoice.invoice_currency}}" index="{{invoice.vendor_invoice.id}}" exchangetype="{{exchangetype}}" readonly></td>
+                            
+                            {% if exchangetype == "1" %}
+                                <td><input type="text" name="exchangerate" id="id_exchangerate" class="exchangeratecls form-control in-bor-clr" dataid="{{exchangetype}}" value="{{invoice.invoice_exchange_rate}}" index="{{invoice.vendor_invoice.id}}" {% if invoice.invoice_exchange_rate == "N/A" %}readonly {% endif %}></td>
+                                <td><input type="text" name="amount" id="id_amount" class="amountcls form-control in-bor-clr" placeholder="" readonly index="" {% if invoice.invoice_number %} value="{{invoice.invoice_total_amount}}" {% endif %}></td>
+                            {% else %}
+                                <td style="display: none;"><input type="text" name="exchangerate" id="id_exchangerate" class="exchangeratecls form-control in-bor-clr" dataid="{{exchangetype}}" value="N/A" index="{{invoice.vendor_invoice.id}}" readonly></td>
+                                <td style="display: none;"><input type="text" name="amount" id="id_amount" class="amountcls form-control in-bor-clr" placeholder="" readonly index="" value="{{invoice.invoice_total_amount}}"></td>
+                            {% endif %}
+                            <td><select name="bank" class="form-control form-select bankdetailcls in-bor-clr" index="{{invoice.vendor_invoice.id}}">
+                                <option value="">--Select--</option>
+                                {% for bank in bankdetails %}
+                                    {% if invoice.currency.id == bank.bankcurrency.id %}
+                                        <option value={{bank.id}} {% if invoice.invoice_bank.id == bank.id%} selected {% endif %} dataid={{bank.bankcurrency.id}}>{{bank.bankname}}-{{bank.accountnumber}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select></td>
+                                                        {% if no_invoice != 1 %}
+                            <td class="text-center"><button type="button" class="removerowcls clo-ss"><i class="fa fa-close" aria-hidden="true"></i></button>
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+                </div>
+                
+
+                <div class="btnsumcls invdetailcls" {% if invoicedetail == "" or created_invoice_count == 0 %} style="display:none" {% endif %}><button type="button" class="sum-btn">Show Summary</button> <button type="button" class="hide-btn">Hide Summary</button></div>
+                <div class="row summarytblcls" style="display:none">
+                    <h6 class="sum-heed">Invoice Summary Details</h6>
+                    {% for inv in maininvoices %}
+                    {% checkallinvoice pk inv.id as invcount %}
+                    <div class="invoicesummarycls{{inv.id}}" {% if invcount != 0 %} style="display: none;" {% endif %}>
+                        {% for invoice in pk|subinvoice:inv.id %}
+                            <div class="row"><div class="row"><div class="col-lg-1 col-md-0"> </div> <div class="col-lg-3 col-md-4"><div class="same-lline"><p class="sum-vew p-head">Invoice No :</p><p class="sum-date p-value">{{invoice.invoice_number}}</p></div></div> <div class="col-lg-3 col-md-5 cen-hed"><label class="sum-vew">Date :<span class="sum-date">{{invoice.invoice_date|convertinvoicedate:request.company.id}}</span></label></div> <div class="col-lg-3 col-md-3 ryt-ali"><label class="a-mount">Amount</label></div> <div class="col-lg-1 col-md-0"></div> </div> <div class="row"> <div class="col-lg-1 col-md-0"></div> <div class="col-lg-9 col-md-12"> <table class="inv_sum_cls bor-liness"><tbody> <tr><th class="hed-inv-gr">Gross Amount Payable After Discount</th><td class="hed-inv-gr-val finaldiscountcls">{% if inv.exchange_rate == '2' %}{{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}}{% endif %}  {% invoiceafterdiscount invoice.invoice_percentage invoicedetail.total_after_otherdetails invoice.invoice_exchange_rate as invdisval %}{{invdisval}}</td></tr> <tr><th class="hed-inv-gross">Exclusive Taxes and Levies</th><td class="hed-inv-gross-val finaltaxcls">{% if inv.exchange_rate == '2' %}{{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}}{% endif %}  {% invoiceexclusivevalue invoice.invoice_percentage invoicedetail.total_exclusive_value invoice.invoice_exchange_rate as invexcval %}{{invexcval}}</td></tr> <tr><th class="hed-inv-gro">Gross Total Inclusive of Taxes and Levies</th><td class="hed-inv-gro-val totalsumcls">{% if inv.exchange_rate == '2' %}{{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}}{% endif %} {% invoiceafterdiscount invoice.invoice_percentage invoicedetail.total_after_otherdetails invoice.invoice_exchange_rate as invdisval %}{% invoiceexclusivevalue invoice.invoice_percentage invoicedetail.total_exclusive_value invoice.invoice_exchange_rate as invexcval %} {{invdisval|addvalues:invexcval}}</td></tr> </tbody></table></div> <div class="col-lg-1 col-md-0"></div> </div> 
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                </div>
+            <div class="text-center btn-cls" >
+                <input type="hidden" name="submit_type" value="0">
+                <button name="submit_type" type="submit" id="id_draft1"  class="btn btn-clr text-left draft-cls1 generate_report_3" value="0">Save as Draft</button>
+                <button type="submit" id="id_submit1" class="btn btn-clr text-left final-cls1 generate_report_3"  value="1">Save and Next</button>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" ></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" ></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    var totalvalueofinvoice = '{{totalvalueofinvoice}}'    
+    var no_invoice="{{no_invoice}}"
+    var wcc_id="{{wcc_id}}"
+    var invoicecount="{{vendorinvoicecount}}"
+    var vendorpaymentcount=parseInt("{{vendorpaymentcount}}")
+    var vendor_id="{{invoice.vendor_id}}"
+    var total_old_val = '{{total_value}}'
+    var contract_reference='{{contract_reference}}'
+    var created_invoices_count="{{created_invoice_count}}"
+    var invoice_numbers="{{invoice_numbers|safe}}"
+    var invoice_vendor_id = '{{invoice.vendor_id}}' 
+    let invoice_tax_types = '{{invoice.tax_type}}'
+</script>
+<script src="{% static 'js/invoice/editinvoicesteptwo.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,646 @@
+{% extends "base.html" %}
+{% block content %} 
+{% load static %}            
+{% load custom_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/profile/companyprofile.css' %}">
+<style>
+    .fontstyle{
+        cursor: pointer;
+    }
+</style>
+<div class="">
+
+    <h4 class="from-head">Edit Client Admin Details</h4>
+    <form method="POST" enctype="multipart/form-data" runat="server" id="editclientadmin">
+        {% csrf_token %}
+    <div class="row">
+        <div class="row">
+            <div class="row">
+                <div class="col-9">
+                </div>
+
+                <div class="col-3">
+                    <button type="button" onclick="history.back()" class="btn btn-clr btn-master">
+                        {% comment %}
+                        <a href="{% url 'custom_auth:clientadminview' pk=userdata.id%}">
+                        {% endcomment %}
+                        <a onclick="history.back()"></a>
+                            Back
+                        </a>
+                    </button>
+                </div>
+            </div>
+            <div class="col-1"></div>
+        <div class="col-5">
+            <div class="creat-user-bottom">
+            <label for="staticEmail" class="col-form-label edit-client-label">First Name<span class="star-clr">*</span></label>
+            <input type="text" name="firstname" class="form-control edit-client-int"  value="{{userdata.name}}" readonly>
+            </div>
+            <div class="creat-user-bottom">
+            <label for="staticEmail" class="col-form-label edit-client-label">Email<span class="star-clr">*</span></label>
+            <input type="text" name="email" class="form-control edit-client-int"  value="{{userdata.email}}" readonly>
+            </div>
+            {% if userimage == '' %}
+            <img id="image-preview" src="{% static 'images/icons/Character_icon.svg' %}" class="company-img-cls"><br>
+            {% else %}
+            <img id="image-preview" src="{{userimage}}" class="company-img-cls"><br>
+            {% endif %}
+
+            <label for="staticEmail" class="col-form-label edit-com-hd edit-client-label" >User Photo<span class="star-clr"></span></label>
+            <input type="file" name="image" id="file-input" accept="image, .png, .jpeg, .pdf, .jpg" class="form-control edit-client-int filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+        </div>
+
+        <div class="col-5">
+           <div class="creat-user-bottom">
+            <label for="staticEmail" class="col-form-label edit-client-label">Last Name<span class="star-clr">*</span></label>
+            <input type="text" name="lastname" value="{{userdata.lastname}}" class="form-control edit-client-int edit-com-int"  value="" readonly>
+           </div>
+        
+           {% if request.user.signature_type != NULL %}
+           <div class="row creat-user-bottom">
+            <div class="col-12">
+                <label for="staticEmail" class="col-form-label countr_break">User Signature<span class="star-clr">*</span></label>  <span class="waring-err signaturewrg"></span>                
+            </div>
+            
+            <input value="{{userdata.signature_type}}" class="sign_type" name="sign_type" type="hidden">
+            <div class="col-12 pt-1">
+            <ul id="myTabs" class="nav nav-pills nav-justified new-tab" role="tablist" data-tabs="tabs">
+                {% if request.user.signature_type == 'font' %}
+              <li class="font"><a class="prjlist-menu1 choose_signature" data-toggle="tab"><input value="font" type="hidden" >CHOOSE</a></li>
+                {%endif%}
+                {% if request.user.signature_type == 'signature' %}
+              <li class="signature"><a class="prjlist-menu1" data-toggle="tab"><input value="signature" type="hidden">DRAW </a></li>
+               {%endif%}
+               {% if request.user.signature_type == 'file' %}
+              <li  class="file"><a class="prjlist-menu1" data-toggle="tab"><input value="file" type="hidden">UPLOAD</a></li>
+               {%endif%}  </ul>
+            </div>
+            
+            <div class="col-12 pt-2">
+                   <div class="file-div-sign" {% if request.user.signature_type == "signature" %}style="display:none" {% endif %}>
+                    
+                    <img id="sign-image-preview" src="{% if request.user.signature_type == "file" %}{{request.user.signature_image.url}}{% endif %}" class="" style="height: 168px;"><br>
+                   
+                    </div>
+                </div>
+                
+                <div class="can-sign pt-4" style="display:none">
+                    <input type="hidden" class="sign_draw" name="sign_draw" value="" id="hdn_sign_draw">
+                    <canvas id="signature" class="canva" width="450" height="150" style="border: 1px solid #ddd;"></canvas>
+                    <div class="spanclass_error">
+                        <span class="waring-err invoicenumspn"> </span>
+                    </div>
+                    <br>
+                  
+                    <button class="btn-clr12" type="button" id="save-signature">Save</button>
+                    <button class="btn-clr12" type="button" id="clear-signature">Clear</button>
+                    <!-- <button class="btn-clr12" type="button" id="cancel-signature">Cancel</button> -->
+                    </div>
+                  
+                <div class="font-sign pt-4" style="display: none;" >
+                    <input name="inputfield" class="inputfield"  value="{{userdata.signature_fontname|default_if_none:'' }}" readonly>
+                    <input name="fontfamily" class="fontfamily" type="hidden" value="{{userdata.signature_fontfamily_id}}" id="{{userdata.signature_fontfamily.font_name}}">
+                  
+                 </div>
+                 
+                 <div class="show-sign-div saved-draw"{% if request.user.signature_type == "file" %}style="display:none" {% endif %}>
+                    <div class="show-file-div edit-clin-admin"> <img class ="canva-div"src="{% if request.user.signature_image != '' and request.user.signature_type == "signature" %}{{request.user.signature_image.url}}{% endif %}" id="show-img-sign"></div>
+                   </div>
+                </div>    
+           {%else%}
+        <!-- Customize-->
+        <div class="row creat-user-bottom">
+            <div class="col-12">
+                <label for="staticEmail" class="col-form-label countr_break">User Signature (Choose Only One)<span class="star-clr">*</span></label>  <span class="waring-err signaturewrg"></span>                
+            </div>
+            
+            <input value="{{userdata.signature_type}}" class="sign_type" name="sign_type" type="hidden">
+            <div class="col-12 pt-1">
+                <ul id="myTabs" class="nav nav-pills nav-justified new-tab" role="tablist" data-tabs="tabs">
+                    <li class="font"><a class="prjlist-menu1 choose_signature" data-toggle="tab"><input value="font" type="hidden" >CHOOSE</a></li>
+                   <li class="signature"><a class="prjlist-menu1" data-toggle="tab"><input value="signature" type="hidden">DRAW </a></li>
+                   <li  class="file"><a class="prjlist-menu1" data-toggle="tab"><input value="file" type="hidden">UPLOAD</a></li>
+                 </ul>
+            </div>
+            <div class="col-12 pt-2">
+                   <div class="file-div-sign" {% if request.user.signature_type == "signature" %}style="display:none" {% endif %}>
+                    
+                    <img id="sign-image-preview" src="{% if request.user.signature_type == "file" %}{{request.user.signature_image.url}}{% endif %}" class="" style="height: 168px;"><br>
+                    <input type="file" name="sign_file" accept="image, .png, .jpeg,  .jpg, " class="form-control mt-2 fileupload filesize" id="signfile_id"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span><br><p class="filenote"><strong>Note:</strong> Max file size is 2 MB and file type should be JPG,PNG,JPEG</p>
+                    </div>
+                </div>
+                
+                <div class="can-sign pt-4" style="display:none">
+                    <input type="hidden" class="sign_draw" name="sign_draw" value="" id="hdn_sign_draw">
+                    <canvas id="signature" class="canva" width="450" height="150" style="border: 1px solid #ddd;"></canvas>
+                    <div class="spanclass_error">
+                    <span class="waring-err invoicenumspn"> </span>
+                </div>
+                    <br>
+                  
+                    <button class="btn-clr12" type="button" id="save-signature">Save</button>
+                    <button class="btn-clr12" type="button" id="clear-signature">Clear</button>
+                    <!-- <button class="btn-clr12" type="button" id="cancel-signature">Cancel</button> -->
+                    </div>
+
+                <div class="font-sign pt-4" style="display: none;" >
+                    <input name="inputfield" class="inputfield"   placeholder=" Type Name ">
+                    <input name="fontfamily" class="fontfamily" type="hidden" value="{{userdata.signature_fontfamily_id}}" id="{{userdata.signature_fontfamily.font_name}}">
+                    <div class="selectfiled col-grd" style="display: none;" >
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <p class="preview"><strong>Preview</strong></p>
+                                {% for font in fontfamily%}
+                                <td> <input class="user-font" type="radio" id="html" name="fav_language" value="HTML" style="cursor: pointer;">
+                                </td>
+                                <td>
+                                    <input class="fontstyle" style="font-family:'{{font.font_name}}'"  value="{{font.id}}" readonly>
+                                </td>
+                            </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                 </div>
+
+                 <div class="show-sign-div saved-draw"{% if request.user.signature_type == "file" %}style="display:none" {% endif %}>
+                    <div class="show-file-div"> <img class ="canva-div"src="{% if request.user.signature_image != '' and request.user.signature_type == "signature" %}{{request.user.signature_image.url}}{% endif %}" id="show-img-sign"></div>
+                   
+                        <button class="btn btn-clr text-center" type="button" id="edit-signature">Edit</button>
+                    </div>
+                </div>    
+        <!-- Customize-->    
+        
+        
+        </div>
+        <div class="col-1"></div>
+    </div>
+         </div>
+         {%endif%}
+        </div>
+        <div class="col-2"></div>
+        <div class="text-center spacing-button my-5">
+            <button type="submit" class="btn btn-clr text-center submit-cls" data-id="1">Submit</button>
+        </div>
+    </div>
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+{{ block.super }}
+<script>
+var usersignature = '{{request.user.signature_type}}'
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>
+<script type="text/javascript" src="./js/sig_pad.js"></script>
+<script>
+jQuery.noConflict();
+$(document).ready(function(){
+    if(usersignature == 'None'){
+        $('.choose_signature').click();
+    }
+    if(usersignature == 'font'){
+        $('.choose_signature').click();
+    }
+})
+// $(document).on('change','#file-input',function(){
+//     var val=$(this).val()
+//     if (val != ''){
+//         var splitval=val.split('.')
+//         strFile = splitval[splitval.length-1];
+//         var s = ["jpeg","jpg","gif","png"];
+//         z=0
+//         $.each(s, function( index, value ) {
+//             if (strFile == value){
+//                 z=+1
+//             }
+//         });
+//             console.log(z)
+//             if (z == 1){
+//                 $('.submit-cls').attr('disabled', false);
+//                 z=0
+
+//             }
+//             else{
+//                 swal.fire("Please Provide a Proper Image Format")
+//                 $('.submit-cls').attr('disabled', 'disabled');
+//             }
+//     }
+// })
+
+function readURL(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        $('#image-preview').attr('src', e.target.result);
+        $('#image-preview').hide();
+        $('#image-preview').fadeIn(650);
+      }
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+  
+  $("#file-input").change(function() {
+    readURL(this);
+  });
+
+
+
+  
+
+
+  $(function() {
+    //   alert()
+    
+    $("form[id='editclientadminss']").validate({ 
+        
+      rules: {
+      
+        firstname:{
+              required: true,
+              
+          }, 
+          email:{
+              required: true,
+              
+          },
+          image:{
+              required: true,
+              
+          },
+          lastname:{
+              required: true,
+              
+          },
+          
+          
+      },
+    messages: {  
+        firstname:
+             {
+                 required :"Enter Firstname",
+              
+             },
+             email:
+             {
+                 required :"Enter Email-IDS",
+              
+             },
+             image:
+             {
+                 required :"Select Profile Image",
+              
+             },
+             lastname:
+             {
+                 required :"Enter Lastname",
+              
+             },
+             
+       
+
+          },
+          submitHandler: function(form) {
+             form.submit();
+         },
+    
+     });
+});
+
+//signature script
+
+$('.inputfield').keyup(function(){
+    $('.selectfiled').show()
+    // alert($('.inputfield').val())
+    $('.fontstyle').val( $(".inputfield").val())
+    if ($(this).val() == ''){
+        $('.selectfiled').hide()
+    }
+})
+
+$('.fontstyle').click(function(){
+   console.log({'Radiobtn': $(this).closest('tr').find('.user-font').prop('checked')})
+   $(this).closest('tr').find('.user-font').prop('checked', true);
+   let fontFamily = $(this).closest('tr').find('.fontstyle').val()
+   $('.inputfield').val(fontFamily)
+   $('.inputfield').css("font-family",$(this).closest('tr').find('.fontstyle').css("font-family"))
+   $('.fontfamily').val($(this).closest('tr').find('.fontstyle').attr('value'))
+})
+
+$('.user-font').click(function(){
+    let fontFamily = $(this).closest('tr').find('.fontstyle').val()
+   $('.inputfield').val(fontFamily)
+   $('.inputfield').css("font-family",$(this).closest('tr').find('.fontstyle').css("font-family"))
+   $('.fontfamily').val($(this).closest('tr').find('.fontstyle').attr('value'))  
+   $('#signfile_id').val('')
+   $('#sign-image-preview').removeAttr('src')
+   $('.canva-div').attr('src','')
+   $('.sign_type').val('font')
+   signaturePad.clear();
+   $('.invoicenumspn').html("")
+})
+// var userid="{{request.user.roles.id}}"
+var signaturePad;
+$(document).ready(function(){
+   
+    var val=$('.sign_type').val();
+    if(val == 'font')
+    {
+        $('.font-sign').show()
+        $('.file-div-sign').hide();
+        $('.can-sign').hide();
+        $('.show-sign-div').hide();
+        $('.font').addClass('active')
+        $('.font').find('a').addClass('active')
+      
+    }
+    else if(val == 'None'){
+        $('.file-div-sign').hide();
+        $('.can-sign').hide();
+        $('.show-sign-div').hide();
+        $('.font-sign').show()  
+        
+    }
+    else if(val == 'file'){
+        $('.filenote').hide()
+        $('.inputfield').val('')
+        console.log({'file':$('.file').find('a')})
+        $('.file').addClass('active')
+        $('.file').find('a').addClass('active')
+    }
+    else{
+        $('.inputfield').val('')
+        $('.file-div-sign').hide()
+        $('.font-sign').hide()
+       var get_length=$('#show-img-sign').attr('src').length;
+       if (get_length > 0){
+            $('.show-sign-div').show();
+        }
+        else{
+            $('.can-sign').show();
+        }
+        $('.signature').addClass('active')
+        $('.signature').find('a').addClass('active')
+       }
+       
+    $('.inputfield').css("font-family",$('.fontfamily').attr('id'))
+   
+})
+
+$('.fileupload').click(function(){
+    $('.sign_type').val('file')
+})
+
+$('.file').click(function(){
+  
+    $('.file-div-sign').show();
+    $('.can-sign').hide();
+    $('.show-sign-div').hide();
+    $('.font-sign').hide()
+    $('#hdn_sign_draw').val('')
+    $('#signfile_id').click(function()
+    {
+       $('.sign_type').val('file')
+       $('.inputfield').val('')
+       $('.selectfiled').hide()
+       $('.canva-div').attr('src','')
+       $('.filenote').hide()
+       signaturePad.clear();
+       $('.invoicenumspn').html("")
+       
+    })
+})
+
+$('.signature').click(function(){
+    
+    var get_length=$('#show-img-sign').attr('src').length;
+        if (get_length > 0){
+            $('.show-sign-div').show();
+        }
+        else{
+            $('.can-sign').show();
+        }
+        
+        $('.file-div-sign').hide();
+        $('.font-sign').hide()
+        $('#save-signature').click(function(){
+            $('#sign-image-preview').removeAttr('src')
+            $('#signfile_id').val('')
+            $('.inputfield').val('')
+            $('.selectfiled').hide()
+        })
+
+    //     $('#save-signature').click(function(){
+    //        if($('.sign_draw').val == ''){
+    //         $('.invoicenumspn').html("<p>Save Your Signature</p>")
+    //         return false
+    // }
+    // else{
+    //     $('.invoicenumspn').html("")
+    //     $('.submit-cls').attr('disabled',false)
+    // }
+    //        }
+    //     })
+})
+$('.font').click(function(){
+
+    $('.font-sign').show()
+    $('.file-div-sign').hide();
+    $('.can-sign').hide();
+    $('.show-sign-div').hide();
+    
+})
+$('.fontstyle').click(function(){
+       $('#signfile_id').val('')
+       $('#sign-image-preview').removeAttr('src')
+       $('.canva-div').attr('src','')
+        $('.sign_type').val('font')
+        signaturePad.clear();
+        $('.invoicenumspn').html("")
+    })
+    $('.fontstyle').click(function(){
+       $('#signfile_id').val('')
+       $('#sign-image-preview').removeAttr('src')
+       $('.canva-div').attr('src','')
+        $('.sign_type').val('font')
+        signaturePad.clear();
+        $('.invoicenumspn').html("")
+    })
+$(document).ready(function($){
+    var canvas = document.getElementById("signature");
+    signaturePad = new SignaturePad(canvas);    
+});
+
+$(document).on('click','#edit-signature', function(){
+    var data = signaturePad.toDataURL('image/png');
+    console.log('sad',data)
+    $('.can-sign').show(500);
+    $('.show-sign-div').hide(500);
+});
+
+$(document).on('click','#clear-signature', function(){
+    signaturePad.clear();
+})
+
+$(document).on('click','#save-signature', function(){
+    $('#edit-signature').removeAttr('style')
+    var data = signaturePad.toDataURL('image/png');
+    $('#hdn_sign_draw').val(data)
+    $('.can-sign').hide(500);
+    $('.show-sign-div').show(500);
+    $('#show-img-sign').attr("src",data);
+});
+
+$(document).on('click','.fontstyle',function(){
+    $('.fontstyle').removeClass('active')
+    $(this).addClass('active')
+})
+
+function readURL(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        $('#image-preview').attr('src', e.target.result);
+        $('#image-preview').hide();
+        $('#image-preview').fadeIn(650);
+      }
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+  
+  $("#file-input").change(function() {
+    readURL(this);
+  });
+
+function reaSignURL(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        $('#sign-image-preview').attr('src', e.target.result);
+        $('#sign-image-preview').hide();
+        $('#sign-image-preview').fadeIn(650);
+      }
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+  
+  $("#signfile_id").change(function() {
+    var val=$(this).val()
+        if (val != ''){
+            var splitval=val.split('.')
+            strFile = splitval[splitval.length-1];
+            var s = ["jpeg","jpg","png"];
+            chkextension=0
+            $.each(s, function( index, value ) {
+                if (strFile == value){
+                    chkextension=+1
+                }
+            });
+                
+                if (chkextension == 1){
+                   
+                    $('.submit-cls').attr('disabled', false);
+                    chkextension=0
+
+                }
+                else{
+                    
+                    swal.fire("Please Provide a Proper Image Format")
+                    $(this).val('')
+                    $('.submit-cls').attr('disabled', 'disabled');
+                }
+        }
+        var file = this.files[0];
+       if (file) {
+      var fileSize = file.size; // Get the file size in bytes
+      var maxSizeInBytes = 2000000; // Specify the maximum file size in bytes (e.g., 1MB)
+
+      if (fileSize > maxSizeInBytes) {
+        swal.fire("Please Provide a Image Size Within 2MB")
+        $(this).val('')
+      }
+    }
+    reaSignURL(this);
+  });
+
+
+  let canvacount = 0;
+$('.canva').click(function(){
+    canvacount++;
+    $('.sign_type').val('signature')
+})
+
+let signaturecount = 0;
+let editsignaturecount = 0;
+$('#save-signature').click(function
+(){
+    $('.sign_type').val('signature')
+    signaturecount =1
+   
+    if( canvacount == 0 ){
+       $('.invoicenumspn').html("<p>Draw your sign</p>")
+       
+        return false
+    }
+    else{
+        
+      $('#save-signature').attr('disabled',false) 
+    }
+})
+
+$('#edit-signature').click(function(){
+    // canvacount=0
+    signaturecount = 0
+    editsignaturecount = 1
+   $('.invoicenumspn').html("")
+    })
+    $('.canva').click(function(){
+        editsignaturecount = 1
+    })
+$('#clear-signature').click(function(){
+    canvacount = 0
+    $('.sign_draw').val('')
+})
+
+$('.submit-cls').click(function(){
+//    alert($('.sign_type').val())
+//    if($('.sign_type').val() == 'None'){
+//     $('.fontfamily').val(1)
+//    }
+if($('.inputfield').val() == '' && $('.sign_draw').val() == '' && $('#signfile_id').val() == ''){
+       
+       $('.signaturewrg').html("<p class='ptag'>Please Select Signature</p>")
+       return false
+   }
+   else{
+      $('.signaturewrg').html("")
+   }
+   if($('.sign_type').val() == 'signature')
+   {
+//    alert(editsignaturecount)
+//    alert(signaturecount)
+//    alert(canvacount) 
+    if(editsignaturecount == 1){
+    if(signaturecount == 0 || canvacount == 0)
+      {
+        $('.invoicenumspn').html("<p>Save Your Signature</p>")
+        // alert('1')
+        return false
+    }
+    else{
+        $('.invoicenumspn').html("")
+        $('.submit-cls').attr('disabled',false)
+    }
+}
+    }
+})
+
+</script>
+
+{% endblock %}

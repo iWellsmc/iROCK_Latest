@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/user_Management/userroles.css' %}">
+<div class="row">
+    <!-- <div class="col-3">
+        <button type="button" class="btn btn-clr btn-master chck-tst mr-0"><a href="{% url 'InvoiceGuard:list-rolesandrights-form' %}">Back</a></button>
+    </div> -->
+    <div class="col-12 text-end">
+        <a class="btn btn-clr btn-master chck-tst mr-0" href="{% url 'InvoiceGuard:list-rolesandrights-form' %}">Back</a>
+    </div>
+</div>
+<section class="usesr-management-Edit-section">
+<div>
+    
+
+    <h3 class="from-head">Edit Roles and Rights</h3>
+   
+    <div class="row d-flex justify-content-center">
+       
+
+        <div class="col-6">
+        <div class="invite-cards">
+            <form  class="form-txt" id="addtaxformid" method="POST">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-12">
+                        <div>
+                            <div class="mt-2"></div>
+                            <label class="vend-appor-hd mb-3">Module<span class="star-clr">*</span></label>
+                            <select name="module_id" id="taxtype" class="form-control taxtypecls" disabled="true">
+                                <option value="{{role.module.id}}">{{role.module}}</option>
+                            </select>
+
+                            <div class="mt-4">
+                                <label class="vend-appor-hd mb-3">Role<span class="star-clr">*</span></label>
+                                <input type="text" autocomplete="off" name="role_name" id="taxnameid0" class="form-control taxnamecls " value="{{role.role_name}}" placeholder="Tax/Levy Name">
+                               
+                            </div>
+                        </div>
+
+                       
+                            
+                    </div>  
+                 
+                </div>
+                <div class="text-center phase-vendor mt-4" id="btn">
+                    <button type="submit" class="final-cls btn btn-clr text-right">Edit Rights</button>
+                </div>
+
+            </form>
+        </div>
+        </div>
+
+        
+
+    </div>
+
+</div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>  var csrf_token = '{{csrf_token}}';</script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script type="text/javascript" src="{% static 'js/invoiceguard/edit_role.js' %}"></script>
+<script>
+// var global=$('.taxnamecls').val();
+// $(document).ready(function(){
+
+//     $('#addtaxformid').validate();
+//     $("[name=taxname]").rules("add", {
+//         required: true,
+//         });   
+// });
+
+// //$(document).on('keyup','.taxnamecls',function(){
+//     var ajaxData = false;
+//     $(".taxnamecls").focusout(function(){
+//         var val=$(this).val()
+//         if (global != val){
+//             $('.waring-err').remove()
+//             var currentelement=$(this)
+//             $.ajax({
+//                 type: "POST",
+//                 headers: { "X-CSRFToken": "{{ csrf_token }}"},
+//                 url: "{% url 'InvoiceGuard:validate-role-form' %}",
+//                 async:false,
+//                 data: {'role_name':$.trim(val),'role_id':'{{role.id}}'},
+//                 success: function(data){
+//                     console.log({'checktaxname':data})
+//                     if (data.status){
+//                         ajaxData = true;
+//                         currentelement.after('<span class="waring-err">Role Already Exists</span>')
+//                         $('.final-cls').prop('disabled',true)
+//                     }
+//                     else{
+//                         ajaxData = false;
+//                         $('.final-cls').prop('disabled',false)
+//                     }
+//                 }
+//             });
+//         }
+//         else{
+//             $('.waring-err').remove()
+//             ajaxData = false;
+//             $('.final-cls').prop('disabled',false)
+//         }
+//     })
+//     $('.taxnamecls').keyup(function() {
+//         var $th = $(this);
+//         $th.val($th.val().replace(/(\s{2,})/g, ' '));
+//         $th.val($th.val().replace(/^\s*/, ''));
+//         });
+
+// $('.final-cls').click(function(e){
+//     console.log({'ajaxData':ajaxData})
+//     if (ajaxData){
+// e.preventDefault();
+// }
+// })
+
+</script>
+
+{% endblock %}

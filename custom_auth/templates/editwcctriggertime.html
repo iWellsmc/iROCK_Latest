@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_process/company-setting.css' %}">
+<div>
+  <div class="row">
+    <div class="col-12 text-end">
+        <button type="button" class="btn btn-clr"><a href="{% url 'custom_auth:Wcctriggertime' companyid=request.user.company.id %}">Back</a></button>
+    </div>
+    </div>
+
+  <h4 class="from-head">WCC Approval Terms</h4>
+  <div class="save_button text-end">
+    <!-- <button id="mainsave" class='btn btn-clr add-btn pha-sebtn addbtn mr-0' type="submit">Add</button>  -->
+  </div>
+  <div class="row justify-content-end">
+
+    <div class="col-12">
+      <form method="POST" class="editwcctriggertime_form">
+        {% csrf_token %}
+      <table class="table settings-data-list-view data-list-view irock-table with_invoice invoice_trigger">
+        <thead>
+          <tr>
+            
+            <th class="wid-iin">Work Completion Certificate Approval</th>
+            <th class="wid-iin" id="text-initial">Time allowed per Station (Minutes/Hours/Days)</th>
+            <th id="text-initial">Time allowed per Station</th>
+          </tr>
+        </thead>
+     
+        
+        <tbody class="table-list-invoice">
+          <input type="hidden" id="wcc_check" value="{{wcc_completion_data}}">
+          {% for i in masterinvoicetrigger %}
+          <tr>
+           
+            <input type="hidden" name="pk" class="form-control" value="{{i.id}}" >
+           <td>All Work Completion Certificates</td>
+           <td>
+              <select name="time_unit" class="form-control form-select time_unit">
+                {% for format in time_format %}
+                  <option value="{{format.key}}" {% if i.time_unit == format.key %}selected{% endif %}>{{format.value}}</option>
+                {% endfor%}
+              </select>
+              <!-- <input type="text" readonly class="form-control"value="{% if i.time_unit == 1 %} Days{%else%}Hours {% endif %}"> -->
+              <!-- <input type="hidden" name="time_unit"value="{% if i.time_unit == 1 %}1{%else%}0{% endif %}"> -->
+           </td>
+           <td><input type="text" name="time_allotted" class="form-control time_allotted" value="{{i.time_allotted}}"></td>
+           
+          </tr>
+         
+            {% endfor %}
+        </tbody>
+      </table>
+      <div class="save_button text-center">
+        <button id="mainsave" class='btn btn-clr add-btn pha-sebtn mainsave' type="submit">Submit</button> 
+      </div>
+    </form>
+    </div>
+  </div>
+
+  </div>
+</div>
+{% endblock%}
+
+{% block scripts %}
+{{ block.super }}
+<script type="text/javascript" src="{%static 'js/custom_auth/editwcctriggertime.js'%}"></script>
+<script>
+
+</script>
+
+{%endblock%}

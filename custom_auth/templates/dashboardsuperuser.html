@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% load tz %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/dashboard/vendordashboard.css' %}">
+<div class="row">
+    <div>
+      <h5 class="from-head" style="text-transform:capitalize; text-align: left;">Welcome {{request.user.name|default_if_none:"---"}} {{request.user.lastname|default_if_none:"---"}},</h5>
+    </div>
+    <div>
+        <h4>Your last login : <span class="local_time" login_date="{{request.user.login_date}}"></span></h4>
+    </div> 
+   
+</div>
+<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#enquiries_registered_companies" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Enquiries and Registered Companies</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#licenses" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Licenses</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#payments" type="button" role="tab" aria-controls="pills-contact" aria-selected="false">Payments</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#manage_user" type="button" role="tab" aria-controls="pills-contact" aria-selected="false">Manage Users</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#bug_service_tickets" type="button" role="tab" aria-controls="pills-contact" aria-selected="false">Bug Fixes and Service Tickets</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#new_versions_upgrade" type="button" role="tab" aria-controls="pills-contact" aria-selected="false">New Versions and Upgrades</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#countrywise_overview" type="button" role="tab" aria-controls="pills-contact" aria-selected="false">Country-Wise Overview</button>
+    </li>
+</ul>
+<div class="tab-content" id="pills-tabContent">
+<div class="tab-pane fade show active" id="enquiries_registered_companies" role="tabpanel" aria-labelledby="enquiries_registered_companies-tab">
+  
+
+</div>
+<div class="tab-pane fade" id="licenses" role="tabpanel" aria-labelledby="licenses-tab">
+   
+</div>
+<div class="tab-pane fade" id="payments" role="tabpanel" aria-labelledby="payments-tab">
+    
+</div>
+<div class="tab-pane fade" id="manage_user" role="tabpanel" aria-labelledby="manage_user-tab">
+
+
+</div>
+<div class="tab-pane fade" id="bug_service_tickets" role="tabpanel" aria-labelledby="bug_service_tickets-tab">
+
+
+</div>
+<div class="tab-pane fade" id="new_versions_upgrade" role="tabpanel" aria-labelledby="new_versions_upgrade-tab">
+
+</div>
+<div class="tab-pane fade" id="countrywise_overview" role="tabpanel" aria-labelledby="countrywise_overview-tab">
+    <div class="card country_wise_projects_card">
+        <div class="card_body">
+            <div id="country_wise_projects"  class="country_wise_projects_div"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/common/commondate.js' %}"></script>
+<script src="{% static 'js/dashboard/poadashboard.js' %}"></script>
+
+{% endblock %}
+
+

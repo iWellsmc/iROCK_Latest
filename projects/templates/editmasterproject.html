@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/projectmaster.css' %}">
+<div class="row">
+    <div class="col-12 text-end">
+        <button class="btn btn-clr chck-tst waves-effect waves-float waves-light"><a
+                href="{% url 'projects:listmaster'%}">Back</a></button>
+    </div>
+</div>
+<div class="row">
+
+    <h3 class="from-head">Edit Project Master</h3>
+
+    <div class="row d-flex justify-content-center">
+        <div class="col-6 col-lg-6 col-md-9">
+            <div class="invite-cards">
+
+                <form method="POST" class="form-txt" id="edit-masterproject">
+                    {% csrf_token %}
+                    <div class="col step-1">
+
+                        <div class="mid-edit-mass ">
+                            <div class="col-sm-12">
+                                <label for="staticEmail" class="col-5 col-form-label p-0 mb-2">Country</label>
+                                <input type="text" id="country" name="country" class="form-control"
+                                    value="{{project.country.nicename}}" readonly><br>
+                                {% comment %} <select name="country" id="id_country">
+                                    {% for country in countries %}
+                                    <option value="{{country.id}}" {% if country.id==project.country.id
+                                        %}selected{%endif%}>{{country.name}}</option>
+                                    {% endfor %}
+                                </select> {% endcomment %}
+                            </div>
+                            <div class="col-sm-12 col-form-label">
+                                <label for="staticEmail" class="col-5 col-form-label p-0 mb-2">Project Name</label>
+                                <input type="hidden" id="project_id" name="project_id" value={{project.id}}>
+                                <input type="text" name="name" maxlength="255" class="form-control"
+                                    value="{{project.name}}" id="id_name" readonly>
+                            </div>
+                            <div class="text-center spacing-button">
+                                <button type="button" class="btn btn-clr text-center submit-cls"
+                                    data-id="1">Exit</button>
+                                <button type="button" class="btn btn-clr text-center next-btn" data-id="1">Next</button>
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+    var project_id = "{{project.id}}"
+    $('.submit-cls').click(function () {
+        /* var form=$("#edit-masterproject");
+         $.ajax({
+             type:"POST",
+             container:"#edit-masterproject",
+             url:'/projects/editmasterproject/'+project_id,
+             data:form.serialize(),
+             success: function(data){   
+             }
+         })*/
+        var url = "{% url 'projects:listmaster'%}";
+        document.location.href = url;
+    })
+
+    $('.next-btn').click(function () {
+        var url = "{% url 'projects:editmasterblock' 123 %}";
+        document.location.href = url.replace('123', project_id);
+    })
+</script>
+{% endblock %}

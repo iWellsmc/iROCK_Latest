@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+{% load widget_tweaks %}
+<section>
+          <div class="card1">
+            
+            <div class="row">
+              
+            <div class="col-12">
+              <h4 class="card-title card-head">Project Overview</h4>
+            </div>
+            <div class="col-9"></div>
+            <div class="col-3">
+            <button type="button" class="btn btn-clr b-btn"><a href="{% url 'projects:projectlist' %}">Back</a></button>
+            </div>
+            </div>
+            <div class="card-body project-over">
+                <table class="table col view-table">
+                    <tr><th>Company Name</th><td colspan="5">{{project.company.company_name}}</td></tr>
+                    <tr><th>Entity Name</th><td colspan="5">{{project.entity}}</td></tr>
+                    <tr><th>Project Name</th><td colspan="5">{{project.name}}</td></tr>
+                    <tr><th>Country</th><td colspan="5">{{project.country}}</td></tr>
+                    <tr><th>Block Name</th><td colspan="5">{{project.block_name}}</td></tr>
+                    <tr><th>Field Name</th><td colspan="5">{{project.field_name}}</td></tr>
+                    <tr><th>Project Environment</th><td colspan="5">{{project.project_environment}}-{{project.project_environment_subtype}}</td></tr>
+                    <tr><th>Project Discipline</th><td>{{project.project_discipline}}{% for subtype in projects_subtype %}<li>{{subtype.discipline_subtype.name}}</li>{%endfor%}</td></tr>
+              </tr>
+                </table>
+        </div>
+      </div>
+    </section>
+
+{% endblock %}

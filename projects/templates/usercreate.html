@@ -1,0 +1,671 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/user_Management/users.css' %}">
+<div>
+    <div class="row">
+        <!-- <div class="col-3">
+            <button type="button" class="btn btn-clr btn-master"><a href="{% url 'projects:userlist' %}">Back</a></button>
+        </div> -->
+        <div class="col-12 text-end">
+            <a class="btn btn-clr" href="{% url 'projects:userlist' %}">Back</a>
+        </div>
+    </div>
+
+    <h3 class="from-head">Create User</h3>
+    <form  class="form-txt" id="usercreateid" method="POST">
+        {% csrf_token %}
+        {% for hidden in form.hidden_fields %}
+            {{hidden}}
+        {% endfor %}
+        
+
+<div class="row mb-4">
+    <div class="col-md-7">
+        <div class="row">
+    <div class="col-md-4">
+        <label for="staticEmail" class="col-form-label new-clr-tlt">Title<span class="star-clr">*</span></label>
+                        <select name="title" class="form-control form-select">
+                            <option value='' selected>---Select---</opiton>
+                            <option value='Mr'>Mr</opiton>
+                            <option value='Mrs'>Mrs</opiton>
+                            <option value='Ms'>Ms</opiton>
+                        </select>
+    </div>
+    <div class="col-md-8">
+        <label for="staticEmail" class="col-form-label new-clr-tlt">{{ form.name.label }}<span class="star-clr">*</span></label>
+        {% render_field form.name class="form-control" %}
+    </div>
+</div>
+</div>
+    <div class="col-md-5">
+        <label for="staticEmail" class="col-form-label new-clr-tlt">{{ form.lastname.label }}<span class="star-clr">*</span></label>
+                {% render_field form.lastname class="form-control" %}
+    </div>
+</div>
+
+<div class="row mb-4">
+    
+    <div class="col-md-7">
+        <div class="row">
+        <div class="col-md-6">
+            <label for="staticEmail" class="col-form-label new-clr-tlt">{{ form.email.label }}<span class="star-clr" id="email-error">*</span></label>
+            {% render_field form.email class="form-control" %}
+            <span id="email-error-span" class="waring-err"></span>
+        </div>
+        <div class="col-md-6">
+            <label for="staticEmail" class="col-form-label new-clr-tlt">{{ form.designation_role.label }}<span class="star-clr">*</span></label>
+                {% render_field form.designation_role class="form-control" %}
+        </div>
+    </div>
+</div>
+
+<div class="col-md-5">
+    <div class="row">
+        <div class="col-md-6">
+            <label for="staticEmail" class="col-form-label new-clr-tlt">User Department<span class="star-clr" id="userdepartment-error">*</span></label>
+            <select name="user_department" class="form-control form-select">
+                <option value='' selected>---Select---</opiton>
+                    {% for departments in user_department%}
+                    <option value="{{departments.id}}">{{departments.department}}</option> 
+                    {% endfor %}
+            </select>
+            <span id="userdepartment-error-span" class="waring-err"></span>
+        </div>
+        <div class="col-md-6">
+
+            <label for="staticEmail" class="col-form-label new-clr-tlt">User Group<span class="star-clr" id="usergroup-error">*</span></label>
+            <select name="user_group" class="form-control form-select">
+                <option value='' selected>---Select---</opiton>
+                    {% for group in user_group%}
+                    <option value="{{group.id}}">{{group.group}}</option> 
+                    {% endfor %}
+            </select>
+            <span id="usergroup-error-span" class="waring-err"></span>
+
+        </div>
+    </div> 
+</div>
+</div>
+
+
+<div class="row mb-4">
+    <div class="col-lg-7 col-md-12">
+        <div class="row">
+            <div class="col-md-2">
+                <label for="staticEmail" class="col-form-label new-clr-tlt .user_phn_cls {
+                }">{{form.phone_countrycode.label}}<span class="star-clr"></span></label>
+                {% comment %} {% render_field form.phone_countrycode class="form-control" %} {% endcomment %}
+                <select name="phone_countrycode" placeholder="Country Code" class="form-control form-select respo-input response-input mar-top-none">
+                    <option  value="" selected="selected">---Select---</option>
+                    {% for code in phone%}
+                    <option value="{{code.id}}">{{code.iso}} {{code.phonecode}}</option> 
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="staticEmail" class="col-form-label area-cd-wd new-clr-tlt">{{form.areacode.label}}<span class="star-clr"></span></label>
+                {% render_field form.areacode class="form-control" %}
+            </div>
+            <div class="col-md-4">
+                <label for="staticEmail" class="col-form-label new-clr-tlt">{{ form.phone.label }}<span class="star-clr"></span></label>
+                {% render_field form.phone class="form-control input-land-line" %}
+            </div>
+            <div class="col-md-4">
+                <label for="staticEmail" class="col-form-label new-clr-tlt">{{ form.phone_number_extenstion.label }}<span class="star-clr"></span></label>
+                {% render_field form.phone_number_extenstion class="form-control pho-input respo-input response-input" %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5 col-md-8">
+        <div class="row">
+        <div class="col-md-6">
+            <label for="staticEmail" class="col-form-label new-clr-tlt width-code-size">{{form.mobile_countrycode.label}}<span class="star-clr">*</span></label>
+            {% comment %} {% render_field form.mobile_countrycode class="form-control" %} {% endcomment %}
+            <select name="mobile_countrycode" placeholder="Country Code" class="form-control form-select respo-input country-code-input">
+                <option  value="" selected="selected">---Select---</option>
+                {% for code in phone%}
+                <option value="{{code.id}}">{{code.iso}} {{code.phonecode}}</option> 
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label for="staticEmail" class="col-form-label new-clr-tlt width-code-size-mb">{{ form.mobile.label }}<span class="star-clr">*</span></label>
+            {% render_field form.mobile class="form-control" %}
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="row">
+   <div class="col-md-7">
+    <label for="staticEmail" class="col-form-label new-clr-tlt">Password<span class="star-clr">*</span></label>
+    <div class="eye-icon-usse">
+
+        <input type="password" name="password" id="id_password" class="form-control user-cret-pass ff-pass">
+
+    
+    <span id="toggle_pwd" class="fa fa-fw fa-eye field_icon eye-iicon-useredit"></span>
+   </div>
+</div>
+   <div class="col-md-5">
+    {% comment %} <label for="staticEmail" class="col-form-label new-clr-tlt">Confirm Password:</label>
+    <div class="sign-eye-icon-user">
+        <input type="password" class="form-control" name="password2" id="password2" placeholder="Confirm password">
+        <span id="toggle_pwd2" class="fa fa-fw fa-eye field_icon eye-iicon2-user"></span>
+    </div> {% endcomment %}
+   </div>
+</div>
+
+
+<!-- 
+
+        <div class="row">
+            <div class="col-6">
+                <div class="row creat-user-bottom">
+                    <div class="col-3">
+                        <label for="staticEmail" class="col-form-label new-clr-tlt">Title<span class="star-clr">*</span></label>
+                        <select name="title" class="form-control">
+                            <option value='' selected>-Select-</opiton>
+                            <option value='Mr'>Mr</opiton>
+                            <option value='Mrs'>Mrs</opiton>
+                            <option value='Ms'>Ms</opiton>
+                        </select>
+                    </div>
+                    <div class="col-9">
+                        <label for="staticEmail" class="col-form-label new-clr-tlt">{{ form.name.label }}<span class="star-clr">*</span></label>
+                        {% render_field form.name class="form-control" %}
+                    </div>
+                </div> -->
+
+
+                <!-- <div class="creat-user-bottom">
+                <label for="staticEmail" class="col-form-label new-clr-tlt">{{ form.email.label }}<span class="star-clr" id="email-error">*</span></label>
+                {% render_field form.email class="form-control" %}
+
+                <span id="email-error-span" class="waring-err"></span> -->
+
+
+
+
+
+<!-- 
+                    <label for="staticEmail" class="col-form-label new-clr-tlt">User Department<span class="star-clr" id="userdepartment-error">*</span></label>
+                    <select name="userdepartment" class="form-control">
+                        <option value='' selected>-Select-</opiton>
+                            {% for department in departments%}
+                            <option value="{{department.id}}">{{department.department}}</option> 
+                            {% endfor %}
+                    </select>
+                    <span id="userdepartment-error-span" class="waring-err"></span>
+
+
+                    <label for="staticEmail" class="col-form-label new-clr-tlt">User Group<span class="star-clr" id="userdepartment-error">*</span></label>
+                    <select name="userdepartment" class="form-control">
+                        <option value='' selected>-Select-</opiton>
+                            {% for group in user_group%}
+                            <option value="{{group.id}}">{{group.group}}</option> 
+                            {% endfor %}
+                    </select>
+                    <span id="userdepartment-error-span" class="waring-err"></span> -->
+
+
+                
+                    <!-- <div class="col-2">
+                        <label for="staticEmail" class="col-form-label new-clr-tlt .user_phn_cls {
+                            width: 1px;
+                        }">{{form.phone_countrycode.label}}<span class="star-clr"></span></label>
+                        {% comment %} {% render_field form.phone_countrycode class="form-control" %} {% endcomment %}
+                        <select name="phone_countrycode" placeholder="Country Code" class="form-control">
+                            <option  value="" selected="selected">---Select---</option>
+                            {% for code in phone%}
+                            <option value="{{code.id}}">{{code.iso}} {{code.phonecode}}</option> 
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-2">
+                        <label for="staticEmail" class="col-form-label area-cd-wd new-clr-tlt">{{form.areacode.label}}<span class="star-clr"></span></label>
+                        {% render_field form.areacode class="form-control" %}
+                    </div> -->
+
+                    <!-- <div class="col-4">
+                        <label for="staticEmail" class="col-form-label new-clr-tlt">{{ form.phone.label }}<span class="star-clr"></span></label>
+                        {% render_field form.phone class="form-control" %}
+                    </div>
+                    <div class="col-4">
+                        <label for="staticEmail" class="col-form-label new-clr-tlt">{{ form.phone_number_extenstion.label }}<span class="star-clr"></span></label>
+                        {% render_field form.phone_number_extenstion class="form-control response-input" %}
+                    </div>
+                </div> -->
+
+
+<!-- 
+               <div class="creat-user-bottom">
+                <label for="staticEmail" class="col-form-label new-clr-tlt">Password<span class="star-clr">*</span></label>
+                <div class="eye-icon-usse">
+
+                    <input type="password" name="password" id="id_password" class="form-control">
+
+                
+                <span id="toggle_pwd" class="fa fa-fw fa-eye field_icon eye-iicon-useredit"></span>
+                </div>
+                </div>
+            </div> -->
+
+
+            <!-- <div class="col-6">
+                <div class="creat-user-bottom">
+                <label for="staticEmail" class="col-form-label new-clr-tlt">{{ form.lastname.label }}<span class="star-clr">*</span></label>
+                {% render_field form.lastname class="form-control" %}
+                </div>
+                <div class="creat-user-bottom">
+                <label for="staticEmail" class="col-form-label new-clr-tlt">{{ form.designation_role.label }}<span class="star-clr">*</span></label>
+                {% render_field form.designation_role class="form-control" %}
+                 </div> -->
+
+<!--                  
+                <div class="row creat-user-bottom">
+                    <div class="col-5">
+                        <label for="staticEmail" class="col-form-label new-clr-tlt width-code-size">{{form.mobile_countrycode.label}}<span class="star-clr">*</span></label>
+                        {% comment %} {% render_field form.mobile_countrycode class="form-control" %} {% endcomment %}
+                        <select name="mobile_countrycode" placeholder="Country Code" class="form-control">
+                            <option  value="" selected="selected">---Select---</option>
+                            {% for code in phone%}
+                            <option value="{{code.id}}">{{code.iso}} {{code.phonecode}}</option> 
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-7">
+                        <label for="staticEmail" class="col-form-label new-clr-tlt width-code-size-mb">{{ form.mobile.label }}<span class="star-clr">*</span></label>
+                        {% render_field form.mobile class="form-control" %}
+                    </div>
+                </div>
+                {% comment %} <label for="staticEmail" class="col-form-label new-clr-tlt">Confirm Password:</label>
+                <div class="sign-eye-icon-user">
+                    <input type="password" class="form-control" name="password2" id="password2" placeholder="Confirm password">
+                    <span id="toggle_pwd2" class="fa fa-fw fa-eye field_icon eye-iicon2-user"></span>
+                </div> {% endcomment %}
+            </div>
+        </div> -->
+
+        <div class="text-center spacing-button pt-3">
+            <button type="submit" class="btn btn-clr text-center submit-cls" data-id="1">Create</button>
+        </div>
+
+    </form>
+</div>
+{% endblock%}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script>
+    var general_setting="{{general_setting}}"
+    var id="{{company_id}}"
+    if (general_setting == '0'){
+        swal.fire({
+            text: "Kindly Update General Settings Before Creating the User",
+            type: "success"
+            }).then(function() {
+                window.location.href='../generalsetting/'+id+'/'
+                // window.location.href='../generalsetting/'+id+'/'
+            });
+    }
+    $('#id_password').val('Hello@123')
+    $('#id_password').prop("readonly", true);
+    
+    $(document).on('change','#id_email',function(){
+        //alert('1')
+        var val=$(this).val();
+        $.ajax({
+            type:"GET",
+            url:'/projects/checkcompanyuseremailexists',
+            data:{'email':val},
+            success: function(data){
+                console.log(data)
+                if (data.data == 'exists'){
+                 
+                    swal.fire('Email Already Exists')
+                    $('.submit-cls').attr('disabled', true);
+                    // $('#email-error-span').text('Please Enter New Email-ID')
+
+                }
+                else{
+                    $('.submit-cls').attr('disabled', false);
+                    $('#email-error-span').empty()
+                }
+            }
+        })
+    })
+
+
+
+    $(function () {
+        $("#toggle_pwd").click(function () {
+            $(this).toggleClass("fa-eye fa-eye-slash");
+           var type = $(this).hasClass("fa-eye-slash") ? "text" : "password";
+            $("#id_password").attr("type", type);
+        });
+    });
+    $(function () {
+        $("#toggle_pwd2").click(function () {
+            $(this).toggleClass("fa-eye fa-eye-slash");
+           var type = $(this).hasClass("fa-eye-slash") ? "text" : "password";
+            $("#password2").attr("type", type);
+        });
+    });
+    $.validator.addMethod(
+        "regex",
+        function(value, element, regexp) {
+            return this.optional(element) || regexp.test(value);
+        },
+    )
+
+
+    $('#id_name').keyup(function() {
+            var $th = $(this);
+            $th.val($th.val().replace(/\d+/g, ''))
+            $th.val($th.val().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ''));
+            // $th.val($th.val().replace(/^\s*/, ''));
+            remove_dot = $th.val().replace(/\.{2,}/g, '.');
+            $(this).val(remove_dot)
+            });
+
+
+    $('#id_lastname').keyup(function() {
+            var $th = $(this);
+            $th.val($th.val().replace(/\d+/g, ''))
+            $th.val($th.val().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ''));
+            // $th.val($th.val().replace(/^\s*/, ''));
+            remove_dot = $th.val().replace(/\.{2,}/g, '.');
+            $(this).val(remove_dot)
+            });
+
+$(document).on('keyup','#id_areacode',function(){
+let value=$(this).val();
+var text = value.replace(/(\s{2,})|[^0-9\.'']/g, '');
+$('#id_areacode').val(text);
+})
+
+
+
+$.validator.addMethod("valid_contactno", function(value, element) {
+
+            var number= $('#id_phone').val();
+            if(number!='')
+            {
+                var text = value.replace(/[^0-9\s]/g,'');
+            $('#id_phone').val(text);
+            return true;
+            }
+            else 
+            {
+                return false;
+            }
+
+            });
+                    
+
+$(document).on('keyup','#id_phone',function(){
+    let value=$(this).val();
+    var text = value.replace(/(\s{2,})|[^0-9\.'']/g, '');
+$('#id_phone').val(text);
+
+
+//     if (/\D/g.test(this.value))
+//   {
+//     this.value = this.value.replace(/\D\s/g, ' ');
+//     this.value = this.value.replace(/(\s{2,})']/g, ' ')
+//     // this.value = (this.value().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+//   }
+})
+
+
+
+$.validator.addMethod("valid_extenstion", function(value, element) {
+
+var number= $('#id_phone_number_extenstion').val();
+if(number!='')
+{
+    var text = value.replace(/[^0-9\s]/g,'');
+$('#id_phone_number_extenstion').val(text);
+return true;
+}
+else 
+{
+    return false;
+}
+
+});
+        
+
+
+$(document).on('keyup','#id_phone_number_extenstion',function(){
+    let value=$(this).val();
+    var text = value.replace(/(\s{2,})|[^0-9\.'']/g, '');
+$('#id_phone_number_extenstion').val(text);
+
+// if (/\D/g.test(this.value))
+// {
+// this.value = this.value.replace(/\D\s/g, ' ');
+// this.value = this.value.replace(/(\s{2,})']/g, ' ')
+// // this.value = (this.value().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+// }
+})
+
+
+$.validator.addMethod("valid_mobile", function(value, element) {
+
+var number= $('#id_mobile').val();
+if(number!='')
+{
+    var text = value.replace(/[^0-9\s]/g,'');
+$('#id_mobile').val(text);
+return true;
+}
+else 
+{
+    return false;
+}
+
+});
+        
+
+$(document).on('keyup','#id_mobile',function(){
+    let value=$(this).val();
+    var text = value.replace(/(\s{2,})|[^0-9\.'']/g, '');
+$('#id_mobile').val(text);
+
+// if (/\D/g.test(this.value))
+// {
+// this.value = this.value.replace(/\D\s/g, ' ');
+// this.value = this.value.replace(/(\s{2,})']/g, ' ')
+// // this.value = (this.value().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+// }
+})
+
+    //    $('#id_designation_role').keyup(function() {
+    //         var $th = $(this);
+    //         $th.val($th.val().replace(/\d+/g, ''))
+    //         $th.val($th.val().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+    //         // $th.val($th.val().replace(/^\s*/, ''));
+    //         remove_dot = $th.val().replace(/\.{2,}/g, '.');
+    //         $(this).val(remove_dot)
+    //         });
+
+
+$(document).on('keyup','#id_email',function(){
+    // alert('2')
+var inputvalue = $('input[name="email"]').val();
+
+inputvalue = inputvalue.trim();
+
+$('input[name="email"]').val(inputvalue);
+})
+
+    $("#usercreateid").validate({
+        rules: {
+            title:{
+                required:true,
+            },
+            lastname:{
+                required:true,
+            },
+            designation_role:{
+                required:true,
+                // regex:/^[a-zA-Z]+$/,
+            },
+            email: {
+                required: true,
+                email: true,
+                regex:/^\b[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b$/i,
+            },
+            password: {
+              required:true,
+              minlength: 8,
+              regex:/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+,.\\\/;':"-]).{8,}$/
+            },
+            password2: {
+                required: true,
+                equalTo: "#id_password",
+            },
+            name:{
+                required:true,
+                // regex:/^[a-zA-Z ]+$/,
+            },
+            lastname:{
+                required:true,
+                // regex:/^[a-zA-Z ]+$/,
+            },
+            phone_countrycode:{
+                // required:true,
+              
+            },
+            // areacode:{
+            //     // required:true,
+            //     regex:/^[0-9 ]+$/,
+            // },
+            phone:{
+                // required:true,
+                minlength:5,
+                maxlength:20,
+                // valid_contactno:true,
+                // regex:/^[0-9 ]+$/,
+            },
+            phone_number_extenstion:{
+                // required:true,
+                minlength:4,
+                maxlength:10,
+                // valid_extenstion:true,
+                // regex:/^[0-9]+$/,
+            },
+            mobile_countrycode:{
+                required:true,
+                regex:/^[0-9]+$/,
+            },
+            mobile:{
+                required:true,
+                minlength:5,
+                maxlength:20,
+                valid_mobile:true,
+
+                // regex:/^[0-9]+$/,
+            },
+
+            user_department:{
+                required:true,
+            },
+            user_group:{
+                required:true,
+            },
+        },
+        messages: {
+            title:{
+                required:"Please Provide a Title",
+            },
+            name:{
+                required:"Please Provide a First Name",
+                // regex:"Accept Only Alphabets",
+            },
+            lastname:{
+                required:"Please Provide a Last Name",
+                // regex:"Accept Only Alphabets",
+            },
+            email:{
+              required:"Please Provide a Email ID",
+              email: "Please Provide a Valid Email ID",
+              regex:"Please Provide a Valid Email ID",
+            },
+            password: {
+              required: "Please Provide a Password",
+              minlength: "Please Enter Atleast 8 Characters",
+              regex: "Password Should Have Minimum 8 Letters Consisting Atleast One From A-Z, a-z, 0-9 and Special Characters",
+    
+            },
+            password2: {
+                required: "Confirm Password Required",
+                equalTo: "Password Mismatch",
+            },
+            phone_countrycode:{
+                // required:"Please Select Country Code",
+              
+            },
+            designation_role : {
+                required : "Please Provide a Designation",
+                // regex:"Accept Only Alphabets",
+
+            },
+            // areacode:{
+            //     required:"Please Enter Area Code",
+            //     regex :"Accept only Numbers",
+            // },
+            phone:{
+                // required:"Please Enter Landline Number",
+                // valid_contactno:"Accept Only Numbers",
+                minlength:"Enter minimum 5 Numbers",
+                maxlength:"Allows Only 20 Numbers",
+
+            },
+            phone_number_extenstion:{
+                // required:"Please Enter Landline Extenstion",
+                // regex :"Accept Only Numbers",
+                minlength:"Enter minimum 4 Numbers",
+                maxlength:"Allows Only 10 Numbers"
+
+            },
+            mobile_countrycode:{
+                required:"Please Select Country Code",
+                regex :"Accept only Numbers",
+
+            },
+            mobile:{
+                required:"Please Enter Mobile Number",
+                valid_mobile:"Accept Only Numbers",
+                minlength:"Enter minimum 5 Numbers",
+                maxlength:"Allows Only 20 Numbers",
+
+
+
+            },
+            user_department:{
+                required:"Please Select Department",
+            },
+            user_group:{
+                required:"Please Select Group",
+            },
+            errorElement : 'span',
+            },
+        submitHandler: function(form) {
+            form.submit();
+            $('.submit-cls').attr('disabled','disabled');
+        },
+    })
+
+</script>
+
+{%endblock%}

@@ -1,0 +1,123 @@
+
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_tags %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/projects/createflow.css' %}">
+
+<head>
+
+</head>
+<div class="table-bck invoice-appo-work top-btn-arrow">
+    <div class="row">
+        <div class="col-12 text-end">
+            <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'projects:projectinvoiceflow' %}">Back</a></button>
+        </div>
+    </div>
+    <h3 class="from-head">Invoice Approval Workflow</h3>
+    
+    <form autocomplete="off" method="post" novalidate class="form-txt">
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-9 col-lg-6 p-0">
+            <div class="invite-cards-invoice">
+            {% csrf_token %}
+            {% comment %} <input type="hidden" name="csrf_name" value="{% csrf_token %}"> {% endcomment %}
+            <!-- <p>Project {{project.projectname.name}}</p> -->
+            <table class="wcc-name">
+                <tr>
+                    <td class="pl-0">Project</td>
+                    <td>:</td>
+                    <td>{{project.projectname.name}}</td>
+                </tr>
+            </table>
+            <!-- <div class="row"> -->
+                <!-- <div class="col-3">
+                    <label for="staticEmail" class="col-form-label">Flow Name</label><br>
+                    <select name="flow_id" class="form-control input-sizze sel-cls">
+                    <option value="">---Select Flow---</option>
+                    {% for flow in flows%}
+                        <option value="{{flow.id}}" {% if flow.id == project.flow_id %}selected{% endif %}>{{flow.flow_name}}</option>
+                    {% endfor %}
+                </select>
+                </div> -->
+
+                <table class="wcc-flow">
+                    <tr>
+                        <td class="pl-0">Flow Name</td>
+                        <td>:</td>
+                        <td>
+                            <select name="flow_id" class="form-control input-sizze sel-cls">
+                                <option value="">---Select Flow---</option>
+                                {% for flow in flows%}
+                                    <option value="{{flow.id}}" {% if flow.id == project.flow_id %}selected{% endif %}>{{flow.flow_name}}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="down-arrow-sig">
+                                <img src="../../../static/images/icons/icons8-down-arrow-18s.png" alt="">
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <!-- <div class="col-3">
+                    <label for="staticEmail" class="col-form-label">Levels</label><br>
+                    <select name="flow_level" class="form-control input-sizze">
+                        <option value="">---Select Level---</option>
+                        <option value="clusters" {% if project.flow_level == 'clusters' %}selected{% endif %}>Clusters</option>
+                        <option value="discipline" {% if project.flow_level == 'discipline' %}selected{% endif %}>Discipline</option>
+                        <option value="well" {% if project.flow_level == 'well' %}selected{% endif %}>Well</option>
+                    </select>
+                </div> -->
+                <table class="wcc-flow">
+                    <tr>
+                        <td class="pl-0">Levels</td>
+                        <td>:</td>
+                        <td>
+                            <select name="flow_level" class="form-control input-sizze">
+                                <option value="">---Select Level---</option>
+                                <option value="clusters" {% if project.flow_level == 'clusters' %}selected{% endif %}>Clusters</option>
+                                <option value="discipline" {% if project.flow_level == 'discipline' %}selected{% endif %}>Discipline</option>
+                                <option value="well" {% if project.flow_level == 'well' %}selected{% endif %}>Well</option>
+                            </select>
+                            <div class="down-arrow-sig">
+                                <img src="../../../static/images/icons/icons8-down-arrow-18s.png" alt="">
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- <table class="wcc-flow">
+                    <tr>
+                        <td class="pl-0">Bank User</td>
+                        <td>:</td>
+                        <td>
+                            <input type="checkbox" name="bank_user" {%if project.invoice_bank_user == 1 %} checked {% endif %} value="1">
+                        </td>
+                    </tr>
+                </table> -->
+
+            <!-- </div> -->
+
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <button type="submit" id="draft_id" class="btn btn-clr text-left draft-cls com-save" name="submit_type" value="0">Save as Draft</button>
+                    <button type="submit" id="save_id" value="1" class="btn btn-clr text-left save-cls com-save" name="submit_type" value="1">Save & Next</button>
+                </div>
+            </div>
+        </div>
+        </div>
+        </div>
+    </form>
+
+</div>
+
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+
+{% endblock %}
+
+

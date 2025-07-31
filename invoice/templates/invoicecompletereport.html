@@ -1,0 +1,1390 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    .report-input {
+        width: 50%;
+    }
+</style>
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/reports/invoicecompletereport.css' %}">
+<div class="row">
+    <div class="col-12 text-end">
+      <a class="btn btn-clr chck-tst" href="{% url 'invoice:listinvoicereport' %}">Back</a>
+      <!-- button place here -->
+    </div>
+  </div>
+  <section id="data-list-view" class="data-list-view-header">
+    <h3 class="from-head">
+        {%if reportname == 'invoice_register'%}
+        Invoice	Register
+        {%elif reportname == 'approval_status'%}
+        Invoice	Register	view	by	Approval	Status
+        {%elif reportname == 'submission_count'%}
+        Invoice	Submission	Count
+        {%elif reportname == 'vendors_ranking'%}
+            Ranking Vendors
+        {%elif reportname == 'ageing_report'%}
+        Invoice	Ageing	Summary 
+        {%elif reportname == 'payment_status'%}
+        Invoice	Payable Report
+        {%elif reportname == 'partially_paid'%}
+        Partially	Paid	Invoices Report
+        {%elif reportname == 'payment_account'%}
+        Payment	on	Account
+
+        {%elif reportname == 'paidinvoice_paymentdays'%}
+        Paid	Invoices	Vs	Days	for	Payment	
+        {%elif reportname == 'unpaidinvoice_overdue'%}
+        Unpaid	invoices	Vs	No	of	Days	
+        Overdue	
+        {%elif reportname == 'exception_report'%}
+        Invoice	Exception	Report
+        {%endif%}
+    </h3> 
+    <div class="row my-4">
+    <form  method="POST">
+        {% csrf_token %}
+        <input name="submitfield" class="submitfield" type="hidden">
+        <input name="download_pdf" class="download_pdf" value='{{download_pdf}}' type="hidden">
+                <input name="id"  type="hidden" value="{{pk}}">
+                <input name="reportname" value="{{reportname}}" type="hidden">
+                <div class="row my-4">
+                    <div class="col-md-4">
+                        <select name="period"  class="form-control form-select date-width" id="period" >
+                            <option value="">---Select Period---</option>
+                            <option value="today"{%if period == 'today' %}Selected{%endif%}>Today</option>
+                            <option value="lastmonth"{%if period == 'lastmonth' %}Selected{%endif%}>End of Last Month</option>
+                            <option value="lastquarter"{%if period == 'lastquarter' %}Selected{%endif%}>End of Last Quarter</option>
+                            <option value="financialyear"{%if period == 'financialyear' %}Selected{%endif%}>End of Last Financial Year</option>
+                          </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <input type="text" name="fromdate"  autocomplete="off" class="dateformat-cls form-control date-width fromdate form-select" placeholder="From date" value="{{fromdate}}">
+                    </div>
+
+                    <div class="col-md-4">
+                        <input type="text" name="todate" value="{{todate}}" autocomplete="off" class="dateformat-cls form-control date-width todate form-select" placeholder="To date">
+                    </div>
+                </div>
+               
+                <div class="row amountfilter" id="Reports">
+                    <div class="col-lg-4 col-md-4">
+                        <select name="amountfilter"  class="currency-clss multiselect form-select" multiple="multiple" id="amountfilter" >
+                                 <option value="grossamount"{%for i in amountfilter%}{%if i == 'grossamount'%}Selected{%endif%}{%endfor%}>Gross Amount (without Excl.Taxes)</option>
+                                 <option value="taxes"{%for i in amountfilter%}{%if i == 'taxes'%}Selected{%endif%}{%endfor%}>Gross Amount Inclusive of all Taxes</option>
+                                 <option value="netamount"{%for i in amountfilter%}{%if i == 'netamount'%}Selected{%endif%}{%endfor%} >Net Payable Amount </option>
+                                  
+                           </select>
+                    </div>
+                   
+                        <div class="col-md-4">
+                            <div class="ageingperiodreport">
+                            <select class="form-control list-control form-select ageing_report" name="ageing_report">
+                            <option value=' '>---Select---</option>
+                            <option value="report" {%if ageing_report == 'report' or ageing_report == ' ' %}Selected{%endif%}>{%if reportname == 'ageing_report'%}Invoice	Ageing Report{%else%}Upaid/Paid Report{%endif%}</option>
+                            <option value="sheet"{%if ageing_report == 'sheet' %}Selected{%endif%}>{%if reportname == 'ageing_report'%}Ageing Detailed Report{%else%}Invoice Payable Report{%endif%}</option>
+                        </select>
+                            </div>
+                        </div>
+                   </div>
+
+               <br>
+
+        <div  class="row wcc-flow report" id="Report">
+                    
+                <div class="col-3">
+                    <select name="country"  class="currency-clss multiselect form-select"  multiple="multiple" id="country" >
+                        {% for country in countries %}
+                        {%if selectedcountry %}
+                            {% for i in selectedcountry%}
+                                <option value="{{country.id}}"{%if i == country.id%} Selected {%endif%}>{{country.name}}</option>
+                            {%endfor%}
+                        {%else%}
+                        <option value="{{country.id}}">{{country.name}}</option>
+                        {%endif%}
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-3">
+                    <select name="project"  class="currency-clss multiselect form-select" multiple="multiple" id="project" >
+                     {% for project in projects %}
+                        {%if selectedproject %}
+                            {% for i in selectedproject%}
+                                <option value="{{project.id}}" {%if i == project.id%} Selected {%endif%}>{{project.projectname.name}}</option>
+                            {%endfor%}
+                        {%else%}
+                        <option value="{{project.id}}">{{project.projectname.name}}</option>
+                        {%endif%}
+    
+                    {%endfor%}
+                    </select>
+                    
+                </div>
+
+                <div class="col-3">
+                    <select name="discipline"  class="currency-clss multiselect form-select" multiple="multiple" id="discipline" >
+                      {% for discipline in discipline_subtype %}
+                        {%if selecteddiscipline%}
+                            {%for i in selecteddiscipline%}
+                                <option value="{{discipline}}" {%if i == discipline %} Selected {%endif%}>{{discipline}}</option>
+                            {%endfor%}
+                        {%else%}
+                        <option value="{{discipline}}">{{discipline}}</option>
+                        {%endif%}
+                      {%endfor%}
+                    </select>
+                    
+                </div>
+
+                <div class="col-2">
+                    <select class="currency-clss multiselect form-select"  id="service" multiple="multiple"  name="service" class="form-control gener-hd-input" placeholder="Select Type of Service">
+                     <option value="Service"{%for i in selectedservice %} {%if i == 'Service' %}Selected{%endif%}{%endfor%}>Service</option>
+                     <option value="Supply"{%for i in selectedservice %} {%if i == 'Supply' %}Selected{%endif%}{%endfor%}>Supply</option>
+                     <option value="Service & Supply"{%for i in selectedservice %} {%if i == 'Service & Supply' %}Selected{%endif%}{%endfor%}>service and Supply</option>
+                    </select>
+                    
+                </div>
+                <div class="col-1">
+                    <div class="paymentstatusfield">
+                        <select name="paymentstatus"  class="currency-clss multiselect form-select" multiple="multiple" id="paymentstatus" >
+                            <option value=2 {%for i in selectedpaymentstatus %} {%if i == 2 %}Selected{%endif%}{%endfor%}>Paid</option>
+                            <option value=1 {%for i in selectedpaymentstatus %} {%if i == 1 %}Selected{%endif%}{%endfor%}>Unpaid</option>
+                        </select>
+                    </div>
+
+                   
+                   
+                </div>
+                </div>
+          
+            <div class="row mt-3 wcc-flow report" id="Report">
+                <div class="col-3">
+                    <select name="currency"  class="form-control list-control form-select currency-clss form-select">
+                        <option value="">--Select--</option>
+                     {% for currency in companycurrency %}
+                    
+                            {%if selectedcurrency %}
+                            <option value="{{currency.id}}" {%if selectedcurrency == currency.id%} Selected {%endif%}>{{currency.currency_symbol}}-{{currency.currency}}</option>
+                            {%else%}
+                               <option value="{{currency.id}}" {%if allreports.currency == currency.id%} Selected {%endif%}>{{currency.currency_symbol}}-{{currency.currency}}</option>
+                            {%endif%}
+                           
+                        {%endfor%}
+                    </select>
+                </div>
+                <div class="col-3">
+                    <select name="approvalstatus"  class="currency-clss multiselect form-select" multiple="multiple" id="approval" >
+                        {%if reportname != 'exception_report' %}
+                        <option value="Approved" {%for i in selectedapprovalstatus %} {%if i == 'Approved' %}Selected{%endif%}{%endfor%}>Approved</option>
+                        <option value="Awaiting Approval" {%for i in selectedapprovalstatus %} {%if i == 'Awaiting Approval' %}Selected{%endif%}{%endfor%}>Awaiting Approval</option>
+                        {%endif%}
+                        <option value="Disputed"{%for i in selectedapprovalstatus %} {%if i == 'Disputed' %}Selected{%endif%}{%endfor%}>Disputed</option>
+                        <option value="Returned"{%for i in selectedapprovalstatus %} {%if i == 'Returned' %}Selected{%endif%}{%endfor%}>Returned</option>
+                        <option value="Rejected"{%for i in selectedapprovalstatus %} {%if i == 'Rejected' %}Selected{%endif%}{%endfor%}>Rejected</option>
+                    </select>
+                </div>
+                
+                <div class="col-3">
+                    {%if reportname == 'vendors_ranking' %}
+                    <select name="vendorranking" class="form-control date-width vendorranking form-select" id="vendorranking">
+                        <option value="">---Select---</option>
+                        <option value="5"{%if vendorranking == '5'%} Selected{%endif%}>Top 5</option>
+                        <option value="10"{%if vendorranking == '10'%} Selected{%endif%}>Top 10</option>
+                        <option value="15"{%if vendorranking == '15'%} Selected{%endif%}>Top 15</option>
+                        <option value="20"{%if vendorranking == '20'%} Selected{%endif%}>Top 20</option>
+                    </select>
+                    {%else%}
+                    <select name="vendor" class="currency-clss multiselect form-select" multiple="multiple" id="vendor" placeholder="Select Vendor">
+                        {% for vendors in vendorslist %}
+                             {%if selectedvendor%}
+                                 {%for i in selectedvendor%}
+                                     <option value="{{vendors.id}}" {%if i == vendors.id  %} Selected {%endif%}>{{vendors.vendor_name}}</option>
+                                 {%endfor%}
+                             {%else%}
+                             <option value="{{vendors.id}}">{{vendors.vendor_name}}</option>
+                             {%endif%}
+                         {%endfor%}
+                     </select>
+                     {%endif%}
+                </div>
+              
+                <div class="col-3">
+                    <div class="ageingperiod">   
+                    {%if reportname == 'exception_report' %} 
+                    <select name="exceptions"  class="currency-clss multiselect form-select" multiple="multiple"  id="exceptions">
+                        <option value="1"{%for i in selectedexceptions %} {%if i == 1 %}Selected{%endif%}{%endfor%}>Changes in Supporting Documents</option>
+                        <option value="2"{%for i in selectedexceptions %} {%if i == 2 %}Selected{%endif%}{%endfor%}>Work Completion Certificate or Timesheet mismatch with Invoice billing details</option>
+                        <option value="3"{%for i in selectedexceptions %} {%if i == 3 %}Selected{%endif%}{%endfor%}>Material Delivery Ticket or Certificate Mismatch with Invoice Billing details</option>
+                        <option value="4"{%for i in selectedexceptions %} {%if i == 4 %}Selected{%endif%}{%endfor%}>Mismatch between price quoted on invoice and selected contract</option>
+                        <option value="5"{%for i in selectedexceptions %} {%if i == 5 %}Selected{%endif%}{%endfor%}>Asking for Credit Note</option>
+
+                        <option value="7"{%for i in selectedexceptions %} {%if i == 7 %}Selected{%endif%}{%endfor%}>Supporting Documents Missing</option>
+                        <option value="8"{%for i in selectedexceptions %} {%if i == 8 %}Selected{%endif%}{%endfor%}>Wrong Supporting Documents</option>
+                        <option value="9"{%for i in selectedexceptions %} {%if i == 9 %}Selected{%endif%}{%endfor%}>Irrelevant Invoice</option>
+                        <option value="10"{%for i in selectedexceptions %} {%if i == 10 %}Selected{%endif%}{%endfor%}>Relevant Contract not selected for invoice</option>
+                        <option value="11"{%for i in selectedexceptions %} {%if i == 11 %}Selected{%endif%}{%endfor%}>Work Done previously Invoiced</option>
+
+                        <option value="13"{%for i in selectedexceptions %} {%if i == 13 %}Selected{%endif%}{%endfor%}>Invoice details interpretation issues</option>
+                        <option value="14"{%for i in selectedexceptions %} {%if i == 14 %}Selected{%endif%}{%endfor%}>Supporting document issues</option>
+                        <option value="15"{%for i in selectedexceptions %} {%if i == 15 %}Selected{%endif%}{%endfor%}>Issues due to Verbal communication for work invoiced</option>
+                        <option value="16"{%for i in selectedexceptions %} {%if i == 16 %}Selected{%endif%}{%endfor%}>Work done outside of approval limits</option>
+                        <option value="17"{%for i in selectedexceptions %} {%if i == 17 %}Selected{%endif%}{%endfor%}>Dispute on contract execution</option>
+                        <option value="18"{%for i in selectedexceptions %} {%if i == 18 %}Selected{%endif%}{%endfor%}>Dispute coming out of Audit findings</option>
+                        <option value="19"{%for i in selectedexceptions %} {%if i == 19 %}Selected{%endif%}{%endfor%}>Inability to clarify through normal methods</option>
+                        <option value="20"{%for i in selectedexceptions %} {%if i == 20 %}Selected{%endif%}{%endfor%}>Other Reasons</option>
+                    </select>
+                    {%else%}
+                    <select name="ageingperiod"  class="currency-clss multiselect form-select" multiple="multiple"  id="ageingperiod">
+                       <option value="0"{%for i in selectedageingperiod %} {%if i == 0 %}Selected{%endif%}{%endfor%}>Not Yet Due</option>
+                        <option value="1"{%for i in selectedageingperiod %} {%if i == 1 %}Selected{%endif%}{%endfor%}>1 - 30 Days</option>
+                        <option value="2"{%for i in selectedageingperiod %} {%if i == 2 %}Selected{%endif%}{%endfor%}>31 - 60 Days</option>
+                        <option value="3"{%for i in selectedageingperiod %} {%if i == 3 %}Selected{%endif%}{%endfor%}>61 - 90 Days</option>
+                        <option value="4"{%for i in selectedageingperiod %} {%if i == 4 %}Selected{%endif%}{%endfor%}>91 - 120 Days</option>
+                        <option value="5"{%for i in selectedageingperiod %} {%if i == 5 %}Selected{%endif%}{%endfor%}>Above 120 Days</option>
+                    </select>
+                    {%endif%}
+                    
+                </div>
+                </div>
+           
+               
+            </div>
+        </div>
+        <div class="d-flex justify-content-between my-3">
+        <div class="">
+            <button type="submit" class="btn btn-clr com-save generate_report ven-cr">Generate Report</button>
+            <button type="submit" class="btn btn-clr com-save draftsave">Draft</button>
+        </div>
+        <div>
+         <button type="button" class="btn btn-clr download_report"><a target="_blank" href="{% url 'invoice:generateinvoicereport' reportname=reportname %}">Download</a></button> 
+    </div>
+    </div>
+
+</form>
+
+<div class="table-responsive text-nowrap inv-table_wid">
+    <table class="table prj-back_clr settings-data-list-view data-list-view invoicelist tot-in irock-table invoicevendor-table" id="master_project_list">
+      {%if reportname == 'invoice_register' or reportname == 'ageing_report' %}
+        <thead>
+            <tr >
+                <th>S/N</th> 
+                <th>Vendor Name</th>  
+                <th>Invoice No</th>   
+                <th>Country</th>   
+                <th>Project Name</th>  
+                <th>Project Discipline</th>  
+                <th>Type of Service</th>  
+                
+                {%if ageing_report == 'sheet' and reportname == 'ageing_report'%}
+                <th>1 - 30 Days</th>
+                <th>31 - 60 Days</th>
+                <th>61 - 90 Days</th>
+                <th>91 - 120 Days</th>
+                <th>Above 120 Days</th>
+                <th>Total</th>
+                {%else%}
+                <th>Invoice Date</th>
+                <th>Submitted Date</th>
+                {%if reportname == 'ageing_report' %}
+                <th>Due Date</th>
+                <th>Days Overdue</th>
+                <th>Aging period</th>
+                {%endif%}
+                {%if amountfilter %}
+                
+                    {%for i in amountfilter%}
+                        {%if i == 'grossamount'%}
+                            <th>Gross Amount(without Excl.Taxes)</th>
+                        {%elif i == 'taxes'%}
+                            <th>Taxes</th>
+                        {%elif i == 'netamount'%}
+                            <th>Net Amount Payable</th>
+                        {%endif%}
+                    {%endfor%}
+                {%else%}
+                
+                <th>Gross Amount(without Excl.Taxes)</th>
+                <th>Taxes</th>
+                <th>Net Amount Payable</th>
+                {%endif%}
+                <th>Approval Status</th>
+                <th>Approval/Disputed Date</th>
+                <th>Payment Status</th>
+                <th>Payment Date</th>
+                <th>Actions</th>
+                {%endif%}
+            </tr>
+        </thead>
+        <tbody class="table-list">
+            <!-- {% if invoice_count == 0 %}
+            <tr>
+                <td colspan="9" class="cls-nil">
+                  ---
+                </td>
+              </tr>   
+              {%else%} -->
+            {% for invoice in invoicecurrencylist %}
+          
+            <tr>
+                <td class="snocls"></td>
+                <td>{{invoice.invoice.vendor.vendor_name}}</td>
+                <td>{{invoice.invoice_number}}</td>
+                {%getcountry invoice.invoice_id as country%}
+                <td>{{country|default_if_none:"---"}}</td>
+                <td>{{invoice.invoice.project_name}}</td>
+                <td>{%getprojectdiscipline invoice.invoice_id as discipline%}{{discipline}}</td>
+                <td>{{invoice.invoice.types_service}}</td>
+                {%if ageing_report == 'sheet'%}
+                {%getagingperiod invoice.invoice.id invoice.invoice.contractid invoice.invoice.company_id as days_difference%}
+                {% invoicegrossamount invoice.id as invdisval %}
+                {% invoicetaxamount invoice.id as invdistax %}
+                
+                {%if days_difference >= 1 and days_difference <= 30%}
+                <td>  <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                    </div></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                {%elif days_difference >= 31 and days_difference <= 60%}
+                <td></td>
+                <td>  <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                    </div></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                {%elif days_difference >= 61 and days_difference <= 90%}
+                <td></td>
+                <td></td>
+                <td>  <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                    </div></td>
+                <td></td>
+                <td></td>
+                {%elif days_difference >= 91 and days_difference <= 1200%}
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>  <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                    </div></td>
+                <td></td>
+                {%else%}
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>  <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                    </div></td>
+                {%endif%}
+                <td><div> {{selectedcurrencysymbol.currency_symbol}}      {{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                    </div></td>
+                {%else%}
+                <td class="t-sub-data">
+                    <div class="cos-in-nu">{{invoice.invoice_date}}</div>
+                </td>
+                <td class="td-center text-wrap"> 
+                    <div>{{invoice.invoice_submission_date|confulldate:invoice.invoice.company.id|default_if_none:"---"}}</div>
+                </td>
+                
+                {%if reportname == 'ageing_report' %}
+                <td>{%getduedate invoice.invoice.id invoice.invoice.contractid invoice.invoice.company_id as duedate%}{{duedate}}</td>
+                {%getagingperiod invoice.invoice.id invoice.invoice.contractid invoice.invoice.company_id as days_difference%}
+                <td>{{days_difference}}</td>
+                <td>
+                    {%if days_difference == 0 %}Not Yet Due
+                    {%elif days_difference >= 1 and days_difference <= 30%}1 - 30 Days
+                    {%elif days_difference >= 31 and days_difference <= 60%}31 - 60 Days
+                    {%elif days_difference >= 61 and days_difference <= 90%}61 - 90 Days
+                    {%elif days_difference >= 91 and days_difference <= 120%}91 - 120 Days
+                    {%else%}Above 120 Days{%endif%}
+                </td>
+
+                {%endif%}
+                {%if amountfilter %}
+                    {%for i in amountfilter%}
+                        {%if i == 'grossamount'%}
+                        <td>{% invoicegrossamount invoice.id as invdisval %}
+                            <div>{{selectedcurrencysymbol.currency_symbol}}   {{invdisval}}</div>
+                        </td>
+                        {%elif i == 'taxes'%}
+                        <td>{% invoicetaxamount invoice.id as invdisval %}
+                            <div>{{selectedcurrencysymbol.currency_symbol}} {{invdisval}}</div>
+                        </td>
+                        {%elif i == 'netamount'%}
+                        <td>{% invoicegrossamount invoice.id as invdisval %}
+                            {% invoicetaxamount invoice.id as invdistax %}
+                            <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                            {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                            </div>
+                        </td>
+                        {%endif%}
+                    {%endfor%}
+                {%else%}
+                <td>{% invoicegrossamount invoice.id as invdisval %}
+                      <div>{{selectedcurrencysymbol.currency_symbol}}   {{invdisval}}</div>
+                </td>
+                <td>{% invoicetaxamount invoice.id as invdisval %}
+                      <div>{{selectedcurrencysymbol.currency_symbol}} {{invdisval}}</div>
+                </td>
+                <td>{% invoicegrossamount invoice.id as invdisval %}
+                    {% invoicetaxamount invoice.id as invdistax %}
+                    <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                    </div>
+                </td>
+                {%endif%}
+                <td class="td-left ">
+                  <div>{% if invoice.approval_status == 6 and invoice.invoice.invoice_status == 6 %} Disputed {% elif invoice.approval_status == 1 and invoice.invoice.invoice_status == 2 %} Awaiting Approval {% elif invoice.approval_status == 1 and invoice.invoice.invoice_status == 1 %} Not Yet Submitted {% elif invoice.approval_status == 4 and invoice.invoice.invoice_status == 4 %} Returned {% elif invoice.approval_status == 5 and invoice.invoice.invoice_status == 5 %} Rejected {% else %} Approved {% endif %}</div>
+                </td>
+                <td class="td-center text-wrap">
+                   <div>{% if invoice.approval_date == "" or invoice.approval_date == None %} N/A {% else %} {{invoice.approval_date|confulldate:invoice.invoice.company.id}}{% endif %}</div>
+                </td>
+                <td class="vin_left text-wrap">
+                   <div>{% if invoice.payment_status == 1 %} Unpaid {% else %}  Paid {% endif %}</div>
+                </td>
+                <td>
+                   <div>{% if invoice.payment_date == "" or invoice.payment_date == None %} N/A {% else %} {{invoice.payment_date|confulldate:invoice.invoice.company.id}}{% endif %}</div>
+                </td>
+               
+                <td class="eye_test text-wrap"><a class="btn p-0" href="{% url 'invoice:invoiceview' invoice.invoice.id %}"><i class="fa fa-eye" title="View"></i>
+                    </a>
+                        {% if vendor_status == True %}
+                        {% if invoice.invoice_status == 1 %} 
+                        <a class="btn p-0" href="{% url 'invoice:editinvoiceform' invoice.invoice.id 1 %}{% if invoice.invoice.wcc_id %}?wcc_id={{invoice.invoice.wcc_id}}{% endif %}"><i class="fa fa-edit" ></i>
+                    </a>
+                        {% endif %}
+                        {% endif %}
+                </td>
+              
+            </tr>
+            {% if forloop.last %}
+            <tr>
+            {%if reportname == 'ageing_report' %}
+                <td></td>
+                <td></td>
+                <td></td>
+            {%endif%}
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <th>Grand Total</th>
+                {%if amountfilter %}
+                {%for i in amountfilter%}
+                    {%if i == 'grossamount'%}
+                        <th>{% gettotalgrossamount invoicecurrencylist as sumgrossamount %}{{selectedcurrencysymbol.currency_symbol}} {{sumgrossamount}}</th>
+                    {%elif i == 'taxes'%}
+                        <th>{% gettotaltaxamount invoicecurrencylist as totaltaxamount %}{{selectedcurrencysymbol.currency_symbol}} {{totaltaxamount}}</th>
+                    {%elif i == 'netamount'%}
+                    <th> {% gettotalgrossamount invoicecurrencylist as invdisval %}
+                        {% gettotaltaxamount invoicecurrencylist as invdistax %}{{selectedcurrencysymbol.currency_symbol}} 
+                        <div>{{invdisval|addvalues:invdistax}}
+                        {%with total=invdisval|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}</div></th>
+                    {%endif%}
+                {%endfor%}
+                {%else%}
+                <th>{% gettotalgrossamount invoicecurrencylist as sumgrossamount %}{{selectedcurrencysymbol.currency_symbol}} {{sumgrossamount}}</th>
+                <th>{% gettotaltaxamount invoicecurrencylist as totaltaxamount %}{{selectedcurrencysymbol.currency_symbol}} {{totaltaxamount}}</th>
+                <th> {% gettotalgrossamount invoicecurrencylist as invdisval %}
+                    {% gettotaltaxamount invoicecurrencylist as invdistax %}
+                    <div>{{selectedcurrencysymbol.currency_symbol}} {{invdisval|addvalues:invdistax}}
+                    {%with total=invdisval|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}</div></th>
+            {%endif%}
+                <td></td>
+                <td></td>
+           </tr>
+           {%endif%}
+            {% endif %}
+
+            {% empty %}
+            <tr>
+                <td colspan="9" class="cls-nil">
+                    ---</td>
+            </tr>
+           
+            {% endfor %}
+            {% endif %}
+         
+            {%elif reportname == 'payment_status' and ageing_report == 'report'%}
+            <thead>
+                <tr>
+                    <th>S/N</th> 
+                    <th>Country <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>
+                    <th>Project <button class="filter-btn" data-filter="last-name"> <i class="fas fa-sort"></i></button></th>
+                    <th>Paid Amount <button class="filter-btn" data-filter="designation"> <i class="fas fa-sort"></i></button></th>
+                    <th>Unpaid Amount <button class="filter-btn" data-filter="dept"> <i class="fas fa-sort"></i></button></th>
+                    <th>Total <button class="filter-btn" data-filter="group"> <i class="fas fa-sort"></i></button></th>
+                </tr>
+                {%for i in projectlist %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    {%getprojectname i as name%}
+                    <td>{{name.country.name}}</td>
+                    <td>{{name}}</td>
+                    {% getpaidamount i invoicecurrencylist as val %}
+                    <td> {{selectedcurrencysymbol.currency_symbol}} {%commoseperator val.0 as value%}{{value}} </td>
+                    <td>{{selectedcurrencysymbol.currency_symbol}}  {%commoseperator val.1 as value_one%}{{value_one}}</td>
+                    <td>{{selectedcurrencysymbol.currency_symbol}}  {%sumoftwono val.0 val.1 as amount %} {{amount}}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="cls-nil">
+                        ---</td>
+                </tr>
+               
+                {% endfor %}
+                {%elif reportname == 'payment_status' or ageing_report == 'sheet'%}
+               
+                <thead>
+                    <tr >
+                        <th>S/N</th> 
+                        <th>Vendor Name <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>  
+                        <th>Invoice No <button class="filter-btn" data-filter="last-name"> <i class="fas fa-sort"></i></button></th>   
+                        <th>Country <button class="filter-btn" data-filter="designation"> <i class="fas fa-sort"></i></button></th>   
+                        <th>Project Name <button class="filter-btn" data-filter="dept"> <i class="fas fa-sort"></i></button></th>  
+                        <th>Project Discipline <button class="filter-btn" data-filter="group"> <i class="fas fa-sort"></i></button></th>  
+                        <th>Type of Service <button class="filter-btn" data-filter="email"> <i class="fas fa-sort"></i></button></th> 
+                        <th>Submitted Date <button class="filter-btn" data-filter="submit-date"> <i class="fas fa-sort"></i></button></th>
+                        <th>Payment Status <button class="filter-btn" data-filter="pay-status"> <i class="fas fa-sort"></i></button></th>
+                        {%if amountfilter %}
+                        {%for i in amountfilter%}
+                        {%if i == 'grossamount'%}
+                            <th>Gross Amount(without Excl.Taxes)</th>
+                        {%elif i == 'taxes'%}
+                            <th>Taxes</th>
+                        {%elif i == 'netamount'%}
+                            <th>Net Amount Payable</th>
+                        {%endif%}
+                    {%endfor%}
+                        {%else%}
+                            <th>Gross Amount(without Excl.Taxes)</th>
+                            <th>Taxes</th>
+                            <th>Net Amount Payable</th>
+                        {%endif%}
+                    </tr>
+                </thead>
+                {% for invoice in invoicecurrencylist %}
+                <tr>
+                    <td class="snocls"></td>
+                    <td>{{invoice.invoice.vendor.vendor_name}}</td>
+                    <td>{{invoice.invoice_number}}</td>
+                    {%getcountry invoice.invoice_id as country%}
+                    <td>{{country|default_if_none:"---"}}</td>
+                    <td>{{invoice.invoice.project_name}}</td>
+                    <td>{%getprojectdiscipline invoice.invoice_id as discipline%}{{discipline}}</td>
+                    <td>{{invoice.invoice.types_service}}</td>
+                    <td class="td-center text-wrap"> 
+                        <div>{{invoice.invoice_submission_date|confulldate:invoice.invoice.company.id|default_if_none:"---"}}</div>
+                    </td>
+                    <td class="vin_left text-wrap">
+                        <div>{% if invoice.payment_status == 1 %} Unpaid {% else %}  Paid {% endif %}</div>
+                    </td>
+                    {%if amountfilter %}
+                    {%for i in amountfilter%}
+                    {%if i == 'grossamount'%}
+                    <td>{% invoicegrossamount invoice.id as invdisval %}
+                        <div>{{selectedcurrencysymbol.currency_symbol}}   {{invdisval}}</div>
+                    {%elif i == 'taxes'%}
+                    <td>{% invoicetaxamount invoice.id as invdisval %}
+                        <div>{{selectedcurrencysymbol.currency_symbol}} {{invdisval}}</div>
+                  </td>
+                    {%elif i == 'netamount'%}
+                    <td>{% invoicegrossamount invoice.id as invdisval %}
+                        {% invoicetaxamount invoice.id as invdistax %}
+                        <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                        {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                        </div>
+                    </td>
+                    {%endif%}
+                {%endfor%}
+                    {%else%}
+                       
+                  
+                    <td>{% invoicegrossamount invoice.id as invdisval %}
+                        <div>{{selectedcurrencysymbol.currency_symbol}}   {{invdisval}}</div>
+                  </td>
+                  <td>{% invoicetaxamount invoice.id as invdisval %}
+                        <div>{{selectedcurrencysymbol.currency_symbol}} {{invdisval}}</div>
+                  </td>
+                  <td>{% invoicegrossamount invoice.id as invdisval %}
+                      {% invoicetaxamount invoice.id as invdistax %}
+                      <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                      {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                      </div>
+                  </td>
+                  {%endif%}
+                </tr>
+                {%if forloop.last %}
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <th>Total</th>
+                {%if amountfilter %}
+                {%for i in amountfilter%}
+                    {%if i == 'grossamount'%}
+                        <td>{% gettotalgrossamount invoicecurrencylist as sumgrossamount %}{{selectedcurrencysymbol.currency_symbol}} {{sumgrossamount}}</td>
+                    {%elif i == 'taxes'%}
+                        <td>{% gettotaltaxamount invoicecurrencylist as totaltaxamount %}{{selectedcurrencysymbol.currency_symbol}} {{totaltaxamount}}</td>
+                    {%elif i == 'netamount'%}
+                    <td> {% gettotalgrossamount invoicecurrencylist as invdisval %}
+                        {% gettotaltaxamount invoicecurrencylist as invdistax %}{{selectedcurrencysymbol.currency_symbol}} 
+                        <div>{{invdisval|addvalues:invdistax}}
+                        {%with total=invdisval|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}</div></td>
+                    {%endif%}
+                {%endfor%}
+                {%else%}
+                    <td>{% gettotalgrossamount invoicecurrencylist as sumgrossamount %}{{selectedcurrencysymbol.currency_symbol}} {{sumgrossamount}}</td>
+                    <td>{% gettotaltaxamount invoicecurrencylist as totaltaxamount %}{{selectedcurrencysymbol.currency_symbol}} {{totaltaxamount}}</td>
+                    <td> {% gettotalgrossamount invoicecurrencylist as invdisval %}
+                        {% gettotaltaxamount invoicecurrencylist as invdistax %}{{selectedcurrencysymbol.currency_symbol}} 
+                        <div>{{invdisval|addvalues:invdistax}}
+                        {%with total=invdisval|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}</div></td>
+                {%endif%}
+                {%endif%}
+               
+                {% empty %}
+
+                <tr>
+                    <td colspan="9" class="cls-nil">
+                        ---</td>
+                </tr>
+               
+             
+                {%endfor%}
+                {%elif reportname == 'submission_count' %}
+                <thead>
+                        <tr>
+                            <th>S/N</th> 
+                            <th>Month <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>
+                            <th>Invoice Count <button class="filter-btn" data-filter="last-name"> <i class="fas fa-sort"></i></button></th>
+                        </tr>
+                        {%getinvoicecount invoicecurrencylist months_data as invoicesubmissionlist%}
+                        {%for i in invoicesubmissionlist%}
+                        <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{i.0}} {{i.1}}</td>
+                            <td>{{i.2}}</td>
+                        </tr>
+                        {% empty %}
+
+                        <tr>
+                            <td colspan="9" class="cls-nil">
+                                --- </td>
+                        </tr>
+                       
+                     
+                                      
+                         
+                        
+                </thead>
+                        {%endfor%}
+                {%elif reportname == 'vendors_ranking'%}
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>Vendor <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>
+                        <th>Total Net Payable Amount <button class="filter-btn" data-filter="last-name"> <i class="fas fa-sort"></i></button></th>
+                        <th>Percentage of Total Net Payable Amount <button class="filter-btn" data-filter="designation"> <i class="fas fa-sort"></i></button></th>
+                    </tr>
+                    {%for i,amount in rankinglist%}
+                        <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td class="td-left">{{i.vendor_name}}</td>
+                            <td>{{selectedcurrencysymbol.currency_symbol}} {{ amount|commoseperatorfilter|safe }}</td>
+                            <td>{% getamountpercentage amount rankinglist as percentage %}{{ percentage|floatformat:0 }} %</td>
+                        </tr>
+                        {% if forloop.last %}
+                        <tr>
+                            <td></td>
+                            <th>Total</th>
+                            <td>{{selectedcurrencysymbol.currency_symbol}} {{ rankinglist|rankinglisttotalamount|safe }}</td>
+                        </tr>
+                        {%endif%}
+                    {%endfor%}
+                </thead>   
+                {%elif reportname == 'approval_status'%}   
+               <thead>  
+                    <tr>
+                        <th>S/N</th>
+                        <th>Country</th>
+                        <th>Project Name</th>
+                        {%for i in selectedapprovalstatus%}
+                        <th>{{i}}</th>
+                        {%endfor%}
+                        <th>Grand Total</th>
+                    </tr>  
+                </thead>  
+             
+                {%for i in projectlist %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    {%getprojectname i as name%}
+                    <td>{{name.country.name}}</td>
+                    <td>{{name}}</td>
+                    {%for j in selectedapprovalstatus %}
+                    {%statusvalue i j aprrovalstatus_invoicelist as finalamount%}
+                    <td>{{selectedcurrencysymbol.currency_symbol}} {{finalamount}}</td>
+                    {%endfor%}
+                    {%grandtotalproject i selectedapprovalstatus aprrovalstatus_invoicelist as grandtotal%}
+                    <th>{{selectedcurrencysymbol.currency_symbol}} {{grandtotal}}</th>
+                </tr>
+                {%endfor%}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <th>Grand Total</th>
+                    {%for j in selectedapprovalstatus %}
+                    {%grandtotal projectlist j aprrovalstatus_invoicelist as grandtotal%}
+                    <th>{{selectedcurrencysymbol.currency_symbol}} {{grandtotal}}</th>
+                    {%endfor%}
+                    {%grandtotalapprovalstatus projectlist selectedapprovalstatus aprrovalstatus_invoicelist as grandtotal%}
+                    <!-- <th>{{selectedcurrencysymbol.currency_symbol}} {{grandtotal}}</th> -->
+                </tr>
+
+            {%elif reportname == 'partially_paid'%}
+            <thead>
+                <tr>
+                    <th>S/N</th> 
+                    <th>Vendor Name <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>  
+                    <th>Invoice No <button class="filter-btn" data-filter="last-name"> <i class="fas fa-sort"></i></button></th>   
+                    <th>Country <button class="filter-btn" data-filter="designation"> <i class="fas fa-sort"></i></button></th>   
+                    <th>Project Name <button class="filter-btn" data-filter="dept"> <i class="fas fa-sort"></i></button></th>  
+                    <th>Project Discipline <button class="filter-btn" data-filter="group"> <i class="fas fa-sort"></i></button></th>  
+                    <th>Type of Service <button class="filter-btn" data-filter="email"> <i class="fas fa-sort"></i></button></th>
+                    <th>Total Amount <button class="filter-btn" data-filter="mobile"> <i class="fas fa-sort"></i></button></th>
+                    <th>Amount Paid <button class="filter-btn" data-filter="inv-num"> <i class="fas fa-sort"></i></button></th>
+                    <th>Amount Pending <button class="filter-btn" data-filter="pay-status"> <i class="fas fa-sort"></i></button></th>
+                  
+                </tr> 
+            </thead>     
+                {% for invoice in partialypaid_invoicelist %}
+                <tr>
+                <td>{{forloop.counter}}</td>
+                    <td>{{invoice.invoice.vendor.vendor_name}}</td>
+                    <td>{{invoice.invoice_number}}</td>
+                    {%getcountry invoice.invoice_id as country%}
+                    <td>{{country|default_if_none:"---"}}</td>
+                    <td>{{invoice.invoice.project_name}}</td>
+                    <td>{%getprojectdiscipline invoice.invoice_id as discipline%}{{discipline}}</td>
+                    <td>{{invoice.invoice.types_service}}</td>
+                    <td>{% invoicegrossamount invoice.id as invdisval %}
+                        {% invoicetaxamount invoice.id as invdistax %}
+                        <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                        {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                        </div>
+                    </td>
+                    {%getpartialypaidamount invoice.id invoice.invoice.company.id as amount%}
+                    <td>{{selectedcurrencysymbol.currency_symbol}} {{amount.0}}</td>
+                    <td>{{selectedcurrencysymbol.currency_symbol}} {{amount.1}}</td>
+                </tr>
+                {%if forloop.last%}
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <th>Grand Total</th>
+                    <th> {% gettotalgrossamount partialypaid_invoicelist as invdisval %}
+                        {% gettotaltaxamount partialypaid_invoicelist as invdistax %}{{selectedcurrencysymbol.currency_symbol}} 
+                        <div>{{invdisval|addvalues:invdistax}}
+                        {%with total=invdisval|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}</div></th>
+                    {%gettotalparialypaidinvoice partialypaid_invoicelist invoice.invoice.company.id as totalamount%}
+                    <th>{{selectedcurrencysymbol.currency_symbol}} {{totalamount.0}}</th>
+                    <th>{{selectedcurrencysymbol.currency_symbol}} {{totalamount.1}}</th>
+                {%endif%}
+
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="9" class="cls-nil">
+                        ---</td>
+                </tr>
+               
+             
+                              
+                {%endfor%}
+                {%elif reportname == 'paidinvoice_paymentdays' or reportname == 'unpaidinvoice_overdue' %}
+                <thead>
+                    <tr>
+                        <th>S/N</th> 
+                        <th>Vendor Name <button class="filter-btn" data-filter="inv-num"> <i class="fas fa-sort"></i></button></th>  
+                        <th>Invoice No <button class="filter-btn" data-filter="pay-status"> <i class="fas fa-sort"></i></button></th>
+                        <th>Submitted Date <button class="filter-btn" data-filter="submit-date"> <i class="fas fa-sort"></i></button></th> 
+                        {%if reportname == 'paidinvoice_paymentdays'%}
+                        <th>Payment Date <button class="filter-btn" data-filter="pay-date"> <i class="fas fa-sort"></i></button></th>  
+                        {%endif%}
+                        {%if reportname == 'paidinvoice_paymentdays'%}
+                        <th>No Days For Payment <button class="filter-btn" data-filter="approval"> <i class="fas fa-sort"></i></button></th>
+                        {%else%}
+                        <th>Days Due <button class="filter-btn" data-filter="status"> <i class="fas fa-sort"></i></button></th>
+                        {%endif%}
+                        <th>Days For Payment <button class="filter-btn" data-filter="approval"> <i class="fas fa-sort"></i></button></th>
+                        <th>Net Payable Amount <button class="filter-btn" data-filter="inv-num"> <i class="fas fa-sort"></i></button></th>
+                    </tr>
+                </thead>
+                <!-- <p>{{invoicecurrencylist}}invoicettt</p> -->
+                {% for invoice in invoicecurrencylist %}
+
+          
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{invoice.invoice.vendor.vendor_name}}</td>
+                    <td>{{invoice.invoice_number}}</td>
+                    <td class="td-center text-wrap"> 
+                        <div>{{invoice.invoice_submission_date|confulldate:invoice.invoice.company.id|default_if_none:"---"}}</div>
+                    </td>
+                    {%if reportname == 'paidinvoice_paymentdays'%}
+                    <td>
+                        <div>{% if invoice.payment_date == "" or invoice.payment_date == None %} N/A {% else %} {{invoice.payment_date|confulldate:invoice.invoice.company.id}}{% endif %}</div>
+                     </td>
+                    {%endif%}
+                    {%if reportname == 'unpaidinvoice_overdue' %}
+                    {%getdaysforunpaid invoice.invoice.id invoice.invoice.contractid invoice.invoice.company_id as days_difference%}
+                    {%else%}
+                    {%getdaysforpayment invoice.invoice.id invoice.invoice.contractid invoice.invoice.company_id as days_difference%}
+                    {%endif%}
+                    <td>{{days_difference}}</td>
+                    <td>
+                        {%if days_difference == 0%}Not Yet Due
+                        {%elif days_difference >= 1 and days_difference <= 30%}1 - 30 Days
+                        {%elif days_difference >= 31 and days_difference <= 60%}31 - 60 Days
+                        {%elif days_difference >= 61 and days_difference <= 90%}61 - 90 Days
+                        {%elif days_difference >= 91 and days_difference <= 1200%}91 - 120 Days
+                        {%else%}Above 120 Days{%endif%}
+                    </td>
+                    <td>{% invoicegrossamount invoice.id as invdisval %}
+                        {% invoicetaxamount invoice.id as invdistax %}
+                        <div> {{selectedcurrencysymbol.currency_symbol}}   {{invdisval|addvalues:invdistax}}
+                        {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                        </div>
+                    </td>
+                <tr>
+                   
+                {%endfor%}
+                {% if invoicecurrencylist%}
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    {%if reportname == 'paidinvoice_paymentdays'%}
+                    <td></td>
+                    {%endif%}
+                    <th>Gross Net Payable Amount</th>
+                    <th> {% gettotalgrossamount invoicecurrencylist as invdisval %}
+                        {% gettotaltaxamount invoicecurrencylist as invdistax %}
+                        <div>{{selectedcurrencysymbol.currency_symbol}}  {{invdisval|addvalues:invdistax}}
+                        {%with total=invdisval|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}</div></th>
+                    {%else%}
+                    <tr>
+                        <td colspan="9" class="cls-nil">
+                            ---</td>
+                    </tr>
+                    {%endif%}
+                </tr>
+                {%elif reportname == 'exception_report'%}
+                <thead>
+                    <tr>
+                        <th>S/N</th> 
+                        <th>Vendor Name<button class="filter-btn" data-filter="inv-num"> <i class="fas fa-sort"></i></button></th>  
+                        <th>Invoice No <button class="filter-btn" data-filter="pay-status"> <i class="fas fa-sort"></i></button></th>
+                        <th>Submitted Date <button class="filter-btn" data-filter="submit-date"> <i class="fas fa-sort"></i></button></th> 
+                        <th>Approval Status <button class="filter-btn" data-filter="approval"> <i class="fas fa-sort"></i></button></th>
+                        <th>Exceptions <button class="filter-btn" data-filter="status"> <i class="fas fa-sort"></i></button></th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                
+                {% for invoice in exceptionlist %}
+                <tr>
+                    
+                    <td>{{forloop.counter}}</td>
+                    <td><div {%for j,count in exceptionrankinglist %} {%if j.id == invoice.invoice.vendor.id %} style="color: red;  font-weight: bold;" {%endif%} {%endfor%}>{{invoice.invoice.vendor.vendor_name}}</div></td>
+                    <td>{{invoice.invoice_number}}</td>
+                    <td class="td-center text-wrap"> 
+                        <div>{{invoice.invoice_submission_date|confulldate:invoice.invoice.company.id|default_if_none:"---"}}</div>
+                    </td>
+                    <td class="td-left ">
+                        <div>{% if invoice.approval_status == 6 and invoice.invoice.invoice_status == 6 %} Disputed {% elif invoice.approval_status == 1 and invoice.invoice.invoice_status == 2 %} Awaiting Approval {% elif invoice.approval_status == 1 and invoice.invoice.invoice_status == 1 %} Not Yet Submitted {% elif invoice.approval_status == 4 and invoice.invoice.invoice_status == 4 %} Returned {% elif invoice.approval_status == 5 and invoice.invoice.invoice_status == 5 %} Rejected {% else %} Approved {% endif %}</div>
+                      </td>
+                      {%getexceptions invoice.invoice.id invoice.invoice.company.id invoice.approval_status invoice.invoice.invoice_status as exceptions_reasons%}
+                      <td>{%for i in exceptions_reasons %}
+                       
+                       <ul>
+                        {%if i.exceptional_type == 1  %}{%for j,k in exceptionreasonlist%}<div {%if j == '1' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Changes in Supporting document </div>{%endif%}
+                        {%if i.exceptional_type == 2  %}{%for j,k in exceptionreasonlist%}<div {%if j == '2' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%}  Work Completion Certificate or Timesheet mismatch with Invoice billing details{%endif%}
+                        {%if i.exceptional_type == 3  %}{%for j,k in exceptionreasonlist%}<div {%if j == '3' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Material Delivery Ticket or Certificate Mismatch with Invoice Billing details{%endif%}
+                        {%if i.exceptional_type == 4  %}{%for j,k in exceptionreasonlist%}<div {%if j == '4' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Mismatch between price quoted on invoice and selected contract{%endif%}
+                        {%if i.exceptional_type == 5  %}{%for j,k in exceptionreasonlist%}<div {%if j == '5' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%}  Asking for Credit Note{%endif%}
+
+                        {%if i.exceptional_type == 7  %}{%for j,k in exceptionreasonlist%}<div {%if j == '7' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%}  Supporting Documents Missing{%endif%}
+                        {%if i.exceptional_type == 8  %} {%for j,k in exceptionreasonlist%}<div {%if j == '8' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Wrong Supporting Documents{%endif%}
+                        {%if i.exceptional_type == 9  %} {%for j,k in exceptionreasonlist%}<div {%if j == '9' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Irrelevant Invoice </div>{%endif%}
+                        {%if i.exceptional_type == 10  %} {%for j,k in exceptionreasonlist%}<div {%if j == '10' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Relevant Contract not selected for invoice{%endif%}
+                        {%if i.exceptional_type == 11  %} {%for j,k in exceptionreasonlist%}<div {%if j == '11' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Work Done previously Invoiced{%endif%}
+
+                        {%if i.exceptional_type == 13  %} {%for j,k in exceptionreasonlist%}<div {%if j == '13' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Invoice details interpretation issues{%endif%}
+                        {%if i.exceptional_type == 14  %} {%for j,k in exceptionreasonlist%}<div {%if j == '14' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Supporting document issues{%endif%}
+                        {%if i.exceptional_type == 15  %} {%for j,k in exceptionreasonlist%}<div {%if j == '15' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Issues due to Verbal communication for work invoiced{%endif%}
+                        {%if i.exceptional_type == 16  %} {%for j,k in exceptionreasonlist%}<div {%if j == '16' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Work done outside of approval limits{%endif%}
+                        {%if i.exceptional_type == 17  %} {%for j,k in exceptionreasonlist%}<div {%if j == '17' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Dispute on contract execution{%endif%}
+                        {%if i.exceptional_type == 18  %} {%for j,k in exceptionreasonlist%}<div {%if j == '18' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Dispute coming out of Audit findings{%endif%}
+                        {%if i.exceptional_type == 19  %} {%for j,k in exceptionreasonlist%}<div {%if j == '19' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%} Inability to clarify through normal methods{%endif%}
+                        {%if i.exceptional_type == 20 or i.exceptional_type == 12 or i.exceptional_type == 6  %}{%for j,k in exceptionreasonlist%}<div {%if j == '6' or j == '12' or j == '20' %}style="color: red;  font-weight: bold;"{%endif%}>{%endfor%}  Other Reasons{%endif%}
+                       </ul>
+                       
+                        {%endfor%}</td>
+                        {% comment %} {%getcomments invoice.invoice.id invoice.invoice.company.id as comments%}
+                      <td>{{comments}}</td> {% endcomment %}
+                      <td class="eye_test text-wrap"><a class="btn p-0" href="{% url 'invoice:invoiceview' invoice.invoice.id %}"><i class="fa fa-eye" title="View"></i>
+                      </a>
+                          {% if vendor_status == True %}
+                          {% if invoice.invoice_status == 1 %} 
+                          <a class="btn p-0" href="{% url 'invoice:editinvoiceform' invoice.invoice.id 1 %}{% if invoice.invoice.wcc_id %}?wcc_id={{invoice.invoice.wcc_id}}{% endif %}"><i class="fa fa-edit" ></i>
+                      </a>
+                          {% endif %}
+                          {% endif %}
+                  </td>
+                  
+                </tr>
+                {% empty %}
+
+                <tr>
+                    <td colspan="9" class="cls-nil">
+                        --- </td>
+                </tr>
+               
+                {%endfor%}
+                
+            {%endif%}
+        </tbody>
+        </table> 
+    </div>
+  
+    <figure class="highcharts-figure">
+        <div id="container"></div>
+        <div id="container_paid_unpaid"></div>
+    </figure>
+
+</section>
+
+
+{% endblock%}
+{% block scripts %}
+{{ block.super }}
+<script>
+  var scheme = '{{scheme}}'
+  var gethost = '{{gethost}}'
+  var csrf_token = '{{csrf_token}}'
+  var reportname= `{{reportname}}`
+</script>
+
+<script src="https://code.jquery.com/ui/1.11.0/jquery-ui.js"></script> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" ></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="{% static 'js/invoice/invoicecompletereport.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/invoice/invoicelist.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/projects/userslist.js' %}"></script>
+<script>
+  
+    
+    
+if(reportname == 'approval_status'){
+ 
+    var selectedapprovalstatus = {{ selectedapprovalstatus|safe }}
+    projectname={{ projectname|safe }}
+     approvalstatus_matrix={{ approvalstatus_matrix|safe }}
+
+     seriesData = approvalstatus_matrix.map(function(row) {
+        return row.map(function(amount) {
+            return parseFloat(amount.replace(/,/g, ''));
+        });
+    });
+
+    var series = selectedapprovalstatus.map(function(name, index) {
+        return {
+            name: name,
+            data: seriesData[index]
+        };
+    });
+    
+
+    Highcharts.chart('container', {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Invoice by Approval Status',
+            align: 'left'
+        },
+        xAxis: {
+            categories: projectname,
+            crosshair: true,
+            accessibility: {
+                description: 'Months'
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Gross Amount (Inclusive of all Taxes)'
+            }
+        },
+        tooltip: {
+            valueSuffix: ''
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: series
+    });
+
+}
+
+//chart submissioncount
+if(reportname == 'submission_count'){
+    var year_month = {{ year_month|safe }}
+     invoicecount = {{ invoicecount|safe }}
+     Highcharts.chart('container', {
+        chart: {
+            type: 'area'
+        },
+        title: {
+            text: 'Invoice Submission Count',
+            align: 'left'
+        },
+        xAxis: {
+            categories: year_month,
+            title: {
+                text: 'Time Period'
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Total Submitted'
+            }
+        },
+    
+        plotOptions: {
+            series: {
+                fillOpacity: 0.1
+            }
+        },
+    
+        series: [{
+            data: invoicecount
+        }]
+    });
+}
+
+//chart payment_status
+if(reportname == 'payment_status'){
+  var paidamount = {{ paidamount|safe }}
+   unpaidamount = {{ unpaidamount|safe }}    
+   projectname={{ projectname|safe }}
+    Highcharts.chart('container', {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Payable Report',
+            align: 'left'
+        },
+        subtitle: {
+            align: 'left'
+        },
+        xAxis: {
+            categories: projectname,
+            crosshair: true,
+            accessibility: {
+                description: 'Countries'
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Amount'
+            }
+        },
+       
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [
+            {
+                name: 'Paid Invoice',
+                data: paidamount
+            },
+            {
+                name: 'Unpaid Invoice',
+                data: unpaidamount
+            }
+        ]
+    });
+}
+
+if(reportname == 'vendors_ranking'){
+   var vendorname = {{ vendorname|safe }}
+   vendorrankingamount = {{ vendorrankingamount|safe }}
+    vendorranking ={{ vendorranking|safe }}
+    $(function () {
+        $('#container').highcharts({
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: 'Vendor Ranking'
+            },
+            xAxis: {
+                categories: vendorname
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Vendor'
+                }
+            },
+            legend: {
+                reversed: true
+            },
+            plotOptions: {
+                series: {
+                    stacking: 'normal'
+                }
+            },
+            series: [{
+                name: 'Invoice Amount',
+                data: vendorrankingamount
+            }, ]
+        });
+    });
+}
+
+if(reportname == 'unpaidinvoice_overdue' || reportname == 'paidinvoice_paymentdays'){
+    if(reportname == 'unpaidinvoice_overdue')
+      title='Unpaid Invoice Count'
+    else
+        title='Paid Invoice Count'
+        
+    var unpaidinvoice_range = {{ unpaidinvoice_range|safe }}
+     unpaidinvoice_counts = {{ unpaidinvoice_counts|safe }}
+     min_amount = {{ min_amount|safe }}
+     max_amount = {{ max_amount|safe }}
+    
+    Highcharts.chart('container', {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: title,
+            align: 'left'
+        },
+        
+        xAxis: {
+            categories: unpaidinvoice_range,
+            crosshair: true,
+            accessibility: {
+                description: 'Countries'
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Invoice Count'
+            }
+        },
+       
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [
+            {
+                name: 'No of Days',
+                data: unpaidinvoice_counts
+            },
+        ]
+    });
+
+    const seriesData = [];
+
+$(document).ready(function() {
+    min_amount.forEach((min, index) => {
+        const dataPoint = {
+            low: min,
+            high: max_amount[index]
+        };
+
+        seriesData.push(dataPoint);
+    });
+
+    const chartOptions = {
+        chart: {
+            type: 'columnrange'
+        },
+        title: {
+            text: title
+        },
+        xAxis: {
+            categories: unpaidinvoice_range
+        },
+        yAxis: {
+            title: {
+                text: 'Amount'
+            }
+        },
+        series: [{
+            name: 'No of Days',
+            data: seriesData
+        }]
+    };
+
+    Highcharts.chart('container_paid_unpaid', chartOptions);
+});
+}
+
+
+if(reportname == 'ageing_report'){
+    title='Ageing Chart'
+    var ageingchart_range = {{ ageingchart_range|safe }}
+    ageingprojectname = {{ projectname|safe }}
+    ageingchart_counts = {{ ageingchart_counts|safe }}
+     projectlist = {{ projectlist|safe }}
+     project_data = {{ project_data|safe }}
+    Highcharts.chart('container', {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: title,
+            align: 'left'
+        },
+        
+        xAxis: {
+            categories: ageingchart_range,
+            crosshair: true,
+            accessibility: {
+                description: 'Countries'
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Invoice Count'
+            }
+        },
+       
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [
+            {
+                name: 'No of Days',
+                data: ageingchart_counts
+            },
+        ]
+    });
+   
+
+    var project_names = Object.keys(project_data);
+var days_ranges = ['Not Yet Due','1-30 days', '31-60 days','61-90 days','91-120 days','Over 120 days'];
+
+// Create series data based on project data
+var seriesData = [];
+for (var i = 0; i < days_ranges.length; i++) {
+    var range = days_ranges[i];
+    var data = project_names.map(function (id) {
+        return project_data[id][range];
+    });
+    seriesData.push({
+        name: range,
+        data: data
+    });
+}
+
+Highcharts.chart('container_paid_unpaid', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Invoice Count',
+        align: 'left'
+    },
+    xAxis: {
+        categories: ageingprojectname.map(function (id) {
+            return  id;
+        }),
+        crosshair: true,
+        accessibility: {
+            description: 'Projects'
+        }
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Invoice Count'
+        }
+    },
+    tooltip: {
+        headerFormat: '<span style="font-size: 10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>{point.y}</b></td></tr>',
+        footerFormat: '</table>',
+        shared: true,
+        useHTML: true
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+        }
+    },
+    series: seriesData
+});
+}
+</script>
+{% endblock %}
+

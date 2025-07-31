@@ -1,0 +1,915 @@
+/* sa 14-05-24 */
+.inv_rec_cls {
+    width: 100%;
+    max-width: 350px;
+    border-radius: 20px;
+    padding: 13px 0px;
+}
+.inv_rec_cls p {
+    margin-bottom: 5px;
+}
+/* end */
+.select2-container--classic .select2-results__option[aria-selected='true'], .select2-container--default .select2-results__option[aria-selected='true']{
+    background-color: #BD2753 !important;
+    color: white !important;
+}
+.select2-selection__arrow{
+    display: none;
+}
+.tot-in td:nth-child(2) {
+    text-align:  var(--centertext-align);
+}
+
+.tot-in td:last-child {
+    text-align:  var(--centertext-align) !important;
+}
+
+
+.vend-thead td:nth-child(1) {
+    text-align:  var(--centertext-align) !important;
+
+}
+
+.vend-thead td:nth-child(4) {
+    text-align:  var(--centertext-align) !important;
+}
+
+.vend-thead td {
+    border-right: 1px solid var(--tableborder-color);
+}
+
+.prj-back_clr th {
+    background: transparent !important;
+}
+
+.vin_left {
+    text-align: left !important;
+}
+
+.vin_center {
+    text-align: center !important;
+}
+
+.all-tbl-hd th {
+    text-transform: capitalize !important;
+}
+
+#upload-file {
+    width: 400px;
+}
+
+.t-sub-data {
+    width: 20%;
+}
+
+.cos-in-nu {
+    word-break: break-word;
+}
+
+.invoice-info {
+    width: 100%;
+    margin: 0 auto;
+    border: 1px solid #c7c7c7;
+}
+
+.invoice-info th,
+.invoice-info td {
+    border: 1px solid #c7c7c7 !important;
+    padding: 8px;
+    color: #000;
+}
+
+.invoice-info th {
+    width: 50%;
+    border-right: 1px solid #c7c7c7 !important;
+    color: #000;
+    font-weight: 600;
+}
+
+.invoice-info a,
+.invoice-info a:hover,
+.inv-pretbl a,
+.inv-pretbl a:hover {
+    color: #96183a;
+    font-weight: 500;
+}
+
+.am-valu {
+    text-align: center !important;
+}
+
+.color-fil {
+    color: #006c5d;
+    font-size: 15px;
+    margin-bottom: 15px;
+}
+
+.inv-table_wid th:nth-child(1) {
+    width: 5%;
+}
+
+.inv-table_wid th:nth-child(2) {
+    width: 15%;
+}
+
+.inv-table_wid th:nth-child(3) {
+    width: 10%;
+}
+
+.inv-table_wid th:nth-child(4) {
+    width: 15%;
+}
+
+.inv-table_wid th:nth-child(5) {
+    width: 15%;
+}
+
+.inv-table_wid th:nth-child(6) {
+    width: 10%;
+}
+
+.inv-table_wid th:nth-child(8) {
+    width: 10%;
+}
+
+.inv-table_wid th:nth-child(9) {
+    width: 10%;
+}
+
+.payment-invoice-summary thead tr th:nth-child(4) {
+    width: 16%;
+}
+
+
+.inv-prev_width th:nth-child(3) {
+    width: 15%;
+}
+
+.inv-prev_width th:nth-child(4) {
+    width: 20%;
+}
+
+.inv-prev_width th:nth-child(5) {
+    width: 20%;
+}
+
+.td-left {
+    text-align: var(--lefttext-align);
+}
+
+@media screen and (min-width:768px) and (max-width:1023px) {
+    .from-head {
+        font-size: 24px;
+    }
+
+    .contractfilehead {
+        font-size: 16px;
+    }
+
+    .invoicetblcls {
+        width: 175vw;
+    }
+
+    .inv-prev_table {
+        /* width: 135vw; */
+    }
+
+    .tab_prev {
+        /* overflow-x: auto !important;
+        white-space: nowrap !important; */
+    }
+
+    .bor-rgt {
+        /* border-right: none !important; */
+    }
+
+    .inv-row_wid {
+        width: 180vw;
+    }
+
+    .whole_table_prev {
+        overflow-x: auto !important;
+    }
+
+    .sum-date {
+        font-size: 16px;
+    }
+
+    .hed-inv-gr {
+        font-size: 16px;
+    }
+
+    .hed-inv-gross {
+        font-size: 16px;
+    }
+
+    .hed-inv-gro {
+        font-size: 16px;
+    }
+
+    .inv-table_wid>table {
+        width: 200%;
+    }
+}
+
+@media screen and (min-width:1024px) and (max-width:1199px) {
+    .bor-rgt {
+        /* border-right: none !important; */
+    }
+
+    .inv-row_wid {
+        width: 130vw;
+    }
+
+    .whole_table_prev {
+        overflow-x: auto !important;
+    }
+
+    .sum-date {
+        font-size: 16px;
+    }
+
+    .hed-inv-gr {
+        font-size: 16px;
+    }
+
+    .hed-inv-gross {
+        font-size: 16px;
+    }
+
+    .hed-inv-gro {
+        font-size: 16px;
+    }
+}
+
+@media screen and (min-width:1200px) {
+    .inv-view_wrap {
+        white-space: normal !important;
+    }
+}
+
+@media screen and (min-width: 1200px) and (max-width: 1399px) {
+    .whole_table_prev {
+        overflow-x: auto !important;
+    }
+
+    .inv-row_wid {
+        width: 130vw;
+    }
+}
+
+/********** createinvoiceform2 **********/
+
+.tab-one {
+    border: 1px solid #eee;
+    width: 100%;
+}
+
+.tab-one th {
+    text-align: center;
+    font-size: 18px;
+    padding: 10px;
+    border: 1px solid #eee !important;
+    white-space: normal !important;
+}
+
+.tab-one td {
+    border: 1px solid #eee !important;
+    padding: 10px;
+}
+
+.tab-one td [type="text"] {
+    text-align:  var(--centertext-align) !important;
+}
+
+@media (max-width:1199px) {
+    .tab-one {
+        width: 150vw !important;
+    }
+}
+
+@media (min-width:1200px) and (max-width:1285px) {
+    .tab-one th:nth-child(2) {
+        width: 15% !important;
+    }
+}
+
+/********** createinvoiceform2 **********/
+
+
+/********** createinvoiceform2, editinvoicesteptwo **********/
+.head-inv-pre {
+    color: #AF2B50 !important;
+    font-size: 1.5rem !important;
+}
+
+/********** createinvoiceform2, editinvoicesteptwo **********/
+
+
+/********** editinvoicesteptwo **********/
+.tab-edit-one {
+    border: 1px solid #eee;
+    width: 100%;
+}
+
+.tab-edit-one th {
+    text-align: center;
+    font-size: 18px;
+    padding: 10px;
+    border: 1px solid #eee !important;
+    white-space: normal !important;
+}
+
+.tab-edit-one td {
+    border: 1px solid #eee !important;
+    padding: 10px;
+}
+
+.tab-edit-one td [type="text"] {
+    text-align:  var(--centertext-align) !important;
+}
+
+.eye-color td:nth-child(1) i {
+    /* color: #95183a !important; */
+}
+
+@media (max-width:1199px) {
+    .tab-edit-one {
+        width: 150vw !important;
+    }
+}
+
+@media (min-width:1200px) and (max-width:1285px) {
+    .tab-edit-one th:nth-child(2) {
+        width: 15% !important;
+    }
+}
+
+/********** editinvoicesteptwo **********/
+
+
+
+/********** companyinvoicelist **********/
+.tab-heading {
+    border-radius: 5px !important;
+    border: 1px solid #eee !important;
+}
+
+.tab-heading th {
+    padding: 10px 10px !important;
+    background-color: #fff !important;
+}
+
+.tab-heading th:nth-child(2) {
+    width: 10% !important;
+    ;
+}
+
+.tab-heading th:nth-child(5) {
+    width: 20% !important;
+}
+
+.tab-heading th:nth-child(7) {
+    width: 12% !important;
+    ;
+}
+
+.tab-heading td {
+    padding: 10px 10px !important;
+}
+
+.tab-heading td:nth-child(1),
+.tab-heading td:nth-child(5) {
+    text-align:  var(--centertext-align) !important;
+}
+
+.date-center {
+    text-align:  var(--centertext-align);
+}
+
+.actions-center {
+    text-align:  var(--centertext-align);
+}
+
+.paginate_button:hover {
+    border: 1px solid #979797 !important;
+    background: linear-gradient(to bottom, white 0%, #dcdcdc 100%) !important;
+}
+
+.paginate_button:active {
+    border: 1px solid #979797 !important;
+    background: linear-gradient(to bottom, white 0%, #dcdcdc 100%) !important;
+}
+
+
+
+@media (min-width:768px) and (max-width:1199px) {
+    .tab-heading {
+        width: 160vw !important;
+    }
+}
+
+@media (min-width:1200px) and (max-width:1359px) {
+    .tab-heading th:nth-child(2) {
+        width: 18% !important;
+    }
+}
+
+@media (min-width:768px) and (max-width:786px) {
+    .tab-heading th:nth-child(8) {
+        width: 15% !important;
+    }
+}
+
+@media (min-width:1200px) and (max-width:1414px) {
+    .tab-heading th:nth-child(8) {
+        width: 26% !important;
+    }
+}
+
+/********** companyinvoicelist **********/
+
+/********** editinvoicestepthree **********/
+.doc-uploads th,
+td {
+    white-space: normal !important;
+}
+
+.doc-uploads label {
+    word-break: break-word;
+}
+
+.color-fil {
+    word-break: break-word;
+}
+
+.first-col {
+    width: 40%;
+}
+
+.second-col {
+    width: 60%;
+}
+
+.link-file {
+    word-break: break-word;
+}
+
+.sm-lin {
+    align-items: baseline;
+}
+
+/********** editinvoicestepthree **********/
+
+
+
+/********** payment receipt upload **********/
+
+/********** Comment Pop-up **********/
+.comment-head {
+    background-color: #FFE9E9 !important;
+    border: none !important;
+}
+
+.comment-head button {
+    padding: 0px !important;
+}
+
+.comment-head span {
+    font-size: 28px;
+    color: #96193a !important;
+    /* padding: 0px 10px !important; */
+    line-height: 0 !important;
+    /* outline: 1px solid #96193a;
+    outline-offset: -10px; */
+    border-radius: 25px;
+    /* padding: 0px 12px 5px 12px !important; */
+    padding: 0px 12px 5.8px 12px !important;
+}
+
+.comment-body {
+    background-color: #FFE9E9 !important;
+}
+
+.modal-body input {
+    /* display: none; */
+    /* visibility: hidden; */
+    /* position: absolute; */
+}
+
+.modal-body h5 {
+    font-size: 18px;
+    color: #96193a !important;
+}
+
+.comment-foot {
+    background-color: #FFE9E9 !important;
+    border: none;
+    justify-content: center;
+    padding: 10px 15px !important;
+}
+
+.comment-foot button {
+    background-color: #BD2753 !important;
+    margin: 0px !important;
+}
+
+.comment-foot button:hover {
+    box-shadow: 0 8px 10px -8px #8D1636 !important;
+}
+
+.upload-choose-file {
+    width: 100%;
+}
+
+.upload-choose-file .flex-val {
+    display: flex;
+    align-items: center;
+}
+
+.upload-choose-file input {
+    width: 100%;
+}
+
+.upload-choose-file td:nth-child(1) {
+    width: 13%;
+}
+
+.add {
+    background-color: #BD2753 !important;
+    color: white;
+    border-radius: 5px;
+    border: none;
+    padding: 5px 10px;
+    margin: 5px 5px;
+}
+
+.delete {
+    background-color: #BD2753 !important;
+    color: white;
+    border-radius: 5px;
+    border: none;
+    padding: 5px 10px;
+    margin: 5px 5px;
+}
+
+/********** Comment Pop-up **********/
+
+#files-area {
+    /* width: 30%; */
+    margin: 0 auto;
+}
+
+.file-block {
+    border-radius: 10px;
+    /* background-color: rgba(144, 163, 203, 0.2); */
+    background-color: #FFE9E9;
+    margin: 5px;
+    color: #96193a;
+    display: inline-flex;
+
+    &>span.name {
+        padding-right: 10px;
+        width: max-content;
+        display: inline-flex;
+    }
+}
+
+.file-delete {
+    display: flex;
+    width: 24px;
+    color: #96193a;
+    background-color: #FFE9E9;
+    font-size: large;
+    justify-content: center;
+    margin-right: 3px;
+    cursor: pointer;
+    border-radius: 10px !important;
+
+    &:hover {
+        background-color: #FFE9E9 !important;
+        border-radius: 10px !important;
+    }
+
+    &>span {
+        transform: rotate(45deg);
+    }
+}
+
+
+/********** payment receipt upload **********/
+
+
+/********** Vendor Login Invoice Note **********/
+@media (min-width:1024px) and (max-width:1325px) {
+    .invoicevendor-table {
+        width: 120vw;
+    }
+}
+/********** Vendor Login Invoice Note **********/
+
+.width-appo{
+    width:15%;
+}
+
+/* wcc approved list starts here */
+
+.coversheet-users {
+    width: 100%;
+    border: 1px solid #000;
+}
+
+.coversheet-users th {
+    /* color: #007480; */
+    color: #fff;
+    background-color: #891737;
+    /* color: #AF2B50; */
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    border: 1px solid #000 !important;
+    padding: 10px 10px;
+}
+
+.coversheet-users td {
+    color: #000;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 10px 10px;
+    border: 1px solid #000;
+}
+
+.coversheet-users-image {
+    text-align: center;
+}
+
+.coversheet-users-image img {
+    width: 250px;
+}
+
+.coversheet-users-image p {
+    font-size: 30px;
+    font-weight: 600;
+    margin-bottom: 0px;
+}
+/* wcc approved list ends here */
+
+/* Invoice information */
+
+@media screen and (max-width: 768px) and (max-width: 1023px){
+    .invoice-sum-info th {
+        padding: 0 25px;
+    }
+    .wcc-summery-detil{
+        width: 130%;
+    }
+    }
+
+    /* Sa 28/10/2023 */
+    .assign-user i {
+        color: #95183a;
+        font-size: 17px;
+    }
+
+    .all-icon-same-clr i{
+        color: #95183a !important;
+        font-size: 17px;
+    }
+
+
+/* 31/10/2022 SA */
+.all-icon-same-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.all-icon-same-line img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+.status-width-invoice{
+    width:100px;
+    
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    /* border-radius: 50% !important;
+    padding: 0.5em 0.9em !important; */
+ }
+
+ /* div#comp_ven_invoice_paginate {
+    position: relative;
+    left: -50%;
+    top: 0px;
+    transform: translateX(50%);
+}
+
+a#comp_ven_invoice_previous {
+    border-radius: 50px !important;
+    border: 1px solid transparent;
+    color: #fff !important;
+    background-color: #BD2753;
+    padding: 0.5em 0.9em !important;
+}
+
+div#comp_ven_invoice_paginate .paginate_button:hover {
+    border-radius: 50px !important;
+    border: 1px solid transparent;
+    color: #fff !important;
+    background-color: #BD2753 !important;
+    padding: 0.3em 0.9em !important;
+}
+
+a#comp_ven_invoice_next {
+    border: 1px solid transparent;
+    border-radius: 50px !important;
+    background: #a01c3f;
+    color: #fff !important;
+    padding: 0.5em 0.9em !important;
+}
+
+div#comp_ven_invoice_paginate .paginate_button:hover{
+    border: 1px solid transparent;
+    border-radius: 50px !important;
+    background: #a01c3f !important;
+    color: #fff !important;
+    padding: 0.3em 0.9em !important;
+}
+
+div#comp_ven_invoice_paginate .paginate_button.current {
+    color: #fff !important;
+}
+
+a.paginate_button.current {
+    border-radius: 50% !important;
+    background: #a01c3f !important;
+
+} */
+
+.icon-same-lines a i{
+    /* color:#95183a; */
+}
+
+/* pagination ui 1/11/2023 SA*/
+
+div#comp_ven_invoice_paginate {
+    position: relative;
+    left: -50%;
+    top: 0px;
+    transform: translateX(50%);
+    padding-top:10px;
+    padding-bottom: 20px;
+}
+
+a#comp_ven_invoice_previous {
+    border-radius: 50px !important;
+    border: 1px solid transparent;
+    color: #fff !important;
+    background-color: #BD2753 !important;
+    padding: 0.5em 0.9em !important;
+}
+
+a#comp_ven_invoice_next {
+    border: 1px solid transparent;
+    border-radius: 50px !important;
+    background: #BD2753;
+    color: #fff !important;
+    padding: 0.5em 0.9em !important;
+}
+
+div#comp_ven_invoice_paginate a.paginate_button.current{
+color:#fff !important;
+}
+
+a.paginate_button.current {
+    border-radius: 50% !important;
+    background: #BD2753 !important;
+    box-shadow: none !important;
+    border-color: #BD2753 !important;
+
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    border: 2px solid #bd2753;
+    border-radius: 50%;
+    font-weight: 500;
+}
+
+div#comp_ven_invoice_paginate a {
+    margin: 0px 8px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    color: #fff !important;
+    background: #BD2753 !important;
+    border-color: #BD2753 !important;
+    border-radius:50% !important;
+    padding: 0.5em 1em;
+    min-width: 1.5em;
+}
+
+div#comp_ven_invoice_info {
+    /* color: #000; */
+    color:#bd2753;
+    font-weight: 500;
+    padding-top:30px !important;
+}
+/* end */
+
+input::placeholder {
+    text-transform: capitalize !important;
+}
+.warning{
+    border: 1px solid red !important;
+}
+
+.invoice-pay-btn{
+    min-width: 120px !important;
+    font-size: 0.75vw !important;
+}
+/* Filter button UI in invoice list page */
+.filter-btns {
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.filter-btn {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.filter-btn i {
+    color: #666;
+    font-size: 14px;
+}
+
+.filter-btn.active i {
+    color: #000;
+}
+
+.filter-btn:focus {
+    outline: none;
+}
+
+.modal-backdrop {
+    /* Set the background color to transparent */
+    background-color: transparent !important;
+}
+
+iframe#payment_instruction{
+width: 100%;
+min-height: 500px;
+}
+
+.re2{
+    margin-top: 50px;
+}
+
+
+
+ 
+ /* .loader {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px; 
+    height: 40px;
+    border-radius: 50%;
+    border: 4px dotted rgba(255, 255, 255, 0.3); 
+    border-top: 4px dotted #3498db; 
+    animation: spin 1s linear infinite;
+    z-index: 9999;
+    display: none;
+   
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+} */
+
+
+.loader {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1) 75%, #AF2B50 75%, #AF2B50);
+    mask: radial-gradient(farthest-side, transparent calc(100% - 6px), black calc(100% - 6px));
+    animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

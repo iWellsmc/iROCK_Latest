@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+    <h3 class="text-center heading from-head">Edit Project</h3>
+    <form method="POST" id="project-create" class="form-txt">
+        {% csrf_token %}
+        {% for hidden in form.hidden_fields %}
+            {{hidden}}
+        {% endfor %}
+        <div class="form-group row" action="projects/edit/{{project.id}}">
+            <div class="col-sm-12">
+            <label for="staticEmail" class="col-2 col-form-label">Company Name</label> 
+            <button type="button" style="float:right;" class="btn btn-clr"><a href="{% url 'projects:projectlist' %}">Back</a></button> 
+            <input type="text" name="company_name" class="col-sm-12 form-control" value="{{project.company}}" readonly>
+            <label for="staticEmail" class="col-2 col-form-label">Entity/Subsidary Name</label>
+            <input type="text" name="entity" maxlength="255" class="form-control" value="{{project.entity}}" id="id_entity">
+            <label for="staticEmail" class="col-2 col-form-label">Project Name*</label>
+            <input type="text" name="name" maxlength="255" class="form-control" value="{{project.name}}" id="id_name">
+            <label for="staticEmail" class="col-2 col-form-label">Country*</label>
+            <select name="country" class="form-control"  id="id_country">
+            {% comment %} <option value="{{project.country.id}}" selected>{{project.country}}</option> {% endcomment %}
+                {% for country in countries %}
+                    <option value="{{country.id}}"{%  if country.id == project.country.id %}selected{%endif%}>{{country.nicename}}</option>
+                {% endfor %}
+                </select>
+            <label for="staticEmail" class="col-2 col-form-label">Block Name</label>
+            <input type="text" name="block_name" maxlength="255" class="form-control" value="{{project.block_name}}" id="id_block_name">
+            <label for="staticEmail" class="col-2 col-form-label">Field Name</label>
+            <input type="text" name="field_name" maxlength="255" class="form-control" value="{{project.field_name}}" id="id_field_name">
+            <label for="staticEmail" class="col-2 col-form-label">Project Environment</label>
+            <select name="project_environment" class="form-control" required id="id_project_environment">
+            <option value="{{project.project_environment}}-{{project.project_environment_subtype}}" selected>{{project.project_environment}}-{{project.project_environment_subtype}}</option>
+              <optgroup label="Onshore">
+                <option value="Onshore-standalone">Onshore-Standalone</option>
+
+            <option value="Onshore-pad_type">Onshore-Pad Type</option>
+
+            </optgroup>
+            <optgroup label="Offshore">
+            <option value="Offshore-swamp">Offshore-Swamp</option>
+
+            <option value="Offshore-shallow_water">Offshore-Shallow Water</option>
+
+            <option value="Offshore-deepwater">Offshore-Deepwater</option>
+
+            </optgroup>
+            <optgroup label="Custom">
+            <option value="Custom-Onshore">Onshore</option>
+
+            <option value="Custom-Offshore">Offshore</option>
+
+            </optgroup>
+            </select>
+        <label for="staticEmail" class="col-2 col-form-label" >Project Discipline</label>
+        <select name="project_discipline" class="form-control" id="id_project_discipline">
+            {% for discipline in project_discipline %}
+                <option value="{{discipline.id}}" {% if discipline.id == project.project_discipline.id %}selected{% endif %}>{{discipline.name}}</option>
+            {% endfor %}
+            </select>
+        <div id="project_dicipline_subtype">
+        <label for="staticEmail" class="col-2 col-form-label" id="discipline_subtype_id" >Project Discipline Subtype</label><br>
+        {% for check_box in get_checkbox %}
+        <input type="checkbox" name="project_dicipline_subtype" {% if block.status==1 %}checked="checked"{% else %} value="{{check_box.discipline_subtype.id}}" />{{check_box.discipline_subtype.name}}<br>
+        {% endfor %}
+        </div>
+        </div>
+    </div>
+    <div class="text-center">
+    <button type="submit" class="btn btn-clr text-center">Save and Update</button>
+    </div>
+</form>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://jqueryvalidation.org/files/dist/jquery.validate.min.js"></script>
+<script src="https://jqueryvalidation.org/files/dist/additional-methods.min.js"></script>
+<script>
+    $("#id_project_discipline").change(function(){
+    $('#project_dicipline_subtype').hide()
+  $.ajax({
+    type: "GET",
+    url:'{% url "projects:discipline_subtype" %}',
+    data: {
+      "id":$(this).val(),
+    },
+    cache: false,
+    success: function(data)
+    {
+      var html=''
+      $.each(data.get_discipline_subtype,function(key,value){
+          console.log(value)
+      
+      html +='<input type="checkbox" name="project_dicipline_subtype" value='+value.id+'>&emsp;'+value.name+ '<br>'
+      });
+      $("#project_dicipline_subtype").html(html);
+      $("#project_dicipline_subtype").show();
+    } 
+  });
+});
+  
+    </script>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+
+<!-- <footer class="captions" style="text-align: center;">
+    {{pi_number}}
+</footer> -->
+
+<div class="row parent" style="margin-top: 75px;">
+     
+    
+    <!-- <header> -->
+        <!-- <table>
+            <tr style="vertical-align: baseline;">
+                <td class="header_text" >
+                </td>
+                <td class="header_val">
+                    {{request.company.company_name|safe}}
+                </td>
+            </tr>
+        </table> -->
+<!-- 
+        <div class="d-flex justify-content-between align-items-center" style="width: 400px; margin: 50px auto 0px auto !important;">
+            <div class="logo-image"></div>
+            <div class="logo-name">
+                {{request.company.company_name|safe}}
+            </div>
+            <div>
+                {{request.company.address|safe}}
+            </div>
+        </div> -->
+    <!-- </header> -->
+
+    <header style="display: flex; justify-content: center; align-items: center;">
+        <div class="logo-image"></div>
+
+        <div class="company-details">
+            <h5 style="margin: 0px;">{{pi_number}}</h5>
+            <h4 class="head-inv-pre">{{request.company.company_name|safe}}</h4>
+            <p>{{request.company.address|safe}}</p>  
+        </div>
+    </header>
+    
+    <!-- <footer>
+        {{pi_number}}
+    </footer> -->
+    <!-- <p class="captions">
+        Date
+    </p> -->
+
+    <div>
+        <div>{{updated_at}}</div>
+        <div>{{bank_address|safe}}</div>
+    </div>
+    <br>
+    {% if contact_personnel %}
+    <p><span class="captions">Attention to:</span> {{contact_personnel}}</p>
+    {%endif%}
+    
+    {% if contact_personnel_title == 'Mr'%}</h5>
+            <p>Dear Sir</p>
+    {% elif contact_personnel_title == 'Mrs' or contact_personnel_title == 'Ms' %}
+    <p>Dear Madam</p>
+    {%else%}
+    <p>Dear Sir/Madam</p>
+    {%endif%}
+    <div style="text-align:center;">
+        <strong>Transfer Instruction</strong>
+    </div>
+    
+    <p>Kindly transfer the sum of {{payable_amount}} ({{numto_word}}) from our Account No <span class="captions">{{bank_name}} ({{account_no}})</span> with your bank and credit the account with details below:</p>
+
+    <table>
+        <tr>
+                <td class="captions">Beneficiary Name</td>
+                <td class="captions">:</td>
+                <td>{{vendor_name}}</td>
+        </tr>
+        <tr>
+                <td class="captions">For Credit to</td>
+                <td class="captions">:</td>
+                <td>{{vendor_bank_name}}</td>
+        </tr>
+        <tr>
+                <td class="captions">Account No</td>
+                <td class="captions">:</td>
+                <td>{{vendor_bank_acno}}</td>
+        </tr>
+    </table>
+    <br>
+    <p>
+        <span class="captions">Purpose of Payment:</span> Payment on Invoice No: {{invoice_no}} (Payment Percentage: {{payment_percentage}}%)
+    </p>
+    
+    <table>
+        <tr>
+            <td class="display_val" style="padding-bottom: 25px;">
+                Thank You.
+            </td>
+        </tr>
+        <tr>
+            <td class="display_val">
+                Yours Faithfully,
+            </td>
+        </tr>
+        <tr>
+            <td class="display_val">
+                <span class="captions">For: {{name}}</span>
+            </td>
+        </tr>
+        {% get_signed_users invoice_cost request paycount as Invdata %}
+        {% if Invdata  %}
+        <tr>
+            <td class="display_val">
+                <span class="captions">Signature: <span>{{Invdata.name}}</span>
+                    {% if Invdata.signature_type %}
+                    {% if Invdata.signature_type == "signature" %}
+                    {% getEncoded Invdata.signature_image as encoded_image %}
+                         <!-- <img src="{{Invdata.signature_image.url}}"> --{{Invdata.signature_image.url}} -->
+                         <div><img src="{{ encoded_image }}"></div>
+                    {% elif Invdata.signature_type == "font" %}
+                    <p style="font-family:'{{Invdata.signature_fontfamily.font_name}}'">{{Invdata.signature_fontname}}</p>
+                    {% else %}
+                    {% getEncoded Invdata.signature_image as encoded_image %}
+
+                   <div> <img src="{{ encoded_image }}"></div>
+                      
+                    {% endif %}
+                {% elif Invdata.signature_type == '' %}
+                    {% if Invdata.signature_image %}
+                    <img src="{{Invdata.signature_image.url}}">
+                    {% elif Invdata.signature_fontfamily %}
+                    <p style="font-family:'{{Invdata.signature_fontfamily.font_name}}';">
+                        {{Invdata.signature_fontname}}</p>
+                    {% elif Invdata.signature_image %}
+                    <img src="{{Invdata.signature_image.url}}">
+                    {% else %}
+                    -
+                    {% endif %}
+                {% else %}
+                -
+                {% endif %}
+                </span>
+            </td>
+        </tr>
+        {% endif %}
+    </table>
+</div>

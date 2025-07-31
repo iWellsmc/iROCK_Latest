@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+
+
+<h4 class="from-head">Vendor Approval Panel</h4>
+<form method="POST">
+    {% csrf_token %}
+<div class="row">
+    <div class="col-12">
+        <div class="col-6 vend-appor-box">
+            <div class="hd-vend-ap"><label class="vend-appor-hd">Primary Panel Member Name<span class="star-clr">*</span></label>
+            <select name="primarymember" class="form-control vend-appor-inp" id='primary_memberid'>
+                <option value='' selected>--Select User--</option>
+                {% for user in users %}
+                    <option value="{{user.id}}">{{user.username}}</option>
+                {% endfor %}
+            </select>
+            </div>
+            <div class="hd-vend-ap"><label class="vend-appor-hd">Secondary Panel Member Name<span class="star-clr">*</span></label>
+            <select name="secondarymember" class="form-control vend-appor-inp" id='secondary_memberid'>
+                <option value='' selected>--Select User--</option>
+            </select>
+            </div>
+            <div class="text-center spacing-button">
+                <button type="submit" class="btn btn-clr text-center" >Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+
+    $(document).on('change','#primary_memberid',function(){
+        var val=$(this).val();
+        $('#secondary_memberid').html(' ')
+        var html=''
+        if (val !=''){
+            $.ajax({
+                type:"GET",
+                url:'/projects/getapproveusers',
+                data:{'id':val},
+                success: function(data){
+                    console.log(data)
+                    html+='<option value="">--Select User</option>'
+                    $.each(data.data,function(key,value){
+                        html +='<option value='+value.id+'>'+value.username+'</option>'
+                    })
+                    $('#secondary_memberid').html(html)
+                }
+            }) 
+        }
+        else{
+            $('#secondary_memberid').html('<option value="">--Select User</option>')
+        }
+      
+
+    })
+
+</script>
+{% endblock %}

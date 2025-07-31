@@ -1,0 +1,137 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title>Guidelines For Invoice Upload</title>
+  <style>
+    * { font-family: DejaVu Sans, sans-serif; }
+            .companylogo {
+                width: 50px;
+                height: 50px;
+            }
+            p{ font-size:16px; }
+            
+            .companyname-text{ 
+         text-align: center!important;    
+         font-size: 22px;   
+         color: #AF2B50; 
+         font-weight: 600;
+         margin-right: 150px;
+        }
+
+        .from-head {
+        color: #AF2B50;
+        font-weight: 600;
+        font-size:18px;
+       
+       
+        width: 100% !important;
+    }
+
+        </style>
+    </head>
+    <body style="font-family: Arial;">
+
+        <table>
+            <tr>
+                <th  style="width:15%;">{% if imageurl %}  <img src="{{imageurl}}">  {% endif %}</th>
+                <th style="width:85%;">
+                    <h4 class="companyname-text">{{company.company_name}}</h4>
+                    <p style="text-align: center; font-size: 12px; margin-top: -10px; margin-bottom: 10px;">{{company.address|safe}}</p>
+                </th>
+               
+            </tr>
+        </table>
+    
+             
+        <!-- <table class="w-100" style="margin-top: 20px !important;">
+    
+                   <tr>
+                    <td style="width:15%;"></td>
+                    <td class="" style="text-align: center; width:85%;">
+                       
+                     
+                    </td>
+                   </tr>
+                -->
+             </table>
+             <h3 class="from-head" style="margin-top: 20px;">Guidelines For Invoice Upload On iROCK Software</h3>
+     
+
+        <div class="row">
+         
+            <div class="col-6">
+                <p>The Guidelines For Invoice Upload and Registration Will be as Follows:</p>
+            </div>
+        </div>
+
+        <p style="font-size:16px;">Invoice Upload is to be done only by the assigned <b>Primary and Secondary Users</b> of the Vendor Company that are registered in the iROCK software for <b>{{company.company_name}}</b>.<p>
+        
+        <p style="font-size:16px;">Vendor shall communicate to <b>{{company.company_name}}</b> for the replacement of any of the above-mentioned registered users.</p>
+       
+        <h2 style="font-size: 20px;">Invoicing Procedure:</h2>
+        <p style="font-size:16px;">Step 1: Vendor must fill up the Standard Information Form and Checklist on the iROCK software.</p>
+        <p>Each invoice shall clearly state the following:</p>
+            <div style="padding-left:30px;">
+        <p>•   Invoice Number</p>
+        <p>•  Invoice Date</p>
+        <p>•	Period of Service</p>
+        <p>•	Relevant Contract/Amendment/Variation Order Name</p>
+        <p>•	Relevant Contract/Amendment/Variation Order Number</p>
+        <p>•	Type of Service (Service, Supply or Services and Supply)</p>
+        <p>•	Brief Description of Service Rendered</p>
+        <p>•    Quantities of Material Delivered</p>
+        <p>•	Location of Service (Installation site, Rig etc.)</p>
+        <p>•	Project Name</p>
+        <p>•	Block Name</p>
+        <p>•	Field Name</p>
+        <p>•	Pad/Platform/Cluster Name</p>
+        <p>•	Facility Name</p>
+        <p>•	Well name</p>
+        <p>•	Currency and Currency Split where applicable.</p>
+        <p>•	Gross Amount</p>
+        <p>•	Taxes</p>
+        <p>•	Discounts where applicable</p>
+        <p>•	Net Amount Payable</p>
+        <p>•	Payment terms</p>
+        <p>•	Bank Account Details</p>
+        </div>
+            <br><br><br>
+
+        <!--second Page-->
+        <p>Step 2: Vendor shall submit and upload the invoices along with the following:</p>
+        <div style="padding-left:30px;">
+        <p>•	Call Off or Instructions.</p>
+        <p>•	Mobilization Notices.</p>
+        <p>•	Work Completion Certificates.</p>
+        <p>•	Material Delivery Tickets/Certificates</p>
+        <p>•	Timesheets.</p>
+        <p>•	Third Party Invoices.</p>
+        <p>•	Contracts/Amendments/Variation Orders.</p>
+        <p>•	Price Template for attached Contracts/Amendments/Variation Orders.</p>
+        <p>•	Other Supporting Documents necessary to verify the correctness of the items invoiced.</p>
+<br></div>
+        <p>All the above listed documents must be duly signed by {{company.company_name}} Representative as this will be the only measure for acceptance for all supporting documents provided.</p>
+
+        <p><b>The uploading function will not work until Step 1 is fully completed.</b></p>
+        <p><b>Notes:</b></p>
+        <div style="padding-left:30px;">
+        <p>1.	The invoice must be billed and addressed to the Client Company as stated in the relevant awarded contract.</p>
+        <p>2.	Vendor must ensure that invoices are sent as per contractual terms immediately goods are delivered, or services rendered. Invoices not sent to <b> {{company.company_name}}</b> as per contractual terms after job execution will not be accepted.</p>
+
+        <p>3.	For awarded contracts which have a currency split for the services or supply, Vendor is required to:</p>   
+        <div style="padding-left:60px;">
+        <p>•	Submit two separate invoices reflecting the currency split accordingly.</p>
+        <p>•	The invoice number must show clear reference to the currency split in the following manner:</p>
+        <p>Invoice Part A - represents the higher percentage of currency split.</p>
+        <p>Invoice Part B - represents the lower percentage of currency split.</p>
+        </div>
+        <p>4.	When an invoice has incomplete information or does not meet up to the above listed requirements, <b>{{company.company_name}}</b> will return the invoice for correction and the revised invoices shall be Submitted back within <b>{{processdate}}</b> working days for invoice processing.</p>
+
+        <p>5.	When re-submitting an Invoice, Vendor must do the following:</p>
+        <div style="padding-left:60px;">
+        <p>•	Ensure that the reSubmitted invoice shows reference to the previous invoice rejected. </p>
+        <p>•	The previous invoice rejected must be included with the other supporting documents when re-submitting the revised invoice.</p>
+       </div></div>
+
+    </body>
+</html>

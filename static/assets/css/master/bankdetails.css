@@ -1,0 +1,198 @@
+th.action{
+    width: 7% !important;
+}
+.currency {
+    width: 200px;
+    text-align:  var(--centertext-align);
+    /* margin: 0px -20px 0 13px !important; */
+}
+.accountno {
+    width: 200px;
+    text-align:  var(--centertext-align);
+}
+  
+.search-f-inf {
+    border: 1px solid #96183a;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+input.search-f-inf[type="text"] {
+    font-size: 14px !important;
+}
+
+.lens {
+    border: none;
+    background: #9c1b3d;
+    border-radius: 3px;
+    padding: 4px 6px 4px 6px;
+}
+
+.lens i {
+    color: #fff;
+}
+
+.select-style {
+    border: 1px solid #96183a;
+    border-radius: 3px;
+    padding: 4px;
+    background-color: transparent;
+    /* width: 5rem; */
+    margin: 0 0.5rem;
+}
+
+
+/********** companybankcreate **********/
+.note-editable {
+    text-align: left !important;
+}
+
+.bank-select {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.bank-select label {
+    width: 200px !important;
+    margin-bottom: 0;
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+    /* padding-left: 10px; */
+}
+
+.down-arrow-sig {
+    /* position: relative; */
+}
+
+.down-arrow-sig img {
+    position: absolute;
+    right: 10px;
+    top: 8px;
+    transform: translateX(-50%);
+}
+
+.maintable {
+    width: 175%;
+}
+
+.maintable-pia {
+    width: 65%;
+}
+
+.maintable-user {
+    width: 30%;
+}
+
+.maintableuser-action-wid {
+    width: 12%;
+}
+
+.pia-title {
+    width: 22%;
+}
+
+.user-title {
+    width: 12%;
+}
+
+.copyprevious_btn {
+    font-size: 10px;
+    padding: 5px !important;
+}
+
+.td-left {
+    text-align: var(--lefttext-align) !important;
+}
+
+@media screen and (min-width: 768px) and (max-width:1023px){
+    .m-bank-user .form-control{
+        width: 95px !important;
+    } 
+    .m-bank-user td button{
+        margin:2px 20px !important;
+    }
+    /* .m-bank-user td button {
+        margin: 2px 0 !important;
+    } */
+}
+
+
+@media (min-width: 1024px) and (max-width: 1384px) {
+    .maintable {
+        width: 215%;
+    }
+}
+/********** companybankcreate **********/
+
+
+/********** companybankedit **********/
+  .note-editable {
+    height: 50px !important;
+  }
+
+.editbank-table {
+    width: 150%;
+}
+
+.edit-title {
+    width: 13%;
+}
+
+.edit-action {
+    width: 12%;
+}
+
+.editbank-table-pia {
+    width: 30%;
+}
+
+.editbank-table-user {
+    width: 60%;
+}
+
+.edit-currency {
+    width: 200px;
+}
+
+.edit-bankname {
+    width: 200px;
+}
+
+.edit-accno {
+    width: 200px;
+}
+
+@media (min-width: 1024px) and (max-width: 1429px) {
+    .editbank-table {
+        width: 215%;
+    }
+}
+/********** companybankedit **********/
+
+
+/********** View Bank User **********/
+.viewuser-table th {
+    background-color: transparent !important;
+
+}
+
+.create-wid {
+    width: 50%;
+}
+
+.inner-table {
+    border: 1px solid #c7c7c7;
+    width: 100%;
+}
+
+td.btn-middle-align {
+    vertical-align: middle;
+}
+
+.sno-center {
+    text-align: var(--centertext-align) !important;
+}
+
+/********** View Bank User **********/

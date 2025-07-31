@@ -1,0 +1,114 @@
+.contract_detail_list {
+    border: 1px solid #d9dee2 !important;
+}
+
+.contract_detail_list1 {
+    border: none !important;
+}
+
+.contract_detail_list1 tr{
+    border: none !important;
+}
+
+.contract_detail_list1 td{
+    border: none !important;
+    padding: 10px;
+}
+
+.contract_detail_list1 thead{
+    border: none !important;
+}
+
+.contract_detail_list1 tbody{
+    border: none !important;
+}
+
+.contract_detail_list td {
+    text-align: var(--centertext-align);
+}
+
+.contract_detail_list1_con{
+    padding: 20px;
+    border: 1px solid #8b1434;
+    border-radius: 8px;
+}
+
+.view-ul>li>a{
+    color: #96183a ;
+  }
+
+.heading-new th{
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    color: #8D1636 !important;
+}
+
+.accord-head>th:nth-child(1){
+width: 23.2%;
+}
+
+.accord-head>th:nth-child(2){
+    width: 16.66%;
+}
+
+
+
+
+
+.accord-head>th:nth-child(3){
+        width: 16.66%;
+    }
+.accord-head>th:nth-child(4){
+            width: 16.66%;
+    }
+.accord-head>th:nth-child(5){
+                width: 16.66%;
+}
+.accord-head>th:nth-child(6){
+                    width: 10%;
+}
+
+.accord-body{
+    border-radius: 0px !important;
+}
+
+.accord-body>span:nth-child(1){
+    width: 23.2%;
+    }
+    
+    .accord-body>span:nth-child(2){
+        width: 16.66%;
+    }
+    
+    .accord-body>span:nth-child(3){
+            width: 16.66%;
+        }
+        .accord-body>span:nth-child(4){
+                width: 16.66%;
+        }
+        .accord-body>span:nth-child(5){
+                    width: 16.66%;
+    }
+    .accord-body>span:nth-child(6){
+                        width: 10%;
+    }
+
+.indode-accordion-body{
+    border-left: 1px solid #d9dee2 !important;
+    border-right: 1px solid #d9dee2 !important;
+    border-bottom: 1px solid #d9dee2 !important;
+}
+
+.deejan{
+    width: 35px;
+    height: 35px;
+}
+.empty_amendment{
+
+   text-align: center;
+   margin-top: 10px;
+   padding :10px 0px;
+   border-left: 1px solid #d9dee2 !important;
+   border-right: 1px solid #d9dee2 !important;
+   border-bottom: 1px solid #d9dee2 !important;
+}

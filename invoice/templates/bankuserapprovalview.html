@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/bank/bankuserapproval.css' %}">
+<div class="row">
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+            <button class="btn btn-clr btn-master waves-effect waves-float waves-light pc-bk-cls back-bank-us"><a href="{% url 'invoice:vendorbasedinvoice' %}">Back</a></button>
+        </div>
+    <h3 class="from-head">Payment Details</h3>
+    {% comment %} <div class="row">
+        <div class="col-3">Vendor Name :</div>
+        <div class="col-9">{{invoice_detail.vendor.vendor_name}}</div>
+    </div> {% endcomment %}
+    
+    <form method="POST" name="" id="">
+        {% csrf_token %}
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table table-bordered tab-styling payment-table-css">
+               
+                <tbody>
+                    <tr class="d-flex border-0">
+                        <td class="heading-clr-payment">Vendor Name</td>
+                        <td>{{invoice_detail.vendor.vendor_name}}</td>
+                        {% for payment in payment_details %}
+                        {% if not forloop.last %}
+                        <td></td>
+                        {% endif %}
+                        {% endfor %}
+                    </tr>
+                    <tr class="d-flex border-0">
+
+                        <td class="heading-clr-payment">Invoice No.</td>
+                        {% for payment in payment_details %}
+                            <td class="invoice_last_atleast">{{payment.invoicecost.invoice_number}}</td>
+                            <input name="invcost_id" type="hidden" value="{{payment.invoicecost.id}}" id="invoicecost_id">
+                            <input name="inv_id" type="hidden" value="{{payment.invoicecost.invoice.id}}" id="invoice_id">
+                            <input name="pay_id" type="hidden" value="{{payment.id}}" id="payment_id">
+                        {% empty %}
+                        <td>-</td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="d-flex border-0">
+                        <td class="heading-clr-payment">Net Payable Amount</td>
+                        {% for payment in payment_details %}
+                        {% getnetpayment_bysplit payment.invoicecost.invoice_id payment.invoicecost.id payment.invoicecost.new_netpayable as netamount %}
+                        <td>{{payment.invoicecost.invoice_currency}} {{netamount.netamount_separator}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="d-flex border-0">
+                        <td class="heading-clr-payment">Payable Amount</td>
+                        {% for payment in payment_details %}
+                            <td>{{payment.invoicecost.invoice_currency}} {{payment.payable_amount|converttothousandseparator}}</td>
+                        {% empty %}
+                        <td>-</td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="d-flex border-0">
+                        <td class="heading-clr-payment">Payable percentage</td>
+                        {% for payment in payment_details %}
+                            <td>{{payment.payment_percentage}}%</td>
+                        {% empty %}
+                        <td>-</td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="d-flex border-0">
+                        <td class="heading-clr-payment">Bank to Debit</td>
+                        {% for payment in payment_details %}
+                            <td>{{payment.companybank.bank_name.bank_name}}-{{payment.companybank.account_number.accountno}}</td>
+                        {% empty %}
+                        <td>-</td>
+                        {% endfor %}
+                    </tr>
+                    <tr class="d-flex border-0">
+                        <td class="heading-clr-payment">Vendor Bank Details</td>
+                        {% for payment in payment_details %}
+                            <td>{{payment.invoicecost.invoice_bank.bankname}}-{{payment.invoicecost.invoice_bank.accountnumber}}</td>
+                        {% empty %}
+                        <td>-</td>
+                        {% endfor %}
+                    </tr>
+                    {% if request.user.bankuserstatus == 1 %}
+                    <tr class="d-flex border-0">
+                        <td class="heading-clr-payment"><button type="button" class="btn btn-clr waves-effect waves-float waves-light check_code popup_viewcode">View Code</button><button type="button" class="hide_code btn btn-clr waves-effect waves-float waves-light" style="display:none">Hide Code</button></td>
+                        {% for payment in payment_details %}
+                            <td><div style="display:none" class="codes_invoice" >{{payment.verification_code}}</div><div  class="codes_hide" >-</div></td>
+                        {% empty %}
+                        <td>-</td>
+                        {% endfor %}
+                    </tr>
+                    {% endif %}
+                        
+
+                </tbody>
+            </table>
+          </div>
+
+            <div class="row align-items-center">
+                {% comment %} <div class="col-4"><h5 class="verifi-codee">Verification Code :</h5></div> {% endcomment %}
+                <div style="width: fit-content;">
+                  <a class="btn px-1 check_sign all-icon-same-clr" href="{% url 'invoice:viewpaymentinstructions' invoice_detail.id pay_id %}" data_id="{{invoice.id}}" >
+                    <!-- <i class='fa-solid fa-file-invoice'></i> -->
+                    {% comment %} Bank user {% endcomment %}
+                    <button type="button" class="btn btn-clr">View Payment Instructions</button>
+                </a> 
+                </div>
+            <!-- </div> -->
+            {% if check_payment > 0 %}
+            <!-- <div class="row"> -->
+                <div class="col-5 col-md-8 d-flex">
+                  {% if request.user.bankuserstatus == 0 %}
+                  <select name="" class="verify_code form-control form-select list-control me-4 w-50">
+                    <option>--Select--</option>
+                    {% for i in payment_details %}
+                    <option value="{{i.invoicecost_id}}" payment-id="{{i.id}}">{{i.invoicecost.invoice_number}}-{{i.invoicecost.invoice_percentage}}%</option>
+                    {% endfor %}
+                  </select>
+                  {% endif %}
+                  <div class="code_verification d-flex g-3 w-50">
+                  </div>
+                </div>
+            </div>
+            {% endif %}
+        </form>
+
+    </div>    
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    var pay_id="{{pay_id}}"
+</script>
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script src="{% static 'js/invoice/bankuserapproval.js' %}"></script>
+{% endblock %}

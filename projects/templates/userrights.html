@@ -1,0 +1,640 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/user_Management/users.css' %}">
+<div>
+    <div class="row">
+        <!-- <div class="col-3">
+            <button type="button" class="btn btn-clr btn-master"><a href="{% url 'projects:userlist' %}">Back</a></button>
+        </div> -->
+        <div class="col-12 text-end">
+            <a class="btn btn-clr" href="{% url 'projects:userlist' %}">Back</a>
+        </div>
+    </div>
+
+    <h3 class="from-head">User General Rights</h3>
+    
+    <div class="row">
+        <div class="col-11">
+            <label class="txt-name unique-colr">User :</label>
+            <span class="txt-detail uniq-name">{{users.name}} {{users.lastname}} ({{users.user_department.department}}-{{users.designation_role}})</span>
+        </div>
+    </div>
+    <form id="user_rights_id" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="userid" value={{users.id}}>
+    <div class="row">
+        <div class="usercls-box table-responsive text-nowrap">
+        <table class="usercls" id='usergen_id'>
+            <thead>
+            <tr>
+                <th>Modules</th>
+                <th></th>
+                <th >Create</th>
+                <th >View</th>
+                <th>Edit</th>
+                <th>Delete</th>
+                <th>Archive</th>
+                <th>Modify After Archive</th>
+
+            </tr>
+        </thead>
+            <tbody>
+                <tr>
+                    <th class="module-user-head" id="txt-left">Projects</th>
+                    <td><input type="checkbox" id="styled-checkbox-pp"  name="check_all" class="chk-cls-project"><label class="s-all" for="styled-checkbox-pp">Select All</label></td>
+                    <td><input type="checkbox" id="styled-checkbox-pp-01" {%  checkcreate users.id 'Projects'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Projectscreate" class="chk-cls-project common-cls sub-cls" value="1"><label for="styled-checkbox-pp-01"></label></td>
+                    <td><input type="checkbox" id="styled-checkbox-pp-02" {%  checkview users.id 'Projects'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Projectsview" class="chk-cls-project prev-view-cls sub-cls" value="1" ><label for="styled-checkbox-pp-02"></label></td>
+                    <td><input type="checkbox" id="styled-checkbox-pp-03" {%  checkedit users.id 'Projects'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Projectsedit" class="chk-cls-project edit-main-cls sub-cls" value="1" ><label for="styled-checkbox-pp-03"></label></td>
+                    <td><input type="checkbox" id="styled-checkbox-pp-04" {%  checkdelete users.id 'Projects'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Projectsdelete" class="chk-cls-project sub-cls" value="1" ><label for="styled-checkbox-pp-04"></label></td>
+                    <td><input type="checkbox" id="styled-checkbox-pp-05" {%  checklock users.id 'Projects'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Projectslock" class="chk-cls-project sub-cls" value="1" ><label for="styled-checkbox-pp-05"></label></td>
+                    <td><input type="checkbox" id="styled-checkbox-pp-06" {%  checkunlock users.id 'Projects'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Projectsunlock" class="chk-cls-project sub-cls" value="1" ><label for="styled-checkbox-pp-06"></label></td>
+
+                </tr> 
+                <tr>
+                    <th class="module-user-head" id="txt-left">Masters</th>
+                    <th></th>
+                    <th>Create</th>
+                    <th>View</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th class="module-user-head" id="txt-left">Project Masters</th>
+                    <td><input type="checkbox" id="styled-checkbox"  name="check_all" class="chk-cls-projectmaster"><label class="s-all" for="styled-checkbox">Select All</label></td>
+                    <td><input type="checkbox" id="styled-checkbox-2"  {%  checkcreate users.id 'Project_Masters'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Project_Masterscreate" class="chk-cls-projectmaster common-cls sub-cls1" value="1"><label for="styled-checkbox-2"></label></td>
+                    <td><input type="checkbox" id="styled-checkbox-02"  {%  checkview users.id 'Project_Masters'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Project_Mastersview" class="chk-cls-projectmaster prev-view-cls sub-cls1" value="1"><label for="styled-checkbox-02"></label></td>
+                    <td><input type="checkbox" id="styled-checkbox-3"  {%  checkedit users.id 'Project_Masters'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Project_Mastersedit" class="chk-cls-projectmaster edit-main-cls sub-cls1" value="1"><label for="styled-checkbox-3"></label></td>
+                    <td><input type="checkbox" id="styled-checkbox-4" {%  checkdelete users.id 'Project_Masters'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Project_Mastersdelete" class="chk-cls-projectmaster sub-cls1" value="1"><label for="styled-checkbox-4"></label></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th class="module-user-head" id="txt-left">Vendor Masters</th>
+                    <td><input type="checkbox" id="styled-checkbox-vm" name="check_all" class="chk-cls-vendor"><label class="s-all" for="styled-checkbox-vm">Select All</label></td>
+                    <td><input type="checkbox" id="styled-checkbox-vm-01" {% checkcreate users.id 'Vendors' as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Vendorscreate" class="chk-cls-vendor common-cls sub-cls2" value="1"><label for="styled-checkbox-vm-01"></label></td>
+                    <td><input type="checkbox" id="styled-checkbox-vm-02" {% checkview users.id 'Vendors' as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Vendorsview" class="chk-cls-vendor prev-view-cls sub-cls2" value="1" ><label for="styled-checkbox-vm-02"></label></td>
+                    <td><input type="checkbox" id="styled-checkbox-vm-03" {% checkedit users.id 'Vendors' as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Vendorsedit" class="chk-cls-vendor edit-main-cls sub-cls2" value="1" ><label for="styled-checkbox-vm-03"></label></td>
+                    <td><input type="checkbox" id="styled-checkbox-vm-04" {% checkdelete users.id 'Vendors' as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Vendorsdelete" class="chk-cls-vendor sub-cls2" value="1" ><label for="styled-checkbox-vm-04"></label></td>
+                    <td></td>
+                    <td></td>
+                    </tr>             
+                    <tr>
+                        <th class="module-user-head" id="txt-left">Vendor Contract Masters</th>
+                        <td><input type="checkbox" id="styled-checkbox-cm" name="check_all" class="chk-cls-contractmaster"><label class="s-all" for="styled-checkbox-cm">Select All</label></td>
+                        <td><input type="checkbox" id="styled-checkbox-cm-01" {% checkcreate users.id 'Contract_Masters' as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Contract_Masterscreate" class="chk-cls-contractmaster common-cls sub-cls3" value="1"><label for="styled-checkbox-cm-01"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-cm-02" {% checkview users.id 'Contract_Masters' as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Contract_Mastersview" class="chk-cls-contractmaster prev-view-cls sub-cls3" value="1"><label for="styled-checkbox-cm-02"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-cm-03" {% checkedit users.id 'Contract_Masters' as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Contract_Mastersedit" class="chk-cls-contractmaster edit-main-cls sub-cls3" value="1"><label for="styled-checkbox-cm-03"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-cm-04" {% checkdelete users.id 'Contract_Masters' as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Contract_Mastersdelete" class="chk-cls-contractmaster sub-cls3" value="1"><label for="styled-checkbox-cm-04"></label></td>
+                        <td></td>
+                        <td></td>
+                    </tr> 
+                    <tr>
+                        <th class="module-user-head" id="txt-left">Tax Masters</th>
+                        <td><input type="checkbox" id="styled-checkbox-tm" name="check_all" class="chk-cls-taxmaster"><label class="s-all" for="styled-checkbox-tm">Select All</label></td>
+                        <td><input type="checkbox" id="styled-checkbox-tm-01" {% checkcreate users.id 'Tax_Masters' as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Tax_Masterscreate" class="chk-cls-taxmaster common-cls sub-cls4" value="1"><label for="styled-checkbox-tm-01"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-tm-02" {% checkview users.id 'Tax_Masters' as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Tax_Mastersview" class="chk-cls-taxmaster prev-view-cls sub-cls4" value="1"><label for="styled-checkbox-tm-02"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-tm-03" {% checkedit users.id 'Tax_Masters' as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Tax_Mastersedit" class="chk-cls-taxmaster edit-main-cls sub-cls4" value="1"><label for="styled-checkbox-tm-03"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-tm-04" {% checkdelete users.id 'Tax_Masters' as value %} {% if value|datacount > 0 %} checked=checked {% endif %} name="Tax_Mastersdelete" class="chk-cls-taxmaster sub-cls4" value="1"><label for="styled-checkbox-tm-04"></label></td>
+                        <td></td>
+                        <td></td>
+                    </tr> 
+                    <tr>
+                        <th class="module-user-head" id="txt-left">Process</th>
+                        <td><input type="checkbox" id="styled-checkbox-p" name="check_all" class="chk-cls-process"><label class="s-all" for="styled-checkbox-p">Select All</label></td>
+                        <td><input type="checkbox" id="styled-checkbox-p-05"  {%  checkcreate users.id 'Process'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Processcreate" class="chk-cls-process common-cls sub-cls5" value="1"><label for="styled-checkbox-p-05"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-p-06"  {%  checkview users.id 'Process'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Processview" class="chk-cls-process prev-view-cls sub-cls5" value="1"><label for="styled-checkbox-p-06"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-p-07"  {%  checkedit users.id 'Process'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Processedit" class="chk-cls-process edit-main-cls sub-cls5" value="1"><label for="styled-checkbox-p-07"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-p-08" {%  checkdelete users.id 'Process'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Processdelete" class="chk-cls-process sub-cls5" value="1"><label for="styled-checkbox-p-08"></label></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th class="module-user-head" id="txt-left">Flow</th>
+                        <td><input type="checkbox" id="flow_id"  name="check_all" class="chk-cls-flow"><label class="s-all" for="flow_id">Select All</label></td>
+                        <td><input type="checkbox" id="flow_1"  {%  checkcreate users.id 'Flow'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Flowcreate" class="chk-cls-flow common-cls sub-cls6" value="1"><label for="flow_1"></label></td>
+                        <td><input type="checkbox" id="flow_2"  {%  checkview users.id 'Flow'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Flowview" class="chk-cls-flow prev-view-cls sub-cls6" value="1"><label for="flow_2"></label></td>
+                        <td><input type="checkbox" id="flow_3"  {%  checkedit users.id 'Flow'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Flowedit" class="chk-cls-flow edit-main-cls sub-cls6" value="1"><label for="flow_3"></label></td>
+                        <td><input type="checkbox" id="flow_4" {%  checkdelete users.id 'Flow'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Flowdelete" class="chk-cls-flow sub-cls6" value="1"><label for="flow_4"></label></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th class="module-user-head" id="txt-left">User Departments</th>
+                        <td><input type="checkbox" id="styled-checkbox-ud"  name="check_all" class="chk-cls-userdepartment"><label class="s-all" for="styled-checkbox-ud">Select All</label></td>
+
+
+                        <td><input type="checkbox" id="user_dep_1"  {%  checkcreate users.id 'User_Departments'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="User_Departmentscreate" class="chk-cls-userdepartment common-cls sub-cls7" value="1"><label for="user_dep_1"></label></td>
+
+                        <td><input type="checkbox" id="user_dep_2"  {%  checkview users.id 'User_Departments'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="User_Departmentsview" class="chk-cls-userdepartment prev-view-cls sub-cls7" value="1"><label for="user_dep_2"></label></td>
+                        <td><input type="checkbox" id="user_dep_3"  {%  checkedit users.id 'User_Departments'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="User_Departmentsedit" class="chk-cls-userdepartment edit-main-cls sub-cls7" value="1"><label for="user_dep_3"></label></td>
+                        <td><input type="checkbox" id="user_dep_4" {%  checkdelete users.id 'User_Departments'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="User_Departmentsdelete" class="chk-cls-userdepartment sub-cls7" value="1"><label for="user_dep_4"></label></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th class="module-user-head" id="txt-left">User Group</th>
+                        <td><input type="checkbox" id="styled-checkbox-ug"  name="check_all" class="chk-cls-usergroup"><label class="s-all" for="styled-checkbox-ug">Select All</label></td>
+                        <td><input type="checkbox" id="styled-checkbox-ug-01"  {%  checkcreate users.id 'User_Group'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="User_Groupcreate" class="chk-cls-usergroup common-cls sub-cls8" value="1"><label for="styled-checkbox-ug-01"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-ug-02"  {%  checkview users.id 'User_Group'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="User_Groupview" class="chk-cls-usergroup prev-view-cls sub-cls8" value="1"><label for="styled-checkbox-ug-02"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-ug-03"  {%  checkedit users.id 'User_Group'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="User_Groupedit" class="chk-cls-usergroup edit-main-cls sub-cls8" value="1"><label for="styled-checkbox-ug-03"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-ug-04" {%  checkdelete users.id 'User_Group'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="User_Groupdelete" class="chk-cls-usergroup sub-cls8" value="1"><label for="styled-checkbox-ug-04"></label></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th class="module-user-head" id="txt-left">User Roles and Rights</th>
+                        <td><input type="checkbox" id="styled-checkbox-urr"  name="check_all" class="chk-cls-userrolesrights"><label class="s-all" for="styled-checkbox-urr">Select All</label></td>
+                        <td><input type="checkbox" id="styled-checkbox-urr-01"  {%  checkcreate users.id 'User_Roles_and_Rights'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="User_Roles_and_Rightscreate" class="chk-cls-userrolesrights common-cls sub-cls9" value="1"><label for="styled-checkbox-urr-01"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-urr-02"  {%  checkview users.id 'User_Roles_and_Rights'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="User_Roles_and_Rightsview" class="chk-cls-userrolesrights prev-view-cls sub-cls9" value="1"><label for="styled-checkbox-urr-02"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-urr-03"  {%  checkedit users.id 'User_Roles_and_Rights'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="User_Roles_and_Rightsedit" class="chk-cls-userrolesrights edit-main-cls sub-cls9" value="1"><label for="styled-checkbox-urr-03"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-urr-04" {%  checkdelete users.id 'User_Roles_and_Rights'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="User_Roles_and_Rightsdelete" class="chk-cls-userrolesrights sub-cls9" value="1"><label for="styled-checkbox-urr-04"></label></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <th class="module-user-head" id="txt-left">Bank Information</th>
+                        <td><input type="checkbox" id="styled-checkbox-ugg"  name="check_all" class="chk-cls-bankinformation"><label class="s-all" for="styled-checkbox-ugg">Select All</label></td>
+                        <td><input type="checkbox" id="styled-checkbox-ugg-01"  {%  checkcreate users.id 'Bank_Information'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Bank_Informationcreate" class="chk-cls-bankinformation common-cls sub-cls10" value="1"><label for="styled-checkbox-ugg-01"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-ugg-02"  {%  checkview users.id 'Bank_Information'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Bank_Informationview" class="chk-cls-bankinformation prev-view-cls sub-cls10" value="1"><label for="styled-checkbox-ugg-02"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-ugg-03"  {%  checkedit users.id 'Bank_Information'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Bank_Informationedit" class="chk-cls-bankinformation edit-main-cls sub-cls10" value="1"><label for="styled-checkbox-ugg-03"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-ugg-04" {%  checkdelete users.id 'Bank_Information'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Bank_Informationdelete" class="chk-cls-bankinformation sub-cls10" value="1"><label for="styled-checkbox-ugg-04"></label></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <th class="module-user-head" id="txt-left">Signatory Settings</th>
+                        <td><input type="checkbox" id="styled-checkbox-uggr"  name="check_all" class="chk-cls-companysignatorysetting"><label class="s-all" for="styled-checkbox-uggr">Select All</label></td>
+                        <td><input type="checkbox" id="styled-checkbox-uggr-01"  {%  checkcreate users.id 'Company_Signatory_Settings'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Company_Signatory_Settingscreate" class="chk-cls-companysignatorysetting create-main-clss common-cls sub-cls11" value="1"><label for="styled-checkbox-uggr-01"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-uggr-02"  {%  checkview users.id 'Company_Signatory_Settings'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Company_Signatory_Settingsview" class="chk-cls-companysignatorysetting prev-view-cls sub-cls11" value="1"><label for="styled-checkbox-uggr-02"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-uggr-03"  {%  checkedit users.id 'Company_Signatory_Settings'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Company_Signatory_Settingsedit" class="chk-cls-companysignatorysetting  common-cls edit-main-clss sub-cls11" value="1"><label for="styled-checkbox-uggr-03"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-uggr-04" {%  checkdelete users.id 'Company_Signatory_Settings'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Company_Signatory_Settingsdelete" class="chk-cls-companysignatorysetting common-cls delete_css sub-cls11" value="1"><label for="styled-checkbox-uggr-04"></label></td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <th class="module-user-head" id="txt-left">Cost Code</th>
+                        <td><input type="checkbox" id="styled-checkbox-uyy"  name="check_all" class="chk-cls-costcode"><label class="s-all" for="styled-checkbox-uyy">Select All</label></td>
+                        <td><input type="checkbox" id="styled-checkbox-uyy-01"  {%  checkcreate users.id 'Cost_Code'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Cost_Codecreate" class="chk-cls-costcode common-cls sub-cls15" value="1"><label for="styled-checkbox-uyy-01"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-uyy-02"  {%  checkview users.id 'Cost_Code'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Cost_Codeview" class="chk-cls-costcode prev-view-cls sub-cls15" value="1"><label for="styled-checkbox-uyy-02"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-uyy-03"  {%  checkedit users.id 'Cost_Code'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Cost_Codeedit" class="chk-cls-costcode edit-main-cls sub-cls15" value="1"><label for="styled-checkbox-uyy-03"></label></td>
+                        <td><input type="checkbox" id="styled-checkbox-uyy-04" {%  checkdelete users.id 'Cost_Code'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Cost_Codedelete" class="chk-cls-costcode sub-cls15" value="1"><label for="styled-checkbox-uyy-04"></label></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th class="module-user-head" id="txt-left">Assign Cost Code to Vendor</th>
+                        <td>
+                            <input type="checkbox" id="assign_costcode" name="check_all" class="chk-cls-Assign_costcode"><label class="s-all" for="assign_costcode">Select All</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="assign_costcode_create"  {%  checkcreate users.id 'Assign_Cost_Code'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Assign_Cost_Codecreate" class="chk-cls-Assign_costcode " value="1"><label for="assign_costcode_create"></label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="assign_costcode_view"  {%  checkview users.id 'Assign_Cost_Code'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Assign_Cost_Codeview" class="chk-cls-Assign_costcode " value="1"><label for="assign_costcode_view"></label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="assign_costcode_edit"  {%  checkedit users.id 'Assign_Cost_Code'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Assign_Cost_Codeedit" class="chk-cls-Assign_costcode " value="1"><label for="assign_costcode_edit"></label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="assign_costcode_delete"  {%  checkdelete users.id 'Assign_Cost_Code'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Assign_Cost_Codedelete" class="chk-cls-Assign_costcode " value="1"><label for="assign_costcode_delete"></label>
+                        </td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <th class="module-user-head" id="txt-left">WCC Approval Flow</th>
+                        <td><input type="checkbox" id="wcc-uggr"  name="check_all" class="chk-cls-wcc"><label class="s-all" for="wcc-uggr">Select All</label></td>
+                        <td><input type="checkbox" id="wcc_1"  {%  checkcreate users.id 'WCC'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="WCCcreate" class="chk-cls-wcc common-cls sub-cls12" value="1"><label for="wcc_1"></label></td>
+                        <td><input type="checkbox" id="wcc_2"  {%  checkview users.id 'WCC'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="WCCview" class="chk-cls-wcc prev-view-cls sub-cls12" value="1"><label for="wcc_2"></label></td>
+                        <td><input type="checkbox" id="wcc_3"  {%  checkedit users.id 'WCC'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="WCCedit" class="chk-cls-wcc edit-main-cls sub-cls12" value="1"><label for="wcc_3"></label></td>
+                        <td>
+                            -
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+
+                    <tr>
+                        <th class="module-user-head" id="txt-left">Invoice Approval Flow</th>
+                        <td><input type="checkbox" id="invoice-uggr"  name="check_all" class="chk-cls-invoice"><label class="s-all" for="invoice-uggr">Select All</label></td>
+                        <td><input type="checkbox" id="invoice_1"  {%  checkcreate users.id 'Invoice'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Invoicecreate" class="chk-cls-invoice common-cls sub-cls13" value="1"><label for="invoice_1"></label></td>
+                        <td><input type="checkbox" id="invoice_2"  {%  checkview users.id 'Invoice'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Invoiceview" class="chk-cls-invoice prev-view-cls sub-cls13" value="1"><label for="invoice_2"></label></td>
+                        <td><input type="checkbox" id="invoice_3"  {%  checkedit users.id 'Invoice'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Invoiceedit" class="chk-cls-invoice edit-main-cls sub-cls13" value="1"><label for="invoice_3"></label></td>
+                        <td>-
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <th class="module-user-head" id="txt-left">WCC and Invoice time Trigger</th>
+                        <td><input type="checkbox" id="invoice-wcc-uggr"  name="check_all" class="chk-cls-invoice-wcc"><label class="s-all" for="invoice-wcc-uggr">Select All</label></td>
+                        <td><input type="checkbox" id="invoice_wcc_1"  {%  checkcreate users.id 'WCC_Invoice_Time'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="WCC_Invoice_Timecreate" class="chk-cls-invoice-wcc common-cls sub-cls14" value="1"><label for="invoice_wcc_1"></label></td>
+                        <td><input type="checkbox" id="invoice_wcc_2"  {%  checkview users.id 'WCC_Invoice_Time'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="WCC_Invoice_Timeview" class="chk-cls-invoice-wcc prev-view-cls sub-cls14" value="1"><label for="invoice_wcc_2"></label></td>
+                        <td><input type="checkbox" id="invoice_wcc_3"  {%  checkedit users.id 'WCC_Invoice_Time'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="WCC_Invoice_Timeedit" class="chk-cls-invoice-wcc edit-main-cls sub-cls14" value="1"><label for="invoice_wcc_3"></label></td>
+                        <td>-
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <th class="module-user-head" id="txt-left">Project Users</th>
+                        <td>
+                            <input type="checkbox" id="project-user-uggr"  name="check_all" class="chk-cls-project-user"><label class="s-all" for="project-user-uggr">Select All</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="project_user_1"  {%  checkcreate users.id 'Project_User'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Project_Usercreate" class="chk-cls-project-user common-cls sub-cls14" value="1"><label for="project_user_1"></label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="project_user_2"  {%  checkview users.id 'Project_User'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Project_Userview" class="chk-cls-project-user prev-view-cls" value="1"><label for="project_user_2"></label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="project_user_3"  {%  checkedit users.id 'Project_User'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Project_Useredit" class="chk-cls-project-user edt-del-cls" value="1"><label for="project_user_3"></label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="project_user_4"  {%  checkdelete users.id 'Project_User'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Project_Userdelete" class="chk-cls-project-user del-edit-cls" value="1"><label for="project_user_4"></label>
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <th class="module-user-head" id="txt-left">Dispute Committee Member</th>
+                        <td>
+                            <input type="checkbox" id="dispute_commitee"  name="check_all" class="chk-cls-Committee-member"><label class="s-all" for="dispute_commitee">Select All</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="dispute_commitee_1"  {%  checkcreate users.id 'Dispute_Committee'  as value %} {% if value|datacount > 0 %} checked=checked {% endif %}  name="Dispute_Committeecreate" class="chk-cls-Committee-member common-cls sub-cls15" value="1"><label for="dispute_committee_1"></label>
+                        </td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    
+                 
+                </tbody>
+            </table>
+         </div>
+        </div>
+        <div class="text-center spacing-button">
+            <button type="submit" class="btn btn-clr text-center" >Submit</button>
+        </div>
+    </form>
+</div>
+{% endblock%}
+
+{% block scripts %}
+{{ block.super }}
+
+<script>
+
+    $(document).on('click','.common-cls',function(){
+        if ($(this).is(':checked')){
+            $(this).closest('td').next('td').find('input[type=checkbox]').prop('checked',true)
+        }
+        else{
+            if (!$(this).closest('td').next('td').next('td').find('input[type=checkbox]').is(':checked')){
+                $(this).closest('td').next('td').find('input[type=checkbox]').prop('checked',false)
+            }
+        }
+        check_all_select($(this).closest('tr'))
+    })
+
+
+    // select edit auto select view,delete 
+
+    $(document).on('click','.edt-del-cls',function(){
+        if ($(this).is(':checked')){
+            // console.log($(this).closest('td').prev('td').find('input[type=checkbox]'))
+            $(this).closest('td').prev('td').find('input[type=checkbox]').prop('checked',true)
+            // $(this).closest('td').prev('td').next('td').find('input[type=checkbox]').prop('checked',true)
+            $(this).closest('td').next('td').find('input[type=checkbox]').prop('checked',true)
+        }
+        else{
+            if (!$(this).closest('tr').find('.common-cls').is(':checked')){
+                $(this).closest('td').prev('td').find('input[type=checkbox]').prop('checked',false)
+                // $(this).closest('td').prev('td').prev('td').find('.common-cls').prop('checked',false)
+            } 
+                $(this).closest('td').next('td').find('input[type=checkbox]').prop('checked',false)  
+        }
+        check_all_select($(this).closest('tr'))
+    })
+
+    // select delete auto select view,edit 
+
+    $(document).on('click','.del-edit-cls',function(){
+        if ($(this).is(':checked')){
+            // console.log($(this).closest('td').prev('td').find('input[type=checkbox]'))
+            $(this).closest('td').prev('td').find('input[type=checkbox]').prop('checked',true)
+            // $(this).closest('td').prev('td').next('td').find('input[type=checkbox]').prop('checked',true)
+            $(this).closest('td').prev('td').prev('td').find('input[type=checkbox]').prop('checked',true)
+        }
+        else{
+            $(this).closest('td').prev('td').find('input[type=checkbox]').prop('checked',false)
+            // $(this).closest('td').prev('td').prev('td').find('.common-cls').prop('checked',false)
+            if (!$(this).closest('tr').find('.common-cls').is(':checked')){
+                $(this).closest('td').prev('td').prev('td').find('input[type=checkbox]').prop('checked',false)  
+            }
+        }
+        check_all_select($(this).closest('tr'))
+    })
+
+    function check_all_select(tr){
+        if ($(tr).find('td').not('td:first').find('input[type="checkbox"]').not(':checked').length == 0){
+            $(tr).find('td:first').find('input[type="checkbox"]').prop('checked',true)
+        }
+        else{
+            $(tr).find('td:first').find('input[type="checkbox"]').prop('checked',false)
+        }
+        
+    }
+    $(document).on('click','.overall-cls',function(){
+        let get_class_name=$(this).attr('class').split(" ")
+        if ($(this).is(':checked')){
+            
+            $(this).closest('tr').find('.'+get_class_name[0]+'').prop('checked',this.checked);
+        }
+        else{
+            $(this).closest('tr').find('.'+get_class_name[0]+'').prop('checked',false);
+        }
+    })
+
+    $(document).on('click','.prev-view-cls',function(){
+            if ($(this).closest('td').prev('td').find('input[type="checkbox"]').is(':checked') || $(this).closest('td').next('td').find('input[type="checkbox"]').is(':checked')){
+                $(this).prop('checked',true)
+            }
+    })
+
+
+    
+
+    $(document).on('click','.edit-main-clss',function(){
+        if ($(this).is(':checked')){
+            $(this).closest('td').prev('td').find('.common-clss').prop('checked',true)
+            $(this).closest('td').prev('td').prev('td').find('.common-cls').prop('checked',true)
+            $(this).closest('td').next('td').find('.common-cls').prop('checked',true)
+        }
+        else{
+            $(this).closest('td').prev('td').find('.common-clss').prop('checked',false)
+            $(this).closest('td').prev('td').prev('td').find('.common-cls').prop('checked',false)
+            $(this).closest('td').next('td').find('.common-cls').prop('checked',false)  
+        }
+    })
+    $(document).on('click','.create-main-clss',function(){
+        if ($(this).is(':checked')){
+           $(this).closest('td').next('td').find('.common-clss').prop('checked',true)
+           $(this).closest('td').next('td').next('td').find('.common-cls').prop('checked',true)
+           $(this).closest('td').next('td').next('td').next('td').find('.common-cls').prop('checked',true)
+        }
+        else{
+            $(this).closest('td').next('td').find('.common-clss').prop('checked',false)
+           $(this).closest('td').next('td').next('td').find('.common-cls').prop('checked',false)
+           $(this).closest('td').next('td').next('td').next('td').find('.common-cls').prop('checked',false)
+        }
+    })
+    $(document).on('click','.delete_css',function(){
+      
+        if ($(this).is(':checked')){
+           $(this).closest('td').prev('td').find('.common-cls').prop('checked',true)
+           $(this).closest('td').prev('td').prev('td').find('.common-clss').prop('checked',true)
+           $(this).closest('td').prev('td').prev('td').prev('td').find('.common-cls').prop('checked',true)
+        }
+        else{
+        $(this).closest('td').prev('td').find('.common-cls').prop('checked',false)
+           $(this).closest('td').prev('td').prev('td').find('.common-clss').prop('checked',false)
+           $(this).closest('td').prev('td').prev('td').prev('td').find('.common-cls').prop('checked',false)
+        }
+    })
+    
+    $(document).on('click','.edit-main-cls',function(){
+        if ($(this).is(':checked')){
+            $(this).closest('td').prev('td').find('input[type="checkbox"]').prop('checked',true)
+        }
+        else{
+            if (!$(this).closest('td').prev('td').prev('td').find('.common-cls').is(':checked')){
+            $(this).closest('td').prev('td').find('input[type="checkbox"]').prop('checked',false)
+            }
+        } 
+    })
+
+
+   $('#usergen_id tbody tr').each(function () {
+
+       var count=0 
+       $(this).children('td:not(:nth-child(2))').each(function(){
+            //console.log($(this).find('input:checkbox').val())
+            if ($(this).find('input:checkbox').prop('checked')==false){
+                 
+                count+=1
+
+            }
+        })
+        console.log(count)
+        if (count == 0){
+            $(this).children('td:eq(0)').find('input:checkbox').prop('checked',true)
+        }
+    });
+/*
+    $('table tbody tr').each(function(i) { 
+        // Only check rows that contain a checkbox
+        var $chkbox = $(this).find('input[type="checkbox"]');
+
+    })
+    
+    $('input[name=check_all]').each(function () {
+        dataid=$(this).attr('dataid')
+
+        if ($(this).closest('tr').find('td:last-child input:checkbox').is(':checked',false) && $(this).closest('tr').find('td:nth-child(n) input:checkbox').is(':checked',false)){
+           // console.log($(this).val())
+            //$(this).prop('checked',true)
+        }
+        else{
+            console.log('noi')
+            $(this).prop('checked',true)
+        });
+*/
+
+    $(document).on('click','input[name=check_all]',function(){
+        dataid=$(this).attr('class');
+        //  console.log(dataid)
+        if ($(this).is(':checked')){
+            
+            $('.'+dataid+'').prop('checked',this.checked);
+        }
+        else{
+            $('.'+dataid+'').prop('checked',false);
+        }
+    })
+
+   $(document).on('click','.sub-cls',function(){
+    if ($('#styled-checkbox-pp-01').is(':checked',false) && $('#styled-checkbox-pp-02').is(':checked',false) && $('#styled-checkbox-pp-03').is(':checked',false) && $('#styled-checkbox-pp-04').is(':checked',false) && $('#styled-checkbox-pp-05').is(':checked',false) && $('#styled-checkbox-pp-06').is(':checked',false)){
+        $('#styled-checkbox-pp').prop('checked',true)
+    }
+    else{
+        $('#styled-checkbox-pp').prop('checked',false)
+    }
+   })
+   
+
+  $(document).on('click','.sub-cls1',function(){
+    if($('#styled-checkbox-2').is(':checked',false) && $('#styled-checkbox-02').is(':checked',false) && $('#styled-checkbox-3').is(':checked',false) && $('#styled-checkbox-4').is(':checked',false)){
+        $('#styled-checkbox').prop('checked',true)
+    }
+    else{
+        $('#styled-checkbox').prop('checked',false)
+    }
+  })
+   
+  
+
+  $(document).on('click','.sub-cls2',function(){
+    if($('#styled-checkbox-vm-01').is(':checked',false) && $('#styled-checkbox-vm-02').is(':checked',false) && $('#styled-checkbox-vm-03').is(':checked',false) && $('#styled-checkbox-vm-04').is(':checked',false)){
+        $('#styled-checkbox-vm').prop('checked',true)
+    }
+    else{
+        $('#styled-checkbox-vm').prop('checked',false)
+    }
+  })
+
+  $(document).on('click','.sub-cls3',function(){
+    if($('#styled-checkbox-cm-01').is(':checked',false) && $('#styled-checkbox-cm-02').is(':checked',false) && $('#styled-checkbox-cm-03').is(':checked',false) && $('#styled-checkbox-cm-04').is(':checked',false)){
+        $('#styled-checkbox-cm').prop('checked',true)
+    }
+    else{
+        $('#styled-checkbox-cm').prop('checked',false)
+    }
+  })
+
+  $(document).on('click','.sub-cls4',function(){
+    if($('#styled-checkbox-tm-01').is(':checked',false) && $('#styled-checkbox-tm-02').is(':checked',false) && $('#styled-checkbox-tm-03').is(':checked',false) && $('#styled-checkbox-tm-04').is(':checked',false)){
+        $('#styled-checkbox-tm').prop('checked',true)
+    }
+    else{
+        $('#styled-checkbox-tm').prop('checked',false)
+    }
+  })
+
+$(document).on('click','.sub-cls5',function(){
+    if ($('#styled-checkbox-p-05').is(':checked',false) && $('#styled-checkbox-p-06').is(':checked',false) && $('#styled-checkbox-p-07').is(':checked',false) && $('#styled-checkbox-p-08').is(':checked',false)){
+        $('#styled-checkbox-p').prop('checked',true)
+    }
+    else{
+        $('#styled-checkbox-p').prop('checked',false)
+    }
+})
+
+$(document).on('click','.sub-cls6',function(){
+    if ($('#flow_1').is(':checked',false) && $('#flow_2').is(':checked',false) && $('#flow_3').is(':checked',false) && $('#flow_4').is(':checked',false)){
+        $('#flow_id').prop('checked',true)
+    }
+    else{
+        $('#flow_id').prop('checked',false)
+    }
+})
+
+$(document).on('click','.sub-cls7',function(){
+    if ($('#user_dep_1').is(':checked',false) && $('#user_dep_2').is(':checked',false) && $('#user_dep_3').is(':checked',false) && $('#user_dep_4').is(':checked',false)){
+        $('#styled-checkbox-ud').prop('checked',true)
+    }
+    else{
+        $('#styled-checkbox-ud').prop('checked',false)
+    }
+})
+
+$(document).on('click','.sub-cls8',function(){
+    if ($('#styled-checkbox-ug-01').is(':checked',false) && $('#styled-checkbox-ug-02').is(':checked',false) && $('#styled-checkbox-ug-03').is(':checked',false) && $('#styled-checkbox-ug-04').is(':checked',false)){
+        $('#styled-checkbox-ug').prop('checked',true)
+    }
+    else{
+        $('#styled-checkbox-ug').prop('checked',false)
+    }
+})
+
+$(document).on('click','.sub-cls9',function(){
+    if ($('#styled-checkbox-urr-01').is(':checked',false) && $('#styled-checkbox-urr-02').is(':checked',false) && $('#styled-checkbox-urr-03').is(':checked',false) && $('#styled-checkbox-urr-04').is(':checked',false)){
+        $('#styled-checkbox-urr').prop('checked',true)
+    }
+    else{
+        $('#styled-checkbox-urr').prop('checked',false)
+    }
+})
+
+$(document).on('click','.sub-cls10',function(){
+    if ($('#styled-checkbox-ugg-01').is(':checked',false) && $('#styled-checkbox-ugg-02').is(':checked',false) && $     ('#styled-checkbox-ugg-03').is(':checked',false) && $('#styled-checkbox-ugg-04').is(':checked',false)){
+        $('#styled-checkbox-ugg').prop('checked',true)
+    }
+    else{
+        $('#styled-checkbox-ugg').prop('checked',false)
+    }
+})
+
+$(document).on('click','.sub-cls15',function(){
+    if ($('#styled-checkbox-uyy-01').is(':checked',false) && $('#styled-checkbox-uyy-02').is(':checked',false) && $     ('#styled-checkbox-uyy-03').is(':checked',false) && $('#styled-checkbox-uyy-04').is(':checked',false)){
+        $('#styled-checkbox-uyy').prop('checked',true)
+    }
+    else{
+        $('#styled-checkbox-uyy').prop('checked',false)
+    }
+})
+
+
+
+
+$(document).on('click','.sub-cls11',function(){
+    if ($('#styled-checkbox-uggr-01').is(':checked',false) && $('#styled-checkbox-uggr-02').is(':checked',false) && $     ('#styled-checkbox-uggr-03').is(':checked',false) && $('#styled-checkbox-uggr-04').is(':checked',false)){
+        $('#styled-checkbox-uggr').prop('checked',true)
+    }
+    else{
+        $('#styled-checkbox-uggr').prop('checked',false)
+    }
+})
+
+$(document).on('click','.sub-cls12',function(){
+    if ($('#wcc_1').is(':checked',false) && $('#wcc_2').is(':checked',false) && $('#wcc_3').is(':checked',false)){
+        $('#wcc-uggr').prop('checked',true)
+    }
+    else{
+        $('#wcc-uggr').prop('checked',false)
+    }
+})
+
+$(document).on('click','.sub-cls13',function(){
+    if ($('#invoice_1').is(':checked',false) && $('#invoice_2').is(':checked',false) && $('#invoice_3').is(':checked',false)){
+        $('#invoice-uggr').prop('checked',true)
+    }
+    else{
+        $('#invoice-uggr').prop('checked',false)
+    }
+})
+
+$(document).on('click','.sub-cls14',function(){
+    if ($('#invoice_wcc_1').is(':checked',false) && $('#invoice_wcc_2').is(':checked',false) && $('#invoice_wcc_3').is(':checked',false)){
+        $('#invoice-wcc-uggr').prop('checked',true)
+    }
+    else{
+        $('#invoice-wcc-uggr').prop('checked',false)
+    }
+})
+
+</script>
+<script src="{% static 'js/projects/userrights.js' %}"></script>
+
+{%endblock%}

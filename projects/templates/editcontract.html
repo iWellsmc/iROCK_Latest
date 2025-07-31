@@ -1,0 +1,1129 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/vendorcontract.css' %}">
+<div>
+    <div class="row">
+        <div class="col-12 text-end">
+            <button type="button" class="btn btn-clr chck-tst" onclick="history.back()">Back</button>
+        </div>
+    </div>
+<div class="row justify-content-center">
+    {% if contracttype == 'original' %}
+    <h3 class="from-head col-12">Edit Contract</h3>
+    {% else %}
+   
+    <h3 class="from-head col-12">Edit Amendment/Addendum</h3>
+    {% endif %}
+    <input type='hidden' id='user_role' value='{{request.user.roles_id}}'>
+    
+    <form class="form-txt col-lg-5 d-flex flex-column gap-4"  method="POST" id="editcontractmaster"  enctype="multipart/form-data" >
+        {% csrf_token %}
+        <input type="hidden" name="vendorid" id="vendor_id" value="{{vendorcontract.id}}">
+        <select name="companycurrenices" id="id_companycurrenices" style="display:none">
+            {% for country in companycurrency%}
+            <option value="{{country.id}}">{{country.currency_symbol|default_if_none:""}}-{{country.currency|default_if_none:""}} ({{country.name|default_if_none:""}})</option>
+            {% endfor %}
+        </select>
+
+        
+        <select name="projects" id="id_projects" style="display:none">
+            {% for project in projects%}
+            <option value="{{project.id}}" data-id="{{project.active_status}}">{{project.projectname.name|default_if_none:""}}</option>
+            {% endfor %}
+        </select>
+
+        <div class="row align-items-center">
+            <div class="col-5">
+                <input type="hidden" name="dateformat" id="companydateformat" value={{company.dateformat|default_if_none:""}}>
+                <div><label class="txt-name">Vendor Name :</label></div>
+                
+            </div>
+            <div class="col-6">
+                {% if contracttype == 'original' %}{{contractmaster.contractvendor.vendor_name|default_if_none:""}}{% else %}{{ammendment.service.contractvendor.vendor_name|default_if_none:""}}{% endif %}
+             
+            </div>
+        </div>
+
+        {% if not contracttype == 'original' %}
+        <div class="row align-items-center">
+            <div class="col-6">
+                <div><label class="txt-name">Project Name :</label></div>
+                
+            </div>
+            <div class="col-6">
+                <input type="hidden" value="{{ammendment.service.projects.id}}" class="projectcls">
+                {{ammendment.service.projects.projectname.name|default_if_none:""}}
+            </div>
+
+        </div>
+
+        <div class="row align-items-center">
+            <div class="col-6">
+                <div><label class="txt-name">Project Discipline	:</label></div>
+                
+            </div>
+            <div class="col-6">
+                {{ammendment.service.projectdiscipline|convert_projectdiscipline|default_if_none:""}}
+            </div>
+
+        </div>
+        <div class="row align-items-center">
+            <div class="col-6">
+                <div><label class="txt-name">Discipline Type	:</label></div>
+                
+            </div>
+            <div class="col-6">
+                {{ammendment.service.projectdisciplinetype.discipline_subtype|default_if_none:""}}
+            </div>
+
+        </div>
+        {% endif %}
+
+        {% if contracttype == "original" %}
+        <div class="row">
+            <div class="row ">   
+                <div class="col-5 mb-3">
+                    <strong>Contract Type:</strong>
+                </div>    
+                <div class="col-7 d-flex gap-3 mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="types_service" id="option1" value="service" {% if contractmaster.types_service == "service" %} checked {% endif %} >
+                        <label class="form-check-label" for="option1">
+                          Services
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="types_service" id="option2" value="supply" {% if contractmaster.types_service == "supply" %} checked {% endif %} >
+                        <label class="form-check-label" for="option2">
+                          Supply
+                        </label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="types_service" id="option3" value="service_supply" {% if contractmaster.types_service == "service_supply" %} checked {% endif %} >
+                        <label class="form-check-label" for="option3">
+                          Service & Supplies
+                        </label>
+                      </div>
+                </div>    
+        <div>
+
+        </div>
+        <input type="hidden" class="contract_id" name="contract_id" value="{{contractmaster.id}}">
+<div class='gap-5'>
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+        Name of Service/Supply/
+        Service & Supplies
+    </strong>
+  </div>
+  <div class="col-7">
+    <textarea rows="3" cols="30" id="name_service" name="name_service" class="form-control" placeholder="Name of service">{{contractmaster.name_service|default_if_none:"---"}}</textarea>
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Project
+    </strong>
+  </div>
+  <div class="col-7">
+    <select name="project" class="form-control projectcls">
+        <option value="">--Select--</option>
+        {% for project in projects %}
+        <option {% if contractmaster.projects.id == project.id %} selected {% endif %} value="{{project.id}}" data-id="{{project.active_status}}">{{project.projectname.name|default_if_none:"---"}}</option>
+        {% endfor %}
+    </select>
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>WCC <i class="fa fa-info-circle" title="Work Completion Certificate Submission Required"></i></strong>
+  </div>
+  <div class="col-7">
+    <input type="checkbox" class="wcc-cbx wcc_flow_cls" name="wcc" {% if contractmaster.wcc == 1 %} checked value="1" {% else %}value="0" {% endif %}  > 
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Project Discipline
+    </strong>
+  </div>
+  <div class="col-7">
+    <select name="project_discipline" class="form-control p_discipline_cls" id="project_discipline" >
+        <option value="">--Select--</option>
+        {% for i in developmentlist %}
+        <option value="{{i.id}}" {% if i.id == contractmaster.projectdiscipline_id %}selected{% endif %}>{{i.fieldname|default_if_none:""}}</option>
+        {% endfor %}
+      </select>
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Discipline Type
+    </strong>
+  </div>
+  <div class="col-7">
+    <select name="disciplinetype" class="form-control" id="disciplinetype_id">
+        <option value="">--Select--</option>
+        {% for i in projectdisciplinesubtype %}
+        <option value="{{i.id}}" {% if i.id == contractmaster.projectdisciplinetype_id %}selected{% endif %}>{{i.discipline_subtype.discipline_subtype|default_if_none:""}}</option>
+        {% endfor %}
+    </select>
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+        SO/PO/CO Reference Number
+    </strong>
+  </div>
+  <div class="col-7">
+    <textarea rows="3" cols="30" id="refnumber" name="refnumber" class="form-control" >{{contractmaster.reference_number|default_if_none:""}}</textarea>
+  </div>
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Executed Date
+    </strong>
+  </div>
+  <div class="col-7">
+    <input type="text" name="execute_date"  autocomplete="off" value="{{contractmaster.executed_date|checktime:company.company.id|default_if_none:""}}" class="dateformat-cls form-control" >
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+        Maximum Value of SO/PO/CO 
+    </strong>
+  </div>
+  <div class="col-7">
+    <select id="maximum_value" name="currency" class="maximum-cls form-control" >
+        <option value='' selected>--Select--</option>
+        {% for country in companycurrency%}
+        <option {% if contractmaster.currency.id == country.id%}  selected {% endif %} value="{{country.id}}">{{country.currency_symbol|default_if_none:""}}-{{country.currency|default_if_none:""}} ({{country.name|default_if_none:""}})</option>
+        {% endfor %}
+        </select>
+        <input list="browsers" type="text" id="amount_currency" name="amount"  value="{{contractmaster.amount|default_if_none:""}}" class="amount_currency_cls form-control contra-currency" autocomplete="off" ><datalist id="browsers"><option value="No Max Limit"></datalist>
+  </div>
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+    Upload Contract
+    </strong>
+  </div>
+  <div class="col-7">
+    <table class="che-table">
+      <tbody>
+        {% for files in contract_files %}
+      <tr>
+        <td class='pe-3'>
+          <input type="file" accept="image, .png, .jpeg, .pdf, .jpg"  class="con_file_cls form-control" name="confiles{{files.id}}" >
+          <input type="hidden" name="contract_file_ids" value="{{files.id}}" class="contract_file_ids">
+          <p>{{files.original_file_name|default_if_none:""}}</p>
+        </td> 
+        <td class="in-btn-wid che-smline wid-but gap-2">
+          <button id="add_file" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> <button id="remove_file" class="btn btn-clr del-btn" type="button" value="minus"><i class="fa fa-minus"></i></button>
+        </td> 
+      </tr>
+      
+      {% empty %}
+      <tr>
+        <td class='pe-3'>
+          <input type="file" accept="image, .png, .jpeg, .pdf, .jpg" name="con_files" class="con_file_cls form-control">
+        </td> 
+        <td class="in-btn-wid che-smline wid-but gap-2">
+          <button id="add_file" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> <button id="remove_file" class="btn btn-clr del-btn" type="button" value="minus"><i class="fa fa-minus"></i></button>
+        </td> 
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+ 
+  
+</div>
+
+<div class="row mb-3">
+
+  <div class="col-5">
+    <strong>
+      Upload Price Table
+    </strong>
+  </div>
+  <div class="col-7">
+      <table class="che-table">
+        <tbody>
+          {% for files in price_files %}
+          <tr>
+            <td class='pe-3'>
+              <input type="file" accept="image, .png, .jpeg, .pdf, .jpg" name="pricefiles{{files.id}}" class="con_price_file_cls form-control">
+              <input type="hidden" name="price_file_ids" value="{{files.id}}" class="price_file_ids">
+              <p>{{files.original_file_name|default_if_none:""}}</p>
+            </td> 
+            <td class="in-btn-wid che-smline wid-but gap-2">
+              <button id="add_file" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> 
+              <button id="remove_file" class="btn btn-clr del-btn" type="button" value="minus"><i class="fa fa-minus"></i></button>
+            </td> 
+          </tr>
+          {% empty %}
+          <tr>
+            <td class='pe-3'>
+              <input type="file" accept="image, .png, .jpeg, .pdf, .jpg" name="price_files" class="con_price_file_cls form-control">
+            </td> 
+            <td class="in-btn-wid che-smline wid-but gap-2">
+              <button id="add_file" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> 
+              <button id="remove_file" class="btn btn-clr del-btn" type="button" value="minus"><i class="fa fa-minus"></i></button>
+            </td> 
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+  </div>
+</div>
+</div>
+
+    </div>
+    {% else %}
+    <div id="amendment_table" class="amendmenttablecls">
+        {% with pk|checkeditcontractinvoice:ammendment.amendment_type as invoice_count %}
+        <input type="hidden" value="{{ammendment.id}}" class="ammendment_id">
+        <div class="row">
+    
+            <div class="col-6">
+                <label class="txt-name">Type</label>
+            </div>
+            <div class="col-6">
+                <select name="ammendment_type" class="form-control ammendment_type">
+                    <option value="">--Select--</option>
+                    {%for type in types %}
+                        <option {% if ammendment.amendment_type == type %} selected {% endif%} value="{{type}}">{{type}}</option>
+                    {% endfor %}
+                </select>
+                {% comment %} <select name="ammendment_type" class="form-control">
+                    <option value="">--Select--</option>
+                    {%for type in types %}
+                        <option value="{{type}}">{{type}}</option>
+                    {% endfor %}
+                </select> {% endcomment %}
+            </div>
+
+            
+        </div>
+        <br>
+        <div class="row contractfile_row" >
+    
+            <div class="col-6" >
+                <label class="txt-name">WCC</label>
+                 <i class="fa fa-info-circle" title="Work Completion Certificate Submission Required"></i>
+            </div>
+            <div class="col-6">
+                <input type="checkbox" class="wcc-cbx amend_wcc_flow_cls" {% if ammendment.wcc == 1 %}checked value="1"{% else %} value="0"{% endif %} name="wcc"  >
+            </div>
+
+            
+        </div>
+        <br>
+        <div class="row">
+    
+            <div class="col-6">
+                <label class="txt-name"> Reference Number</label>
+            </div>
+            <div class="col-6">
+                <textarea rows="3" cols="30" id="refnumber" name="ref_num" class="form-control">{{ammendment.amendment_reference_number|default_if_none:"---"}}</textarea>
+            </div>
+
+            
+        </div>
+        <br>
+        <div class="row">
+    
+            <div class="col-6">
+                <label class="txt-name">
+                Executed Date
+            </label>
+            </div>
+            <div class="col-6">
+                <input type="text" name="dateformat" autocomplete="off" value="{{ammendment.amendment_executed_date|checktime:company.company.id|default_if_none:"---"}}" class="dateformat-cls form-control" >
+            </div>
+
+            
+        </div>
+        <br>
+        <div class="row">
+    
+            <div class="col-6">
+                <label class="txt-name">
+                Maximum Value
+            </label>
+            </div>
+            <div class="col-6">
+                <select name="currency" class="form-control">
+                    <option value='' selected>--Select--</option>
+                    {% for country in companycurrency %}
+                    <option {% if ammendment.amendment_currency.id == country.id%}  selected {% endif %} value="{{country.id}}">{{country.currency_symbol|default_if_none:"---"}}-{{country.currency|default_if_none:"---"}} ({{country.name|default_if_none:"---"}})</option>
+                    {% endfor %}
+                </select>
+                <input type="text" list="browsers" name="amount" value="{{ammendment.amendment_amount|default_if_none:"---"}}" class="form-control contra-currency amount_currency_cls" autocomplete="off"><datalist id="browsers"><option value="No Max Limit"></datalist>
+            </div>
+
+            
+        </div>
+        <br>
+        <div class="row wcc_row" >
+    
+            <div class="col-6">
+                <label class="txt-name">
+                Upload Contract File
+            </label>
+            </div>
+            <div class="col-6">
+                <table class="che-table">
+                    <tbody>
+                      {% for files in contract_files %}
+                    <tr>
+                      <td class='pe-3'>
+                        <input type="file" accept="image, .png, .jpeg, .pdf, .jpg"  class="con_file_cls form-control" name="confiles{{files.id}}" >
+                        <input type="hidden" name="contract_file_ids" value="{{files.id}}" class="contract_file_ids">
+                        <p>{{files.original_file_name|default_if_none:"---"}}</p>
+                      </td> 
+                      <td class="in-btn-wid che-smline wid-but gap-2">
+                        <button id="add_file" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> <button id="remove_file" class="btn btn-clr del-btn" type="button" value="minus"><i class="fa fa-minus"></i></button>
+                      </td> 
+                    </tr>
+                    
+                    {% empty %}
+                    <tr>
+                      <td class='pe-3'>
+                        <input type="file" accept="image, .png, .jpeg, .pdf, .jpg" name="con_files" class="con_file_cls form-control">
+                      </td> 
+                      <td class="in-btn-wid che-smline wid-but gap-2">
+                        <button id="add_file" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> <button id="remove_file" class="btn btn-clr del-btn" type="button" value="minus"><i class="fa fa-minus"></i></button>
+                      </td> 
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                  </table>
+            </div>
+
+            
+        </div>
+    <br>
+    
+        <div class="row">
+    
+            <div class="col-6">
+                <label class="txt-name">
+                Upload Price Table
+            </label>
+            </div>
+            <div class="col-6">
+                <table class="che-table">
+                    <tbody>
+                      {% for files in price_files %}
+                      <tr>
+                        <td class='pe-3'>
+                          <input type="file" accept="image, .png, .jpeg, .pdf, .jpg" name="pricefiles{{files.id}}" class="con_price_file_cls form-control">
+                          <input type="hidden" name="price_file_ids" value="{{files.id}}" class="price_file_ids">
+                          <p>{{files.original_file_name|default_if_none:"---"}}</p>
+                        </td> 
+                        <td class="in-btn-wid che-smline wid-but gap-2">
+                          <button id="add_file" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> 
+                          <button id="remove_file" class="btn btn-clr del-btn" type="button" value="minus"><i class="fa fa-minus"></i></button>
+                        </td> 
+                      </tr>
+                      {% empty %}
+                      <tr>
+                        <td class='pe-3'>
+                          <input type="file" accept="image, .png, .jpeg, .pdf, .jpg" name="price_files" class="con_price_file_cls form-control">
+                        </td> 
+                        <td class="in-btn-wid che-smline wid-but gap-2">
+                          <button id="add_file" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> 
+                          <button id="remove_file" class="btn btn-clr del-btn" type="button" value="minus"><i class="fa fa-minus"></i></button>
+                        </td> 
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+            </div>
+
+            
+        </div>
+    </div>
+         
+    {% endwith %} 
+          
+          
+            {% endif %}
+    </div>
+        <div class="text-center btn-cls">
+            <input type="hidden" name="contract_date" id="contract_date_input" value="{{ contract_date }}">
+            <input type="hidden" name="submit_type" class="submit_type" value=0>
+            <button type="submit" class="btn btn-clr text-left draft-cls">Save as Draft</button>
+            <button type="submit" class="btn btn-clr text-left final-cls">Submit</button>
+        </div>
+    </form>
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" ></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" ></script>
+    <script>
+        var hdn_dateformat=$('#companydateformat').val()
+        var csrf_token = "{{ csrf_token }}"
+
+        var contracttype = "{{ contracttype }}"
+
+
+        $(document).ready(function(){
+            $('.projectcls').each(function(){
+                var find_inactive=$(this).find('option:selected').attr('data-id')
+                if(find_inactive == 'False'){
+                    $(this).closest('tr').find('#name_service,.projectcls,.p_discipline_cls,#disciplinetype_id,#ref_num,.dateformat-cls,.maximum-cls,#amount_currency,.supplydateformat-cls').attr('readonly','readonly')
+                    $(this).closest('tr').find('.wcc_flow_cls,.con_file_cls,.con_price_file_cls').attr('disabled',true)
+                }
+            })
+
+            $('.contracttablecls > tbody  > tr').each(function(index, tr) { 
+                var projectid=$(tr).find('.projectcls').find(':selected').val()
+                if (projectid != ''){
+                    var currentelement=$(tr).find('.projectcls')
+                    var distype=$(tr).find('td:eq(4)')
+                    // if (typeof(projectid) != 'undefined'){
+                        $.ajax({
+                            type:"GET",
+                            url:'/projects/companyprojectdevelopment',
+                            data:{'projectid':projectid},
+                            async: false,
+                            success: function(data){
+                                if (data.data != 'none'){
+                                    var html=''
+                                    html +='<option value="">--Select--</option>'
+                                    $.each(data.data,function(key,val){
+                                        html +='<option value='+val.id+'>'+val.fieldname+'</option>'
+                                    })
+                                    $(tr).find('.p_discipline_cls').html(html)
+                                    // currentelement.next('td').find('.p_discipline_cls').html(html)
+
+                                }
+ 
+                            }
+                        })
+                        console.log($(tr).find('.hdnp_dis'))
+                        var hdn_projectdiscipline=$(tr).find('.hdnp_dis').val()
+                        if (hdn_projectdiscipline != ''){
+                            $(tr).find('.p_discipline_cls option[value='+hdn_projectdiscipline+']').attr("selected", "selected");
+                            $.ajax({
+                                type:"GET",
+                                url:'/projects/companyprojectdevelopment',
+                                data:{'projectdisciplineid':hdn_projectdiscipline},
+                                async: false,
+                                success: function(data){
+                                    if (data.data != 'none'){
+                                        var html=''
+                                        html +='<option value="">--Select--</option>'
+                                        $.each(data.data,function(key,val){
+                                            html +='<option value='+val.value+'>'+val.text+'</option>'
+                                        })
+                                        
+                                        $('#disciplinetype_id').html(html)
+                                    }
+                                }
+                                })
+                                var hdn_projectdisciplinetype=$(tr).find('.hdnp_distype').val()
+
+                                $('#disciplinetype_id option[value='+hdn_projectdisciplinetype+']').attr("selected", "selected");
+                        }
+                    // }
+                }
+            })
+            
+        })
+
+
+        var optiondict={}
+        var list=[]
+        $("#id_companycurrenices option").each(function(){
+            var thisOptionValue=$(this).val();
+            var thistext=$(this).text()
+            optiondict={"id":thisOptionValue,"symbol":thistext}
+    
+            list.push(optiondict)
+        });
+
+        
+    var projectlist=[]
+    var projectoptiondict={}
+    $("#id_projects option").each(function(){
+        var thisOptionValue=$(this).val();
+        var status_check=$(this).attr('data-id')
+        var thistext=$(this).text()
+        projectoptiondict={"id":thisOptionValue,"projectname":thistext,'check_status':status_check}
+        console.log('projectoptiondict',projectoptiondict)
+        projectlist.push(projectoptiondict)
+    });
+
+
+    $(document).on('change','.projectcls',function(){
+        var val=$(this).val()
+        var get_role=$('#user_role').val()
+        const find_text=$(this).find('option:selected').text()
+        var get_text=$(this).find('option:selected').text()
+        var check_status=$(this).find('option:selected').attr('data-id')
+        if(check_status == 'False'){
+            if (get_role == 2){
+                swal.fire(''+find_text+' Inactive.')
+            }
+            if (get_role == 3){
+            swal.fire(''+find_text+' Inactive. Please contact Client Admin')
+            }
+            $(this).val('')  
+        }
+        $('#disciplinetype_id').html('<option value="">--Select--</option>')
+        var currentelement=$(this)
+        if ( currentelement == ''){
+            $(this).closest('td').next('td').find('.p_discipline_cls').html('<option value="">--Select--</option>')
+        }
+        else{
+            $.ajax({
+                type:"GET",
+                url:'/projects/companyprojectdevelopment',
+                data:{'projectid':val},
+                success: function(data){
+                    console.log(data)
+                    var html=''
+                    html +='<option value="">--Select--</option>'
+                    $.each(data.data,function(key,val){
+                        html +='<option value='+val.id+'>'+val.fieldname+'</option>'
+                    })
+                    $('.p_discipline_cls').html(html)
+                }
+            })
+        }
+
+    })
+
+    $(document).on('change','.p_discipline_cls',function(){
+        var val=$(this).val()
+        var sername=$(this).attr('sername')
+        
+        var currentelement=$(this)
+        if (val == ''){
+            $('#disciplinetype_id').html('<option value="">--Select--</option>')
+        }
+        else{
+            $.ajax({
+                type:"GET",
+                url:'/projects/companyprojectdevelopment',
+                data:{'projectdisciplineid':val},
+                success: function(data){
+                    console.log(data)
+                    var html=''
+                    html +='<option value="">--Select--</option>'
+                    $.each(data.data,function(key,val){
+                        html +='<option value='+val.value+'>'+val.text+'</option>'
+                    })
+                    
+                $('#disciplinetype_id').html(html)
+                }
+            })
+        }
+
+    })
+  
+
+        var dateString = $('#contract_date_input').val();
+        var formattedDate = moment.utc(dateString).format('YYYY-MM-DD');
+        var date = new Date(formattedDate);
+        var cdate = date.getDate();
+        var cmonth = date.getMonth() ;
+        var cyear = date.getFullYear();
+
+     
+        if (hdn_dateformat ==''){
+            $(document).on('focus',".dateformat-cls", function(){
+                var inv_count=$(this).attr('inv_count')
+                if (inv_count != "1"){
+                    $(this).datepicker({
+                        dateFormat: 'dd-M-yy',
+                        minDate: new Date(cyear,cmonth,cdate),
+                        maxDate:new Date(),
+                        yearRange: '1900:+0',
+                        changeMonth:true,
+                        changeYear:true,
+                    });
+                }
+              });
+        }
+        else{
+            if(contracttype=='original'){
+                $(document).on('focus',".dateformat-cls", function(){
+                    console.log('dfrg')
+                    var inv_count=$(this).attr('inv_count')
+                    if (inv_count != "1"){
+                        $(this).datepicker({
+                            dateFormat: hdn_dateformat,
+                           // minDate: new Date(cyear,cmonth,cdate),
+                            maxDate:new Date(),
+                            yearRange: '1900:+0',
+                            changeMonth:true,
+                            changeYear:true,
+                        });
+                    }
+                  });
+
+            }else{
+                $(document).on('focus',".dateformat-cls", function(){
+                    console.log('dfrg')
+                    var inv_count=$(this).attr('inv_count')
+                    if (inv_count != "1"){
+                        $(this).datepicker({
+                            dateFormat: hdn_dateformat,
+                            minDate: new Date(cyear,cmonth,cdate),
+                            maxDate:new Date(),
+                            yearRange: '1900:+0',
+                            changeMonth:true,
+                            changeYear:true,
+                        });
+                    }
+                  });
+
+            }
+           
+        }
+
+        if (hdn_dateformat ==''){
+            $(document).on('focus','.supplydateformat-cls',function(){
+                var inv_count=$(this).attr('inv_count')
+                if (inv_count != "1"){
+                    $(this).datepicker({
+                        dateFormat: 'dd-M-yy',
+                        maxDate:new Date(),
+                        yearRange: '1900:+0',
+                        changeMonth:true,
+                        changeYear:true,
+                    });
+                }
+              });
+        }
+        else{
+            $(document).on('focus','.supplydateformat-cls',function(){
+                console.log('2')
+                var inv_count=$(this).attr('inv_count')
+                if (inv_count != "1"){
+                    $(this).datepicker({
+                        dateFormat: hdn_dateformat,
+                        maxDate:new Date(),
+                        yearRange: '1900:+0',
+                        changeMonth:true,
+                        changeYear:true,
+                    });
+                }
+              });
+        }
+    
+    
+        if (hdn_dateformat ==''){
+            $(document).on('focus','.sersuppdateformat-cls',function(){
+                var inv_count=$(this).attr('inv_count')
+                if (inv_count != "1"){
+                    $(this).datepicker({
+                        dateFormat: 'dd-M-yy',
+                        maxDate:new Date(),
+                        yearRange: '1900:+0',
+                        changeMonth:true,
+                        changeYear:true,
+                    });
+                }
+              });
+        }
+        else{
+            $(document).on('focus','.sersuppdateformat-cls',function(){
+                var inv_count=$(this).attr('inv_count')
+                if (inv_count != "1"){
+                    $(this).datepicker({
+                        dateFormat: hdn_dateformat,
+                        maxDate:new Date(),
+                        yearRange: '1900:+0',
+                        changeMonth:true,
+                        changeYear:true,
+                    });
+                }
+              });
+        }
+
+        $(document).on('change','.p_discipline_cls',function(){
+            var sername=$(this).attr('sername')
+            html='<select name="'+sername+'disciplinetype" class="form-control">'
+            html+='<option value="">--Select--</option>'
+            html+='<option value="subsurface_and_reservoir_engineering">Subsurface and Reservoir Engineering</option><option value="drilling_and_completions">Drilling and Completions</option><option value="facilities_and_projects">Facilities and Projects</option><option value="production_and_operations">Production and Operations</option><option value="human_resources_and_administration">Human Resources and Administration</option><option value="legal">Legal</option><option value="ICT">ICT</option><option value="finance">Finance</option><option value="QHSE_&_community_development">QHSE & Community Development</option><option value="business_development_&_sales_and_marketing">Business Development & Sales and Marketing</option><option value="insurance">Insurance</option><option value="miscellaneous">Miscellaneous</option>' 
+            html+='</select>'
+            $('#disciplinetype_id').html(html)
+        })
+
+        
+
+
+
+      
+        var row=1
+       
+
+
+        $(document).on('change',".con_file_cls", function(){
+
+            $(this).next('p').remove()
+          });
+
+          $(document).on('change',".con_price_file_cls", function(){
+
+            $(this).next('p').remove()
+          });
+
+
+          function numberWithCommas(number) {
+
+            var parts = number.toString().split(".");
+    
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            console.log(parts)
+            return parts.join(".");
+        }
+    
+
+        $(document).on('change','.amount_currency_cls',function(){
+            $(this).next('span').remove();
+            var val=$(this).val()
+            if (val != 'No Max Limit' && val!='no max limit')
+                {
+                $(this).val(val.replace(/([-€~!@#$%^&*()_+=`{}\[\]\|\\:;'<>A-Za-z])+/g, ''));
+                }
+            var number=$(this).val()
+            if ( number !=''){
+                if (number==0){
+                    $(this).after('<span class="waring-err">Value cannot be Zero</span>')
+                }
+                else{
+                    $(this).next('span').remove();
+                }
+            }
+            else{
+                $(this).next('span').remove();
+            }
+            $(".amount_currency_cls").each(function() {
+                var num = $(this).val();
+                var removecomma=num.replace(/,/g, '');
+                var commaNum = numberWithCommas(decimal_value(removecomma));
+                $(this).val(commaNum);
+            });
+            if($(this).val().indexOf('.')!=-1){         
+                if($(this).val().split(".")[1].length > 2){                
+                    if( isNaN( parseFloat( this.value ) ) ) return;
+                    this.value = parseFloat(this.value).toFixed(2);
+                    }  
+                }            
+            return this; //for chaining
+        })
+
+
+$(document).on('click','.final-cls',function(e){
+    e.preventDefault()
+    var count=0
+    var checkedcount=0
+    var form=$('#editcontractmaster')
+    $('input.commoncls[type=checkbox]').each(function(){
+        if ($(this).is(':checked')){
+            console.log('true')
+            checkedcount ++;
+        }
+        else{
+            // checkedcount ++;
+            // console.log($(this))
+            $(this).addClass('con_error')
+        }
+    })
+    $('select').each(function(){
+        var val=$(this).find(':selected').val()
+        
+        if (val == ''){
+            count ++;
+           
+            // console.log($(this))
+            $(this).addClass('con_error')
+            // console.log('a')
+        }
+    })
+    $("input:text, textarea").each(function(){
+       
+        var val=$(this).val()
+        if (val == ''){
+            count ++;
+            // console.log($(this))
+            $(this).addClass('con_error')
+        }
+       
+    });
+
+    $('.con_file_cls').each(function() {
+        var val=$(this).val()
+        if (val == ''){
+            if($(this).closest('td').find('p').length == 0){
+                count ++;
+            $(this).addClass('con_error')
+            }
+            
+        }
+    });
+    $('.con_price_file_cls').each(function() {
+        var val=$(this).val()
+        if (val == ''){
+            if($(this).closest('td').find('p').length == 0){
+                count ++;
+            $(this).addClass('con_error')
+            }
+            
+        }
+    });
+
+    $('#refnumber').not(':hidden').each(function(){
+        var this_ref_num=$(this)
+        var ref_num=$.trim($(this).val())
+        var contract_id=$('.contract_id').val()
+        var ammendment_id=$('.ammendment_id').val()
+        reference_number(this_ref_num,ref_num,contract_id,ammendment_id)
+        if($(this).hasClass('con_error')){
+            count ++;
+        }
+    })
+
+ 
+    if (count == 0 && checkedcount >= 0){
+        $('.submit_type').val(1)
+        form.submit()
+    }
+})
+
+$(document).on('change','.con_error',function(){
+    $(this).removeClass('con_error')
+    
+})
+
+var value;
+function checkcontract(contract_type,contract_id){
+    console.log('a',contract_type,contract_id)
+    if (contract_id != ''){
+        $.ajax({
+            url: "/projects/checkcontractinvoice", 
+            data:{'contract_type':contract_type,'contract_id':contract_id},
+            async:false,
+            success: function(data){
+                console.log(data)
+                if (data.data == 'exsists'){
+                    value=true
+                }
+                else{
+                    value=false
+                }
+            }
+        });
+        return value
+    }
+    else{
+        value = false
+        return value
+    }
+}
+
+$(document).on('click','.wcc_flow_cls',function(){
+    let get_project_id=$('.projectcls').find(':selected').val();
+    let current_element=$(this);
+
+    if (get_project_id){
+        if ($(this).is(':checked')){
+            $.ajax({
+                type:"GET",
+                url:'/projects/companyprojectdevelopment',
+                data:{'projectid':get_project_id},
+                success: function(data){
+                    if (data.project_wcc_flow == 0){
+                        swal.fire('WCC Flow not Added in this Project')
+                        $('.wcc_flow_cls').prop('checked',false);
+                        $('.wcc_flow_cls').val('1');
+                        
+                    }
+                    else{
+                        $('.wcc_flow_cls').prop('checked',true);
+                        $('.wcc_flow_cls').val('1');
+                    }
+                }
+            })
+        }
+        else{
+           $('.wcc_flow_cls').val('0');
+        }
+    }
+    else{
+        swal.fire('Select Project and Then Select WCC');
+        $('.wcc_flow_cls').prop('checked',false);
+       $('.wcc_flow_cls').val('0');
+        
+    }
+})
+
+
+$(document).on('click','.amend_wcc_flow_cls',function(){
+    let get_project_id=$('.projectcls').val();
+    let current_element=$(this);
+    console.log(get_project_id)
+    if (get_project_id){
+        if ($(this).is(':checked')){
+            $.ajax({
+                type:"GET",
+                url:'/projects/companyprojectdevelopment',
+                data:{'projectid':get_project_id},
+                success: function(data){
+                    if (data.project_wcc_flow == 0){
+                        swal.fire('Wcc Flow not Added in this Project')
+                        current_element.prop('checked',false);
+                        current_element.val(0);
+                        current_element.closest('td').find('input[type=hidden]').attr('disabled',false);
+                    }
+                    else{
+                        current_element.val(1);
+                        current_element.prop('checked',true);
+                        current_element.closest('td').find('input[type=hidden]').attr('disabled',true);
+                    }
+                }
+            })
+        }
+        else{
+            current_element.val(0);
+            $(this).closest('td').find('input[type=hidden]').attr('disabled',false);
+        }
+    }
+   
+})
+
+
+
+$(document).on('click','.add-btn',function(){
+    html=$(this).closest('tr').clone()
+    html.find('.con_file_cls').attr('name','con_files')
+    html.find('.con_price_file_cls').attr('name','price_files')
+    html.find('.contract_file_ids').remove()
+    html.find('.price_file_ids').remove()
+    html.find('p').remove()
+    html.find('.con_file_cls,.con_price_file_cls').val('')
+    $(this).closest('tbody').append(html)
+  })
+  
+  $(document).on('change','.con_file_cls,.con_price_file_cls',function(){
+      $(this).closest('td').find('p').remove()
+  })
+  
+  $(document).on('click','.del-btn',function(){
+    let tr_length=$(this).closest('tbody').find('tr').length
+    if (tr_length > 1){
+    $(this).closest('tr').remove()
+    }
+  })
+
+
+  $(document).on('keyup','#refnumber',function(){
+    var this_ref_num=$(this)
+    var ref_num=$.trim($(this).val())
+    var contract_id=$('.contract_id').val()
+    var ammendment_id=$('.ammendment_id').val()
+    reference_number(this_ref_num,ref_num,contract_id,ammendment_id)
+})
+
+$(document).on('change','#refnumber',function(){
+    var this_ref_num=$(this)
+    var ref_num=$.trim($(this).val())
+    var contract_id=$('.contract_id').val()
+    var ammendment_id=$('.ammendment_id').val()
+    reference_number(this_ref_num,ref_num,contract_id,ammendment_id)
+})
+
+function reference_number(this_ref_num,ref_num,contract_id,ammendment_id){
+    $.ajax({
+        type: "GET",
+        headers: { "X-CSRFToken": csrf_token },
+        url: "/projects/checkreferencenumber",
+        data: {
+            'ref_num':ref_num,
+            'contract_id':contract_id,
+            'ammendment_id':ammendment_id
+        }, 
+        success: function(data){
+            if(data.data == '1' || data.data == 1){
+                this_ref_num.addClass('con_error')
+            }
+            else{
+                this_ref_num.removeClass('con_error')
+            }
+          
+        }
+    });
+}
+
+
+$(document).on('click','.draft-cls',function(e){
+    e.preventDefault()
+    var count=0
+    var form=$('#editcontractmaster')
+    $('#refnumber').not(':hidden').each(function(){
+        var this_ref_num=$(this)
+        var ref_num=$.trim($(this).val())
+        var contract_id=$('.contract_id').val()
+        var ammendment_id=$('.ammendment_id').val()
+        reference_number(this_ref_num,ref_num,contract_id,ammendment_id)
+        if($(this).hasClass('con_error')){
+            count ++;
+        }
+    })
+    if (count == 0){
+        $('.submit_type').val(0)
+        form.submit()
+    }
+})
+   
+  
+    </script>
+{% endblock %}

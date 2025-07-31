@@ -1,0 +1,35 @@
+{% load cost_code_tags %}
+<div class="modal fade" id="confirm_cost_code" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true"  data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header comment-head">
+      
+        <h5 class="modal-title" id="exampleModalCenterTitle">Confirm Cost Code</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" >
+          <span aria-hidden="true">&times;</span>
+        </button>
+
+      </div>
+      <div class="modal-body comment-body">
+        <button type="button" class="btn btn-clr"><a href="{% url 'cost_code:getvendorcostcode_bycontract' pk %}" target="_blank">Cost Code</a></button>
+          <p>{{costcode_data.codecode_component}}</p>
+          <p>{{costcode_data.costcode_view}}</p>
+
+          <select name="costcode" id="vendor_costcode" class="commom-cls form-control form-select inv-inf-bor">
+              <option value="">--Select Code--</option>
+              {% for data in vendor_costcodes %}
+              {% getcostcode_preview data.costcode_main data.order request.company as subcostcode %}
+              {% getcostcode_string data.costcode_main data.order request.company as all_costcode_string %}
+              <option value="{{data.id}}" {% if order == data.order %} selected {% endif %} order="{{data.order}}">{{subcostcode}}-{{all_costcode_string}}</option>
+              {% endfor %}
+          </select>
+          <textarea name="conform_costcode_comments" class="form-control comnts" id="conform_costcode_comments"></textarea>
+
+          
+      </div>
+      <div class="modal-footer comment-foot">
+        <button type="button" class="btn btn-secondary"  id="conform_costcode_btn">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>

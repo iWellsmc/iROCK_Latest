@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load custom_tags %}
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/editprojectuser.css' %}">
+
+<div class="row">
+  <div class="col-12 text-end">
+      <a class="btn btn-clr chck-tst" href="{% url 'projects:editprojectnextstep' pk %}">Back</a>
+  </div>
+</div>
+
+<section class="usesr-management-Edit-section users">
+    <div>
+
+        <h3 class="from-head edit-user " data-id='{{pk}}'>Edit Project User</h3>
+        
+        <div class="row d-flex justify-content-center margin-grey">
+            <div class="col-12 users-section">
+                <form class="form-txt" id="addtaxformid" method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12 mt-3 wid-select">
+                            <div class="down-arrow">
+                                    <img src="../../../static/images/icons/icons8-down-arrow-18s.png" alt="" {% if request.user.roles_id == 3 %}{% if rights.create == None %}style="display:none" {% endif %}{% endif %}>
+
+
+                            <!-- <label for="staticEmail" class="col-form-label">Users<span class="star-clr">*</span></label>
+                            <select id="project_manager" name="project_user" class="form-control input-sizze sel-cls"
+                                multiple="multiple">
+                                {% for user in all_users %}
+                                <option value="{{user.id}}" {% if user.id in users %} selected {% endif %}>
+                                    {{user.name}} {{user.lastname}} &nbsp;-- {{user.designation_role}} &nbsp; {% if user.roles.id == 2 %}-- Administration{% else %}{% if user.user_department_id is not None %}-- {{user.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>
+                                {% endfor %}
+                            </select> -->
+
+                            <div class="row align-items-baseline vvv">
+                                <div class="col-1">
+                                    <label for="staticEmail" class="col-form-label" id='userdata' data-id={{pk}}>Users <span class="star-clr">*</span></label>
+                                </div>
+                                
+                                
+                                <div class="col-11 multi-user-sel-new">
+                                  {% if request.user.roles_id == 3 %}
+                                    {% if rights.create == None %}
+                                      No Rights to Edit Project Users
+                                      {% for user in all_users %}
+                                      <input type="hidden" name="project_user" value="{{user.id}}">
+                                      {% endfor %}
+                                    {% else %}
+                                       <select id="project_manager" name="project_user" class="form-control input-sizze sel-cls"
+                                        multiple="multiple">
+                                          {% for user in all_users %}
+                                          <option value="{{user.id}}" {% if user.id in users %} selected {% endif %}>
+                                              {{user.name}} {{user.lastname}} &nbsp;-- {{user.designation_role}} &nbsp; {% if user.roles.id == 2 %}-- Administration{% else %}{% if user.user_department_id is not None %}-- {{user.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>
+                                          {% endfor %}
+                                        </select>  
+                                    {% endif %} 
+                                  {% else %}
+                                     <select id="project_manager" name="project_user" row="4"class="form-control input-sizze sel-cls"
+                                      multiple="multiple">
+                                        {% for user in all_users %}
+                                        <option value="{{user.id}}" {% if user.id in users %} selected {% endif %}>
+                                            {{user.name}} {{user.lastname}} &nbsp;-- {{user.designation_role}} &nbsp; {% if user.roles.id == 2 %}-- Administration{% else %}{% if user.user_department_id is not None %}-- {{user.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;</option>
+                                        {% endfor %}
+                                      </select>
+                                  {% endif %}
+                                  
+                                </div>
+
+                        </div>
+                        </div>
+                    </div>
+                    <div class="text-center phase-vendor" id="btn">
+                        <button type="submit" class="{% if request.user.roles_id == 3 %}{% if rights.create != None %}save-cls edituser_save editproject {% endif %}{% else %}save-cls edituser_save editproject {% endif %}btn btn-clr text-right mt-4" >
+                          Submit
+                          <!-- <a href="{% url 'projects:editprojectsignatory' pk %}">Save & Next</a> -->
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</section>
+<style>
+  
+</style>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
+<script
+src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.2/js/bootstrap-multiselect.js"
+integrity="sha512-YwbKCcfMdqB6NYfdzp1NtNcopsG84SxP8Wxk0FgUyTvgtQe0tQRRnnFOwK3xfnZ2XYls+rCfBrD0L2EqmSD2sA=="
+crossorigin="anonymous"
+referrerpolicy="no-referrer">
+</script>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.2/css/bootstrap-multiselect.css"
+integrity="sha512-tlP4yGOtHdxdeW9/VptIsVMLtgnObNNr07KlHzK4B5zVUuzJ+9KrF86B/a7PJnzxEggPAMzoV/eOipZd8wWpag=="
+ crossorigin="anonymous"
+ referrerpolicy="no-referrer" />
+<script>
+  var csrf_token = '{{csrf_token}}'
+</script>
+<script>
+
+$(document).ready(function(){
+    var selectedValue = $('#sign_settings :selected').val();
+    if(selectedValue==2){
+        $('.project_sign').hide();
+    }
+    if(selectedValue==1){
+        $('.Default_sign').hide();
+        $('.project_sign').show();
+    }
+})
+$(document).on('change','#project_manager',function(){
+        var selectedTexts = [];
+        var html='<option>--Select--</option>'
+        $('#project_manager option:selected').each(function() {
+            selectedTexts.push($(this).text());
+            let values=$(this).val()
+            html+='<option value="'+values+'">'
+            html+=''+$(this).text()+''
+            html+='</option>'
+            $('.opt').remove('')
+        });
+        $('.project_value').html(html)
+})
+
+$(document).on('click','.editproject',function(){
+  selectedTexts=[];
+  let pk=$('#userdata').attr('data-id')
+  let form=$('#addtaxformid')
+  console.log('pk',pk)
+  $('#project_manager option:selected').each(function() {
+    selectedTexts.push($(this).val());
+});
+$.ajax({
+  url: '/projects/usercheck/'+pk+'',
+  type: "POST",
+  headers: { "X-CSRFToken": csrf_token},
+  async: false,
+  data: {
+    'pk': pk,
+    'users_in':selectedTexts,
+  },
+  success: function (data) {
+    if(data.status == false){
+    form.validate({
+        rules: {
+          project_user: {
+                required: true
+            },
+        },
+        messages: {
+            project_user:{
+                required:"Select User"
+            }          
+        }
+    });
+;
+      if (form.validate()){
+        form.validate().settings.ignore = ":disabled,:hidden";
+        return form.valid();
+    }
+    else{
+        return true
+    }
+    }
+  }
+})
+})
+
+$(document).on('click','.edituser_save',function(e){
+  var selectedTexts = $('.sel-cls option:selected').val();
+  if(selectedTexts == undefined){
+    $('.sel-cls').addClass('con_error')
+    e.preventDefault();
+  }
+  else{
+    $('form').submit();
+  }
+})
+
+
+{% comment %} $('.settings_sign').change(function(){
+    var delete_id=$(this).attr('data-id')
+    var projectname=$(this).attr('project-name')
+    Swal.fire({
+      title: 'Are you sure you want to delete '+projectname,
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, I Confirm',
+      cancelButtonText: 'No',
+    }).then((result) => {
+      if (result.isConfirmed) {
+         $.ajax({
+        type: "GET",
+        url:'/projects/delete',
+        data: {
+          "id":delete_id,
+        },
+        success: function(data)
+        {
+          console.log(data)
+          setTimeout(function(){  
+          location.reload();  
+          },1000);
+        }
+         });
+        Swal.fire(projectname,'Deleted Successfully')
+      }
+    })
+  }) {% endcomment %}
+
+    $(document).on('change','.settings_sign',function(){
+        Swal.fire({
+            text: 'Are You sure want to change signatory type?',
+            showDenyButton: true,
+            confirmButtonText: 'Yes',
+            denyButtonText: 'No',
+            confirmButtonColor: '#AF2B50',
+            denyButtonColor:'#AF2B50',
+            customClass: {
+              actions: 'my-actions',
+              confirmButton: 'order-2',
+              denyButton: 'order-3',
+            }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              let changed_val=$(this).val()
+              let pk=$('.edit-user').attr('data-id')
+              $.ajax({
+                type: "POST",
+                headers: { "X-CSRFToken": "{{ csrf_token }}"},
+                url: "{% url 'projects:validatesignatorysettings' pk %}",
+                data: {'changed_val':changed_val,'pk':pk},
+                success: function(data){
+                    window.location.reload();                    
+                }
+            })
+            
+            } else if (result.isDenied) {
+            }
+          })
+
+
+
+        var value_tye=$(this).val()
+        if(value_tye=='1'){
+            $('.project_sign').removeAttr('style')
+            $('.Default_sign').addClass('style').css('display', 'none');
+            }
+        else{
+            $('.project_sign').addClass('style').css('display', 'none');
+        }
+        if(value_tye=='2'){
+            $('.Default_sign').removeAttr('style')
+        }
+        else{
+            $('.Default_sign').addClass('style').css('display', 'none');
+        }
+    })
+    
+
+    $('.sel-cls').multiselect({
+           
+
+            numberDisplayed:'{{all_users.count}}',
+            buttonWidth: '100%',
+            maxHeight: 600,
+            maxWidth:'100%',
+            nonSelectedText: 'All',
+            enableClickableOptGroups: true,
+            enableCollapsibleOptGroups: true,
+            enableCaseInsensitiveFiltering : true,
+            includeSelectAllOption: true,
+            disableIfEmpty: true,
+            checkboxName: function(option) {
+                return 'multiselect[]';
+            }
+
+    });
+
+  
+
+</script>
+
+<!-- Removing tooltip script -->
+<script>
+    $('.btn-default').removeAttr('title');
+</script>
+<!-- Removing tooltip script -->
+
+<script>
+    function setFocus () {
+  document.getElementById('w-input-text').focus();
+}
+</script>
+
+{% endblock %}

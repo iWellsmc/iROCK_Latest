@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load wcc_custom_tags %}
+{% load static %}
+{% block content %}
+
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/invoice.css' %}"> -->
+<style>
+    .start-float {
+        float: unset;
+    }
+    .span_cls {
+        color: red;
+        font-weight: 500;
+    }
+</style>
+    <div>
+
+        <form  method="POST" id="wccform2" enctype="multipart/form-data"> 
+            <div class="row">
+                <!--back url-->
+                <div class="col-12 text-end">
+                    <button type="button" class="btn btn-clr"><a href="{% url 'wcc:wcceditformone' pk=pk %}">Back</a></button>
+                </div>
+            </div>
+            {% csrf_token %}
+            <h3 class="from-head">Standard Information Form</h3>
+            <h3 class="from-head">WCC Cost Details and Supporting Documents</h3>
+            
+ 
+            <div class="row de-bottom"><div><label class="contractfilehead curr-ency">Currency As Per Contract :<span class="currency-clr">{% if wcc_data.contracttype == "original" %}{{contractmaster.currency.currency_symbol}}-{{contractmaster.currency.currency}}{% else %}{{contractmaster.amendment_currency.currency_symbol}}-{{contractmaster.amendment_currency.currency}}{% endif %}</span></label></div></div>
+
+            <div class="row de-bottom justify-content-center">
+                <div class="row">
+                        <div class="col-6 sm-lin pl-0">
+                            <label class="contractfilehead">Total Value of WCC</label>
+                        </div>
+                         <div class="col-6">
+                            <input type="text" name="totalvalue" id="id_totalvalue" class="form-control in-bor-clr-start inp-ut-wid wid-to-box custom_validation cur_symbol start-float" autocomplete="off" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');" placeholder="Total Value">
+                        </div>
+                        <input type="hidden" name="dateformat" id="companydateformat" value={{company.dateformat}}>
+                        <input type="hidden" name="fromdate" id="fromdate" value="{{ from_date }}">
+
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-3 sm-lin pl-0">
+                        <label class="contractfilehead">WCC No.</label>
+                    </div>
+                    <div class="col-3 sm-lin">
+                        <label class="contractfilehead">WCC Date</label>
+                    </div>
+                    <div class="col-3 sm-lin">
+                        <label class="contractfilehead">WCC File</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-3 pl-0">
+                        <input type="text" name="wc_num" autocomplete="off" class="form-control wcc_num_cls" value="{{wcc_number}}" readonly>
+                    </div>
+                    <div class="col-3 sm-lin">
+                        <input type="text" name="wcc_date"  autocomplete="off" class="wccdateformat-cls form-control form-select">
+                    </div>
+                    <div class="col-3 ">
+                        <input type="file" name="wcc_file" class="form-control wcc_file_cls filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                        
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 sm-lin pl-0 mt-3 mb-2">
+                        <label class="contractfilehead">Other Supporting Documents :</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <table id="id_checklist" class="cre-invoice3">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th class="head-inv3">Document Name</th>
+                                <th class="head-inv3">Uploads</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc_detail in supports_docs %}
+                            <tr>
+                                <td class="text-center">
+                                    <input type="checkbox" class="checkfile" name="checksupportfile" value="{{doc_detail.id}}"></td>
+                                <td>
+                                    {{doc_detail.name}}
+                                </td>
+                                <td class="addfilecls"></td>
+                            </tr>
+                            {% endfor %}
+
+                            <tr>
+                                <td></td>
+                                <td>
+                                    Original Contract
+                                </td>
+                                <td>               
+                                 {% get_wcc_originalcontract_price_files contractmaster wcc_data.contracttype 1 as contract_files %}
+                                        {%if contract_files.1 != 0  %}
+                                        <div class="col-6"> 
+                                            <ul class="view-ul">
+                                                {% for contract_file in contract_files.0 %}
+                                                <li> <a target="_blank" href="{% url 'invoice:view_contractfiles' pk=contract_file.id %}">{{ contract_file.original_file_name }}</a></li>
+                                                {% empty %}
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                        {% endif %}
+                                </td>
+                            </tr>
+
+                            {% if wcc_data.contracttype != "original" %}
+                            <tr>
+                                <td></td>
+                                <td>
+                                    {{wcc_data.contracttype|capitalize_letter}} Contract
+                                </td>
+                                <td>
+                                    {% getwccamendmentcontract_price_files contractmaster wcc_data.contracttype 1 as contract_files %}
+                                        {%if contract_files.1 != 0  %}
+                                            <div class="col-6">
+                                                <ul class="view-ul">
+                                                {% for contract_file in contract_files.0 %}
+                                                <li><a target="_blank" href="{% url 'invoice:view_contractfiles' pk=contract_file.id %}">{{ contract_file.original_file_name }}</a></li>
+                                                {% empty %}
+                                                {% endfor %}
+                                                </ul>
+                                            </div>
+                                        {% endif %}
+                                </td>
+                            </tr>
+                            {% endif %}
+
+
+                            <tr>
+                                <td></td>
+                                <td>
+                                   Original  Price Table
+                                </td>
+                                <td>  
+
+                                        {% get_wcc_originalcontract_price_files contractmaster wcc_data.contracttype 2 as pricetables %}
+                                            {%if pricetables.1 != 0  %}
+                                                <div class="col-6"> 
+                                                    <ul class="view-ul">
+                
+                                                    {% for file in pricetables.0 %}
+                
+                                                    <li><a target="_blank" href="{% url 'invoice:view_contractfiles' pk=file.id %}">{{ file.original_file_name }}</a></li>
+                                                    {% endfor %}
+                                                     </ul>
+                                                </div>
+                
+                                            {% endif %}
+                                </td>
+                            </tr>
+
+                            {% if wcc_data.contracttype != "original" %}
+                            <tr>
+                                <td></td>
+                                <td>
+                                    {{wcc_data.contracttype|capitalize_letter}}  Price Table
+                                </td>
+                                <td>  
+                                        {% getwccamendmentcontract_price_files contractmaster wcc_data.contracttype 2 as pricetables %}
+                                            {%if pricetables.1 != 0  %}
+                                                <div class="col-6"> 
+                                    <!-- <h4>Price Table Files</h4> -->
+                                                    <ul class="view-ul">
+                                                        {% for file in pricetables.0 %}
+                                                            <li><a target="_blank" href="{% url 'invoice:view_contractfiles' pk=file.id %}">{{ file.original_file_name }}</a></li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% endif %}
+                                </td>
+                            </tr>
+                            {% endif %}
+
+
+
+
+
+
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <div class="text-center btn-cls">
+                <button type="button" id="draft_id" class="btn btn-clr text-left submit-cls" name="submit_type" value="0">Save as Draft</button>
+                <button type="button" id="save_id" name="submit_type" value="1" class="btn btn-clr text-left submit-cls">Save and Submit</button>
+                <button type="button" id="preview_id" name="submit_type" value="2" class="btn btn-clr text-left submit-cls">Preview</button>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" ></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" ></script>
+<!-- <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script> -->
+<script>
+    var contract_reference = '{{contract_reference}}'
+    var total_value = '{{total_value}}'
+</script>
+<script src="{% static 'js/wcc/createwcc.js' %}"></script>
+
+{% endblock %}

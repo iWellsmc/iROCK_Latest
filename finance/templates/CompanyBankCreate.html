@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/bankdetails.css' %}">
+
+<div class="row">
+  <div class="col-12 text-end">
+    <a class="btn btn-clr chck-tst" href="{% url 'finance:list_details' %}">Back</a>
+    <!-- button place here -->
+  </div>
+</div>
+
+<div>
+  <h4 class="from-head">Bank Users</h4>
+
+  <form method="post" id="migrate-user-form" class="bankform">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-5 bank-select">
+        <!-- <div class="down-arrow-sig">
+          <img src="../../../static/images/icons/icons8-down-arrow-18s.png" alt="">
+        </div> -->
+        <label>Select Bank<span>*</span></label>
+        <select class="form-control form-select select_bank" name="select_bank">
+          <option value="">--Select--</option>
+          {% for i in banklist %}
+          <option value="{{i.id}}">{{i.bank_name}}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-7"></div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <div class="table-responsive text-nowrap">
+
+          <table class="table settings-data-list-view creat-head data-list-view m-bank-user tab-res irock-table maintable"
+            id="master_project_list">
+            <thead class="list-user">
+              <tr>
+                <th>Currency*</th>
+                <th>Account No*</th>
+                <th class="maintable-pia">Users*</th>
+                <th class="maintable-user">Payment Instruction Addressed</th>
+                <th class="action">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="table-list">
+              <tr class="tabletr">
+
+                <td>
+                  <select class="form-control form-select currency" name="currency">
+                    <option value="">--Select--</option>
+                  </select>
+                </td>
+                <td>
+                  <select class="form-control form-select accountno" name="accountno">
+                    <option value="">--Select--</option>
+                  </select>
+                </td>
+                <!-- <td>
+                <select class="currency-cls user"  id="hdn_currency" multiple="multiple" name="users" class="form-control gener-hd-input" placeholder="Currency" >
+                 <option>--Select--</option>
+                </select>
+            </td> -->
+                
+                <td>
+                  <table class="inner-table usertable m-bank-user">
+                    <thead>
+                      <tr>
+                        <th class="user-title">Title</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Designation</th>
+                        <th class="maintableuser-action-wid">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- <div class="userdetails"> -->
+                      <tr class="usertr m-bank-user">
+                        <td class="user-title">
+                          <select name="usertitle" class="usertitle userfield form-control form-select">
+                            <option selected value="">--Select--</opiton>
+                            <option value='Mr'>Mr</opiton>
+                            <option value='Mrs'>Mrs</opiton>
+                            <option value='Ms'>Ms</opiton>
+                          </select>
+                        </td>
+                        <td><input type="text" class="userfield userfirstname form-control" name="userfirstname"></td>
+                        <td><input type="text" class="userfield userlastname form-control" name="userlastname"></td>
+                        <td><input type="email" class="userfield useremail form-control" name="useremail"></td>
+                        <td><input type="text" class="userfield userdesignation form-control" name="userdesignation">
+                        </td>
+                        <td class="maintableuser-action-wid">
+                            <button id="adduser" class='btn btn-clr adduser' type='button' value='Add'> <i
+                              class="fa fa-plus"></i> </button>
+                        </td>
+                      </tr>
+                      <!-- </div> -->
+                    </tbody>
+                  </table>
+                </td>
+                <td>
+                  <table class="inner-table paymentinstructer m-bank-user">
+                    <thead>
+                      <tr>
+                        <th class="">Title</th>   <!--class removed -> pia-title -->
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- <div class="userdetails"> -->
+                      <tr>
+                        <td><select name="instructortitle" class="form-control form-select instructortitle">
+                            <option value selected>--Select--</opiton>
+                            <option value='Mr'>Mr</opiton>
+                            <option value='Mrs'>Mrs</opiton>
+                            <option value='Ms'>Ms</opiton>
+                          </select>
+                        </td>
+                        <td><input type="text" class="firstname form-control" name="instructorfirstname"></td>
+                        <td><input type="text" class="lastname form-control" name="instructorlastname"></td>
+                      </tr>
+                      <!-- </div> -->
+                    </tbody>
+                  </table>
+                </td>
+                <!-- <td class="text-left"><textarea class="form-control bank_address" name="bankdetails" id="bank-address" type="text" ></textarea></td> -->
+                <td class="btn-middle-align">
+                  <button id='add' class='btn btn-clr add-btn add' type='button' value='Add'> <i
+                      class="fa fa-plus"></i>
+                </td>
+              </tr>
+          </table>
+
+  </form>
+</div>
+<div class="text-center">
+  <button id="mainsave" class='btn btn-clr pha-sebtn mt-3' type="submit">Save</button>
+</div>
+</div>
+</div>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+  var bankcount = '{{banklist.count}}'
+  var csrf_token = '{{ csrf_token }}'
+</script>
+<script src="{% static 'js/finance/companybankcreate.js' %}"></script>
+{% endblock %}

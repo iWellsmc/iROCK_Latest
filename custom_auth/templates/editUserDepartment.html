@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/user_Management/userdepartment.css' %}">
+<div class="row">
+    <!-- <div class="col-3">
+        <button type="button" class="btn btn-clr btn-master chck-tst mr-0"><a href="{% url 'custom_auth:list-userdepartment-form' %}">Back</a></button>
+    </div> -->
+    <div class="col-12 text-end">
+        <a  class="btn btn-clr chck-tst" href="{% url 'custom_auth:list-userdepartment-form' %}">Back</a>
+    </div>
+</div>
+
+<section class="usesr-management-Edit-section">
+<div>
+
+    <h3 class="from-head">Edit User Department</h3>
+    
+    <div class="row d-flex justify-content-center">
+        
+
+        <div class="col-6">
+        <div class="invite-cards">
+            <form  class="form-txt" id="addtaxformid" method="POST">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-12 mt-3">
+                        <label class="vend-appor-hd mb-3">Department Name<span class="star-clr">*</span></label>
+                        <input type="text" autocomplete="off" name="department" id="taxnameid0" class="form-control taxnamecls" value="{{department.department}}">
+                    </div>
+                </div>
+                <div class="text-center phase-vendor mt-4" id="btn">
+                    <button type="submit" class="final-cls btn btn-clr text-right">Submit</button>
+                </div>
+
+            </form>
+        </div>
+        </div>
+
+    </div>
+
+</div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script>
+var global=$('.taxnamecls').val();
+$(document).ready(function(){
+
+    $('#addtaxformid').validate();
+    $("[name=taxname]").rules("add", {
+        required: true,
+        });   
+});
+
+//$(document).on('keyup','.taxnamecls',function(){
+    var ajaxData = false;
+    $(".taxnamecls").focusout(function(){
+        console.log('focusout pk','{{department.id}}')
+        var val=$(this).val()
+        if (global != val){
+            $('.waring-err').remove()
+            var currentelement=$(this)
+            $.ajax({
+                type: "POST",
+                headers: { "X-CSRFToken": "{{ csrf_token }}"},
+                url: "{% url 'custom_auth:validateuserdepartment' %}",
+                async:false,
+                data: {'department':$.trim(val),'department_id':'{{department.id}}'},
+                success: function(data){
+                    console.log({'checktaxname':data.data})
+                    if (data.success == true){
+                        ajaxData = true;
+                        currentelement.after('<span class="waring-err">User Department Already Exists</span>')
+                        $('.final-cls').prop('disabled',true)
+                    }
+                    else{
+                        ajaxData = false;
+                        $('.final-cls').prop('disabled',false)
+                    }
+                }
+            });
+        }
+        else{
+            $('.waring-err').remove()
+            ajaxData = false;
+            $('.final-cls').prop('disabled',false)
+        }
+    })
+    $('.taxnamecls').keyup(function() {
+        var $th = $(this);
+        $th.val($th.val().replace(/(\s{2,})/g, ' '));
+        $th.val($th.val().replace(/^\s*/, ''));
+        });
+
+$('.final-cls').click(function(e){
+    console.log({'ajaxData':ajaxData})
+    if (ajaxData){
+e.preventDefault();
+}
+})
+
+</script>
+
+{% endblock %}

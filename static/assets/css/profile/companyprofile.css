@@ -1,0 +1,189 @@
+@import url('https://fonts.googleapis.com/css2?family=Babylonica&family=Ballet&family=Birthstone+Bounce&family=Caveat&family=Dancing+Script:wght@500&family=Dr+Sugiyama&family=Kristi&family=La+Belle+Aurore&family=Licorice&family=Mea+Culpa&family=Meddon&family=Miss+Fajardose&family=Monsieur+La+Doulaise&family=Mr+Dafoe&family=Mrs+Saint+Delafield&family=Passions+Conflict&family=Qwigley&family=Satisfy&family=Tangerine:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat&family=Dancing+Script:wght@500&family=Qwigley&family=Sacramento&family=Yellowtail&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Babylonica&family=Ballet&family=Birthstone+Bounce&family=Caveat&family=Dancing+Script:wght@500&family=Dr+Sugiyama&family=Kristi&family=La+Belle+Aurore&family=Licorice&family=Mea+Culpa&family=Meddon&family=Miss+Fajardose&family=Monsieur+La+Doulaise&family=Mr+Dafoe&family=Mrs+Saint+Delafield&family=Passions+Conflict&family=Qwigley&family=Satisfy&family=Tangerine:wght@400;700&family=Zeyada&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat&family=Dancing+Script:wght@500&family=Homemade+Apple&family=Kristi&family=Mr+Dafoe&family=Mrs+Saint+Delafield&family=Qwigley&family=Satisfy&family=Tangerine:wght@400;700&family=Yellowtail&display=swap');
+  
+.logo-parent {
+    position: relative !important;
+    margin-top: 15px !important;
+}
+.company-img-cls-edit-comp{
+    /* margin-bottom: 5.1rem; */
+}
+.edit-com-hd {
+    color: #000;
+    font-size: 15px !important;
+    font-weight: 600;
+    margin: 10px 0px 10px 0px;
+}
+.eye-icon-usse {
+    position: relative !important;
+}
+#toggle_pwd.eye-spaces {
+    right: 13px;
+    top: 10px;
+    font-size: 17px;
+    background-color: white;
+}
+.eye-spaces.fa-eye-slash {
+    font-size: 17px;
+}
+.eye-spaces{
+    top: 10px;
+    right: 13px;
+}
+
+.col-form-label {
+    color: #000 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+}
+
+.preview {
+    margin-bottom: 0px !important;
+    color: #AF2B50 !important;
+}
+
+a.prjlist-menu1.active {
+    border: 1px solid #f8f8f8;
+    padding: 5px 20px 5px 20px;
+    background-image: linear-gradient(182deg, #8b1434, #ce2e58) !important;
+    border-radius: 5px;
+    color: #fff;
+    text-decoration: none;
+}
+a.prjlist-menu1 {
+    border: 1px solid #f8f8f8;
+    padding: 5px 20px 5px 20px;
+    background: #f8f8f8;
+    border-radius: 5px;
+    color: #000;
+    font-weight: 600;
+}
+
+a.prjlist-menu1:hover {
+    color: #9a1a3c;
+}
+
+a.prjlist-menu1.active:hover {
+    color: #fff !important;
+}
+a.prjlist-menu1.active {
+    border: 0px solid #f8f8f8;
+    padding: 5px 20px 5px 20px;
+    background: #97193b;
+    border-radius: 5px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px !important;
+}
+a.prjlist-menu1 {
+    border: 1px solid #f8f8f8;
+    padding: 5px 20px 5px 20px;
+    background: #f8f8f8;
+    border-radius: 5px;
+    color: #000;
+    font-weight: 600;
+    font-size: 16px;
+}
+a.prjlist-menu1:hover {
+    color: #9a1a3c;
+}
+a.prjlist-menu1.active:hover {
+    color: #fff !important;
+}
+.btn-clr12 {
+    border: none !important;
+    background-color: #BD2753 !important;
+    color: #fff !important;
+    padding: 5px 10px 5px 10px;
+    border-radius: 5px;
+}
+.col-grd
+{
+    overflow-y: scroll;
+    height: 200px;
+    min-height: 200px;
+}
+.col-grd input
+{
+    /* padding: 5px; */
+    margin: 5px;
+    font-size: 24px;
+    border-radius: 5px;
+    border: none;
+    /* width: 100%; */
+    width: 75%;
+    background-color: #e3e3e3;
+}
+
+.inputfield
+{
+    padding: 5px;
+    /* margin: 5px; */
+    margin: 5px 0px 5px 0px;
+    /* width: 31.5%; */
+    width: 100%;
+    font-size: 20px;
+    border-radius: 5px;
+    border: 1px solid var(--tableborder-color);
+}
+
+.selectfiled.col-grd table {
+    width: 100%;
+    background-color: #e3e3e3;
+}
+
+.selectfiled.col-grd tbody tr {
+    border-bottom: 1px solid #c9c9c9;
+}
+
+.selectfiled.col-grd tbody tr:hover, .selectfiled.col-grd tbody tr:hover td {
+    background-color: #d3d3d3;
+}
+
+.selectfiled.col-grd tbody tr:hover input {
+    background-color: #d3d3d3;
+} 
+
+.canva {
+    width: 100%;
+}
+
+.canva-div {
+    height: 200px;
+    width: 450px;
+}
+
+
+@media only screen and (min-width:768px) and (max-width:1023px){
+.com-details{
+width: 75% !important;
+}
+.edit-clin-admin img{
+    width: 300px;
+}
+}
+/* -----fire-fox-style for passwords-------- */
+@-moz-document url-prefix() {
+    .ff-pass:focus{
+        background:none;
+    }
+    .ff-pass{
+        background:none;
+    }
+}
+
+@media only screen and (min-width:810px) and (max-width:1135px){
+.res-inp-1{
+margin-top: 22px;
+}
+}
+@media only screen and (min-width:910px) and (max-width:1135px){
+    .res-inp-2{
+        margin-top: 22px;
+    }
+}
+.inputfield::placeholder {
+    font-family: Arial, Helvetica, sans-serif;
+}

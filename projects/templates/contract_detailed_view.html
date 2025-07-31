@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+{% load contract_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/vendordetial.css' %}">
+ 
+ <section>
+  <div class="row">
+        <div class="col-12 text-end">
+            <button class="btn btn-clr chck-tst waves-effect waves-float waves-light" > <a href="{% url 'projects:contractmasterlist' %}">Back</a></button>
+        </div>
+    </div>       
+
+  <div class="row p-3">
+    <h3 class="from-head col-12">Contract Details</h3>
+
+   
+    <div class="d-flex my-3 gap-5">
+      <div>
+    <ul class="text-al_cen text-wrap p-0"><strong>Name of Service   :</strong>  {{ contract.name_service }}</ul>
+    <ul class="text-al_cen text-wrap p-0"><strong>Project Name  :</strong> {{ contract.projects }}</ul>
+      </div>
+    <div>
+
+    <ul class="text-al_cen text-wrap p-0"><strong>Project Discipline :</strong> {{ contract.projectdiscipline |convert_projectdiscipline }}</ul>
+    <ul class="text-al_cen text-wrap p-0"><strong>Discipline Type : </strong>{{ contract.projectdisciplinetype.discipline_subtype }}</ul>
+    <ul class="text-al_cen text-wrap p-0"><strong>Submission Date : </strong> {{contract.created_at|checktime:request.user.company.id}}</ul>
+  </div>
+
+  </div>
+  <h4 class="mb-3">Master Contracts</h4>
+
+<div >
+  <div data-toggle="collapse" class="accordion-toggle">
+  <div class="contract_detail_list1_con mb-4 cursor-pointer">
+    <table class="table contract_detail_list1">
+      <thead>
+        <tr class="heading-new">
+
+          
+          <th class="text-al_cen text-wrap">SO Reference Number </th>
+          <th class="text-al_cen text-wrap">SO Executed Date</th>
+          <th class="text-al_cen text-wrap">Maximum Value of SO</th>
+          <th class="text-al_cen text-wrap">WCC  <i class='fa fa-info-circle jqtooltip i-con-clr' title = "Work Completion Certificate Submission Required" style='color:#000000'></i></th>
+          <th class="text-al_cen text-wrap">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+
+        <td class="text-al_cen text-wrap">{{ contract.reference_number }}</td>
+        <td class="text-al_cen text-wrap">{{ contract.executed_date|checktime:request.user.company.id }}</td>
+        <td class="text-al_cen text-wrap">{{ contract.currency.currency_symbol }} {{ contract.amount|amount_convertion_to_separtors }}</td>
+        {% if contract.wcc == 1 %}
+          <td>Yes</td>
+          {% else %}
+          <td>No</td>
+          {% endif %}
+
+          <td>
+
+
+            {% getActionContract contract.id as contract_check %}
+            {% if contract_check.contract_edit > 0 %}
+            <a href="{% url 'projects:editcontract' contracttype="original" pk=contract.id %}"><i title='Edit Contract' class="fas fa-edit" ></i></a>
+            {% elif contract_check.contract_edit == 0 %}
+            <!-- <a href="{% url 'projects:addamendment' pk=contract.id %}"> -->
+              <!-- <img class="menu-svg deejan" src ="{% static 'images/sidebarIcon/Amendment.svg' %}"> -->
+              <!-- <i class="fa-solid fa-file-signature" title="Add Amendment/Addendum"></i> -->
+            <!-- </a> -->
+            <a href="{% url 'projects:addamendment' pk=contract.id %}" title="Add Amendment/Addendum">
+              <img class="menu-svg deejan" src="{% static 'images/sidebarIcon/Amendment.svg' %}" alt="Add Amendment/Addendum">
+            </a>
+            
+            {% endif %}
+
+            {% if not contract_check.contract_edit and not contract_check.edit_ammendment %}
+            <a href="{% url 'projects:addamendment' pk=contract.id %}" title="Add Amendment/Addendum">
+              <img class="menu-svg deejan" src="{% static 'images/sidebarIcon/Amendment.svg' %}" alt="Add Amendment/Addendum"></a>
+            {% endif %}
+            <a class="btn p-0 showtoggle" data-toggle="collapse" href="#demo1" role="button" aria-expanded="false" aria-controls="demo1">
+              <span class="action-edit align-icons">
+                <i class="fa fa-eye" title="View"></i>
+              </span>
+            </a>
+            
+            
+
+                      
+            
+          </td>
+      <tr>
+        <tr class="down-line-contra"> </tr>
+      </tbody>
+    </table>
+  </div>
+      
+    </div>
+    <div class="accordian-body collapse" id="demo1"> 
+      <div class="row">
+
+        {% get_contract_file contract.id 'original' 1 as contract_files %}
+        {%if contract_files.1 != 0  %}
+        <div class="col-6"> 
+          <h4>Contract Files</h4>
+          <ul class="view-ul">
+
+        {% for contract_file in contract_files.0 %}
+          
+        <li class="mb-2">
+        <a target="_blank" href="{% url 'invoice:view_contractfiles' pk=contract_file.id %}">{{ contract_file.original_file_name }}</a>
+
+        </li>
+
+        {% empty %}
+
+        {% endfor %}
+      </ul>
+      </div>
+      {% endif %}
+
+        {% get_contract_file contract.id 'original' 2 as pricetables %}
+        {%if pricetables.1 != 0  %}
+        <div class="col-6"> 
+          <h3>Price Table Files</h3>
+          <ul class="view-ul">
+
+        {% for file in pricetables.0 %}
+
+        <li>
+          <a target="_blank" href="{% url 'invoice:view_contractfiles' pk=file.id %}">{{ file.original_file_name }}</a>
+
+          </li>
+
+        {% endfor %}
+          </ul>
+        </div>
+
+          {% endif %}
+
+        </div>
+
+      </div>
+
+
+    </div>
+    <div>
+    <h4>Amendment / Addendum</h4>
+    <table class="table irock-table mt-3 mb-0 contract_detail_list">
+      <thead>
+          <tr class="accord-head">
+            <th class="text-al_cen text-wrap">Type</th>
+            <th class="text-al_cen text-wrap">Amendment / Addendum (Submission Date)</th>
+            <th class="text-al_cen text-wrap">SO Reference Number</th>
+            <th class="text-al_cen text-wrap">SO Executed Date</th>
+            <th class="text-al_cen text-wrap">Maximum Value of SO</th>
+            <th class="text-al_cen text-wrap">Actions</th>
+          </tr>
+        </thead>
+      </table>
+     {% supply_amendments_count contract.id as amendments_count %} 
+      {%if amendments_count > 0%}
+        <div class="accordion" id="accordionExample">
+          
+       
+          {% supply_amendments contract.id as amendments %}
+              {% for amendment in amendments %} 
+  
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{amendment.id}">
+                  <button class="accordion-button collapsed accord-body" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{amendment.id}}" aria-expanded="False" aria-controls="collapseOne">
+                  
+                   <span>
+                    {{amendment.amendment_type}} 
+                  </span>
+                  <span> {{amendment.amendment_type}}-{{forloop.counter}}  ( {{amendment.created_at|checktime:request.user.company.id}} )
+                  </span>
+                  <span class="text-center">
+                    {{amendment.amendment_reference_number}} 
+                  </span>
+                  <span class="text-center">
+                    {{amendment.amendment_executed_date|checktime:request.user.company.id}}
+                    
+                  </span>
+                  <span class="text-center">
+                    {{amendment.amendment_currency.currency_symbol}} {{amendment.amendment_amount|amount_convertion_to_separtors}}
+                  </span>
+
+                  <span class="text-center">
+                   
+                    {% with amendment.id|check_contract_invoice:"amendment" as invoice_count %}
+                    {% if amendment.save_type == '1' or amendment.save_type == 1 %}
+                        <a href="{% url 'projects:editcontract' contracttype="ammendment" pk=amendment.id %}"><i title='Edit Amendment/Addendum' class="fas fa-edit" ></i></a>
+                    {%else %}
+
+                    {% check_querylist amendment.id  'amendment' as  checkquery %}
+                    {% if checkquery > 0%}
+                        <a href="{% url 'projects:editcontract' contracttype="ammendment" pk=amendment.id %}"><i title='Edit Amendment/Addendum' class="fas fa-edit" ></i></a>
+                    {% endif %}
+
+
+                    
+                    {% endif %}
+                      {% if invoice_count == 0 %}
+                            {% if request.user.roles_id == 3 or rights.create == '1' or rights.edit == '1' %}
+                                  {% if rights.create == '1' or rights.edit == '1'%} 
+                                    <a href="{% url 'projects:createvendortax' contracttype="amendment" id=amendment.id %}"><i title='Add/Edit Taxes & Currency Split' class="fas fa-plus checkfilecls" ></i></a>
+                                  {%endif%}
+                              {%else%}
+                                  <a href="{% url 'projects:createvendortax' contracttype="amendment" id=amendment.id %}"><i title='Add/Edit Taxes & Currency Split' class="fas fa-plus checkfilecls" ></i></a>
+                              {%endif%}
+                                                    {% endif %}
+                  {% endwith %}
+                  {% with amendment.id|check_contract_tax:"amendment" as tax_count %}
+                    {% if tax_count > 0 %}
+                      <a href="{% url 'projects:viewvendortax' contracttype="amendment" id=amendment.id %}"><i title='View Taxes & Currency Split' class="fas fa-eye checkfilecls" ></i></a>
+                    {% endif %}
+                  {% endwith %}
+                  
+                  <a href="#" class="del_contract1" data-amendment-id="{{ amendment.id }}"><i class="fa fa-trash-o" title="Delete"></i></a>
+                  </span>
+                  </button>
+                </h2>
+
+  
+                </div>
+                <div id="collapse{{amendment.id}}" class="accordion-collapse collapse collapse" aria-labelledby="heading{{amendment.id}}" data-bs-parent="#accordionExample">
+                  <div class="accordion-body indode-accordion-body py-3">
+                    <div class="mb-3">
+                      <strong>       <p> WCC  <i class='fa fa-info-circle jqtooltip i-con-clr' title = "Work Completion Certificate Submission Required" style='color:#000000'></i></p>
+                      </strong>  {%if amendment.wcc == 1 %}  Yes {% else %} No  {% endif %}
+                    </div>
+                    <div class="row">
+  
+                    {% get_contract_file amendment.id 'Amendment' 1 as contract_files %}
+                    {%if contract_files.1 != 0  %}
+                    <div class="col-6"> 
+                      <h4>Contract Files</h4>
+                      <ul class="view-ul">
+  
+                    {% for contract_file in contract_files.0 %}
+                      
+                    <li>
+                    <a target="_blank" href="{% url 'invoice:view_contractfiles' pk=contract_file.id %}">{{ contract_file.original_file_name }}</a>
+  
+                    </li>
+  
+                    {% empty %}
+  
+                    {% endfor %}
+                  </ul>
+                  </div>
+                  {% endif %}
+  
+                    {% get_contract_file amendment.id 'Amendment' 2 as pricetables %}
+                    {%if pricetables.1 != 0  %}
+                    <div class="col-6"> 
+                      <h4>Price Table Files</h4>
+                      <ul class="view-ul">
+  
+                    {% for file in pricetables.0 %}
+  
+                    <li>
+                      <a target="_blank" href="{% url 'invoice:view_contractfiles' pk=file.id %}">{{ file.original_file_name }}</a>
+    
+                      </li>
+  
+                    {% endfor %}
+                      </ul>
+                    </div>
+  
+                      {% endif %}
+  
+                    </div>
+  
+                  </div>
+                </div>
+                  <!-- Display amendment details here -->
+                    
+  
+                   
+  
+            {% endfor %}
+          {%else %}
+          <div class='empty_amendment'> --- </div>
+          {% endif %}
+         
+         
+  
+    </div>
+  </div>
+  </div>
+
+
+
+
+
+ </section>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+ <script>
+
+  $(document).on('click', '.del_contract1', function() {
+    var $this = $(this); // Store $(this) in a variable
+    var amendment_id = $this.data('amendment-id');
+    
+    $.ajax({
+      type: 'POST',
+      url: '{% url "projects:delete_amendment" %}',
+      data: {
+        'amendment_id': amendment_id,
+        'csrfmiddlewaretoken': '{{ csrf_token }}'
+      },
+      success: function(response) {
+        if (response.success) {
+          $this.closest('div.accordion-item').next('.accordion-collapse').remove();
+          $this.closest('div.accordion-item').remove();
+        } else {
+          // alert('Error deleting amendment!');
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error(xhr.responseText);
+        // alert('Error deleting amendment!');
+      }
+    });
+  });
+</script>
+
+
+{% endblock %}

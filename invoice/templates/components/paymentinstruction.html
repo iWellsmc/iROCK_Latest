@@ -1,0 +1,807 @@
+{% load invoice_custom_tags %}
+{% load custom_tags %}
+<input type='hidden' name='check_type' class='check_type' value='{% if credit_value %}2{% else %}1{% endif %}'>
+{% if data %}
+ <div>
+        <input type="hidden" name="invoice_id" value="{{invoice_id}}" class="invoice_id">
+        {% if credit_value %}
+        <select  id="credit_note_datas" class="multiselect" multiple="multiple" name="credit_note">
+            {% for credit_val in list_creditnote %}
+            <option value={{credit_val.credit_id}} {% if credit_val.credit_id in selected_users %}selected{% endif %} {% if credit_val.invoice_value == invoice_id %} selected disabled{% endif %} >{% for i in credit_val.credit_number %}{% if forloop.last %} {{i.credit_note_no}} {% else %}{{i.credit_note_no}}, {% endif %}{% endfor %}</option>
+            {% endfor %}
+        </select>
+        <div>
+            <input type="hidden" name="invoice_credit_id" value="{{invoice_id}}" class="invoice_id">
+            <div class="table-responsive">
+                
+                    {% if if_paymentinstruct %}
+                    <table class="table table-bordered gen-table mt-4">
+                        <thead>
+                            <th>Invoice No.</th>
+                            <th> Invoice Net Payable Amount</th>
+                            <th>Credit Note Net Amount</th>
+                            <!-- <th>Balance Credit Note Value</th> -->
+                            <th>Revised Net Payable Amount</th>
+                            {% if payment_split > 0 %}
+                            <th>Already Paid Percentage</th>
+                            <th>Already Paid Amount</th>
+                            {%endif%}
+                            <th>Payment Percentage</th>
+                            <th>Payable Amount</th>
+                            <th>Pending Amount</th>
+                            <th>Bank to Debit</th>
+                            <th>Vendor Bank Details</th>
+                        </thead>
+                        <tbody>
+
+                        {% for payment in payment_instruction %}
+                        <tr>
+                            <td>{{payment.invoice_number}}</td>
+                            {% getnetpayment_bysplit payment.invoice_id payment.id payment.new_netpayable as netamount %}
+                            <td class="total_investment">
+                                
+                            <!-- {% if payment.new_netpayable %}
+                                {{payment.new_netpayable}}
+                              {% else %}
+                                {{payment.invoice_total_amount}}
+                              {% endif %}-->
+                              {{payment.invoice_currency}}   {{ netamount.netamount_separator}}
+                            </td> 
+                            {% get_total_credit_val payment request invoice_id 2 as cc %}
+                            <td class="total_credit_val" data-id="{{payment.id}}" data-val="{{payment.vendor_invoice_id}}" currency="{{payment.invoice_currency}}" check_credit="{{cc}}">
+                                <input type="hidden" value="{{cc}}" currency_symbol="{{payment.invoice_currency}}" class="original_credit_val">
+                                {% new_credit_investment payment request as total_credit %}
+                                ({{payment.invoice_currency}} {{total_credit}})
+                            </td>
+                             <!-- {% new_credit_investment payment request as total_credit %}
+                            {% if payment.new_netpayable %}
+                            {% get_balance_credit_val payment.new_netpayable total_credit as net_payable %}
+                            {% else %}
+                            {% get_balance_credit_val payment.invoice_total_amount total_credit as net_payable %}
+                            {% endif %} -->
+                            <!-- <td class="pending_credit_val" initial_pending_val="{{payment.invoice_currency}} {{net_payable}}">
+                                
+                                {{payment.invoice_currency}} {{net_payable}}
+    
+                            </td> -->
+                            
+                            {% if payment.new_netpayable %}
+                            {% get_net_payableamount payment.new_netpayable cc as ge_amount %}
+                            {% else %}
+                            {% get_net_payableamount payment.invoice_total_amount cc as ge_amount %}
+                            {% endif %}
+                            <input type="hidden" value="{{ge_amount}}" class="intial-net-payable">
+    
+
+                            {% new_credit_investment payment request as total_credit %}
+                            {% if payment.new_netpayable %}
+                            {% get_net_payableamount netamount.netpayment total_credit as net_payable %}
+                            {% else %}
+                            {% get_net_payableamount netamount.netpayment total_credit as net_payable %}
+                            {% endif %}
+                            <td class="payable_value">
+                                {{payment.invoice_currency}} {{net_payable}}
+                                <input type="hidden" value="{{net_payable}}" class="net-payable">
+                            
+                            </td>
+                            {% partial_payment_percentage payment.id  as paidpercentage %}
+                            {% paid_payment payment.id net_payable  as paidamount %}
+                            {% if payment_split > 0 %}
+                            <td>{{paidpercentage}}%</td>
+                            <td>{{payment.invoice_currency}} {{paidamount}}</td>
+                            {%endif%}
+                            <td>
+                                {% if payment.partial_status == 3  %}
+                                <input type="number" name="payment_percentage_credit" value="" class="form-control payment-percentage" disabled>
+                                <input type="hidden" value="{{payment.id|remainingvalue}}" class="remaining-percentage">
+                                <input type="hidden" value="{{paidamount}}" class="alreadypaidamount">
+                                <input type="hidden" value="{{payment.id|costinvoicepaidvalue}}" class="paid-amount">
+                                <input type="hidden" value="{% if payment.new_netpayable %}{{payment.new_netpayable}}{% else %}{{payment.invoice_total_amount}}{% endif %}" class="net-payable">
+                                <input type="hidden" value="{{payment.currency.currency_symbol}}" class="currency-symbol">
+                                <input type="hidden" name="create_credit" value="True" class="create">
+                                <input type="hidden" name="update_credit" value="{{update}}" class="update">
+                                {% else %} 
+                                <input type="number" name="payment_percentage_credit{{payment.id}}" value="" class="form-control payment-percentage">
+                                <input type="hidden" value="{{paidamount}}" class="alreadypaidamount">
+                                <input type="hidden" value="{{payment.id|remainingvalue}}" class="remaining-percentage">
+                                <input type="hidden" value="{{payment.id|costinvoicepaidvalue}}" class="paid-amount">
+                                <input type="hidden" value="{% if payment.new_netpayable %}{{payment.new_netpayable}}{% else %}{{payment.invoice_total_amount}}{% endif %}" class="net-payable">
+                                <input type="hidden" value="{{payment.currency.currency_symbol}}" class="currency-symbol">
+                                <input type="hidden" name="create_credit" value="True" class="create">
+                                <input type="hidden" name="update_credit" value="{{update}}" class="update">
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if payment.partial_status == 3  %}
+                                <input type="text" name="payable_amount_credit" value="" class="form-control payable-amount" readonly>
+                                {% else %}
+                                <input type="text" name="payable_amount_credit{{payment.id}}" value="" class="form-control payable-amount" readonly>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if payment.partial_status == 3  %}
+                                <input type="text" name="remaining_amount_credit" value="" class="form-control remaining-amount" readonly>
+
+                                {% else %} 
+                                <input type="text" name="remaining_amount_credit{{payment.id}}" value="" class="form-control remaining-amount" readonly>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if payment.partial_status == 3  %}
+                                        {% checkforbankuser request.company as bank_user %}
+                                        {% if bank_user == 1 %}
+                                            <select name="bank_credit" class="form-control bankdetailcls in-bor-clr" disabled >
+                                                <option name="company_bank" value="">--Select--</option>
+                                                    {% for bank in payment.currency.id|vendorbasedbank:request %}
+                                                        <option value="{{bank.id}}">{{bank.bank_name.bank_name}}-{{bank.account_number.accountno}}</option>
+                                                    {% endfor %}
+                                            </select>
+                                        {% else %} 
+                                            <select name="bank_credit" class="form-control bankdetailcls in-bor-clr" disabled >
+                                                <option name="company_bank" value="">--Select--</option>
+                                                    {% for bank in payment.currency.id|withoutbankuserbanklist:request %}
+                                                        <option value="{{bank.id}}">{{bank.bank_name}}-{{bank.id|fetbankaccountnumber}}</option>
+                                                    {% endfor %}
+                                            </select>
+                                        {% endif %}
+
+                                {% else %}
+                                        {% checkforbankuser request.company as bank_user %}
+                                        <input type="hidden" name="bank_user_status{{payment.id}}" value="{% if bank_user == 1 %}2{%else %}3{%endif%}" class="form-control" >
+                                        {% if bank_user == 1 %}
+                                            <select name="bank_credit{{payment.id}}" class="form-control bankdetailcls in-bor-clr">
+                                                <option name="company_bank" value="">--Select--</option>
+                                                    {% for bank in payment.currency.id|vendorbasedbank:request %}
+                                                        <option value="{{bank.id}}">{{bank.bank_name.bank_name}}-{{bank.account_number.accountno}}</option>
+                                                    {% endfor %}
+                                            </select>
+                                        {% else %} 
+                                            <select name="bank_credit{{payment.id}}" class="form-control bankdetailcls in-bor-clr">
+                                                <option name="company_bank" value="">--Select--</option>
+                                                    {% for bank in payment.currency.id|withoutbankuserbanklist:request %}
+                                                        <option value="{{bank.id}}">{{bank.bank_name}}-{{bank.id|fetbankaccountnumber}}</option>
+                                                    {% endfor %}
+                                            </select>
+                                        {% endif %}
+                                {% endif %}
+                            </td>
+                            
+                            <td>
+                                {{payment.invoice_bank.bankname}}-{{payment.invoice_bank.accountnumber}}
+                            </td>
+                        </tr>
+
+                    </tr>
+                    {% endfor %}
+
+                {% else %}
+                <table class="table table-bordered gen-table mt-4">
+                    <thead>
+                        <th>Invoice No.</th>
+                        <th> Invoice Net Payable Amount</th>
+                        <th>Credit Note Net Amount</th>
+                        <!-- <th>Balance Credit Note Value</th> -->
+                        <th>Revised Net Payable Amount</th>
+                        {% if payment_split > 1 %}
+                        <th>Already Paid Percentage</th>
+                        <th>Already Paid Amount</th>
+                        {%endif%}
+                        <th>Payment Percentage</th>
+                        <th>Payable Amount</th>
+                        <th>Pending Amount</th>
+                        <th>Bank to Debit</th>
+                        <th>Vendor Bank Details</th>
+                    </thead>
+                    <tbody>
+                        {% for payment in payment_instruction %}
+                        <tr>
+                            <td>{{payment.invoicecost.invoice_number}}</td>
+                            {% getnetpayment_bysplit payment.invoicecost.invoice_id payment.invoicecost.id payment.invoicecost.new_netpayable as netamount %}
+                            <td class="total_investment">{{payment.invoicecost.invoice_currency}}   {{ netamount.netamount_separator}}</td>
+                            <!-- <td>{% if payment.invoicecost.new_netpayable %} {{payment.invoicecost.invoice_currency}} {{payment.invoicecost.new_netpayable|currency_convert}}{% else %} {{payment.invoicecost.invoice_currency}} {{payment.invoicecost.invoice_total_amount|currency_convert}}{% endif %}</td> -->
+                            {% get_total_credit_val payment.invoicecost request invoice_id 2 as cc %}
+                            <td class="total_credit_val" data-id="{{payment.invoicecost.id}}" data-val="{{payment.invoicecost.vendor_invoice_id}}" currency="{{payment.invoicecost.invoice_currency}}" check_credit="{{cc}}">
+                                <input type="hidden" value="{{cc}}" currency_symbol="{{payment.invoicecost.invoice_currency}}" class="original_credit_val">
+                                {% new_credit_investment payment.invoicecost request as total_credit %}
+                                ({{payment.invoicecost.invoice_currency}} {{total_credit}})
+                            </td>
+                            {% new_credit_investment payment.invoicecost request as total_credit %}
+                            {% if payment.invoicecost.new_netpayable %}
+                            {% get_balance_credit_val payment.invoicecost.new_netpayable total_credit as net_payable %}
+                            {% else %}
+                            {% get_balance_credit_val payment.invoicecost.invoice_total_amount total_credit as net_payable %}
+                            {% endif %}
+                            <!-- <td class="pending_credit_val" initial_pending_val="{{payment.invoicecost.invoice_currency}} {{net_payable}}">
+                                
+                                {{payment.invoicecost.invoice_currency}} {{net_payable}}
+    
+                            </td> -->
+                            {% if payment.invoicecost.new_netpayable %}
+                            {% get_net_payableamount payment.invoicecost.new_netpayable cc as ge_amount %}
+                            {% else %}
+                            {% get_net_payableamount payment.invoicecost.invoice_total_amount cc as ge_amount %}
+                            {% endif %}
+                            <input type="hidden" value="{{ge_amount}}" class="intial-net-payable">
+    
+
+                            {% getnetpayment_bysplit payment.invoicecost.invoice_id payment.invoicecost.id payment.invoicecost.new_netpayable as netamount %}
+                            {% new_credit_investment payment.invoicecost request as total_credit %}
+                            {% comment %} {% get_total_credit_val payment.invoicecost request contractid.id as total_credit %} {% endcomment %}
+                            {% if payment.invoicecost.new_netpayable %}
+                            {% get_net_payamount netamount total_credit as net_payable %}
+                            {% else %}
+                            {% get_net_payableamount payment.invoicecost.invoice_total_amount total_credit as net_payable %}
+                            {% endif %}
+                            <td class="payable_value">
+                                {{payment.invoicecost.invoice_currency}} {{net_payable}}
+    
+                                {% comment %} {% get_total_credit_val payment.invoicecost request invoice_id as total_credit %}
+                                {% get_net_payableamount payment.invoicecost.invoice_total_amount total_credit as net_payable %}
+                                {{payment.invoicecost.invoice_currency}} {{net_payable}} {% endcomment %}
+                                <input type="hidden" value="{{net_payable}}" class="net-payable">
+                            </td>
+                            {% paid_payment_percentage payment.invoicecost.id payment.payment_percentage as paidpercentage %}  
+                            {% paid_payment_amount payment.invoicecost.id  payment.payment_percentage net_payable as paidamount %}
+                            {% if payment_split > 1 %}
+                            <td >{{  paidpercentage }}%</td>
+                            <td >{{payment.invoicecost.invoice_currency}}  {{  paidamount }}</td>
+                            {%endif%}
+                            <td>
+                                {% if payment.partial_status == 3  %}
+                                <input type="number" name="payment_percentage_credit" value="{% if not edit %}{{payment.payment_percentage}}{% else %}{{payment.payment_percentage}}{% endif %}" class="form-control payment-percentage" disabled>
+                                <input type="hidden" value="{{payment.invoicecost.id|remainingvalue}}" class="remaining-percentage">
+                                <input type="hidden" value="{{payment.invoicecost.id|costinvoicepaidvalue}}" class="paid-amount">
+                                <input type="hidden" value="{{paidamount}}" class="alreadypaidamount">
+                                <input type="hidden" value="{% if payment.invoicecost.new_netpayable %}{{payment.invoicecost.new_netpayable}}{% else %}{{payment.invoicecost.invoice_total_amount}}{% endif %}" class="net-payable">
+                                <input type="hidden" value="{{payment.invoicecost.currency.currency_symbol}}" class="currency-symbol">
+                                <input type="hidden" name="create_credit" value="{{create}}" class="create">
+                                <input type="hidden" name="update_credit" value="{{update}}" class="update">
+                                {% else %} 
+                                <input type="number" name="payment_percentage_credit{{payment.invoicecost.id}}" value="{% if not edit %}{{payment.payment_percentage}}{% else %}{{payment.payment_percentage}}{% endif %}" class="form-control payment-percentage">
+                                <input type="hidden" value="{{payment.invoicecost.id|remainingvalue}}" class="remaining-percentage">
+                                <input type="hidden" value="{{payment.invoicecost.id|costinvoicepaidvalue}}" class="paid-amount">
+                                <input type="hidden" value="{{paidamount}}" class="alreadypaidamount">
+                                <input type="hidden" value="{% if payment.invoicecost.new_netpayable %}{{payment.invoicecost.new_netpayable}}{% else %}{{payment.invoicecost.invoice_total_amount}}{% endif %}" class="net-payable">
+                                <input type="hidden" value="{{payment.invoicecost.currency.currency_symbol}}" class="currency-symbol">
+                                <input type="hidden" name="create_credit" value="{{create}}" class="create">
+                                <input type="hidden" name="update_credit" value="{{update}}" class="update">
+                                {%endif%}
+                            </td>
+                            <td>
+                                {% if payment.partial_status == 3  %}
+                                <input type="text" name="payable_amount_credit" value="{{payment.payable_amount}}" class="form-control payable-amount" readonly>
+                                {% else %} 
+                                <input type="text" name="payable_amount_credit{{payment.invoicecost.id}}" value="{{payment.payable_amount}}" class="form-control payable-amount" readonly>
+                                {%endif%}
+                            </td>
+                            <td>
+                                {% if payment.partial_status == 3  %}
+                                <input type="text" name="remaining_amount_credit" value="{{payment.pending_amount}}" class="form-control remaining-amount" readonly>
+                                {% else %} 
+                                <input type="text" name="remaining_amount_credit{{payment.invoicecost.id}}" value="{% if payment.pending_amount == 0 %} 0.00 {%else%} {{payment.pending_amount|convert_to_thousand_separator|default_if_none:'0'}}{%endif%}" class="form-control remaining-amount" readonly>
+                                {%endif%}
+                            </td>
+                            <td>
+                                {% if payment.partial_status == 3  %}
+                                    {% checkforbankuser request.company as bank_user %}
+                                    {% if bank_user == 1 %}
+                                        <select name="bank_credit " class="form-control bankdetailcls in-bor-clr" disabled>
+                                            <option name="company_bank" value="">--Select--</option>
+                                                {% for bank in payment.invoicecost.currency.id|vendorbasedbank:request %}
+                                                    <option value="{{bank.id}}" {% if bank.id == payment.companybank.id %} selected {% endif %}>{{bank.bank_name.bank_name}}-{{bank.account_number.accountno}}</option>
+                                                {% endfor %}
+                                        </select>
+                                     {% else %} 
+                                        <select name="bank_credit " class="form-control bankdetailcls in-bor-clr" disabled>
+                                            <option name="company_bank" value="">--Select--</option>
+                                                {% for bank in payment.invoicecost.currency.id|withoutbankuserbanklist:request %}
+                                                    <option value="{{bank.id}}" {% if bank.id == payment.companybank.id %} selected {% endif %}>{{bank.bank_name}}-{{bank.id|fetbankaccountnumber}}</option>
+                                                {% endfor %}
+                                        </select>
+                                    {%endif %}
+                                {% else %} 
+                                {% checkforbankuser request.company as bank_user %}
+                                <input type="hidden" name="bank_user_status{{payment.invoicecost.id}}" value="{% if bank_user == 1 %}2{%else %}3{%endif%}" class="form-control" >
+
+                                    {% if bank_user == 1 %}
+                                        <select name="bank_credit{{payment.invoicecost.id}}" class="form-control bankdetailcls in-bor-clr">
+                                            <option name="company_bank" value="">--Select--</option>
+                                                {% for bank in payment.invoicecost.currency.id|vendorbasedbank:request %}
+                                                    <option value="{{bank.id}}" {% if bank.id == payment.companybank.id %} selected {% endif %}>{{bank.bank_name.bank_name}}-{{bank.account_number.accountno}}</option>
+                                                {% endfor %}
+                                        </select>
+                                    {% else %} 
+                                        <select name="bank_credit{{payment.invoicecost.id}}" class="form-control bankdetailcls in-bor-clr">
+                                            <option name="company_bank" value="">--Select--</option>
+                                                {% for bank in payment.invoicecost.currency.id|withoutbankuserbanklist:request %}
+                                                    <option value="{{bank.id}}" {% if bank.id == payment.masterbank.id %} selected {% endif %}>{{bank.bank_name}}-{{bank.id|fetbankaccountnumber}}</option>
+                                                {% endfor %}
+                                        </select>
+                                    {%endif%}
+                                {%endif%}
+                            </td>
+                            <td>
+                                {{payment.invoicecost.invoice_bank.bankname}}-{{payment.invoicecost.invoice_bank.accountnumber}}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>      
+
+
+        {% else %}
+
+        {% if not credit_value %}
+        {% if credit_count > 0 %}
+        <button class='adjust_credit btn btn-clr mb-3' data-id=0>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10a2 2 0 1 0 4 0a2 2 0 0 0-4 0m2-6v4m0 4v8m4-4a2 2 0 1 0 4 0a2 2 0 0 0-4 0m2-12v10m0 4v2m4-13a2 2 0 1 0 4 0a2 2 0 0 0-4 0m2-3v1m0 4v11"/></svg>
+            Adjust Credit Note</button>
+        {% endif %}
+        {% endif %}
+        <table class="table table-bordered gen-table with_data" > <!--view table after payment generation submit -->
+            <thead>
+                <th>Invoice No.</th>
+                <th>Net Payable Amount</th>
+                {% if payment_split > 1 %}
+                <th>Already Paid Percentage</th>
+                <th>Already Paid Amount</th>
+                {%endif%}
+                <th>Payment Percentage</th>
+                <th>Payable Amount</th>
+                <th>Pending Amount</th>
+                <th >Bank to Debit</th> 
+                <th>Vendor Bank Details</th>
+            </thead>
+            <tbody>
+            {% for payment in payment_instruction %}
+            <tr>
+                <td>{{payment.invoicecost.invoice_number}}{%if payment.invoicecost.payment_account == 1%}(Allocated to Payment on Account){%endif%}</td>
+                {% getnetpayment_bysplit payment.invoicecost.invoice_id payment.invoicecost.id payment.invoicecost.new_netpayable as netamount %}
+                <td>{{payment.invoicecost.invoice_currency}}   {{ netamount.netamount_separator}}</td>
+                <!-- <td>{% if payment.invoicecost.new_netpayable %} {{payment.invoicecost.invoice_currency}} {{payment.invoicecost.new_netpayable|currency_convert}}{% else %} {{payment.invoicecost.invoice_currency}} {{payment.invoicecost.invoice_total_amount|currency_convert}}{% endif %}</td> -->
+                {% paid_payment_percentage payment.invoicecost.id payment.payment_percentage as paidpercentage %}  
+                {% paid_payment_amount payment.invoicecost.id  payment.payment_percentage netamount.netamount_separator as paidamount %}
+                {% if payment_split > 1 %}
+                <td >{{  paidpercentage }}%</td>
+                <td class="already-paid-amount" >{{payment.invoicecost.invoice_currency}}  {{  paidamount }}</td>
+                {%endif%}
+               
+                
+                <td>
+                    {% if payment.partial_status == 3  %}
+                    <input type="number"  name="payment_percentage" value="{%if payment.invoicecost.payment_account == 1%}100{% else %}{% if not edit %}{{payment.payment_percentage}}{% endif %}{% endif %}" class="form-control payment-percentage"  {%if payment.invoicecost.payment_account == 1%}readonly{%endif%}>
+                    <input type="hidden" value="{{payment.invoicecost.id|remainingvalue}}" class="remaining-percentage">
+                    <!-- <input type="hidden" value="{% if payment.invoicecost.new_netpayable %}{{payment.invoicecost.new_netpayable}}{% else %}{{payment.invoicecost.invoice_total_amount}}{% endif %}" class="net-payable"> -->
+                    <input type="hidden" value="{{paidamount}}" class="alreadypaidamount">
+                    <input type="hidden" value="{{netamount.netpayment}}" class="net-payable">
+                    <input type="hidden" value="{{payment.invoicecost.currency.currency_symbol}}" class="currency-symbol">
+                    <input type="hidden" name="create" value="{{create}}" class="create">
+                    <input type="hidden" name="update" value="{{update}}" class="update">
+                    {% else %}
+                    <input type="number"  name="payment_percentage{{payment.invoicecost.id}}" value="{%if payment.invoicecost.payment_account == 1%}100{% else %}{% if not edit %}{{payment.payment_percentage}}{% endif %}{% endif %}" class="form-control payment-percentage"  {%if payment.invoicecost.payment_account == 1%}readonly{%endif%}>
+                    <input type="hidden" value="{{payment.invoicecost.id|remainingvalue}}" class="remaining-percentage">
+                    <!-- <input type="hidden" value="{% if payment.invoicecost.new_netpayable %}{{payment.invoicecost.new_netpayable}}{% else %}{{payment.invoicecost.invoice_total_amount}}{% endif %}" class="net-payable"> -->
+                    <input type="hidden" value="{{netamount.netpayment}}" class="net-payable">
+                    <input type="hidden" value="{{paidamount}}" class="alreadypaidamount">
+                    <input type="hidden" value="{{payment.invoicecost.currency.currency_symbol}}" class="currency-symbol">
+                    <input type="hidden" name="create" value="{{create}}" class="create">
+                    <input type="hidden" name="update" value="{{update}}" class="update">
+                    {% endif %}                        
+                <td>
+                    {% if payment.partial_status == 3  %}
+                    <input type="text"  name="payable_amount" value="{{payment.invoicecost.invoice_currency}}{%if payment.invoicecost.payment_account == 1%}0.00{%else%}{% commoseperator payment.payable_amount as amount %} {{amount}}{%endif%}" class="form-control payable-amount pending-payable"  readonly>
+                    {% else %} 
+                    <input type="text" name="payable_amount{{payment.invoicecost.id}}" value="{{payment.invoicecost.invoice_currency}}{%if payment.invoicecost.payment_account == 1%}0.00{%else%}{% commoseperator payment.payable_amount as amount %} {{amount|convert_to_thousand_separator|default_if_none:'0'}}{%endif%}" class="form-control payable-amount pending-payable"  readonly>
+                    {%endif%}
+                </td>
+                <td>
+                    {% if payment.partial_status == 3  %}
+                    <input type="text" name="remaining_amount" value="{%if payment.invoicecost.payment_account == 1%}0.00{%else%}{% commoseperator payment.pending_amount as amount %} {{payment.invoicecost.invoice_currency}} {{amount}}{%endif%}" class="form-control remaining-amount pending-payable" readonly>
+                    {% else %} 
+                    <input type="text" name="remaining_amount{{payment.invoicecost.id}}" value="{%if payment.invoicecost.payment_account == 1%}0.00{%else%}{% commoseperator payment.pending_amount as amount %} {{payment.invoicecost.invoice_currency}} {% if payment.pending_amount == 0 %} 0.00 {%else%}{{payment.pending_amount|convert_to_thousand_separator|default_if_none:'0'}}{%endif%}{%endif%}" class="form-control remaining-amount pending-payable" readonly>
+                    {%endif%}
+                </td>
+                <td>    
+                    {% if payment.partial_status == 3  %}
+                        {% checkforbankuser request.company as bank_user %}
+                        {% if bank_user == 1 %}
+                            <select name="bank"   {%if payment.invoicecost.payment_account == 1%}  data-id='1' readonly {%endif%} class="form-control bankdetailcls in-bor-clr bank-to-debit-width" disabled>
+                                {%if payment.invoicecost.payment_account == 1%}
+                                <option value='' selected>--</option>
+                                {%else%}
+                                <option name="company_bank" value="">--Select--</option>
+                                    {% for bank in payment.invoicecost.currency.id|vendorbasedbank:request %}
+                                        <option value="{{bank.id}}" {% if bank.id == payment.companybank.id %} selected {% endif %}>{{bank.bank_name.bank_name}}-{{bank.account_number.accountno}}</option>
+                                    {% endfor %}
+                                {%endif%}
+                            </select>
+                        {% else %}
+                            <select name="bank"   {%if payment.invoicecost.payment_account == 1%}  data-id='1' readonly {%endif%} class="form-control bankdetailcls in-bor-clr bank-to-debit-width" disabled>
+                                {%if payment.invoicecost.payment_account == 1%}
+                                <option value='' selected>--</option>
+                                {%else%}
+                                <option name="company_bank" value="">--Select--</option>
+                                    {% for bank in payment.invoicecost.currency.id|withoutbankuserbanklist:request %}
+                                        <option value="{{bank.id}}" {% if bank.id == payment.companybank.id %} selected {% endif %}>{{bank.bank_name}}-{{bank.id|fetbankaccountnumber}}</option>
+                                    {% endfor %}
+                                {%endif%}
+                            </select>
+                        {%endif%}
+
+                    {% else %} 
+                        {% checkforbankuser request.company as bank_user %}
+                        <input type="hidden" name="bank_user_status{{payment.invoicecost.id}}" value="{% if bank_user == 1 %}2{%else %}3{%endif%}" class="form-control" >
+                        {% if bank_user == 1 %}
+                            <select  name="bank{{payment.invoicecost.id}}"  {%if payment.invoicecost.payment_account == 1%}  data-id='1' readonly {%endif%} class="form-control bankdetailcls in-bor-clr bank-to-debit-width">
+                                {%if payment.invoicecost.payment_account == 1%}
+                                <option value='' selected>--</option>
+                                {%else%}
+                                <option name="company_bank" value="">--Select--</option>
+                                    {% for bank in payment.invoicecost.currency.id|vendorbasedbank:request %}
+                                        <option value="{{bank.id}}" {% if bank.id == payment.companybank.id %} selected {% endif %}>{{bank.bank_name.bank_name}}-{{bank.account_number.accountno}}</option>
+                                    {% endfor %}
+                                {%endif%}
+                            </select>
+                        {% else %}
+                            <select  name="bank{{payment.invoicecost.id}}"  {%if payment.invoicecost.payment_account == 1%}  data-id='1' readonly {%endif%} class="form-control bankdetailcls in-bor-clr bank-to-debit-width">
+                                {%if payment.invoicecost.payment_account == 1%}
+                                <option value='' selected>--</option>
+                                {%else%}
+                                <option name="company_bank" value="">--Select--</option>
+                                    {% for bank in payment.invoicecost.currency.id|withoutbankuserbanklist:request %}
+                                        <option value="{{bank.id}}" {% if bank.id == payment.masterbank.id %} selected {% endif %}>{{bank.bank_name}}-{{bank.id|fetbankaccountnumber}}</option>
+                                    {% endfor %}
+                                {%endif%}
+                            </select>
+                        {%endif%}
+
+                    {%endif%}
+                </td>
+                <td>{{payment.invoicecost.invoice_bank.bankname}}-{{payment.invoicecost.invoice_bank.accountnumber}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div  class='with_creditnote' style='display:none'>
+        <select  id="credit_note" class="multiselect" multiple="multiple" name="credit_note">
+            {% for credit_val in list_creditnote %}
+            <option value={{credit_val.credit_id}} invoice={{invoice_id}} credit={{credit_val.invoice_value}} {% if credit_val.invoice_value == invoice_id %}selected disabled{% endif %}>{% for i in credit_val.credit_number %}{% if forloop.last %} {{i.credit_note_no}} {% else %}{{i.credit_note_no}}, {% endif %}{% endfor %}</option>
+            {% endfor %}
+        </select>
+        <input type="hidden" name="invoice_credit_id" value="{{invoice_id}}" class="invoice_id">
+        <table>
+            <thead>
+                <th>Invoice No.</th>
+                <th> Invoice Net Payable Amount</th>
+                <th>Credit Note Net Amount</th>
+                <!-- <th>Balance Credit Note Value</th> -->
+                <th>Revised Net Payable Amount</th>
+                <th>Payment Percentage</th>
+                <th>Payable Amount</th>
+                <th>Pending Amount</th>
+                <th>Bank to Debit</th>
+                <th>Vendor Bank Details</th>
+            </thead>
+            <tbody>
+                {% for payment in payment_instruction %}
+                <tr>
+                    <td>{{payment.invoicecost.invoice_number}}</td>
+                    <td class="total_investment">{% if payment.invoicecost.new_netpayable %}{{payment.invoicecost.new_netpayable}}{% else %}{{payment.invoicecost.invoice_total_amount}}{% endif %}</td>
+                    {% new_total_credit_val payment.invoicecost request invoice_id 1 as total_credit %}
+                    <td class="total_credit_val" data-id="{{payment.invoicecost.id}}" data-val="{{payment.invoicecost.vendor_invoice_id}}" currency="{{payment.invoicecost.invoice_currency}}" check_credit="{{total_credit}}">
+                        ({{payment.invoicecost.invoice_currency}} {{total_credit}})
+                    </td>
+                    {% getnetpayment_bysplit payment.invoicecost.invoice.id payment.invoicecost.id payment.invoicecost.new_netpayable as netamount %}
+                    {% if payment.invoicecost.new_netpayable %}
+                    {% get_balance_credit_val netamount.netpayment total_credit as credit_bal %} 
+                    {% else %}
+                    {% get_balance_credit_val netamount.netpayment total_credit as credit_bal %} 
+                    {% endif %}
+                    <input type="hidden" class="balance_credit_note" value="{{credit_bal}}" name="balance_credit_note">
+                    <!-- <td class="pending_credit_val" initial_pending_val="{{payment.invoicecost.invoice_currency}} {{credit_bal}}">{{payment.invoicecost.invoice_currency}} {{credit_bal}}</td> -->
+
+                    <td class="payable_value">
+                        {% new_total_credit_val payment.invoicecost request invoice_id 1 as total_credit %}
+                        {% if payment.invoicecost.new_netpayable %}
+                        {% get_net_payableamount payment.invoicecost.new_netpayable total_credit as net_payable %}
+                        {% else %}
+                        {% get_net_payableamount payment.invoicecost.invoice_total_amount total_credit as net_payable %}
+                        {% endif %}
+                        {{payment.invoicecost.invoice_currency}} {{net_payable}}
+                        <input type="hidden" value="{{net_payable}}" class="net-payable">
+                    </td>
+                    {% if payment.invoicecost.new_netpayable %}
+                    {% get_net_payableamount payment.invoicecost.new_netpayable total_credit as net_payable %}
+                    {% else %}
+                    {% get_net_payableamount payment.invoicecost.invoice_total_amount total_credit as net_payable %}
+                    {% endif %}
+                    <input type="hidden" value="{{net_payable}}" class="net-payable">
+                    <input type="hidden" value="{{net_payable}}" class="intial-net-payable">
+
+                    <td>
+                        <input type="number" name="payment_percentage_credit{{payment.invoicecost.id}}" value="" class="form-control payment-percentage">
+                        <input type="hidden" value="0" class="alreadypaidamount"> 
+                        <input type="hidden" value="{{payment.invoicecost.id|remainingvalue}}" class="remaining-percentage">
+                        <input type="hidden" value="{{payment.invoicecost.id|costinvoicepaidvalue}}" class="paid-amount">
+                        <input type="hidden" value="{{payment.invoicecost.currency.currency_symbol}}" class="currency-symbol">
+                        <input type="hidden" name="create_credit" value="True" class="create">
+                    </td>
+                    <td>
+                        <input type="text" name="payable_amount_credit{{payment.invoicecost.id}}" value="" class="form-control payable-amount" readonly>
+                    </td>
+                    <td>
+                        <input type="text" name="remaining_amount_credit{{payment.invoicecost.id}}" value="" class="form-control remaining-amount" readonly>
+                    </td>
+                    <td>
+                        {% checkforbankuser request.company as bank_user %}
+                        <input type="hidden" name="bank_user_status{{payment.invoicecost.id}}" value="{% if bank_user == 1 %}2{%else %}3{%endif%}" class="form-control" >
+                        {% if bank_user == 1 %}
+                            <select name="bank_credit{{payment.invoicecost.id}}" class="form-control bankdetailcls in-bor-clr">
+                                <option name="company_bank" value="">--Select--</option>
+                                    {% for bank in payment.invoicecost.currency.id|vendorbasedbank:request %}
+                                        <option value="{{bank.id}}">{{bank.bank_name.bank_name}}-{{bank.account_number.accountno}}</option>
+                                    {% endfor %}
+                            </select>
+                        {% else %}
+                            <select name="bank_credit{{payment.invoicecost.id}}" class="form-control bankdetailcls in-bor-clr">
+                                <option name="company_bank" value="">--Select--</option>
+                                    {% for bank in payment.invoicecost.currency.id|withoutbankuserbanklist:request %}
+                                        <option value="{{bank.id}}">{{bank.bank_name}}-{{bank.id|fetbankaccountnumber}}</option>
+                                    {% endfor %}
+                            </select>
+                        {%endif%}
+                        <td>{{payment.invoicecost.invoice_bank.bankname}}-{{payment.invoicecost.invoice_bank.accountnumber}}</td>
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+    {% endif %}
+{% else %}
+<div class='without_data'>
+{% if credit_count > 0 %}
+<button class='adjust_credit btn btn-clr mb-3' data-id=0>
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 10a2 2 0 1 0 4 0a2 2 0 0 0-4 0m2-6v4m0 4v8m4-4a2 2 0 1 0 4 0a2 2 0 0 0-4 0m2-12v10m0 4v2m4-13a2 2 0 1 0 4 0a2 2 0 0 0-4 0m2-3v1m0 4v11"/></svg>
+    Adjust Credit Note</button>
+
+<!-- {% comment %} {% for credit_val in list_creditnote %}
+<div><label for="{{credit_val.credit_id}}"><input type="checkbox" name="exceptional" value="'+element.value+'"  id="{{credit_val.credit_id}}"> {% for i in credit_val.credit_number %}{% if forloop.last %} {{i.credit_note_no}} {% else %}{{i.credit_note_no}}, {% endif %}{% endfor %}</label></div>
+{% endfor %} {% endcomment %} -->
+
+{% endif %} 
+<input type="hidden" name="invoice_id" value="{{invoice_id}}" class="invoice_id">
+<table class="table table-bordered gen-table">
+    <thead>
+        <th>Invoice No.</th>
+        <th>Net Payable Amount</th>
+        {% if payment_split > 0 %}
+        <th>Already Paid Percentage</th>
+        <th>Already Paid Amount</th>
+        {% endif %}
+        <th>Payment Percentage</th>
+        <th>Payable Amount</th>
+        <th>Pending Amount</th>
+        <th>Bank to Debit</th>
+        <th>Vendor Bank Details</th>
+    </thead>
+    {% for payment in payment_instruction %}
+    <tr>
+        <td>{{payment.invoice_number}}
+            {%if payment.payment_account == 1%} 
+            (Allocated to Payment on Account)
+            {%endif%}
+        </td>
+        {% getnetpayment_bysplit payment.invoice.id payment.id payment.new_netpayable as netamount %}
+        <!-- <td>{% if payment.new_netpayable %}{{ payment.currency.currency_symbol }}{{payment.new_netpayable}}{% else %}{{ payment.currency.currency_symbol }}{{payment.invoice_total_amount}}{% endif %}</td> -->
+        <td>{{ payment.currency.currency_symbol }} {{netamount.netamount_separator}}</td>
+        <!-- {% comment %} <td>{% if payment.new_netpayable %}{{ payment.currency.currency_symbol }}{{payment.new_netpayable}}{% else %}{{ payment.currency.currency_symbol }}{{payment.invoice_total_amount}}{% endif %}</td> {% endcomment %} -->
+        {% partial_payment_percentage payment.id  as paidpercentage %}
+        {% paid_payment payment.id netamount.netamount_separator  as paidamount %}  
+        {% if payment_split > 0 %}
+        <td>{{ paidpercentage }}%</td>
+        <td> {{ payment.currency.currency_symbol }} {{ paidamount }}</td>
+        {% endif %}
+        <td>
+            {% if payment.partial_status == 3  %}
+            <input type="number"  name="payment_percentage" {%if payment.payment_account == 1%} value="100" readonly {%else%} value="" {%endif%} class="form-control payment-percentage" disabled>
+            <input type="hidden" value="{{payment.id|remainingvalue}}" class="remaining-percentage">
+            <input type="hidden" value="{{paidamount}}" class="alreadypaidamount">
+            <input type="hidden" value="{{payment.id|costinvoicepaidvalue}}" class="paid-amount">
+            <input type="hidden" value="{% if payment.new_netpayable %}{{payment.new_netpayable}}{% else %}{{payment.invoice_total_amount}}{% endif %}" class="net-payable">
+            <input type="hidden" value="{{payment.currency.currency_symbol}}" class="currency-symbol">
+            <input type="hidden" name="create" value="True" class="create">
+            {% else %} 
+            <input type="number"  name="payment_percentage{{payment.id}}" {%if payment.payment_account == 1%} value="100" readonly {%else%} value="" {%endif%} class="form-control payment-percentage">
+            <input type="hidden" value="{{payment.id|remainingvalue}}" class="remaining-percentage">
+            <input type="hidden" value="{{paidamount}}" class="alreadypaidamount">
+            <!-- <input type="hidden" value="{% if payment.new_netpayable %}{{payment.new_netpayable}}{% else %}{{payment.invoice_total_amount}}{% endif %}" class="net-payable"> -->
+            <input type="hidden" value="{{netamount.netpayment}}" class="net-payable">
+            <input type="hidden" value="{{payment.currency.currency_symbol}}" class="currency-symbol">
+            <input type="hidden" name="create" value="True" class="create">
+            {%endif%}
+            
+        </td>
+        <td>
+            {% if payment.partial_status == 3  %}
+            <input type="text"  name="payable_amount" {%if payment.payment_account == 1%} value="{{payment.currency.currency_symbol}} 0.00" readonly {%else%} value="" {%endif%} class="form-control payable-amount pending-payable" readonly>
+            {% else %} 
+            <input type="text"  name="payable_amount{{payment.id}}" {%if payment.payment_account == 1%} value="{{payment.currency.currency_symbol}} 0.00" readonly {%else%} value="" {%endif%} class="form-control payable-amount pending-payable" readonly>
+            {%endif%}
+            
+        </td>
+        <td>
+            {% if payment.partial_status == 3  %}
+            <input type="text"  name="remaining_amount" {%if payment.payment_account == 1%} value="{{payment.currency.currency_symbol}} 0.00" readonly {%else%} value="" {%endif%} class="form-control remaining-amount pending-payable" readonly>
+            {% else %} 
+            <input type="text"  name="remaining_amount{{payment.id}}" {%if payment.payment_account == 1%} value="{{payment.currency.currency_symbol}} 0.00" readonly {%else%} value="" {%endif%} class="form-control remaining-amount pending-payable" readonly>
+            {%endif%}
+            
+        </td>
+        <td>
+            {% if payment.partial_status == 3  %}
+                {% checkforbankuser request.company as bank_user %}
+                {% if bank_user == 1 %}
+                    <select  {%if payment.payment_account == 1%} readonly data-id='1' {%endif%} name="bank" class="form-control bankdetailcls in-bor-clr bank-to-debit-width" disabled>
+                    
+                        {%if payment.payment_account == 1%}
+                        <option value='' selected>--</option>
+                        {%else%}
+                        <option name="company_bank" value="">--Select--</option>
+                            {% for bank in payment.currency.id|vendorbasedbank:request %}
+                                <option value="{{bank.id}}">{{bank.bank_name.bank_name}}-{{bank.account_number.accountno}}</option>
+                            {% endfor %}
+                        {%endif%}
+                    </select>
+                {%else %}
+                    <select  {%if payment.payment_account == 1%} readonly data-id='1' {%endif%} name="bank" class="form-control bankdetailcls in-bor-clr bank-to-debit-width" disabled>
+                    
+                        {%if payment.payment_account == 1%}
+                        <option value='' selected>--</option>
+                        {%else%}
+                        <option name="company_bank" value="">--Select--</option>
+                            {% for bank in payment.currency.id|withoutbankuserbanklist:request %}
+                                <option value="{{bank.id}}">{{bank.bank_name}}-{{bank.id|fetbankaccountnumber}}</option>
+                            {% endfor %}
+                        {%endif%}
+                    </select>
+                {%endif%}
+
+            {% else %} 
+            {% checkforbankuser request.company as bank_user %}
+            <input type="hidden" name="bank_user_status{{payment.id}}" value="{% if bank_user == 1 %}2{%else %}3{%endif%}" class="form-control" >
+
+                {% if bank_user == 1 %}
+                    <select {%if payment.payment_account == 1%} readonly data-id='1' {%endif%} name="bank{{payment.id}}" class="form-control bankdetailcls in-bor-clr bank-to-debit-width">
+                    
+                        {%if payment.payment_account == 1%}
+                        <option value='' selected>--</option>
+                        {%else%}
+                        <option name="company_bank" value="">--Select--</option>
+                            {% for bank in payment.currency.id|vendorbasedbank:request %}
+                                <option value="{{bank.id}}">{{bank.bank_name.bank_name}}-{{bank.account_number.accountno}}</option>
+                            {% endfor %}
+                        {%endif%}
+                    </select>
+                {%else %}
+                    <select   {%if payment.payment_account == 1%} readonly data-id='1' {%endif%} name="bank{{payment.id}}" class="form-control bankdetailcls in-bor-clr bank-to-debit-width">
+                    
+                        {%if payment.payment_account == 1%}
+                        <option value='' selected>--</option>
+                        {%else%}
+                        <option name="company_bank" value="">--Select--</option>
+                            {% for bank in payment.currency.id|withoutbankuserbanklist:request %}
+                                <option value="{{bank.id}}">{{bank.bank_name}}-{{bank.id|fetbankaccountnumber}}</option>
+                            {% endfor %}
+                        {%endif%}
+                    </select>
+                {%endif%}
+
+            {%endif%}
+
+        </td>
+        <td>{{payment.invoice_bank.bankname}}-{{payment.invoice_bank.accountnumber}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<div style='display:none' class='with_creditnote'>
+    <input type="hidden" name="invoice_credit_id" value="{{invoice_id}}" class="invoice_id">
+    <select  id="credit_note" class="multiselect" multiple="multiple" name="credit_note">
+        {% for credit_val in list_creditnote %}
+        <option value={{credit_val.credit_id}} invoice={{invoice_id}} credit={{credit_val.invoice_value}} {% if credit_val.invoice_value == invoice_id %}selected disabled{% endif %}>{% for i in credit_val.credit_number %}{% if forloop.last %} {{i.credit_note_no}} {% else %}{{i.credit_note_no}}, {% endif %}{% endfor %}</option>
+        {% endfor %}
+    </select>
+    <table class="table table-bordered credit_table" >
+        <thead>
+            <th>Invoice No.</th>
+            <th> Invoice Net Payable Amount</th>
+            <th>Credit Note Net Amount</th>
+            <!-- <th>Balance Credit Note Value</th> -->
+            <th>Revised Net Payable Amount</th>
+            <th>Payment Percentage</th>
+            <th>Payable Amount</th>
+            <th>Pending Amount</th>  
+            <th>Bank to Debit</th>
+            <th>Vendor Bank Details</th>
+        </thead>
+        <tbody>
+            <input type="hidden" class="credit_to_update" value="" name="credit_to_update">
+            {% for payment in payment_instruction %}
+            <tr>
+                <td>{{payment.invoice_number}}</td>
+                <!-- <td class="total_investment">{% if payment.new_netpayable %}{{payment.new_netpayable}}{% else %}{{payment.invoice_total_amount}}{% endif %}</td> -->
+                {% getnetpayment_bysplit payment.invoice.id payment.id payment.new_netpayable as netamount %}
+                <td>{{ payment.currency.currency_symbol }} {{netamount.netamount_separator}}</td>
+                {% new_total_credit_val payment request invoice_id 1 as total_credit %}
+                <td class="total_credit_val" data-id="{{payment.id}}" data-val="{{payment.vendor_invoice_id}}" currency="{{payment.invoice_currency}}" check_credit="{{total_credit}}">
+                    ({{payment.invoice_currency}} {{total_credit}})
+                </td>
+                {% if payment.new_netpayable %}
+                {% get_balance_credit_val payment.new_netpayable total_credit as credit_bal %} 
+                {% else %}
+                {% get_balance_credit_val payment.invoice_total_amount total_credit as credit_bal %} 
+                {% endif %}
+                <input type="hidden" class="balance_credit_note" value="{{credit_bal}}" name="balance_credit_note">
+                <!-- <td class="pending_credit_val" initial_pending_val="{{payment.invoice_currency}} {{credit_bal}}">{{payment.invoice_currency}} {{credit_bal}}</td> -->
+                {% new_total_credit_val payment request invoice_id 1 as total_credit %}
+                {% getnetpayment_bysplit payment.invoice.id payment.id payment.new_netpayable as netamount %}
+                {% if payment.new_netpayable %}
+                {% get_net_payableamount netamount.netpayment total_credit as net_payable %}
+                {% else %}
+                {% get_net_payableamount netamount.netpayment total_credit as net_payable %}
+                {% endif %}
+                <input type="hidden" value="{{net_payable}}" class="net-payable">
+                <input type="hidden" value="{{net_payable}}" class="intial-net-payable">
+                <td class="payable_value">
+                    {{payment.invoice_currency}} {{net_payable}}
+                    
+                </td>
+                <td>
+                    <input type="number" name="payment_percentage_credit{{payment.id}}" value="" class="form-control payment-percentage">
+                    <input type="hidden" value="{{payment.id|remainingvalue}}" class="remaining-percentage">
+                    <input type="hidden" value="0" class="alreadypaidamount">
+                    <input type="hidden" value="{{payment.id|costinvoicepaidvalue}}" class="paid-amount">
+                    <input type="hidden" value="{{payment.currency.currency_symbol}}" class="currency-symbol">
+                    <input type="hidden" name="create_credit" value="True" class="create">
+                </td>
+                <td>
+                    <input type="text" name="payable_amount_credit{{payment.id}}" value="" class="form-control payable-amount" readonly>
+                </td>
+                <td>
+                    <input type="text" name="remaining_amount_credit{{payment.id}}" value="" class="form-control remaining-amount" readonly>
+                </td>
+                <td>
+                    {% checkforbankuser request.company as bank_user %}
+                    <input type="hidden" name="bank_user_status{{payment.id}}" value="{% if bank_user == 1 %}2{%else %}3{%endif%}" class="form-control" >
+                    {% if bank_user == 1 %}
+                    <select name="bank_credit{{payment.id}}" class="form-control bankdetailcls in-bor-clr">
+                        <option name="company_bank" value="">--Select--</option>
+                            {% for bank in payment.currency.id|vendorbasedbank:request %}
+                                <option value="{{bank.id}}">{{bank.bank_name.bank_name}}-{{bank.account_number.accountno}}</option>
+                            {% endfor %}
+                    </select>
+                    {% else %}
+                        <select name="bank_credit{{payment.id}}" class="form-control bankdetailcls in-bor-clr">
+                            <option name="company_bank" value="">--Select--</option>
+                                {% for bank in payment.currency.id|withoutbankuserbanklist:request %}
+                                    <option value="{{bank.id}}">{{bank.bank_name}}-{{bank.id|fetbankaccountnumber}}</option>
+                                {% endfor %}
+                        </select>
+                    {% endif %}
+                </td>
+                <td>{{payment.invoice_bank.bankname}}-{{payment.invoice_bank.accountnumber}}</td>
+            </tr>
+            {% endfor %}
+    </table>
+</div>
+{% endif %}

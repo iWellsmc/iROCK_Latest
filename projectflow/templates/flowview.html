@@ -1,0 +1,494 @@
+
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% load projectflowtags %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/projects/editlevel.css' %}">
+
+<style>
+    .input-center {
+        color: #000 !important;
+        font-size: 15px;
+        font-weight: 500;
+        text-align: center;
+    }
+    .modules {
+        color: #000 !important;
+        font-size: 15px;
+        font-weight: 500;
+        margin-right: 0px !important;
+    }
+    .nos-users {
+        color: #000 !important;
+        font-size: 15px;
+        font-weight: 500;
+        text-align: center;
+    }
+    .roles-data {
+        color: #000 !important;
+        font-size: 15px;
+        font-weight: 500;
+        text-align: center;
+    }
+    .users-data p {
+        color: #000 !important;
+        font-size: 15px;
+        font-weight: 500;
+    }
+</style>
+
+<div class="row">
+    <div class="col-12 text-end">
+        <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'projects:projectinvoiceflow' %}">Back</a></button>
+    </div>
+</div>
+
+<div class="table-bck invoice-appo-work top-btn-arrow">
+    <h3 class="from-head">Invoice Approval Workflow View</h3>
+    
+        <div>
+            <input type="hidden" name="page_type" value="edit" id="page_type">
+            <div class="row">
+                <div class="col-4">
+                    <div class="d-flex">
+                        <table class="wcc-name">
+                            <tbody>
+                                <tr>
+                                    <td>Project</td>
+                                    <td> : </td>
+                                    <td>{{project.projectname.name}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="d-flex">
+                        <table class="wcc-name">
+                            <tbody>
+                                <tr>
+                                    <td>Flow Name</td>
+                                    <td> : </td>
+                                    <td>{{project.flow.flow_name}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="d-flex">
+                        <table class="wcc-name">
+                            <tbody>
+                                <tr>
+                                    <td>Level</td>
+                                    <td> : </td>
+                                    <td>{{project.flow_level|title}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+<!-- 
+                <div class="col-4">
+                    <div class="d-flex">
+                        <table class="wcc-name">
+                            <tbody>
+                                <tr>
+                                    <td>Bank User</td>
+                                    <td> : </td>
+                                    <td>{% if project.invoice_bank_user == 1 %}Yes{% else %}No{% endif %}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div> -->
+            </div>
+            <div class="invoice-app">
+            <div class="row all-left tabl">
+                <div class="row mt-3 p-0">
+                    <div class="col-2 heading-title">{{project.flow_level|title}}</div>
+                    <div class="col-2 heading-title bor-xnone">Process Name</div>
+                    <div class="col-2 heading-title">No. of Stations</div>
+                    <div class="col-2 heading-title bor-xnone">Modules</div>
+                    <div class="col-1 heading-title">No. of Users</div>
+                    <div class="col-1 heading-title bor-xnone">Roles</div>
+                    <div class="col-2 heading-title">Station Users</div>
+                </div>
+                <div class="row"> <!-- p-0 -> class removed-->
+                    <div class="col-12 p-0">
+                    {% show_signatories project.projectname.id request as sign_users %}
+                    {% if project.flow_level == 'clusters' %}
+                    {% for cluster in leveltypes.clusters %}
+                        {% checkflowavailable cluster.id project.flow_level project_id as checkflow %}
+                        <div class="row data-border" {% if checkflow == 0 %} style="display:none;" {% endif %}>
+                            {% if checkflow > 0 %}
+                            <div class="col-2 discipline-name">
+                                <label class="pt-type level_label">{{cluster.clustersubname.cluster_subname}}</label><br>
+                            </div>
+                            <div class="col-10 process_clusters_{{cluster.id}}">
+                                {% for process in flow_process %}
+                                <div class="row">
+                                    <div class="col-3 process-name">
+                                        <p>{{process.process_name}}</p>
+                                    </div>
+                                    <div class="col-9">
+                                        {% getprojectflowlevel process.id cluster.id project_id as flowleveldetails%}
+                                        {% getmodule_byprocess process.process_id as modules%}
+                                        <div class="row">
+                                            <div class="col-2 mt-2 input-center">
+                                                <p>{{flowleveldetails.no_of_stations}}</p>
+
+                                            </div>
+                                            <div class="col-10">
+                                                <div class="row">
+                                                    <div class="col-12 module_{{cluster.id}}_{{process.id}}">
+                                                        {% for i in flowleveldetails.no_of_stations|times %}
+                                                            {% getprojectflowmodule flowleveldetails.id i as projectflowmodules%}
+                                                            {% getroleandusers projectflowmodules.module_id company project_id as rolesandusers %}
+                                                            <div class="row module_rows module_row_{{cluster.id}}_{{process.id}}_{{i}} justify-content-end mt-2">
+                                                                <div class="col-3 modules">
+                                                                        {% for module in modules %}
+                                                                            {% if module.id == projectflowmodules.module_id %}
+                                                                                <p>{{module.module_name}}</p>
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                </div>
+                                                                <div class="col-2 module_row_{{cluster.id}}_{{process.id}}_{{i}}_noof_users nos-users">
+                                                                    <p>{% if projectflowmodules.module.module_id == 5%}{{sign_users|length}}{% else %}{{projectflowmodules.no_of_users}}{% endif %}</p>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <div class="row justify-content-around">
+                                                                        <div class="col-4 module_row_{{cluster.id}}_{{process.id}}_{{i}}_roles roles-data">
+                                                                                {% for role in rolesandusers.roles %}
+                                                                                    {% if role.id == projectflowmodules.role_id %}
+                                                                                        <p>{{role.role_name}}</p>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+
+                                                                        </div>
+                                                                        <div class="col-8 module_{{cluster.id}}_{{process.id}}_{{i}}_station_users users-data">
+                                                                            {% if projectflowmodules.module.module_id == 5%}
+                                                                                {% for user in sign_users %}
+                                                                                    <p>{{user.user__name}} {{user.user__lastname}}-{{user.user__designation_role}} {{user.signatory__currency__currency_symbol}}</p>
+                                                                                {% endfor %}
+                                                                            {% else %}
+                                                                                {% for j in projectflowmodules.no_of_users|times %}
+                                                                                {% getflowusers projectflowmodules.id j as flowusers %}
+                                                                                        {% for user in rolesandusers.projectusers %}
+                                                                                            {% if user.id == flowusers.user_id %}
+                                                                                                <p>{{user.user_name}} {{user.user_lastname}}-{{user.user_designation_role}}</p>
+                                                                                            {% endif %}
+                                                                                        {% endfor %}
+                                                                                {% endfor %}
+                                                                            {% endif%}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                            {%empty%}
+                            <div class="border-empty-data">---</div>
+                        </div>
+                    {% endfor %}
+                    {% elif project.flow_level == 'discipline' %}
+                        {% for discipline in leveltypes.discipline%}
+                            {% checkflowavailable discipline.id project.flow_level project_id as checkflow %}
+                            {% if checkflow > 0 %}
+                            <div class="row data-border" {% if checkflow == 0 %} style="display:none;" {% endif %}>
+                                <div class="col-2 discipline-name">
+                                    <label class="pt-type level_label">{{discipline.discipline_subtype__discipline_subtype}}-{% if discipline.project_discipline__project_discipline == "1"%}Green Field Development{% elif discipline.project_discipline__project_discipline == "2"%}Brown Field Development{% else%}Others{% endif %}-{{discipline.project_discipline__cluster__clustersubname__cluster_subname}}</label><br>
+                                </div>
+                                <div class="col-10 process_discipline_{{discipline.id}}">
+                                    {% for process in flow_process %}
+                                        <div class="row">
+                                            <div class="col-3 process-name">
+                                                <p>{{process.process_name}}</p>
+                                            </div>
+                                            <div class="col-9">
+                                                {% getprojectflowlevel process.id discipline.id project_id as flowleveldetails%}
+                                                {% getmodule_byprocess process.process_id as modules%}
+    
+    
+                                                <div class="row">
+                                                    <div class="col-2 mt-2 input-center">
+                                                        <p>{{flowleveldetails.no_of_stations}}</p>
+                                                    </div>
+                                                    <div class="col-10">
+                                                        <div class="row">
+                                                            <div class="col-12 module_{{discipline.id}}_{{process.id}}">
+                                                                {% for i in flowleveldetails.no_of_stations|times %}
+                                                                    {% getprojectflowmodule flowleveldetails.id i as projectflowmodules%}
+                                                                    {% getroleandusers projectflowmodules.module_id company project_id as rolesandusers %}
+                                                                    <div class="row module_rows module_row_{{discipline.id}}_{{process.id}}_{{i}} justify-content-end mt-2">
+                                                                        <div class="col-3 modules">
+                                                                            {% for module in modules %}
+                                                                                {% if module.id == projectflowmodules.module_id %}
+                                                                                    <p>{{module.module_name}}</p>
+                                                                                {% endif %}
+                                                                            {% endfor %}
+                                                                        </div>
+                                                                        <div class="col-2 module_row_{{discipline.id}}_{{process.id}}_{{i}}_noof_users nos-users">
+                                                                            <p>{% if projectflowmodules.module.module_id == 5%}{{sign_users|length}}{% else %}{{projectflowmodules.no_of_users}}{% endif %}</p>
+                                                                        </div>
+                                                                        <div class="col-6">
+                                                                            <div class="row justify-content-around">
+                                                                                <div class="col-4 module_row_{{discipline.id}}_{{process.id}}_{{i}}_roles roles-data">
+                                                                                        {% for role in rolesandusers.roles %}
+                                                                                            {% if role.id == projectflowmodules.role_id %}
+                                                                                                <p>{{role.role_name}}</p>
+                                                                                                {% endif %}
+                                                                                        {% endfor %}
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-8 module_{{discipline.id}}_{{process.id}}_{{i}}_station_users users-data">
+                                                                                    {% if projectflowmodules.module.module_id == 5%}
+                                                                                        {% for user in sign_users %}
+                                                                                            <p>{{user.user__name}} {{user.user__lastname}}-{{user.user__designation_role}} {{user.signatory__currency__currency_symbol}}</p>
+                                                                                        {% endfor %}
+                                                                                    {% else %}
+                                                                                        {% for j in projectflowmodules.no_of_users|times %}
+                                                                                        {% getflowusers projectflowmodules.id j as flowusers %}
+                                                                                            {% for user in rolesandusers.projectusers %}
+                                                                                                {% if user.id == flowusers.user_id %}
+                                                                                                    <p>{{user.user_name}} {{user.user_lastname}}-{{user.user_designation_role}}</p>
+                                                                                                {% endif %}
+                                                                                            {% endfor %}
+                                                                                        {% endfor %}
+                                                                                    {% endif %}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+    
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+                                
+                            </div>
+                            {%empty%}
+                            <div class="border-empty-data">---</div>
+                        {% endfor %}
+
+                    {% else %}
+                    <!--starts here -->
+                    {% for well in leveltypes.well%}
+                    {% checkwellbasedflowavailable well.discipline_id project.flow_level project_id as checkflow %}
+                    {% if checkflow > 0 %}
+                    <div class="row data-border">
+                       
+                        <div class="col-2 discipline-name">
+                            <label class="pt-type level_label">{{well.discipline_name}}-{{well.project_discipline}}-{{well.cluster}}</label><br>
+                        </div>
+                        <div class="col-10 process_well_{{well.discipline_id}}">
+                            {% for process in flow_process %}
+                                <div class="row">
+                                    <div class="col-3 process-name">
+                                        <p>{{process.process_name}}</p>
+                                    </div>
+                                    <div class="col-9">
+                                        {% getprojectflowlevel process.id well.discipline_id project_id as flowleveldetails%}
+                                        {% getmodule_byprocess process.process_id as modules%}
+                                        <div class="row">
+                                            <div class="col-2 mt-2 input-center">
+                                                <p>{{flowleveldetails.no_of_stations}}</p>
+                                            </div>
+                                            <div class="col-10">
+                                                <div class="row">
+                                                    <div class="col-12 module_{{well.discipline_id}}_{{process.id}}">
+                                                        {% for i in flowleveldetails.no_of_stations|times %}
+                                                            {% getprojectflowmodule flowleveldetails.id i as projectflowmodules%}
+                                                            {% getroleandusers projectflowmodules.module_id company project_id as rolesandusers %}
+                                                            <div class="row module_rows module_row_{{well.discipline_id}}_{{process.id}}_{{i}} justify-content-end mt-2">
+                                                                <div class="col-3 modules">
+                                                                        {% for module in modules %}
+                                                                            {% if module.id == projectflowmodules.module_id %}
+                                                                                <p>{{module.module_name}}</p>
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                </div>
+                                                                <div class="col-2 module_row_{{well.discipline_id}}_{{process.id}}_{{i}}_noof_users nos-users">
+                                                                    <p>{% if projectflowmodules.module.module_id == 5%}{{sign_users|length}}{% else %}{{projectflowmodules.no_of_users}}{% endif %}</p>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <div class="row justify-content-around">
+                                                                        <div class="col-4 module_row_{{well.discipline_id}}_{{process.id}}_{{i}}_roles roles-data">
+                                                                                    {% for role in rolesandusers.roles %}
+                                                                                    {% if role.id == projectflowmodules.role_id %}
+                                                                                    <p>{{role.role_name}}</p>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="col-8 module_{{well.discipline_id}}_{{process.id}}_{{i}}_station_users users-data">
+                                                                            {% if projectflowmodules.module.module_id == 5%}
+                                                                                {% for user in sign_users %}
+                                                                                    <p>{{user.user__name}} {{user.user__lastname}}-{{user.user__designation_role}} {{user.signatory__currency__currency_symbol}}</p>
+                                                                                {% endfor %}
+                                                                            {% else %}
+                                                                                {% for j in projectflowmodules.no_of_users|times %}
+                                                                                {% getflowusers projectflowmodules.id j as flowusers %}
+                                                                                        {% for user in rolesandusers.projectusers %}
+                                                                                            {% if user.id == flowusers.user_id %}
+                                                                                                <p>{{user.user_name}} {{user.user_lastname}}-{{user.user_designation_role}}</p>
+                                                                                            {% endif %}
+                                                                                        {% endfor %}
+                                                                                    </select>
+                                                                                {% endfor %}
+                                                                            {% endif %}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {%empty%}
+                                <div class="border-empty-data">---</div>
+                
+                            {% endfor %}
+                   
+                        </div>
+                       
+                    </div>
+                    {% endif %}
+                        <!--discipline well-->
+                        {% if checkflow > 0 %}
+                        {% for discipline_well in well.well_datas%}
+                       
+                            {% checkflowavailable discipline_well.id project.flow_level project_id as well_checkflow %}
+                            {% if well_checkflow > 0 %}
+                            <div class="row data-border">
+                                
+                                <div class="col-2 discipline-name"> 
+                                    <label class="pt-type level_label">{{discipline_well.wellname__well_subname}}</label><br>
+                                </div>
+                                <div class="col-10 process_well_{{discipline_well.id}}">
+                                    
+                                    {% for process in flow_process %}
+                                        <div class="row">
+                                            <div class="col-3 process-name">
+                                                <p>{{process.process_name}}</p>
+                                            </div>
+                                            <div class="col-9">
+                                                {% getprojectflowlevel process.id discipline_well.id project_id as flowleveldetails%}
+                                                {% getmodule_byprocess process.process_id as modules%}
+                                                <div class="row">
+                                                    <div class="col-2 mt-2 input-center">
+                                                        <p>{{flowleveldetails.no_of_stations}}</p>
+                                                    </div>
+                                                    <div class="col-10">
+                                                        <div class="row">
+                                                            <div class="col-12 module_{{discipline_well.id}}_{{process.id}}">
+                                                                {% for i in flowleveldetails.no_of_stations|times %}
+                                                                    {% getprojectflowmodule flowleveldetails.id i as projectflowmodules%}
+                                                                    {% getroleandusers projectflowmodules.module_id company project_id as rolesandusers %}
+                                                                    <div class="row module_row_{{discipline_well.id}}_{{process.id}}_{{i}} justify-content-end mt-2">
+                                                                        <div class="col-3 modules">
+                                                                                {% for module in modules %}
+                                                                                    {% if module.id == projectflowmodules.module_id %}
+                                                                                        <p>{{module.module_name}}</p>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                        </div>
+                                                                        <div class="col-2 module_row_{{discipline_well.id}}_{{process.id}}_{{i}}_noof_users nos-users">
+                                                                            <p>{% if projectflowmodules.module.module_id == 5%}{{sign_users|length}}{% else %}{{projectflowmodules.no_of_users}}{% endif %}</p>
+                                                                        </div>
+                                                                        <div class="col-6">
+                                                                            <div class="row justify-content-around">
+                                                                                <div class="col-4 module_row_{{discipline_well.id}}_{{process.id}}_{{i}}_roles roles-data">
+                                                                                        {% for role in rolesandusers.roles %}
+                                                                                            {% if role.id == projectflowmodules.role_id %}
+                                                                                                <p>{{role.role_name}}</p>
+                                                                                            {% endif %}
+                                                                                        {% endfor %}
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-8 module_{{discipline_well.id}}_{{process.id}}_{{i}}_station_users users-data">
+                                                                                    {% if projectflowmodules.module.module_id == 5%}
+                                                                                        {% for user in sign_users %}
+                                                                                            <p>{{user.user__name}} {{user.user__lastname}}-{{user.user__designation_role}} {{user.signatory__currency__currency_symbol}}</p>
+                                                                                        {% endfor %}
+                                                                                    {% else %}
+                                                                                        {% for j in projectflowmodules.no_of_users|times %}
+                                                                                        {% getflowusers projectflowmodules.id j as flowusers %}
+                                                                                                {% for user in rolesandusers.projectusers %}{% if user.id == flowusers.user_id %}
+                                                                                                    <p>{{user.user_name}} {{user.user_lastname}}-{{user.user_designation_role}}</p>
+                                                                                                {% endif %}
+                                                                                                {% endfor %}
+                                                                                        {% endfor %}
+                                                                                    {% endif %}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                        {%empty%}
+                        <div class="border-empty-data">---</div>
+                    {% endfor %}
+                <!--end here-->
+                    {% endif %}
+
+                    
+                    
+                </div>
+              </div>
+            </div>
+        </div>
+        </div>
+</div>
+
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+    var flow="{{project.flow_id}}"
+    var project_id="{{project.id}}"
+    var company="{{company}}"
+
+</script>
+<script src="{% static 'js/projects/flowedit.js' %}"></script>
+
+{% endblock %}
+
+

@@ -1,0 +1,171 @@
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+
+<html>
+    <head>
+        <title>Contract Report</title>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <style>
+        .table, .table td, .table th {  
+        border-bottom: 1px solid #ddd;
+        border-top: 1px solid #ddd;
+        border-left:1px solid #ddd;
+        border-right:1px solid #ddd; 
+        }
+
+            .companylogo {
+                width: 60px;
+                height: 60px;
+            }
+            @page land{
+                size:landscape;
+          }
+          .from-head {
+            color: #AF2B50;
+        font-weight: 600;
+        font-size:18px;
+        text-align: center;
+        margin: 0px 150px 0px 0px;
+        width: 100% !important;
+    }
+  
+        .table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+}
+    th { height: 40px; }
+    td { height: auto; }
+            .table th, .table td { margin:5px; padding-top: 5px;}
+           
+        .padding-out{
+            padding-top:4px !important;
+        }
+
+    
+        .companyname-text{ 
+         text-align: center!important;    
+         font-size: 22px;   
+         color: #AF2B50; 
+         font-weight: 600;
+        margin-right: 150px;
+        }
+        </style>
+    </head>
+    <body>
+  
+        <div>
+            
+            <table class="w-100">
+ 
+             <tr>
+                 <td>{% if imageurl %}  <img src="{{imageurl}}">  {% endif %}</td>
+                 <td>
+                     <h4 class="companyname-text">{{company.company_name}}</h4>
+                     <div style="text-align: center;">
+                        <p style="text-align: center; font-size: 12px; margin-top: -10px; margin-bottom: 10px;">{{company.address|safe}}</p>
+                     </div>
+                 </td>
+             </tr>
+     
+                    <tr>
+                     <td style="width:15%;"></td>
+                     <td class="" style="text-align: center; width:85%;">
+                        
+                         <h3 class="from-head">Contract Master List</h3>
+                      
+                     </td>
+                    </tr>
+                
+              </table>
+ 
+             </div>
+
+        <!-- <table>
+            <tr>
+                <th  style="width:15%;">{% if imageurl %}  <img src="{{imageurl}}">  {% endif %}</th>
+                <th style="width:85%;"><h4 class="companyname-text">{{company.company_name}}</h4>
+                </th>
+               
+            </tr>
+        </table>
+    
+             
+        <table class="w-100">
+    
+                   <tr>
+                    <td style="width:15%;"></td>
+                    <td class="" style="text-align: center; width:85%;">
+                        <h3 class="from-head">Contract Master List</h3>
+                        
+                    </td>
+                   </tr>
+               
+             </table> -->
+
+ 
+     
+        <p style="font-size: 14px; color:#AF2B50;">*VIN-Vendor Identification Number</p>
+        <div class="row"> 
+                    <table class="table type-last-vend mid-view-tbl tlt-cap tbl-contra-list">
+                      <thead>
+                      <tr>
+                        <th style="width:5%;" class="wid-sn">S/N</th>
+                        <th>VIN</th>
+                        <th>Vendor Name</th>
+                        <th>Type of Service</th>
+                        <th>Name of Service</th>
+                        <th>Project Name</th>
+                        <th>Project Discipline</th>
+                        <th>Discipline Type</th>
+                        <th>Reference Number</th>
+                        <th>Executed Date</th>
+                        <th>Maximum Value of Contract</th>
+                      </tr>
+                      </thead>
+                      <tbody >
+                {% for contracts in vendormasterlist %}
+                        <tr>
+                            <td style="text-align: center;">{{forloop.counter}}</td>
+                            <td style="text-align: center;">{{contracts.contractvendor.vin}}</td>
+                            <td style="word-break: break-word !important;">{{contracts.contractvendor.vendor_name | split_addspace}}</td>
+                            <td>{{contracts.types_service|disciplines_replace_cap}}</td>
+                            <td>{{contracts.name_service|split_addspaces}}</td>
+                            <td>{{contracts.projects.projectname}}</td>
+                            <td>{{contracts.projectdiscipline|convert_projectdiscipline | split_addspaces}}</td>
+                            <td>{{contracts.projectdisciplinetype.discipline_subtype}}</td>
+                            <td class="padding-out" style="text-align: center;">{{contracts.reference_number|split_addspaces}}</td>
+                            <td style="text-align: center;">{{contracts.executed_date|checktime:contracts.company.id}}</td>
+                            {% if contracts.amount == "No Max Limit" %}
+                            <td style="text-align: center;">{{contracts.currency.currency}} {{contracts.amount}} </td>
+
+                            {% else %}
+                            <td style="text-align: center;">{{contracts.currency.currency}} {{contracts.amount|convert_to_thousand_separator}} </td>
+                            {% endif %}
+                        </tr>
+                            {% for amendment in contracts.id|serviceademdmentcontractpdf %}
+                            <tr class="amen-type-lists">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>{{amendment.amendment_type}}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td style="text-align: center;">{{amendment.amendment_reference_number|split_addspace}}</td>
+                                    <td style="text-align: center;">{{amendment.amendment_executed_date|checktime:amendment.company.id}}</td>
+                                    <td style="text-align: center;">{{amendment.amendment_currency.currency}} {{amendment.amendment_amount}}</td>
+                            </tr>
+                            {% endfor %}
+                        {% empty %}
+                        <tr style="text-align: center;">
+                            <td colspan="11" id="empty_class">---</td>
+                          </tr>
+                    {%endfor%}
+        </tbody>
+    </table>
+    </div>
+</html>

@@ -1,0 +1,646 @@
+{% extends "base.html" %}
+{% block content %} 
+{% load static %}            
+{% load custom_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/profile/companyprofile.css' %}">
+
+
+<div class="row">
+    <form action="" method="post" id="editcompanyform" enctype="multipart/form-data" runat="server">
+        {% csrf_token %}
+        <h4 class="from-head">Edit Company Profile</h4>
+
+    <div class="row">
+        <div class="row">
+            <div class="col-9">
+            </div> 
+            <div class="col-3">
+                <button class="btn btn-clr btn-master waves-effect waves-float waves-light pc-bk-cls" ><a href="{% url 'custom_auth:viewcompany' pk=company.id%}">Back</a></button>
+            </div>
+        </div>
+            <div class="col-lg-6 col-md-12 md-form">
+                <label for="staticEmail" class="col-form-label edit-com-hd">Company Name<span class="star-clr">*</span></label>
+                <input type="hidden" name="companyids" id="companyid" value="{{company.id}}">
+                <input type="text" id="companynameid" name="companyname" class="form-control edit-com-input" value="{{company.company_name}}" readonly>
+                
+                <label for="form1" class="edit-com-hd">Country<span class="star-clr">*</span></label>
+                <select id="country_id" name="country" class="form-control edit-com-input country_id_1">
+                <option  value="" selected="selected">---Select Country---</option>
+                    {% for country in countries%}
+                    <option {% if company.country.id == country.id %} selected {% endif %}value="{{country.id}}">{{country.name}}</option>
+                    {% endfor %}
+                </select>
+                
+                <!-- <div class="row">
+                    <div class="col-6">
+                <label for="staticEmail" class="col-form-label edit-com-hd">First Name<span class="star-clr">*</span></label>
+                <input type="text" id="firstnameid" name="firstname" class="form-control edit-com-input" value="{{company.first_name}}">
+                </div>
+                <div class="col-6">
+                <label for="staticEmail" class="col-form-label edit-com-hd">Last Name<span class="star-clr">*</span></label>
+                <input type="text" id="lastnameid" name="lastname" class="form-control edit-com-input" value="{{company.last_name}}">
+                </div>
+                </div> -->
+
+                <label for="form1" class="edit-com-hd">Address<span class="star-clr">*</span></label>
+                <textarea row="4"  col="30" name="address" id="inputaddress" maxlength="255" class="form-control edit-com-input " placeholder="Address">{{company.address|default_if_none:""}}</textarea> 
+                <span id="address-error" class="waring-err"></span>
+                <div class="row">
+                    <div class="col-4">
+                        <label for="form1" class="edit-com-hd">Country Code<span class="star-clr"></span></label>
+                        <input type="text" name="phone_countrycode" class="form-control bgcolor-cls res-inp-1" id="phone_countrycode" placeholder="Country Code" value="{{company.phone_countrycode|default_if_none:""}}" readonly>
+                    </div>
+                    <div class="col-3">
+                        <label for="form1" class="edit-com-hd">Area Code<span class="star-clr">*</span></label>
+                        <input type="text" name="phone_areacode" value="{{company.areacode|default_if_none:""}}" id="inputareacode"  oninput="validateInputOnlyNumber(this)" class="form-control res-inp-2" id="phone_areacode" placeholder="Area Code">
+                    </div>
+                    <div class="col-5">
+                        <label for="form1" class="edit-com-hd">Phone Number (Land Line)<span class="star-clr">*</span></label>
+                        <input type="text" name="phone_no" minlength="5" maxlength="20"  oninput="validateInputOnlyNumber(this)" id="inputphoneno" value="{{company.phonenumber|default_if_none:""}}" class="form-control edit-com-input res-inp-3" placeholder="Phone No">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <label for="form1" class="edit-com-hd">Country Code<span class="star-clr"></span></label>
+                        <input type="text" name="mobile_countrycode" class="form-control bgcolor-cls" id="mobile_countrycode" placeholder="Country Code" value="{{company.mobile_countrycode|default_if_none:""}}" readonly>
+                    </div>
+                    <div class="col-8">
+                        <label for="form1" class="edit-com-hd">Phone Number (Mobile Line)<span class="star-clr">*</span></label>
+                        <input type="text" name="mobile_no" minlength="5" maxlength="20" oninput="validateInputOnlyNumber(this)" id="inputmobileno" class="form-control edit-com-input" placeholder="Mobile No" value="{{company.mobile|default_if_none:""}}">
+                    </div>
+                </div>
+                <label for="form1" class="edit-com-hd">Company Website<span class="star-clr"></span></label>
+                <input type="text" name="website" id="idwebsite" class="form-control edit-com-input" placeholder="Website" value="{{company.website|default_if_none:""}}">
+            </div>
+            <div class="col-lg-6 col-md-12 md-form logo-parent">
+                {% if image == '' %}
+                <img id="image-preview" src="{% static 'images/icons/Character_icon.svg' %}" class="company-img-cls def-cls" image_check="Character_icon.svg"><br>
+                {% else %}
+                <img id="image-preview" src="{{image}}" class="company-img-cls company-img-cls-edit-comp"><br>
+                {% endif %}
+
+                <label for="staticEmail" class="col-form-label edit-com-hd" >Company Logo<span class="star-clr">*</span></label>
+                {% comment %} id="" {% endcomment %}
+                <input type="file" name="image" id="file-input" class="form-control edit-com-input filesize"><br><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                <br>
+
+                <div class="type-radios">
+                    <label for="form1" class="edit-com-hd">Type of Organization<span class="star-clr">*</span></label>
+                    {% for category in entitytype %}
+                    <div><input type="radio" id="project_type" name="projecttype" {% if company.id|checkentitytype:category > 0 %} checked=checked {% endif %} value="{{category}}">&emsp;<label class="pt-type">{{category|category_replace}}</label></div>
+                    {% endfor %}
+                </div>
+        </div>
+        <div class="text-center spacing-button my-5">
+            <button type="submit" id="submit" class="btn btn-clr text-center submit-cls">Save</button>
+        </div>
+    </form>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+
+<!-- <script src="{% static 'js/finance/createuserbank.js' %}"></script> -->
+<script>
+    // jQuery.noConflict();
+    $('#inputaddress').summernote(
+        {
+        toolbar: false,
+
+
+    });
+    
+    function validateInputOnlyNumber(input) {
+        input.value = input.value.replace(/[^0-9\s]/g, '');
+    }
+    
+
+
+    $(document).ready(function() {
+
+        $('#inputaddress').summernote(
+        {
+        toolbar: false,
+
+
+    });
+    $(document).on('input','#inputmobileno, #inputphoneno', function(e) {
+        validateInputOnlyNumber(this)
+    });
+}); 
+// var maxContentLength = 255;
+// var changingContent = false;
+// $('#inputaddress').on('summernote.keyup', function(e) {
+//         if (!changingContent) {
+//             changingContent = true; // Set a flag to avoid recursion
+
+//             var content = $(this).summernote('code');
+           
+
+//             if (content.length > maxContentLength) {
+//                 e.preventDefault();
+//                 // $('#address-error').text('Characters exceed limit 255')
+//                 // If the content length exceeds the limit, truncate it
+//             var truncatedContent = content.substring(0, maxContentLength);
+//             $(this).summernote('code', truncatedContent);
+//             } 
+
+//             changingContent = false; // Reset the flag
+//         }
+//     });
+$('#editcompanyform').on('submit', function(e) {
+  
+  if($('#inputaddress').summernote('isEmpty')) {
+    console.log('contents is empty, fill it!');
+    // $('#inputaddress').summernote.html(' ')
+    $('#inputaddress').summernote('code', '');
+
+    // cancel submit
+    // alert()
+    e.preventDefault();
+    $('#address-error').text('Please Provide a Address')
+
+  }
+  else {
+    
+    $('#address-error').text('')
+    return true;
+    // do action
+  }
+})
+
+
+$(document).on('keyup','.note-editable',function(){
+   
+
+   var address= $(this).text()
+  
+
+if(address!='')
+{
+    // alert()
+    $('#address-error').text('')
+   
+ 
+}
+else
+{
+    $('#address-error').text('Please Provide a Address')
+    
+    
+}
+
+});
+
+
+
+
+    var companyid=$('#companyid').val()
+
+    $(document).on('change','#country_id',function(){
+        $('#phone_countrycode').val(' ')
+        $('#mobile_countrycode').val(' ')
+        var val=$(this).val();
+        var html=''
+        if (val != ''){
+            $.ajax({
+                type:"GET",
+                url:'/editcompany/'+companyid+'/getcountrycode',
+                data:{'countryid':val},
+                success: function(data){
+                    console.log(data.data.countrycode)
+                    ///html +='<input type="text" name="phone_countrycode" class="form-control" //id="phone_countrycode"  value='+data.data.countrycode+'>'
+                $('#phone_countrycode').val(data.data.countrycode)
+                $('#mobile_countrycode').val(data.data.countrycode)
+                }
+
+               
+            })
+
+        }
+        else
+                {
+                $('#phone_countrycode').val('')
+                $('#mobile_countrycode').val('')
+                }
+    })
+    $(document).on('change','#file-input',function(){
+        var val=$(this).val()
+        if (val != ''){
+            var splitval=val.split('.')
+            strFile = splitval[splitval.length-1];
+            var s = ["jpeg","jpg","gif","png"];
+            z=0
+            $.each(s, function( index, value ) {
+                if (strFile == value){
+                    z=+1
+                }
+            });
+                console.log(z)
+                if (z == 1){
+                    $('.submit-cls').attr('disabled', false);
+                    z=0
+
+                } else{
+                    swal.fire("Please Provide a Proper Image Format")
+                    $('.submit-cls').attr('disabled', 'disabled');
+                }
+        }
+
+    })
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            $('#image-preview').attr('src', e.target.result);
+            $('#image-preview').hide();
+            $('#image-preview').fadeIn(650);
+            $('#image-preview').removeClass('def-cls')
+          }
+          reader.readAsDataURL(input.files[0]);
+        //   reader.onload = () => {
+        //        img.src = reader.result; 
+        }
+      }
+      
+      $("#file-input").change(function() {
+        readURL(this);
+      });
+      
+
+
+
+
+
+    $.validator.addMethod("valid_contactno", function(value, element) {
+
+       var number= $('#inputphoneno').val();
+        if(number!='')
+        {
+            var text = value.replace(/[^0-9\s]/g,'');
+        $('#inputphoneno').val(text);
+        return true;
+        }
+        else 
+        {
+            return false;
+        }
+    
+      });	   
+      $.validator.addMethod("valid_mobileno", function(value, element) {
+
+            var number= $('#inputmobileno').val();
+            if(number!='')
+            {
+                var text = value.replace(/[^0-9\s]/g, '');
+            $('#inputmobileno').val(text);
+            return true;
+            }
+            else 
+            {
+                return false;
+            }
+
+            });	  
+
+
+     $.validator.addMethod("valid_areacode", function(value, element) {
+
+            var number= $('#inputareacode').val();
+            if(number!='')
+            {
+                var text = value.replace(/[^0-9]/g, '');
+            $('#inputareacode').val(text);
+            return true;
+            }
+            else 
+            {
+                return false;
+            }
+
+            });	  
+    // $.validator.addMethod("valid_firstname", function(value, element) {
+
+    //         var number= $('#firstnameid').val();
+    //         if(number!='')
+    //         {
+    //         var text = value.replace(/[^A-Za-z]/g, '');
+    //         $('#firstnameid').val(text);
+    //         return true;
+    //         }
+    //         else 
+    //         {
+    //         return false;
+    //         }
+
+    //         });	  
+
+
+    // $.validator.addMethod("valid_lastname", function(value, element) {
+
+    //         var number= $('#lastnameid').val();
+    //         if(number!='')
+    //         {
+    //         var text = value.replace(/[^A-Za-z]/g, '');
+    //         $('#lastnameid').val(text);
+    //         return true;
+    //         }
+    //         else 
+    //         {
+    //         return false;
+    //         }
+
+    //         });	 
+            
+            
+            // $('#firstnameid').keyup(function() {
+            // var $th = $(this);
+            // $th.val($th.val().replace(/\d+/g, ''))
+            // $th.val($th.val().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+            // // $th.val($th.val().replace(/^\s*/, ''));
+            // remove_dot = $th.val().replace(/\.{2,}/g, '.');
+            // $(this).val(remove_dot)
+            // });
+
+
+
+                        
+            // $('#lastnameid').keyup(function() {
+            // var $th = $(this);
+            // $th.val($th.val().replace(/\d+/g, ''))
+            // $th.val($th.val().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+            // // $th.val($th.val().replace(/^\s*/, ''));
+            // remove_dot = $th.val().replace(/\.{2,}/g, '.');
+            // $(this).val(remove_dot)
+            // });
+
+
+
+            
+$(document).on('keyup','#inputphoneno',function(){
+    if (/\D/g.test(this.value))
+  {
+    this.value = this.value.replace(/\D\s/g, '');
+    this.value = this.value.replace(/(\s{2,})']/g, ' ')
+    // this.value = (this.value().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+  }
+})
+
+
+
+$(document).on('keyup','#inputmobileno',function(){
+    // alert('kk')
+    if (/\D/g.test(this.value))
+  {
+    this.value = this.value.replace(/\D\s/g, '');
+    this.value = this.value.replace(/(\s{2,})']/g, ' ')
+    // this.value = (this.value().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+  }
+})
+
+
+
+
+// $.validator.addMethod("validphone", function(value, element) {
+//     alert(value)
+//     value.replace(/(\s{2,})]/g, ' ');
+//     return value;
+// });	   
+$(document).on('change','#file-input',function(){
+    $('#remove-error').remove()
+})
+
+
+  $(document).on('click','#submit',function(event){
+    
+    // var imgsrc = $(this).attr('data-id');
+    $('#remove-error').remove()
+    if ( $("#image-preview").hasClass("def-cls") ){
+        // console.log('yes')
+        event.preventDefault();
+        $('#file-input').after('<span class="error pro-cls-logo" id="remove-error">Please Provide a Logo</span>');
+      } else {
+        // console.log('no')
+        //$(this).find('span').remove()
+        $('#remove-error').remove()
+      }
+})
+
+
+      $(function() {
+    // alert()
+      
+      $("form[id='editcompanyform']").validate({ 
+        rules: {
+        
+            companynamemail:{
+                required: true,
+                
+            }, 
+            country:{
+                required: true,
+                
+            },
+            // firstname:{
+            //     required: true,
+            //     // valid_firstname : true,
+                
+            // },
+            // lastname:{
+            //     required: true,
+            //     // valid_lastname : true,
+                
+            // },
+            addresss:{
+                required: true,
+                maxlength: 255,
+                // validaddress:true,
+                
+            },
+            phone_countrycode:{
+                required: true,
+                
+            },
+            phone_areacode:{
+                required: true,
+                valid_areacode : true,
+                
+            },
+            phone_no:{
+                required: true,
+                minlength:0,
+                valid_contactno:true,
+                // validphone:true,
+                
+            },
+            mobile_countrycode:{
+                required: true,
+                
+            },
+            mobile_no:{
+                required: true,
+                minlength:0,
+                valid_mobileno: true,
+                
+            },
+            // website:{
+            //     required: true,
+                
+            // },
+            // image:{
+            //     required: true,
+                
+            // },
+            projecttype:{
+                required: true,
+                
+            },
+
+        },
+      messages: {  
+        companyname:
+               {
+                   required :"Please Provide a Company Name",
+                
+               },
+               country:
+               {
+                   required :"Select the Country",
+                
+               },
+            //    firstname:
+            //    {
+            //        required :"Please Provide a First Name",
+            //     //    valid_firstname : "Accept Only Alphabets"
+                
+            //    },
+            //    lastname:
+            //    {
+            //        required :"Please Provide a Last Name",
+            //  //    valid_lastname : "Accept Only Alphabets"
+
+                
+            //    },
+               addresss:
+               {
+                   required :"Please Provide a Address",
+                //    validaddress:"Enter valid Address",
+                
+               },
+               phone_countrycode:
+               {
+                   required :"Select the County",
+                
+               },
+               phone_areacode:
+               {
+                   required :"Provide Area code",
+                   valid_areacode : "Accept Only Numbers",
+                
+               },  
+               phone_no:
+               {
+                   required :"Please Provide Phone Number",
+                   valid_contactno:"Accept Only Numbers",
+                //    validphone:'error',
+                   
+                
+               },
+               mobile_countrycode:
+               {
+                required :"Select the Country",
+                
+               },
+               mobile_no:
+               {
+                   required :"Please Provide Mobile Number",
+                   valid_mobileno:"Accept Only Numbers",
+                
+               },
+            //    website:
+            //    {
+            //        required :"Enter Website",
+                
+            //    },
+            //    image:
+            //    {
+            //        required :"Please Provide a Logo",
+                
+            //    },
+               projecttype:
+               {
+                   required :"Select Organization Type",
+                
+               },
+         
+
+            },
+            submitHandler: function(form) {
+                form.submit();
+           },
+      
+       });
+});
+
+ 
+$(document).on("click", ".submit-cls", function(e) {
+
+    var countryField = $(".country_id_1");
+
+    if (!countryField.val()) {
+        countryField.addClass("con_error");
+
+        countryField.css({
+            "border": "1px solid red",  
+             
+        });
+        e.preventDefault();  
+
+    } else {
+        countryField.removeClass("con_error").css({
+            "border": "",
+             
+        });
+
+        $("form").submit();
+     }
+});
+
+$(document).on("change", ".country_id_1", function() {
+    if ($(this).val()) {
+        $(this).removeClass("con_error").css({
+            "border": "",
+            
+        });
+    } else {
+        $(this).addClass("con_error").css({
+            "border": "1px solid red",
+            
+        });
+    }
+});
+
+ 
+$(".country_id_1").blur(function() {
+    if (!$(this).val()) {
+        $(this).addClass("con_error").css({
+            "border": "1px solid red",
+            
+        });
+    }
+});
+
+
+
+
+
+</script>
+
+
+{% endblock %}

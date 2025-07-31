@@ -1,0 +1,380 @@
+#vendor-sort th {
+  text-transform: capitalize;
+}
+
+.prj-back_clr th {
+  background: transparent !important;
+}
+
+.vendor_left-alg {
+  text-align: left !important;
+}
+
+.vend-thead th {
+  text-align:  var(--centertext-align);
+}
+
+.vend-thead td:nth-child(4) {
+  text-align:  var(--centertext-align) !important;
+}
+
+.vend-thead td {
+  /* border-right: 1px solid var(--tableborder-color); */
+}
+
+.new-vendor-table {
+  border: 1px solid var(--tableborder-color) !important;
+}
+
+.new-vendor-table th {
+  border: 1px solid var(--tableborder-color) !important;
+  border-bottom: 2px solid var(--tableborder-color) !important;
+}
+
+.new-vendor-table td {
+  border: 1px solid var(--tableborder-color) !important;
+}
+
+.new-tab li {
+  display: inline-block;
+  width: 25% !important;
+}
+
+.master-crd {
+  padding: 30px !important;
+}
+
+.upload-btn-wrapper {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.lds-dual-ring.hidden {
+  display: none;
+}
+
+.lds-dual-ring {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 5% auto;
+  border-radius: 50%;
+  border: 6px solid #fff;
+  border-color: #fff transparent #fff transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+
+.sno-center {
+  text-align: var(--centertext-align);
+}
+
+.vin-center {
+  text-align: var(--centertext-align);
+}
+
+#td-center {
+  text-align: var(--centertext-align) !important;
+}
+
+#td-left {
+  text-align: var(--lefttext-align) !important;
+}
+
+
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.same-line-icons-vend {
+  text-align: var(--centertext-align);
+}
+
+a.prjlist-menu.active {
+  border: 1px solid #f8f8f8;
+  padding: 18px;
+  background-image: linear-gradient(182deg, #8b1434, #ce2e58) !important;
+  border-radius: 20px;
+  color: #fff;
+  text-decoration: none;
+}
+
+a.prjlist-menu {
+  border: 1px solid #f8f8f8;
+  padding: 18px;
+  background: #f8f8f8;
+  border-radius: 20px;
+  color: #000;
+  font-weight: 600;
+}
+
+a.prjlist-menu:hover {
+  color: #9a1a3c;
+}
+
+a.prjlist-menu.active:hover {
+  color: #fff !important;
+}
+
+a.prjlist-menu.active {
+  border: 0px solid #f8f8f8;
+  padding: 18px;
+  background: #97193b;
+  border-radius: 20px;
+  color: #fff;
+  text-decoration: none;
+}
+
+a.prjlist-menu {
+  border: 1px solid #f8f8f8;
+  padding: 18px;
+  background: #f8f8f8;
+  border-radius: 20px;
+  color: #000;
+  font-weight: 600;
+}
+
+a.prjlist-menu:hover {
+  color: #9a1a3c;
+}
+
+a.prjlist-menu.active:hover {
+  color: #fff !important;
+}
+
+.prt-viewlist {
+  margin-top: 40px;
+  padding: 0px 20px;
+}
+
+table.prt-viewlist th {
+  border-style: none !important;
+}
+
+table.prt-viewlist td {
+  border-style: none !important;
+}
+
+.prt-viewlist li {
+  list-style: none;
+}
+
+.prt-viewlist {
+  margin-top: 40px !important;
+}
+
+table.prt-viewlist th {
+  border-style: none !important;
+}
+
+table.prt-viewlist td {
+  border-style: none !important;
+}
+
+table.prt-viewlist th {
+  text-align: left !important;
+}
+
+table.prt-viewlist {
+  box-shadow: 0px 0px 5px;
+  border-radius: 15px;
+}
+
+table.prt-viewlist td {
+  color: #000;
+  font-weight: 400;
+}
+
+/*12-02-22*/
+table.prt-viewlist.mid-view-tbl td {
+  word-break: break-word !important;
+  overflow-wrap: anywhere;
+  text-align: var(--lefttext-align) !important;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #a9adac;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 13px;
+  width: 13px;
+  left: 1px;
+  bottom: 2px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked+.slider {
+  background-color: #8d0000;
+}
+
+input:focus+.slider {
+  box-shadow: 0 0 1px #8d0000;
+}
+
+input:checked+.slider:before {
+  -webkit-transform: translateX(13px);
+  -ms-transform: translateX(13px);
+  transform: translateX(13px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* vendor master list toggle button starts here*/
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 30px;
+  height: 17px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+h5.head_cls {
+  color: white !important;
+  position: absolute;
+  right: 46%;
+  bottom: 500px !important;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(212, 208, 208, 0.8);
+  z-index: 999;
+  opacity: 1;
+  transition: all 0.5s;
+}
+
+.sear-box-ryt {
+  float: right;
+  margin: 25px 15px;
+}
+
+.search-f-inf {
+  border: 1px solid #96183a;
+  padding: 5px;
+  border-radius: 3px;
+}
+
+.search-f-inf:focus {
+  border: 1px solid #931738 !important;
+}
+
+button.v_search {
+  border: none;
+  background: #9c1b3d;
+  border-radius: 3px;
+  padding: 4px 6px 4px 6px;
+}
+
+.sea-rch-clr {
+  color: #fff !important;
+}
+
+.up-arr {
+  background: transparent;
+  border: none;
+  color: #a11d40;
+  padding: 0px;
+}
+
+.down-arr {
+  background: transparent;
+  border: none;
+  color: #a11d40;
+  padding: 0px;
+}
+
+.samll-tbl {
+  box-shadow: 0px 0px 5px !important;
+  margin: 0px auto;
+  width: 75% !important;
+  border-radius: 5px !important;
+}
+
+.samll-tbl td:nth-child(2) {
+  text-align:  var(--centertext-align);
+}
+
+.samll-tbl td:nth-child(1) {
+  text-align: var(--lefttext-align);
+}
+
+.samll-tbl th {
+  text-align:  var(--centertext-align) !important;
+  width: 5% !important;
+}
+
+@media only screen and (min-width:768px) and (max-width:995px) {
+  .table-wid {
+    width: 200vw !important;
+    max-width: 200vw !important;
+  }
+}
+
+@media only screen and (min-width:996px) and (max-width:1100px) {
+  .table-wid {
+    width: 120vw !important;
+    max-width: 150vw !important;
+  }
+}
+
+@media only screen and (min-width:1200px) and (max-width:1380px) {
+  .vendormas-status {
+    width: 15%;
+  }
+}
+
+@media only screen and (min-width:1100px) and (max-width:1201px) {
+  .vendormas-status {
+    width: 15%;
+  }
+
+  .irock-table td {
+    color: #000;
+    font-weight: 400 !important;
+    font-size: 13px !important;
+    word-break: break-all !important;
+    white-space: normal !important;
+  }
+}

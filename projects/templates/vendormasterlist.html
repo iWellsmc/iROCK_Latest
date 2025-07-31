@@ -1,0 +1,1114 @@
+{% extends "base.html" %} 
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+
+
+<head>
+  <meta name="description" content="Rolling Stone magazine's 2012 list of 500 greatest albums of all time with genres.">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.css">
+  <link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/vendormaster.css' %}">
+  </head>
+
+  
+
+<!-- <div>
+  {{request.GET.sortname}}
+  {{request.GET.sortvendorname}}
+
+  {{request.GET.vendor}} -->
+
+  <section id="data-list-view" class="data-list-view-header">
+  <input type="hidden" class="entries" value="{{pageper_data}}">
+    <h3 class="from-head">Vendor Master</h3>
+    <form method="POST" class="bot-sp-sea" id="vendor_master" enctype="multipart/form-data">
+      {% csrf_token %}
+
+    <div class="row">
+        <div class="col-9 col-md-6">
+              <div class="upload-btn-wrapper ">
+              {% if request.user.roles_id == 3 %}
+                  {%if rights.create == '1' %}
+                  <a data-toggle="modal" href="#myvendorModal" class="btn btn-clr btn-master add_btn">Import Vendor</a>
+                  <div class="modal" id="myvendorModal">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                              <h4 class="modal-title">
+                              Import or Download Excel Template
+                              </h4>    
+                              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            </div>
+                            
+                            <div class="container">
+                            </div>
+                            <div class="modal-body">
+                              <button type="submit" class="btn btn-clr btn-master"><a href="{% url 'projects:createvendorexcelsheet' %}">Download Excel Template</a></button>
+                              <!--<a data-toggle="modal" href="#myModal2" class="btn btn-clr btn-master">Import</a> -->
+                              <input type="file" class="filesize" name="vendorfile" id="vendorfileid"/> <span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="submit" data-toggle="modal" href="#myModal3" class="btn btn-clr btn-master con_file_id" id="submitbtn">Upload</button>
+                              <!-- <a data-toggle="modal" href="#myModal3" class="btn btn-clr btn-master con_file_id">Upload</a> -->
+                              <!-- <a href="#" data-dismiss="modal" class="btn btn-clr btn-master">Close</a> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div id="loader" class="lds-dual-ring hidden overlay">
+                      <h5 class="head_cls">Please Wait...</h5>
+                    </div>
+                  </div>
+
+                {% endif%}
+              {% else %}
+
+                <a data-toggle="modal" href="#myvendorModal" class="btn btn-clr btn-master">Import Vendor</a>
+                <div class="modal" id="myvendorModal">
+                  <div class="modal-dialog modal-lg">
+                      <div class="modal-content back-clr-full">
+                          <div class="modal-header">
+                            <h4 class="modal-title">
+                            Import or Download Excel Template
+                            </h4>    
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                          </div>
+                          
+                          <div class="container">
+                          </div>
+                          <div class="modal-body">
+                            <button type="submit" class="btn btn-clr btn-master validation"><a href="{% url 'projects:createvendorexcelsheet' %}">Download Excel Template</a></button>
+                            {% comment %} <a data-toggle="modal" href="#myModal2" class="btn btn-clr btn-master">Import</a> {% endcomment %}
+                            <input type="file" name="vendorfile" class="filesize" id="vendorfileid" /> <br><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+
+                          </div>
+                          <div class="modal-footer">
+                            <button type="submit" data-toggle="modal" href="#myModal3" class="btn btn-clr btn-master con_file_id" id="submitbtn">Upload</button>
+                            <!-- <a data-toggle="modal" href="#myModal3" class="btn btn-clr btn-master con_file_id">Upload</a> -->
+                            <!-- <a href="#" data-dismiss="modal" class="btn btn-clr btn-master">Close</a> -->
+                          </div>
+                      </div>
+                  </div>
+                  <div id="loader" class="lds-dual-ring hidden overlay">
+                    <h5 class="head_cls">Please Wait...</h5>
+                  </div>
+                </div>
+
+              {% endif %}
+              </div>
+            </div>
+        <div class="col-3 col-md-6 text-end">
+          {% if request.user.roles_id == 3 %}
+            {%if rights.create == '1' %} 
+              <button type="button" class="btn btn-clr chck-tst add_btn"><a href="{% url 'projects:createvendormaster' %}">Add Vendor</a></button>
+            {% endif %}
+              {% if rights.view == '1' %}
+              <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'projects:vendormasterpdf' %}" target="_blank" >Generate Report</a></button>
+            {% endif %}
+          {% else%}
+            <button type="button" class="btn btn-clr chck-tst add_btn"><a href="{% url 'projects:createvendormaster' %}">Add Vendor</a></button>
+            <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'projects:vendormasterpdf' %}" target="_blank">Generate Report</a></button>
+          {% endif %}
+        </div>
+    </div>
+
+    <div class="row my-4">
+      <div class="col-8"> 
+        <div class="card all-noti-box">
+          <div class="show-noti p-0">
+              <label class="mb-0">Show 
+                <select id="datafilters" class="changevalue select-style">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select> entries</label>
+          </div>
+        </div>
+      </div>
+
+          <div class="col-4 text-end">
+              <input type="text" id="myInput" class="search-f-inf" name="searchvendor" placeholder="Search for Vendor Name" value="{{se_vendor}}">
+              <!-- <button type="button" class="v_search"><i class="fas fa-search sea-rch-clr"></i></button> -->
+          </div>
+          </div>
+  </form>
+  <div class="row">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li  {% if message.tags %} class="{{ message.tags }} msg-cls"{% endif %} style="display:none;"> {{ message }} </li>
+        {% endfor %}
+    </ul>
+  {% endif %}
+  </div>
+    
+      <div class="vends-invite-lists table-responsive text-nowrap">
+       
+        <table  id="vendor-sort" class="table settings-data-list-view data-list-view vin-no ascen-descen-class irock-table prj-back_clr table-wid new-vendor-table"> <!-- class removed -> project_master vend-thead vend-tt vend-border -->
+            <thead>
+                <tr>
+                    <th class="vendormas-sn">S/N</th> 
+                    <th class="vendormas-vin">VIN
+                      <button type="button" class="sort up-arr sort line-hight-zero" name="asc">
+                        <svg width="14" height="7" viewBox="0 0 14 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M7 0L13.0622 6.75H0.937822L7 0Z" fill="#A11D40"/>
+                          </svg>
+                       <!-- <i class="fa fa-sort-asc" aria-hidden="true"></i> -->
+                    </button>
+
+                      <button type="button" class="sort down-arr sort line-hight-zero active-descending" name="dec">
+                        <svg width="14" height="7" viewBox="0 0 14 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M7 7L13.0622 0.25H0.937822L7 7Z" fill="#A11D40"/>
+                          </svg>
+                        <!-- <i class="fa fa-sort-desc" aria-hidden="true"></i> -->
+                      </button></th>
+                        
+                        
+                    <th class="vendormas-name">Vendor Name  
+                      
+                      <button type="button" class="sortname up-arr sortname line-hight-zero" name="asc">
+                        <img aria-hidden="true" src="/static/images/svg/up.svg">
+                        <!-- <i class="fa fa-sort-asc" aria-hidden="true"></i> -->
+                    </button>
+
+                    <button type="button" class="sortname down-arr sortname line-hight-zero line-hight-zero-change" name="dec">
+                      <img aria-hidden="true" src="/static/images/svg/Down.svg">
+                      <!-- <i class="fa fa-sort-desc" aria-hidden="true"></i> -->
+                      </button></th>
+
+
+                    <th class="vendormas-contact">Contact Person</th>
+                    <th class="vendormas-email">Email Address</th>
+                    <th class="vendormas-status">Status</th>
+                    <th class="vendormas-action">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="table-list wid-size-vend" id="myTable">
+                {% if vendor_master_count > 0 %}
+                  {% for vendor in vendors %}
+                  <tr>
+                  
+                  <td class="sno-center">{{vendors.start_index|add:forloop.counter0 }}</td>
+                  <td class="vin-center">{{vendor.vin}}</td>
+                  <td class="vendor-master-vname" id="td-left">{{vendor.vendor_name}}</td>
+                  <td id="td-left">{{vendor.contactpersonname}} {{vendor.contactpersonlastname}}</td>
+                  <td id="td-left">{{vendor.contactpersonemail}}</td>
+                  <td id="td-left">
+                    {% checkcontracts_vendor vendor.id as vendorcontractcount %}
+
+                  {% if vendorcontractcount > 0 %}
+                  
+                    <div class="badge badge-success">
+                      Contracts Added
+                    </div>
+                  {% else%}
+                      <div class="badge badge-warning">
+                        No Contracts Added
+                      </div>
+                    
+                  {% endif %}
+                  {% if vendor.approver_status == 0 %}
+                    <div class="badge badge-danger">
+                      Vendor details not updated
+                    </div>
+                  {% else %}
+                    <div class="badge badge-primary">
+                      Vendor details updated
+                    </div>
+                  {% endif %}
+
+                  <!-- {% if vendor.active_status == 1 %}
+                  
+                  <div class="badge badge-success">
+                    Active
+                  </div>
+                {% else%}
+                    <div class="badge badge-warning">
+                      Inactive
+                    </div> -->
+                  
+                <!-- {% endif %} -->
+
+                  </td>
+                  <td class="same-line-icons-vend">
+                    {% if request.user.roles_id == 3 %}
+                      {%if rights.view == '1' %} 
+                          <a class="btn p-0 showtoggle" data-toggle="collapse" href="#collapseExample{{vendor.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                          <span class="action-edit align-icons">
+                            <i class="fa fa-eye eyebutton" title="View" ></i>
+                          </span>
+                        </a>
+                      {% endif %}
+                    {% else%}
+                      <a class="btn p-0 showtoggle" data-toggle="collapse" href="#collapseExample{{vendor.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                        <span class="action-edit align-icons">
+                          <i class="fa fa-eye eyebutton" title="View" ></i>
+                        </span>
+                      </a>
+                    {% endif %}
+
+                    {% if request.user.roles_id == 3 %}
+                      {%if rights.edit == '1' %} 
+                      <a href="{% url 'projects:editvendormaster' pk=vendor.id %}" >
+                        <span class="action-edit align-icons"><i class="fa fa-pencil" title="Edit" ></i></span>
+                      </a>
+                      {% endif %}
+                    {% else %}
+                    <a href="{% url 'projects:editvendormaster' pk=vendor.id %}" >
+                      <span class="action-edit align-icons"><i class="fa fa-pencil" title="Edit" ></i></span>
+                    </a>
+                    {% endif %}
+                    {% if vendorcontractcount == 0 %}  
+                    {% if request.user.roles_id == 3 %}
+                    {%if rights.delete == '1' %} 
+                      <a class="vendormaster_delete" data-id="{{vendor.id}}" vendor_name="{{vendor.vendor_name}}">
+                        <span class="action-delete align-icons"><id class="fa fa-trash-o" title="Delete"  ></i></span>
+                      </a>
+                      {% endif %}
+                    {% else %}
+                      <a class="vendormaster_delete" data-id="{{vendor.id}}" vendor_name="{{vendor.vendor_name}}">
+                        <span class="action-delete align-icons"><id class="fa fa-trash-o" title="Delete" ></i></span>
+                      </a>
+                    {% endif %}
+                    {% if vendor.approver_status == 0 %}
+                      {% if request.user.roles_id == 3 %}
+                      {%if rights.edit == 1 or  rights.create == '1' %} 
+                      <a class="" >
+                        <span title = "Email Login Details" data-id="{{vendor.id}}" class="ale rt-cls action-delete align-icons"><id class="fa fa-paper-plane" id="postform" title="Email Login Details" ></i></span>
+                      </a>
+                      {%endif%}
+                      {%else%}
+                      <a class="" >
+                        <span title = "Email Login Details" data-id="{{vendor.id}}" class="ale rt-cls action-delete align-icons"><id class="fa fa-paper-plane" id="postform" title="Email Login Details" ></i></span>
+                      </a>
+                      {%endif%}
+                    {% endif %}
+                    {% endif %}
+                    {% if request.user.roles_id == 3 %}
+                      {%if rights.edit == 1 or  rights.create == '1' %} 
+                    <label class="switch">
+                      <input type="checkbox" class="inpt" {% if vendor.active_status == 1 %} checked  {% endif %}>
+                      <span class="slider round" data_id="{{vendor.id}}" id="input1" title='{% if vendor.active_status == 1 %}Active{% else %}Inactive{% endif %}'></span>
+                    </label>
+                    {%endif%}
+                    {%else%}
+                    <label class="switch">
+                      <input type="checkbox" class="inpt" {% if vendor.active_status == 1 %} checked  {% endif %}>
+                      <span class="slider round" data_id="{{vendor.id}}" id="input1" title='{% if vendor.active_status == 1 %}Active{% else %}Inactive{% endif %}'></span>
+                    </label>
+                    {%endif%}
+                    
+
+                  </td>
+                  </tr>
+                  <tr>
+                    <td colspan="12" class="p-0">
+                      <div class="collapse" id="collapseExample{{vendor.id}}">
+                        <div class="card card-body shadow-none master-crd m-0">
+                            <ul id="myTabs" class="nav nav-pills nav-justified new-tab" role="tablist" data-tabs="tabs">
+                              <li class="active"><a class="prjlist-menu" href="#vendorlist{{vendor.id}}" data-toggle="tab">Vendor Overview</a></li>
+                            </ul>
+                          
+                            <div class="tab-content"> 
+                              <div role="tabpanel" class="tab-pane active" id="vendorlist{{vendor.id}}">
+                                <div class="row">
+                                  <div class="col-6">
+                                    <br>
+                                    <h4 class="from-head">Vendor Company Information</h4>
+                                    <table class="prt-viewlist mid-view-tbl head-vend-mas">
+                                      <tr><th>Vendor Name:</th><td>{{vendor.vendor_name|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Country Of Incorporation:</th><td>{{vendor.country_of_incorporation.nicename|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Register Number in the Country of Incorporation:</th><td>{{vendor.RegisterNumber|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Vendor Company Website:</th><td>{{vendor.website|yesno:"---"|default:"---"}}</td></tr>
+                                    </table>
+                                  </div>
+                                  <div class="col-6">
+                                    <br>
+                                    <h4 class="from-head">Vendor Company Address</h4>
+                                    <table class="prt-viewlist mid-view-tbl head-vend-mas">
+                                      <tr><th>Country Of Operation:</th><td>{{vendor.country_of_operation.name|yesno:"---"|default:"---" }}</td></tr>
+                                      <tr><th>State in the Country of Operation:</th><td>{{vendor.state.name|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Vendor Company Official Address:</th><td>
+                                        <p class="vendoraddress">
+                                            {{ vendor.Address|default_if_none:''|safe }}
+                                        </p>
+                                    </td></tr>
+                                  </table>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-12">
+                                    <table class="samll-tbl head-vend-mas vendor-tax-details">
+                                      <br>
+                                      <h4 class="from-head">Vendor Tax Details</h4>
+                                      <tr><th>Tax Name</th><th>Tax Number</th></tr>
+                                     
+                                      {% for taxes in vendor.id|vendortaxdetails:"owntax" %}
+                                        <tr><td id="td-left">{{taxes.Tax_Name}}</td><td>{{taxes.Tax_Number}}</td></tr>
+                                      {% empty %}
+                                      <tr><td id="td-center">---</td><td>---</td></tr>
+                                      {% endfor %}
+
+                                    
+                                  </table>
+                                  </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                  <div class="col-6">
+                                    
+                                    <h4 class="from-head">Primary Contact Details</h4>
+                                    <table class="prt-viewlist mid-view-tbl head-vend-mas">
+                                      <tr><th>Primary Person Name:</th><td>{{vendor.contact_primary_title|yesno:"---"|default:"---" }}{% if vendor.contact_primary_title %}.{% endif %}{{vendor.contact_primary_first_name|default_if_none:"---"}} {{vendor.contact_primary_middle_name|default_if_none:"---"}} {{vendor.contact_primary_last_name|default_if_none:"---"}}</td></tr>
+                                      <tr><th>Designation:</th><td>{{vendor.primary_designation|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Email Address:</th><td>{{vendor.official_primary_email|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Country Code:</th><td>{{vendor.contact_primary_phone_code|convertnum|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Area Code:</th><td>{{ vendor.contact_primary_area_code|yesno:"---"|default:"---" }}</td></tr>
+                                      <tr><th>Phone Number(Land Line):</th><td>{{vendor.contact_primary_phone|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Country Code:</th><td>{{vendor.contact_primary_mobile_code|convertnum|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Phone Number(Mobile No.):</th><td>{{vendor.contact_primary_mobile|yesno:"---"|default:"---"}}</td></tr>
+                                    </table>
+                                  </div>
+                                  <div class="col-6">
+                                    <h4 class="from-head" >Secondary Contact Details</h4>
+                                    <table class="prt-viewlist mid-view-tbl head-vend-mas">
+                                      <tr><th>Secondary Person Name:</th><td>{{vendor.contact_secondary_title|yesno:"---"|default:"---"}}{% if vendor.contact_secondary_title %}.{% endif %}{{vendor.contact_secondary_first_name|default_if_none:"---"}} {{vendor.contact_secondary_middle_name|default_if_none:"---"}} {{vendor.contact_secondary_last_name|default_if_none:"---"}}</td></tr>
+                                      <tr><th>Designation:</th><td>{{vendor.secondary_designation|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Email Address:</th><td>{{vendor.official_secondary_email|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Country Code:</th><td>{{vendor.contact_secondary_phone_code|convertnum|yesno:"---"|default:"---" }}</td></tr>
+                                      <tr><th>Area Code:</th><td>{{vendor.contact_secondary_area_code|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Phone Number(Land Line):</th><td>{{vendor.contact_secondary_phone|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Country Code:</th><td>{{vendor.contact_secondary_mobile_code|convertnum|yesno:"---"|default:"---"}}</td></tr>
+                                      <tr><th>Phone Number(Mobile No.):</th><td>{{vendor.contact_secondary_mobile|yesno:"---"|default:"---"}}</td></tr>
+                                    </table>
+                                  </div>
+                                </div>
+                                <!--  -->
+                              </div>
+                               
+                            </div>
+                            
+                            
+                            <div class="row">
+                             
+                  {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="7" class="cls-nil" id="td-center">
+                      ---
+                    </td>
+                  </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        </div>
+    
+
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center">
+      {% if vendors.has_previous %}
+       <li class="page-item">
+          <a class="btn-clr page-link" href="{{request.META.HTTP_REFERER }}">Previous</a>
+        </li>
+      {% else %}
+          <li class="page-item disabled">
+          <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Previous</a>
+        </li>
+      {% endif %}
+
+      {% if vendors.number|add:'-4' > 1 %}
+          <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ vendors.number|add:'-5' }}">&hellip;</a></li>
+      {% endif %}
+
+      {% for i in vendors.paginator.page_range %}
+          {% if vendors.number == i %}
+              <li class="page-item pg-count active" aria-current="page">
+            <span class="btn-clr page-link pg-circle">
+              {{ i }}
+              <span class="sr-only">(current)</span>
+            </span>
+          </li>
+          {% elif i > vendors.number|add:'-5' and i < vendors.number|add:'5' %}
+            {% if request.GET.vendor %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&page={{ i }}">{{ i }}</a></li>
+            {% elif request.GET.vendor and request.GET.sortname %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+            {% elif request.GET.vendor and request.GET.sortvendorname %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?vendor={{request.GET.vendor}}&sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+            {% elif request.GET.sortname %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortname={{request.GET.sortname}}&page={{ i }}">{{ i }}</a></li>
+            {% elif request.GET.sortvendorname %}
+            <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?sortvendorname={{request.GET.sortvendorname}}&page={{ i }}">{{ i }}</a></li>
+            {% else %}
+               <li class="page-item pg-count"><a class="page-link pg-circle" data-id="{{ i }}" href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+          {% endif %}
+      {% endfor %}
+
+      {% if vendors.paginator.num_pages > vendors.number|add:'4' %}
+         <li class="page-item pg-count"><a class="page-link pg-circle" href="?page={{ vendors.number|add:'5' }}">&hellip;</a></li>
+      {% endif %}
+
+      {% if vendors.has_next %}
+          <li class="page-item">
+          <a class="btn-clr page-link " href="?page={{ vendors.next_page_number }}">Next</a>
+        </li>
+      {% else %}
+
+          <li class="page-item disabled">
+          <a class="btn-clr page-link" href="#" tabindex="-1" aria-disabled="True">Next</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+
+</div>  
+</section>  
+{%endblock%}
+
+
+{% block scripts %}
+{{ block.super }}
+
+
+
+<style>
+
+
+/* button.up-arr:hover, button.up-arr:active {font-size: 300%;}
+button.down-arr:hover, button.down-arr:active {font-size: 300%;} */
+
+
+</style>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" ></script>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/additional-methods.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+
+
+
+<script>
+
+  $(document).ready(function() {
+    // Update on page load
+    updateCompanyAddress();
+
+    // Update when textarea value changes
+    $('#inputaddress').on('input', function() {
+        updateCompanyAddress();
+    });
+
+    function updateCompanyAddress() {
+        var address = $('#inputaddress').val();
+        address = address.replace(/\n/g, '<br>'); // Replace newline characters with <br> tags
+        $('.vendoraddress').html(address);
+    }
+});
+
+
+
+  var currency_count ='{{currency_count}}'
+  var generalSettingUrl = "{% url 'custom_auth:generalsetting' companyid=request.user.company.id %}";
+</script>
+
+<script>
+
+
+  $(document).on('click', '.add_btn', function() {
+    if (currency_count == 0) {
+        new swal({
+            title: "Update General Settings",
+            button: "Ok",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.location.href = generalSettingUrl;
+            }
+        });
+        return false;
+    }
+});
+
+
+
+    $(document).ready(function() {
+     $(".showtoggle").on('click', function() {
+ 
+ let nxttr = $(this).closest('tr').next('tr');
+ console.log(nxttr)
+ $(this).closest('table tbody').find('.collapse').not(nxttr.find('.collapse')).removeClass('show');
+});
+
+});
+ 
+
+var url="{{ request.path }}"
+
+$('#ascending').click(function(){
+
+})
+
+
+    $(document).on('click','.vendormaster_delete',function(){
+    var delete_id=$(this).attr('data-id')
+    var projectname=$(this).attr('vendor_name')
+                Swal.fire({
+                  title: 'Are you sure you want to delete '+projectname,
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: 'Yes, I Confirm',
+                  cancelButtonText: 'No',
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                      $.ajax({
+                      type: "GET",
+                      url:'/projects/vendordelete',
+                      data: {
+                        "id":delete_id,
+                      },
+                      success: function(data)
+                      {
+                        console.log(data)
+                        setTimeout(function(){  
+                        location.reload();  
+                        },1000);
+                      }
+                      });
+                    Swal.fire(projectname,'Deleted Successfully')
+                  }
+                })
+
+    })
+
+  var missedarray=[]
+  var existscontracts=[]
+  var existsemail=[]
+  $(document).on('click','.con_file_id' ,function (){
+    filedata = new FormData($('form').get(0));
+    $('.close').attr('data-dismiss','modal')
+   $.ajax({
+       url: '/projects/vendormasterlist',
+       type: 'post',
+       data: filedata,
+       cache: false,
+       processData: false,
+       contentType: false,
+       beforeSend: function() {
+        $('#loader').removeClass('hidden')
+      },
+       success: function(data) {
+        var current_url=$(location).attr("href")
+        var replace_url=current_url.replace("vendormasterlist","checkvendorimport")
+        window.location.href = replace_url;
+       },
+ 
+   });
+   return false;
+   
+ })
+
+$(document).on('click','.alert-cls',function(){
+  var id=$(this).attr('data-id')
+
+  $.ajax({
+    type: "GET",
+    url:'/projects/sendmailforvendor',
+    data: {
+      "data":id,
+    },
+    success: function(data)
+    {
+      setTimeout(function(){  
+        location.reload();  
+        },500);
+    }
+  })
+
+  /*
+  Swal.fire({
+    title: '',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes,I Confirm',
+    cancelButtonText: 'No',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        type: "GET",
+        url:'/projects/sendmailforvendor',
+        data: {
+          "data":id,
+        },
+        success: function(data)
+        {
+          setTimeout(function(){  
+            location.reload();  
+            },1000);
+        }
+      })
+      Swal.fire('Login Details Sent Successfully')
+    }
+    
+    else{
+      Swal.fire({
+        title: 'Do you still want to send out an invite?',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes,I Confirm',
+        cancelButtonText: 'No',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            type: "GET",
+            url:'/projects/sendmailforvendor',
+            data: {
+              "data":id,
+            },
+            success: function(data)
+            {
+              setTimeout(function(){  
+                location.reload();  
+                },1000);
+            }
+          })
+          Swal.fire('Login Details Sent Successfully')
+        }
+        else{
+          var current_url=$(location).attr("href")
+          var replace_url=current_url.replace("vendormasterlist","contractmasterlist")
+          window.location.href = replace_url;
+        }
+      })
+    }
+    */
+})
+
+
+// $(document).ready(function() {
+//     $('#vendor-sort').DataTable();
+// } );
+
+
+
+
+// function myFunction() {
+//   var input, filter, table, tr, td, i, txtValue;
+//   input = document.getElementById("myInput");
+//   filter = input.value.toUpperCase();
+//   table = document.getElementById("vendor-sort");
+//   tr = table.getElementsByTagName("tr");
+//   for (i = 0; i < tr.length; i++) {
+//     td = tr[i].getElementsByTagName("td")[2];
+//     if (td) {
+//       txtValue = td.textContent || td.innerText;
+//       if (txtValue.toUpperCase().indexOf(filter) > -1) {
+//         tr[i].style.display = "";
+//       }
+//     }       
+//   }
+// }
+// $(document).on('keyup','#myInput',function(){
+//   var val=$(this).val()
+//   var count =1;
+//   var html=''
+//   if (val != ''){
+//     $.ajax({
+//             type: "GET",
+//             url:'/projects/searchvendor',
+//             data: {
+//               "data":val,
+//             },
+//             success: function(data)
+//             {
+//               console.log(data)
+            
+//               $.each((data.data),function(key,val){
+//                 html+='<tr><td>'+count+'</td><td>'+val.vin+'</td><td>'+val.vendor_name+'</td>'+val.contactpersonname+'</td><td>'+val.contactpersonname+'</td><td>'+val.contactpersonemail+'</td><td></td><td class="same-line-icons-vend"> <a class="btn p-0" data-toggle="collapse" href="#collapseExample'+val.id+'" role="button"aria-expanded="false" aria-controls="collapseExample"><span class="action-edit align-icons"> <i class="fa fa-eye eyebutton" style="font-size:17px; color:#95183a;"></i> </span> </a> <a href=""><span class="action-edit align-icons"><i class="fa fa-pencil"  style="font-size:17px; color:#95183a;"></i></span></a> <a class="vendormaster_delete" data-id="{{vendor.id}}" vendor_name="{{vendor.vendor_name}}"> <span class="action-delete align-icons"><i class="fa fa-trash-o"  style="font-size:17px; color:#95183a;"></i></span> </a> <a class=""><span title = "Email Login Detail" data-id="{{vendor.id}}" class="alert-cls action-delete align-icons"><id class="fa fa-paper-plane"  style="font-size:17px; color:#95183a;"></i></span></a></td></tr>'
+                
+                
+//                 html+='<tr><td colspan="12" class="p-0"><div class="collapse" id="collapseExample'+val.id+'"><div class="card card-body shadow-none master-crd"><ul id="myTabs" class="nav nav-pills nav-justified new-tab" role="tablist" data-tabs="tabs"><li class="active"><a class="prjlist-menu" href="#vendorlist'+val.id+'" data-toggle="tab">Vendor Overview</a></li></ul><div class="tab-content"> <div role="tabpanel" class="tab-pane active" id="vendorlist'+val.id+'"><div class="row"><div class="col-6"> <br><h4 class="from-head">Vendor Company Information</h4><table class="prt-viewlist mid-view-tbl"><tr><th>Vendor Name:</th><td>'+val.vendor_name+'</td></tr></tr>'
+                 
+//                 count++;
+//               })
+//               $('#vendor-sort tbody').html(html);
+            
+              
+//             }
+//           })
+//   }
+//   else{
+
+//     location.reload();
+//   }
+
+// });
+
+// $(document).on('blur','#myInput',function(){
+//   searchbox=$(this).val();
+
+//   if(searchbox=='')
+//   {
+//     var current_url=$(location).attr("href")
+//     window.location.href = current_url
+//   }
+// });
+$(document).ready(function(){
+  $(document).on("click",".inpt",function() {
+    if ($(this).is(':checked')){
+      $(this).next().attr('title','Active')
+    }
+    else{
+      $(this).next().attr('title','Inactive')
+    }
+});
+})
+
+
+// $('.v_search').on('click',function(){
+//     var name=$('#myInput').val();
+//     // var current_url=$(location).attr("href")
+//     var url="{{ request.path }}"
+//     window.location.href = url+'?vendor='+name
+// });
+
+$(document).on('click','.sort',function(){
+  var url="{{ request.path }}"
+
+  var name=$('#myInput').val();
+  var sortname=$(this).attr("name");
+
+  // alert(sortname);
+  if (name){
+    if (sortname=='asc')
+    {
+      var current_url=$(location).attr("href")
+      window.location.href = '?vendor='+name+'&sortname=ascending'
+     
+    }
+    else
+    {
+    var current_url=$(location).attr("href")
+    let replace_url=current_url.replace('&sortname=ascending','')
+    window.location.href = '?vendor='+name+'&sortname=descending'
+    }
+  }
+  else{
+    if (sortname=='asc')
+    {
+      var current_url=$(location).attr("href")
+    
+      window.location.href = '?sortname=ascending'
+      
+      // alert(url+'?sortname=ascending')
+    }
+    else
+    {
+      var current_url=$(location).attr("href")
+      window.location.href = '?sortname=descending'
+      
+      // alert(url+'?sortname=ascending')
+    }
+  }
+
+
+
+});
+
+
+
+//sort by vendor name
+
+$(document).on('click','.sortname',function(){
+  var name=$('#myInput').val();
+  var sortvendornamename=$(this).attr("name");
+  var url="{{ request.path }}"
+
+  if (name){
+
+    if (sortvendornamename=='asc')
+    {
+      var current_url=$(location).attr("href")
+      window.location.href = '?vendor='+name+'&sortvendorname=ascending'
+    }
+    else
+    {
+      var current_url=$(location).attr("href")
+      let replace_url=current_url.replace('&sortvendorname=ascending','')
+
+      window.location.href = '?vendor='+name+'&sortvendorname=descending'
+      
+    }
+  }
+  else{
+    if (sortvendornamename=='asc')
+    {
+      var current_url=$(location).attr("href")
+ 
+      window.location.href = '?sortvendorname=ascending'
+
+    }
+    else
+    {
+      var current_url=$(location).attr("href")
+      replace_url=current_url.replace('&sortvendorname=ascending','')
+
+      window.location.href = '?sortvendorname=descending'
+      
+    }
+
+}
+
+
+
+});
+
+
+
+//   $(document).on('keyup','#myInput',function(){
+//     var searchtext=$(this).val();
+//     // alert(searchtext)
+ 
+//   if(searchtext!='')
+//   {
+    
+//   }
+//   else
+//   {
+//     window.location.href= url
+//   }
+// } );
+
+
+// $(document).keypress(function(event){
+//   var searchtext=$('#myInput').val();
+
+//   var keycode = (event.keyCode ? event.keyCode : event.which);
+//   if(keycode == '13'){
+//     if(searchtext!='')
+//   {
+//     window.location.href= '?vendor='+searchtext
+//   }
+//   else
+//   {
+//     window.location.href= url
+//   }
+//   }
+// });
+
+// $(document).on('keyup','#myInput',function(){
+//     var searchtext=$(this).val();
+//     // alert(searchtext)
+ 
+//   if(searchtext!='')
+//   {
+    
+//   }
+//   else
+//   {
+//     window.location.href= "{{ request.path }}"
+//   }
+// } );
+
+
+$('form[id="paymentform"]').validate({
+  rules: {
+      amount: 'required',
+      date: 'required',
+      currency: 'required',
+      invoicenum: 'required',
+  },
+  messages: {
+      amount: 'This field is required',
+      date: 'This field is required',
+      currency: 'This field is required',
+      invoicenum: 'This field is required',
+  },
+  submitHandler: function(form) {
+    form.submit();
+  }
+});
+
+
+$( document ).ready(function() {
+  $('#submitbtn').prop('disabled', true);
+  var notyf = new Notyf({
+      duration: 2000,
+      position: {
+        x: 'right',
+        y: 'top',
+      },
+      types: [
+        {
+          type: 'success',
+          background: '#D3D3D',
+          icon: {
+            className: 'fa fa-check-circle',
+            tagName: 'i',
+            color: '#000',
+          },
+        },
+      ]
+    });
+
+  var msg=$('.msg-cls').text();
+  if (msg){
+    notyf.open({
+    type: 'success',
+    message: msg,
+  }); 
+  }
+})
+
+$(document).on('change','#vendorfileid',function(){
+  var val=$(this).val()
+  if (val !="" && val.split('.').pop()=='xlsx'){
+    $('#submitbtn').prop('disabled', false);
+  }
+  else{
+    $('#submitbtn').prop('disabled', true);
+  }
+})
+
+$("#submitbtn").on('click',function(){
+
+    $("form[id='vendor_master']").validate({ 
+      rules: {
+        vendorfile:{
+            required: true,
+            extension: "xlsx",
+        },
+      },
+      messages: {  
+        vendorfile:
+               {
+                   required :"This Field is Required",
+                   extension:"xls file format only allowed"
+                
+               },
+              },
+              submitHandler: function(form) {
+                form.submit();
+                //$('#loader').removeClass('hidden')
+            },
+  });
+});
+// $('.page-link').on('click',function(){
+
+//   $(document).on('click','.page-link',function(){
+// var pagenumber=$(this).attr("data-id")
+//    var current_url=$(location).attr("href")
+//    alert(current_url)
+
+//   replace_url=current_url.replace('?sortvendorname=ascending&page='+pagenumber+'')
+
+      
+// });
+
+$("#postform").on('click',function(){
+  Swal.fire('Email sent successfully to the vendor');
+});
+
+
+$('.slider').on('click',function(){
+  vendor_id=$(this).attr('data_id')
+  $.ajax({
+    type: "GET",
+    url:'/projects/vendor_active_status',
+    data: {
+      "vendor_id":vendor_id,
+    },
+    success: function(data)
+    {
+      console.log(data)
+      // Swal.fire('');
+    }
+  })
+})
+
+
+
+// add class and remove class for ascending order descending order
+
+
+$('.line-hight-zero').on('click', function(){
+    $(this).addClass('active-descending').siblings().removeClass('active-descending');
+});
+
+// window.onload = addClass;
+
+// search and pagination code
+
+$('input').on('change',function() {
+  const queryString = window.location.search;
+  const parameters = new URLSearchParams(queryString);
+  const value = parameters.get('q');
+    if(value!=null && $(this).val() == '') {
+        window.location.href = `${scheme}://${gethost}/projects/vendormasterlist`
+    }
+});
+$(document).on('input', "#myInput", function () {
+    let query = $(this).val()
+    let pageperdata = $('#datafilters').val()
+    console.log({'pageperdata':query})
+    setTimeout(function () {
+        searchVendormaster(query,1,pageperdata)
+    }, 100);
+});
+
+
+$(document).on('click','.pg-circle',function(e){
+    e.preventDefault();
+    let query = $('#myInput').val();
+    let page = $(this).attr('data-id')
+    let pageperdata = $('#datafilters').val()
+    searchVendormaster(query,page,pageperdata)
+})
+
+$(document).on('change','#datafilters',function(e){
+    let query = $('#myInput').val();
+    //let page = $(this).attr('data-id')
+    let pageperdata = $(this).val()
+    searchVendormaster(query,1,pageperdata)
+});
+
+function searchVendormaster(query,page,pageperdata) {
+    $.ajax({
+        url: "/projects/vendormasterlist",
+        headers: { 'X-CSRFToken': '{{csrf_token}}' },
+        data: {
+            'q': query,
+            'page':page,
+            'pageperdata':pageperdata
+        },
+        type: 'POST',
+        success: function (response) {
+            if (response.status) {
+                console.log('right')
+                console.log(response)
+                $('section').replaceWith(response.html)
+                let focusElement = $(document).find('#myInput')
+                let elementLength = focusElement.val().length;
+                focusElement[0].focus();
+                focusElement[0].setSelectionRange(elementLength,elementLength);
+                $('#datafilters').val($('.entries').val())
+            } else {
+                console.log('wrong')
+            }
+        },
+        error: function () {
+            // Error message
+        }
+    });
+}
+</script>
+
+{% endblock %}

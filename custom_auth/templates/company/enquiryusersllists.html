@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/poa_login/enquiries.css' %}">
+
+
+
+
+<section id="data-list-view" class="data-list-view-header">
+  <h1 class="from-head">Enquiry List</h1>
+  {{enquiryuserslist.proposalstatus}}
+
+    <!-- DataTable starts -->
+    <div class="table-responsive text-nowrap">
+        <table class="table company-data-list-view creat-head enq-list irock-table" id="company_list">
+
+            <thead>
+                <tr>
+                    <th class="no-sort">S/N</th>
+                  
+                    <th>User Name</th>
+                    <th>Email</th>
+                    <th>Message</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+
+
+                    </tr>
+            </thead>
+            <tbody class="text-center table-list">
+                {% for obj in enquiryuserslist %}
+                
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                 
+                    <td><input type="hidden" name="proposal_id" class="proposal_cls" data-id="{{obj.id}}">
+                      {{obj.title}}. {{obj.username}}</td>
+                    <td>{{obj.email_id}}</td>
+                    <td class="wiidth-col"><pre class="text-left table-list enq-parr"><p>{{obj.message|safe}}</p></pre></td>
+
+                    <td>
+                        
+                        {% if obj.proposalstatus == 0 %}
+                        Pending
+                        {% elif obj.proposalstatus == 1 %}
+                        Sent
+                        {%else%}
+                        <!-- Do you want to Send the Proposal form again? -->
+                      
+                         Proposal Form Submitted
+                        {%endif%}
+                    </td>
+                    <td>
+                        
+                         
+                        {% if obj.proposalstatus == 0 %}
+                      <!-- <button type="button" value="Send Proposal Form" class="btn btn-outline-success mr-1 mb-1 waves-effect waves-light float-right"><a href="{% url 'custom_auth:proposalformsend' obj.id %}">Send Proposal</a></button> -->
+                      <i title="Send Proposal" class="fa fa-send-o send-ii" data-bs-toggle="modal" data-bs-target="#ModalSendProposal{{obj.id}}" data-id="{{obj.id}}"></i>
+
+                      <div class="modal fade" id="ModalSendProposal{{obj.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Confirmation Alert</h5>
+                              <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                            </div>
+                            <div class="modal-body text-left">
+                              Do you want to send the proposal form?
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              <button type="button" class="btn btn-primary maroon" id="send_prop" u_id="{{obj.id}}">Send</button>
+                              
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      {% elif obj.proposalstatus == 1 %}
+                      <!-- <a  href="{% url 'custom_auth:proposalformsend' obj.id %}" class="btn btn-outline-info mr-1 mb-1 waves-effect waves-light float-right proposal_send" id="proposal_send" data-id="{{obj.id}}">Resend Proposal</a> -->
+                      <i class="fa fa-refresh refesh-ii" title="Resend Proposal" class="btn btn-primary proposal_send" data-id="{{obj.id}}" data-bs-toggle="modal" data-bs-target="#exampleModal{{obj.id}}" data-id="{{obj.id}}"></i>
+
+                      <div class="modal fade" id="exampleModal{{obj.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Confirmation Alert</h5>
+                              <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                            </div>
+                            <div class="modal-body text-left">
+                              Do you want to send the proposal form again?
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              <button type="button" class="btn btn-primary maroon" id="resend_prop" u_id="{{obj.id}}">Send</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {%else%}
+                      <a class="fa fa-check-square-o che-box-enq" title="Proposal Form Submitted"></a>
+                        {%endif%}
+
+                        
+                        <!-- <a class="fa fa-send-o send-ii" href="{% url 'custom_auth:proposalformsend' obj.id %}" class=""></a> -->
+                        <!-- <a href="{% url 'custom_auth:companyapprove' id=obj.id %}" >
+                            <span class="action-edit"><i class="fa fa-eye" style="font-size:15px; color:#95183a;"></i></i></span>
+                        </a> -->
+                    
+                    
+                    </td>
+                    
+                    
+                  
+                  </tr>
+
+                  {% endfor %} 
+            </tbody>
+        </table>
+    </div>
+    <!-- DataTable ends-->
+    <!-- add new sidebar ends -->
+
+
+
+<!-- //modal to resent the proposal form to client-ad -->
+
+<!-- Button trigger modal -->
+<!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Launch demo modal
+  </button> -->
+  
+  <!-- Modal -->
+  <!-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Confirmation Alert</h5> -->
+          <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+        <!-- </div>
+        <div class="modal-body">
+          Do you want to send the proposal form again?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="resend_prop">Send</button>
+          
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+
+  <!-- <div class="modal fade" id="ModalSendProposal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Confirmation Alert</h5> -->
+          <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+        <!-- </div>
+        <div class="modal-body">
+          Do you want to send the proposal form?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="send_prop">Send</button>
+          
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+
+
+
+
+ 
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+<script>
+$(document).ready( function () {
+  $('#company_list').DataTable(
+{
+
+  // "order": [[1,"asc|desc"]],                       // sorting 2nd column
+  // "columnDefs": [
+  //   { "orderable": false, "targets": "_all" } // Applies the option to all columns
+  // ]
+    
+
+    'columnDefs': [ {
+        'targets': [0,5], /* column index */
+        'orderable': false, /* true or false */
+     }]
+    }
+  );
+  $('.company-data-list-view thead tr').each(function(){
+    $(this).find('th:eq(0)').removeClass('sorting_asc')
+  })
+  
+  var get_message = sessionStorage.getItem("send_message")
+  if (get_message){
+    var notyf = new Notyf({
+      duration: 2000,
+      position: {
+        x: 'right',
+        y: 'top',
+      },
+      types: [
+        {
+          type: 'success',
+          // background: 'green',
+          background: '#D3D3D',
+          icon: {
+            className: 'fa fa-check-circle',
+            tagName: 'i',
+            color: '#000',
+          },
+        },
+      ]
+    });
+    
+    notyf.open({
+      type: 'success',
+      message: get_message,
+    });
+    sessionStorage.removeItem("send_message")
+  }
+});
+
+
+
+$(document).on('click','#resend_prop',function(){
+ 
+  var proposal_id=$(this).attr('u_id');
+  // alert(proposal_id)
+  sessionStorage.setItem("send_message", "Proposal form sent successfully");
+  window.location.href ='../proposalformsend/'+proposal_id
+  
+
+    })
+    $(document).on('click','#send_prop',function(){
+ 
+      let proposal_id=$(this).attr('u_id');
+      // alert(proposal_id);
+      sessionStorage.setItem("send_message", "Proposal form sent successfully");
+      window.location.href ='../proposalformsend/'+proposal_id
+      
+        }) 
+</script>
+
+{% endblock %}

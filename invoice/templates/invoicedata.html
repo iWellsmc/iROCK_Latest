@@ -1,0 +1,145 @@
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}  
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/invoicedata.css' %}">
+
+<div class="row w-100 justify-content-center">
+
+    <div class="row">
+        <div class="col-9"> </div>
+        <div class="col-3 pr-0">
+            <button class="btn btn-clr btn-master waves-effect waves-float waves-light pc-bk-cls mr-0"><a href="{% url 'invoice:vendorbasedinvoice' %}">Back</a></button>
+        </div>
+    </div>
+
+    <div class="row">
+    <div class="col-6 pb-5 bor-rgt">
+        <h5 class="head-inv-pre">Invoice Summary Details</h5>
+        {% if check_settlement > 0 %}
+        <div class=""> 
+            {% for inv in maininvoices %}
+            {% for invoice in pk|subinvoice:inv.id %}
+            {% check_for_settlement invoice as settlement %}
+            {% invoiceafterdiscount invoice.invoice_percentage invoicedetail.total_after_otherdetails invoice.invoice_exchange_rate as invdisval %}
+            {% invoiceexclusivevalue invoice.invoice_percentage invoicedetail.total_exclusive_value invoice.invoice_exchange_rate as invexcval %}
+            {% settlement_value invdisval settlement.1.accepted_percentage as inv_val %}
+            {% settlement_value invexcval settlement.1.accepted_percentage as inv_excval %}
+            {% settlement_value invdisval settlement.1.disputed_percentage as disinv_val %}
+            {% settlement_value invexcval settlement.1.disputed_percentage as disinv_excval %}
+            Invoice Number: {{invoice.invoice_number}} <br>
+            (Approved percentage - {{settlement.1.accepted_percentage}}%    Approved Amount - {% if invoice.invoice_exchange_rate == 'N/A' or  invoice.invoice_exchange_rate == '' %} {{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}}{% endif %} {{inv_val|addpreviewvalues:inv_excval}})<br>
+            (Disputed percentage - {{settlement.1.disputed_percentage}}%    Disputed Amount - {% if invoice.invoice_exchange_rate == 'N/A' or  invoice.invoice_exchange_rate == '' %} {{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}}{% endif %} {{disinv_val|addpreviewvalues:disinv_excval}})<br>
+            {% endfor %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div class="table-responsive">
+        <table class="inv-pretbl">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>S/N</th>
+                    <th>Inv No</th>
+                    <th>Inv Date</th>
+                    <th>Period of Service</th>
+                    <!-- <th>Contract No</th> -->
+                   
+                    <th>Gross Amount<br>{% for l in maininvoices %}{% if forloop.first %} {% for k in i %} {% if forloop.first %} {% if pk|get_split_currency:k == 1 %}({{pk|get_curreny:k}}){% else %}({{basecurreccy}}){% endif %}{% endif %}{% endfor %}{% endif %}{% endfor %}</th>
+                    <th>Tax</th>
+                    <th>Total</th>
+                    {% for inv in maininvoices %}
+                    {% if forloop.first %}
+                    {% if inv.exchange_rate == '2' %}
+                    <th>Payment Currency</th>   
+                    {% endif %}
+                    {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+               
+                {% for inv in maininvoices %}
+                {% for invoice in pk|subinvoice:inv.id %}
+                
+                <tr>
+                    <td><i class="fa fa-eye prev-eyee inv_file" value="{{invoice.id|getinvoicefiles:invoice.invoice.id}}" style="font-size:15px"></i></td>
+                    <td>{{forloop.parentloop.counter}}</td>
+                    <td class="inv_name" data-id='{{invoice.id}}'>{{invoice.invoice_number}}</td>
+                    <td>{{invoice.invoice_date|convertinvoicedate:request.company.id}}</td>
+                    <td>{{invoice.invoice.fromdate|date:"d-M-Y"}} to {{invoice.invoice.todate|date:"d-M-Y"}}</td>
+                    <td class="am-valu">{% if invoice.invoice_exchange_rate == 'N/A' or  invoice.invoice_exchange_rate == '' %} {{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}}{% endif %} {% invoiceafterdiscount invoice.invoice_percentage invoicedetail.total_after_otherdetails invoice.invoice_exchange_rate as invdisval %}{{invdisval}}</td>
+                    <td>{% if invoice.invoice_exchange_rate == 'N/A' or  invoice.invoice_exchange_rate == '' %} {{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}}{% endif %}  {% invoiceexclusivevalue invoice.invoice_percentage invoicedetail.total_exclusive_value invoice.invoice_exchange_rate as invexcval %}{{invexcval}}</td>
+                    <td class="am-valu">{% if invoice.invoice_exchange_rate == 'N/A' or  invoice.invoice_exchange_rate == '' %} {{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}}{% endif %} {% invoiceafterdiscount invoice.invoice_percentage invoicedetail.total_after_otherdetails invoice.invoice_exchange_rate as invdisval %}{% invoiceexclusivevalue invoice.invoice_percentage invoicedetail.total_exclusive_value invoice.invoice_exchange_rate as invexcval %} {{invdisval|addpreviewvalues:invexcval}}
+                        {%with total=invdisval|addvalues:invexcval%}{%with dem=total|add:request%}    {%endwith%}    {% endwith %}
+                    </td>
+                    {% if inv.exchange_rate == '2' %}<td>{% if forloop.parentloop.counter == 1 %}{{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}}{% endif %}</td>{% endif %}
+                </tr>
+                {% endfor %}
+                {% endfor %}
+                
+            </tbody>
+        </table>
+    </div>
+    
+    </div>
+    <div class="col-6 pb-2">
+        <!-- <h5 class="head-inv-pre">Supporting Documents</h5> -->
+        <div class="btn-space text-end"> 
+
+            <div class="row">
+                <div class="col-6">
+                   <h5 class="head-inv-pre">Supporting Documents</h5>
+                </div>
+                <div class="col-6 pr-0">
+                    <button type="button" class="btn btn-clr"><a href="{% url 'invoice:invoiceapprovaltrack' pk %}" target="_blank">Track Invoice</a></button>
+                    <button type="button" class="btn btn-clr"><a href="{% url 'invoice:coversheet' pk %}" target="_blank">Cover Sheet</a></button>
+                </div>
+            </div>
+
+            <!-- <button type="button" class="btn btn-clr">Track Order</button>
+            <button type="button" class="btn btn-clr"><a href="{% url 'invoice:coversheet' pk %}">Cover Sheet</a></button> -->
+       </div>
+
+        <div class="row">
+            {% for val in document_list %}
+                {% if not forloop.first %}
+                    <div class="col-md-12 col-lg-4 padd-btn"> 
+                        <button type="button" class="commonbtn" dataid="{{val.data}}">{{val.name}}</button>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+       </div>
+    </div>
+
+    <div class="col-xl-6 col-md-6 bor-rgt">
+
+    </div>
+    
+
+    <div class="show_file_cls col-xl-6 col-md-6">
+    </div>
+
+  
+       <div class="row">
+        <div class="invfilediv bor-rgt col-xl-6 col-md-6" >
+            <div><iframe class="doc_invhidcls" id="file_zoom"  width="100%" src="" frameborder="0"></iframe></div>
+    </div>
+
+    <div class="selectedfilecls col-xl-6 col-md-6">
+        <div><iframe width="100%" class="doc_selinvhidcls" src=""></iframe></div>
+
+    </div>
+       </div>
+    
+    
+    <!-- <div class="row">
+        <div class="invfilediv bor-rgt" style="width: 50%;">
+            <div><iframe class="doc_invhidcls" width="100%" src="" frameborder="0"></iframe></div>
+       </div>
+    </div> -->
+</div>
+{% endblock %}

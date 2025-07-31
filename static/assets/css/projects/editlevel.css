@@ -1,0 +1,125 @@
+.wcc-name td {
+    padding: 5px 5px;
+}
+
+.wcc-name td:nth-child(1){
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+    /* width: 100px; */
+}
+
+.wcc-name td:nth-child(2){
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.wcc-name td:nth-child(3){
+    color: #017474;
+    font-size: 15px;
+    font-weight: 600;
+    width: 250px;
+}
+
+.heading-title {
+    color: #017474;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    padding: 5px;
+    border: 1px solid #c7c7c7;
+    text-transform: capitalize;
+}
+
+.bor-xnone {
+    border-left: none !important;
+    border-right: none !important;
+}
+
+.all-left {
+    margin-left: 13px;
+}
+
+.discipline-name {
+    display: flex;
+    align-items: baseline;
+    padding: 0px;
+    /* border-left: 1px solid #c7c7c7; */
+}
+
+.process-name {
+    color: #000 !important;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.data-border {
+    border: 1px solid #c7c7c7;
+    border-top: none;
+    padding: 0px 10px;
+}
+
+.input-center input {
+    text-align: center;
+}
+
+.nos-users input {
+    text-align: center;
+}
+
+.roles-data select {
+    text-align: center;
+}
+
+.modules {
+    margin-right: 45px;
+}
+
+.modules select {
+    width: 200px;
+}
+
+.roles-data {
+    margin-right: -5px;
+}
+
+.users-data {
+   margin-right: -13px;
+}
+
+.users-data select {
+    margin: 0px auto 8px auto;
+}
+
+.nos-users {
+    margin-right: -15px;
+    padding-left: 20px;
+}
+.level_label{
+padding-right:8px;
+}
+@media only screen and (min-width: 768px) and (max-width: 1023px) {
+    .invoice-appo-work{
+    overflow-y: unset !important;
+    }
+    .invoice-app{
+        overflow-x: scroll;
+    }
+    .invoice-app .tabl{
+        width: 150%;
+    }
+    .invoice-appo-work .wcc-name td:nth-child(1){
+        white-space: nowrap;
+    }
+    .modules select{
+        width: 140px;
+    }
+}
+
+/* empty data */
+.border-empty-data {
+    border: 1px solid #c7c7c7;
+    border-top: 0px;
+    text-align: center;
+}

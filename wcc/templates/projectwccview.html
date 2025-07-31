@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+{% load static %}
+{% load wcc_custom_tags %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/WCC/wccflow.css' %}">
+ 
+<div>
+    <div class="row">
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+            <button type="button" class="btn btn-clr btn-master mr-0"><a href="{% url 'projects:projectwcc'%}">Back</a></button>
+        </div>
+    </div>
+
+    <h3 class="from-head">WCC Workflow View</h3>
+
+        <!-- <div class="row align-items-center">
+            <div class="col-6 heading-name">Project</div>
+            <div class="col-6 heading-name">Level</div>
+        </div> -->
+
+        <div class="d-flex mb-5">
+            <table class="wcc-name">
+                <tr>
+                    <td>Project</td>
+                    <td>:</td>
+                    <td>
+                        {{project.projectname.name}}
+                    </td>
+                </tr>
+            </table>
+    
+            <table class="wcc-name">
+                <tr>
+                    <td>Level</td>
+                    <td>:</td>
+                    <td>
+                         <input type="hidden" id="wcc_flow_hdn" value="{{wcc_data.id}}">
+                         {% for level_type in level_types %}
+                            {% if wcc_data.level_type == level_type %}{{level_type|capfirst }}{% endif %}
+                        {% endfor %}
+    
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+
+        <div class="row heading-border">
+            <div class="col-3 heading-name heading-border-col">Level for Approval Definition</div>
+            <div class="col-2 heading-name heading-border-col">Station</div>
+            <div class="col-2 heading-name heading-border-col">Role</div>
+            <div class="col-2 heading-name heading-border-col">No.of Users per Station(s)</div>
+             
+            <div class="col-3 heading-name">Users</div>
+        </div>
+        <div class="row heading-border heading-border2">
+            <div class="col-12 level_div test1">
+                {% get_wcc_data wcc_data.level_type wcc_data.id project.id as all_level_data %}
+                <!-- Well Based Discipline and Well-->
+                <!-- removed class mx-2 for well and well discipline-->
+                {% if wcc_data.level_type == "well"%}
+                    {% for level_data in all_level_data %}
+                    {% check_wcc_wellbased level_data.discipline_id wcc_data.id as datacount %}
+                    {% if datacount.1 %}
+                        <div class="row my-2">
+                     <div class="col-3 check-label">
+                            <label>{{level_data.discipline_name}}-{{level_data.project_discipline}}-{{level_data.cluster}}</label>
+                        </div>
+                        <div class="col-9">
+                                    <div class="row input-wid">
+                                      <div class="col-3 station text-center">
+                                            <p style="font-weight: 500;">{{datacount.1.station}}</p>
+                                        </div>
+                                        <div class="row col-9 station_per_div">
+                                            {% get_station_data datacount.1.id True as station_datas %}
+                                            {% if station_datas %}
+                                                {% for station in station_datas %}
+                                                <div class="col-3 text-left">
+                                                    {% for wcc_role in wcc_roles %}
+                                                        {% if station.role_id == wcc_role.id %} <p style="font-weight: 500;">{{wcc_role.role_name}}</p>{% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                     <div class="col-4 text-center">
+                                                    <p style="font-weight: 500;">{{station.station_user}}</p>
+                                                </div>
+                                             
+                                                <div class="col-5 pr-0">
+                                                    {% get_station_users station.id True as usersdata %}
+                                                        {% for st_user in usersdata %}
+                                                            <div class="">
+                                                                {% for user in users_list %}
+                                                                {% if user.user_uid == st_user.user.id  %}<p style="font-weight: 500;">{{user.user_name}} {{user.user_lastname}}-{{user.user_designation_role}}</p>{% endif %}
+                                                                {% endfor %}
+                                                            </div>
+                                                        {% endfor %}
+                                                </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+  
+                        </div>
+                        </div>
+                        {% endif %}
+                        {% for well_data in level_data.well_datas %}
+                            {% check_wcc_flowdata wcc_data.level_type well_data.id wcc_data.id as datacount %}
+                            {% if datacount.1 %}
+                            <div class="row my-2">
+                                <div class="col-3 check-label">
+                                <label>{{well_data.wellname__well_subname}}</label>
+                                </div>
+                                <div class="col-9">
+                                        <div class="row input-wid">
+                                            <div class="col-3 station text-center">
+                                                <p style="font-weight: 500;">{{datacount.1.station}}</p>
+                                            </div>
+                                            <div class="row col-9 station_per_div">
+                                                {% get_station_data datacount.1.id True as station_datas %}
+                                                {% if station_datas %}
+                                                    {% for station in station_datas %}
+                                                    <div class="col-3 text-center">
+                                                                {% for wcc_role in wcc_roles %}
+                                                                    {% if station.role_id == wcc_role.id %} <p style="font-weight: 500;">{{wcc_role.role_name}}</p>{% endif %}
+                                                                {% endfor %}
+                                                    </div>
+                                                    <div class="col-4 text-center">
+                                                        <p style="font-weight: 500;">{{station.station_user}}</p>
+                                                    </div>
+                                                    <div class="col-5 pr-0">
+                                                        {% get_station_users station.id True as usersdata %}
+                                                            {% for st_user in usersdata %}
+                                                                <div class="">                                                                
+                                                                    {% for user in users_list %}
+                                                                        {% if user.user_uid == st_user.user.id  %}<p style="font-weight: 500;">{{user.user_name}} {{user.user_lastname}}-{{user.user_designation_role}}</p>{% endif %}
+                                                                    {% endfor %}
+                                                                </div>
+                                                            {% endfor %}
+                                                    </div>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="row my-2">
+                                <div class="col-12 text-center">
+                                <b>---</b>
+                                </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}   
+                        {% empty %}    
+                        <div class="row my-2">
+                            <div class="col-12 text-center">
+                            <b>---</b>
+                            </div>
+                            </div>
+                    {% endfor %}
+                {% else %}
+                <!-- Discipline and cluster Edit-->
+                {% for level_data in all_level_data %}
+                {% check_wcc_flowdata wcc_data.level_type level_data.id wcc_data.id as datacount %}
+                {% if datacount.1 %}
+                        <div class="row my-2">
+                            <div class="col-3 check-label">
+                                
+                                <label>{{level_data.name}}{% if wcc_data.level_type == "discipline" %}- {% if level_data.project_discipline__project_discipline == "1"%}Green Field Development{% elif level_data.project_discipline__project_discipline == "2"%}Brown Field Development{% else%}Others{% endif %}-{{level_data.project_discipline__cluster__clustersubname__cluster_subname}}{% endif %}</label>
+                                
+                            </div>
+                            <div class="col-9">
+                               
+                                    <div class="row input-wid">
+                                        <div class="col-3 station text-center">
+                                            <p style="font-weight: 500;">{{datacount.1.station}}</p>
+                                        </div>
+                                        <div class="row col-9 station_per_div pr-0">
+                                            {% get_station_data datacount.1.id True as station_datas %}
+                                            {% if station_datas %}
+                                                {% for station in station_datas %}
+                                                <div class="col-3 text-left">
+                                                    {% for wcc_role in wcc_roles %}
+                                                        {% if station.role_id == wcc_role.id %} <p style="font-weight: 500;">{{wcc_role.role_name}}</p>{% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                                <div class="col-4 text-center">
+                                                    <p style="font-weight: 500;">{{station.station_user}}</p>
+                                                </div>
+                                                <div class="col-5 pr-0">
+                                                    {% get_station_users station.id True as usersdata %}
+                                                        {% for st_user in usersdata %}
+                                                            <div class="">
+                                                                {% for user in users_list %}
+                                                                    {% if user.user_uid == st_user.user.id  %}<p style="font-weight: 500;">{{user.user_name}} {{user.user_lastname}}-{{user.user_designation_role}}</p>{% endif %}
+                                                                {% endfor %}
+                                                            </div>
+                                                        {% endfor %}
+                                                </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                            </div>
+                        </div>
+                        {% else %}
+                            <div class="row my-2">
+                                <div class="col-12 text-center">
+                                <b>---</b>
+                                </div>
+                                </div>
+                        {% endif %}
+                    {% empty %}
+                      <div class="row my-2">
+                                <div class="col-12 text-center">
+                                <b>---</b>
+                                </div>
+                                </div>
+                    {% endfor %}
+
+                {% endif %}
+
+            </div>
+        </div>
+
+
+
+<!-- new view -->
+
+
+
+
+
+
+
+
+
+</div>
+        
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<!-- <script src="{% static 'js/wcc/wccflow.js' %}"></script> -->
+{% endblock %}

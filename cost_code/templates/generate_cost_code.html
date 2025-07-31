@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% load cost_code_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/cost_code/generate_cost_code.css' %}">
+<div class="text-end">
+    <button type="button" class="btn btn-clr"><a href="{% url 'cost_code:costcodelist' %}">Back</a></button>
+</div>
+<div>
+    <h3 class="from-head">Add New Cost Code</h3>
+    <div class="row">
+    </div>
+    <form method="POST" id="costcodeform">
+    {% csrf_token %}
+    <input type="hidden" value="{{master_count}}" id='master_count'>
+    <div class="row">
+        <div class="col-3 new_cost_code">
+            <input type="hidden" name="costcode_type" class="costcode_type" id="costcode_type">
+            <input type="hidden" name="total_rows" class="total_rows" id="total_rows" value="1">
+
+         <label for="staticEmail" class="col-form-label">Select Root Category<span
+                class="star-clr">*</span></label>
+            <input type="hidden" name="level1_costcode" class="level1_costcode" id="level1_costcode">
+            <select id="level1_category" name="level1_category" class="form-control form-select">
+                <option value="" selected="selected">---Select ---</option>
+                {% for alllevel1 in alllevel1_data %}
+                    <option value="{{alllevel1.value}}">{{alllevel1.name}}</option>
+                {%endfor%}
+            </select>
+        </div>
+        <div class="col-3 new_cost_code">
+            <label for="staticEmail" class="col-form-label">Select Sub Category<span
+                class="star-clr">*</span></label>
+            <input type="hidden" name="level2_costcode" class="level2_costcode" id="level2_costcode">
+            <select id="level2_category" name="level2_category" class="form-control form-select"></select>
+        </div>
+    </div>
+    <div id="subcat_levels">
+    <div class="row mt-3">
+        <div class="col-12">
+            <label for="staticEmail" class="col-form-label">Add Cost Category Path<span class="star-clr">*</span></label>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table id="cost_code_table" class="cost-category-path">
+            <tbody>
+                <tr class="editabletr">
+                    {% for get_remaining_level in get_remaining_levels %}
+                    <td data-id='{{get_remaining_level.level_type_id}}'>
+                        <input type='hidden' class="masterId" name="masterId0" value="{{get_remaining_level.id}}">
+                        
+                        <input type='hidden' name= "maxcode0" class="cost_code_static">
+                        <input type="hidden" name="costcode0" class="costcode">
+                        <input type="hidden" name="sequence_gap" class="sequence_gap">
+                        <input type="hidden" name="costcode_type" class="costcode_type">
+                        <input type="hidden" name="no_of_digits" class="no_of_digits">
+                        <input type="hidden" name="old_text" class="old_text">
+
+
+
+
+                        {% getcost_type_by_masterid get_remaining_level as cost_types %}
+                        <input type="text" name="remaining_levels0" class="form-control class{{forloop.counter}} remaining_levels costcodelevel" data-index="0" data-startfrom="{{ forloop.counter0 }}" data-id='{{get_remaining_level.no_digits}}' index="{{forloop.counter}}" level_id="{{get_remaining_level.id}}">
+                      
+                        <input type="text" name="new_level0" class="form-control new_level_cls costcodelevel" style="display:none" placeholder="Type New Component" data-id="{{request.company.id}}">
+                        <input type="hidden" name="leveltype" class="leveltype"></input>
+                    </td>
+                    {% endfor %}
+                    <td class="code-preview">
+                        <label>Code Preview</label>
+                        <div class="cost_code_preview"></div>
+                        <input type="hidden" name="costcodepreview0" class="costcodepreview">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="row">
+        <div class="col-3">
+            <button type="button" class="add-nxt-btn addbtn" id="addnew-level">Add New</button>
+        </div>
+    </div>
+    </div>
+    <div class="text-center btn-cls">
+        <button type="submit" class="btn btn-clr text-left final-cls waves-effect waves-float waves-light" id="costcode_submit">Submit</button>
+    </div>
+    </form>
+    
+</div>
+    
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+var csrf_token = '{{csrf_token}}'
+var levelonesequencegap ='{{sequencegap}}'
+var levelstartwith = '{{levelstartwith}}'
+var disciplinestartwith = '{{disciplinestartwith}}'
+var disciplineseq = '{{disciplineseq}}'
+var remaining_level_count = '{{count_of_remaining_levels}}'
+
+// console.log("remaining_level_count "+remaining_level_count)
+
+</script>
+<script src="{% static 'js/cost_code/generate_cost_code.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load InvoiceGuardTags %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href='/static/assets/css/invoice_process/company-setting.css'>
+
+<div>
+  <div class="row">
+    <div class="col-7">
+    </div>
+    <div class="col-5 text-end">
+      <a class="btn btn-clr onClass" href="{% url 'finance:listbankuser' %}">Back</a>
+  </div>
+  </div>
+  <h4 class="from-head">Bank Details
+  
+  <div class="row">
+    <div class="col-12">
+      <form method="post" name="main" class="mainform" id="mainform">
+        {% csrf_token %}
+        <div class="sign-table-con table-responsive">
+      <table class="table irock-table createuser-table" id="master_project_list">
+        <thead>
+          <tr>
+            <th>Bank Name*</th>
+            <th class="">Currency*</th>
+            <th class="">Account Number*</th>
+            <th class="create-wid">Other Details</th>
+            <th class="">Actions</th>
+         </tr>
+        </thead>
+        <tbody class="table-list">
+         <tr class="tabletr">
+           <td class="from-invoice"><input type="text" class="bank_name form-control" name="bankname"></td>
+            <td class="from-invoice"> 
+            <select class="currency-clss selectcurrency dn_currencys"  id="hdn_currencys" multiple="multiple"  name="currency" class="form-control gener-hd-input" placeholder="Currency" >
+                {%for i in currency %}
+                 <option value="{{i.id}}">{{i.currency_symbol}}-{{i.currency}}</option>
+               {%endfor%}
+         </select></td>
+            <td class="add-sign acountnumber">
+                <div class='create_align_items'>
+                    <input type="text" class="form-control actno" name="actno"> 
+                    <button id='addact' class='btn btn-clr add-btn addact ml-2' type='button' value='Add'><i class="fa fa-plus"></i> </button> 
+                    
+                  </div>
+                  
+                  <span class ="error-message" ></span>
+                  
+            
+              </td>
+
+              <!-- <td class="from-invoice"><input type="text" class="otherdetails form-control" name="otherdetails"></td> -->
+              <td class="td-left"><textarea class="form-control bankotherdetails otherdetails" name="otherdetails" id="otherdetails" type="text"></textarea></td>   
+              <td>
+                <button id='add' class='btn btn-clr add-btn pha-sebtn mt-3 addbtn' type='button' value='Add'> <i class="fa fa-plus"></i>
+               
+              </td>
+            </tr>
+        </tbody>
+      </table>
+    </div>
+      <div class="save_button text-center">
+        <button id="mainsave" class='btn btn-clr mainsave' type="submit">Save</button> 
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+{% endblock%}
+{% block scripts %}
+{{ block.super }}
+<script>
+var csrf_token = "{{ csrf_token }}"
+var currency = "{{currency}}"
+</script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>  
+<script src="{% static 'js/finance/createuserbank.js' %}"></script>
+<script>
+       $(document).ready(function() {
+        // var data=$('#hdn_currency').select2()
+        // console.log(data)
+        // if (data != ''){
+        //     data = data.replace("[",'');
+        //     data = data.replace("]",'');
+        //     data = data.replaceAll("'",'');
+        //     data = data.replaceAll(" ",'');
+        //     console.log(data);        
+        //     var convert_list = data.split(',');
+        //     console.log(convert_list)
+        //     $(".currency-cls").val(convert_list)
+        // }
+        // $('.currency-cls').select2({
+        //     placeholder: "Select Currency"
+        // });
+    });
+</script>
+{%endblock%}

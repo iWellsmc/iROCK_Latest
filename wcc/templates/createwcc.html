@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+{% load cost_code_tags %}
+
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/invoice.css' %}"> -->
+    <div>
+        <form  method="POST" id="invoiceform1"> 
+            <div class="row">
+                <!--back url-->
+                <div class="col-12 text-end">
+                    <button type="button" class="btn btn-clr"><a href="{% url 'wcc:wcclist' %}">Back</a></button>
+                </div>
+            </div>
+            
+            {% csrf_token %}
+            <h3 class="from-head">Standard Information Form</h3>
+            <h3 class="from-head">WCC Information</h3>
+            
+            <select id="id_contracts" style="display:none">
+                {% for contracts in allcontractlist%}
+                <option value="{{contracts.id}}" dataid="{{contracts.type}}" check_type="{{contracts.check_status}}">{{contracts.contractrefnum}}</option>
+                {% endfor %}
+            </select>
+            
+            <input type="hidden" name="dateformat" id="companydateformat" value={{company.dateformat}}>
+            <input type="hidden" name="hdn_ven_id" id="ven_id" value="{{vendor.id}}">
+            <input type="hidden" name="block_not" id="id_block_not" value ="">
+            <input type="hidden" name="field_not" id="id_field_not" value ="">
+            <input type="hidden" name="well_not" id="id_well_not" value ="">
+            <div class="">
+
+                <div class="row de-bottom"><div><label class="contractfilehead">A: Relevant Contract/Amendment/Variation Order Number<span class="star-clr">*</span></label></div><div><select name="contract" class="commom-cls form-control form-select contractcls inv-inf-bor">       
+                    <option value=" " selected>--Select Contract--</option>         
+                    {% for contracts in allcontractlist%}
+                    <option value="{{contracts.id}}" dataid="{{contracts.type}}" check_type="{{contracts.check_status}}">{{contracts.contractrefnum}}</option>
+                    {% endfor %}
+                    </select>
+                    <input type="hidden" name="contractid" id="id_hdncontractid"></div></div>
+
+                <div class="row de-bottom"><div><label class="contractfilehead">B: Relevant Contract/Amendment/Variation Order Name<span class="star-clr">*</span></label></div><div><input type="text" name="contractnameservice" class="commom-cls form-control nameservicecls inv-inf-bor" readonly></div></div>
+
+                <div class="row de-bottom"><div><label class="contractfilehead">Type of Service<span class="star-clr">*</span></label></div><div><input type="text" name="contractservicetype" class="commom-cls form-control types_service inv-inf-bor" readonly></div></div>
+                
+                <div class="row de-bottom pb-0"><div><label class="contractfilehead Per-til-clr">Period of Service<span class="star-clr">*</span></label></div><div class="col-6"><div><label class="contractfilehead">From</div><input type="text" name="fromdate" id="from_date" autocomplete="off" class="commom-cls periodformdate-cls form-control form-select inv-inf-bor"></div><div class="col-6"><div><div><label class="contractfilehead">To</div></div><input type="text" name="todate" id="to_date"autocomplete="off" class="commom-cls periodtodate-cls form-control form-select inv-inf-bor"><p id="validationMessage" style="font-weight: bold; color:red ;"></p></div></div>
+
+                <div class="row de-bottom"><div><label class="contractfilehead">Brief Description of Service Rendered<span class="star-clr">*</span></label></div><div><input type="text" name="service_rendered" id="id_service_rendered" class="commom-cls form-control inv-inf-bor"></div></div>
+               
+                <div class="row de-bottom"><div><label class="contractfilehead">Location of Service<span class="star-clr">*</span></label></div><div><input type="text" name="location_service" id="id_location_service" class="commom-cls form-control inv-inf-bor" /></div></div>
+
+                <div class="row de-bottom"><div><label class="contractfilehead">Project Name<span class="star-clr">*</span></label></div><div><input type="text" name="project" id="id_project" class="commom-cls form-control inv-inf-bor" dataid="" value="" readonly><input type="hidden" name="project_hdn" id="id_project_hdn"></div></div>
+
+                <div class="row de-bottom"><div><label class="contractfilehead">Block Name<span class="star-clr">*</span></label></div><div><select name="block" id="id_block" class="commom-cls form-control form-select inv-inf-bor"><option value=" " dataid="" selected>--Select Block--</option></select></div></div>
+
+                <div class="row de-bottom"><div><label class="contractfilehead">Field Name<span class="star-clr">*</span></label></div><div> <select name="field" id="id_field" class="commom-cls form-control form-select inv-inf-bor"><option value=" " dataid="" selected>--Select Field--</option></select></div></div>
+
+                <div class="row de-bottom"><div><label class="contractfilehead">Well Name<span class="star-clr">*</span></label></div><div> <select name="well" id="id_well" class="commom-cls form-control form-select inv-inf-bor"><option value=" " dataid="" selected>--Select Well--</option></select></div></div>
+
+                <!-- <div class="row"><div><label class="contractfilehead">Cost Code<span class="star-clr">*</span></label></div><div> <select name="costcode" id="id_costcode" class="commom-cls form-control inv-inf-bor">
+                    <option value="">--Select Code--</option>
+                    {% for data in cost_code_list %}
+                    {% getcostcode_preview data.costcode_main data.order company as subcostcode %}
+                    {% getcostcode_string data.costcode_main data.order company as all_costcode_string %}
+                    <option value="{{data.id}}">{{subcostcode}}-{{all_costcode_string}}</option>
+                    {% endfor %}
+                </select>
+                </div> -->
+            </div>
+                
+            </div>
+
+            <div class="text-center btn-cls">
+                <button type="submit" id="draft_id" class="btn btn-clr text-left draft-cls" name="submit_type" value="0">Save as Draft</button>
+                <button type="submit" id="save_id" value="1" class="btn btn-clr text-left save-cls">Save and Next</button>
+            </div>
+        </form>
+        <input class="formname" type="hidden" value="Wcc">
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" ></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" ></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script>
+    var submitform=$('#invoiceform1')
+    var bankcount=parseInt("{{bankcount}}")
+    var hdn_dateformat=$('#companydateformat').val()
+    var currentdate;
+  
+</script>
+<script src="{% static 'js/invoice/createinvoice.js' %}"></script>
+{% endblock %}

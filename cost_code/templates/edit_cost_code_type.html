@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/cost_code/edit_cost_code_type.css' %}">
+<div>
+    <div class="row">
+        <div class="col-12 text-end">
+            <button type="button" class="btn btn-clr"><a href="{% url 'cost_code:costcodetypelist' pk=cost_code_type.cost_code.level_type_id %}">Back</a></button>
+        </div>
+    </div>
+
+    <h3 class="from-head">{{cost_code_type.cost_code.level_type.level_name}}</h3>
+
+    <form method="POST" id="cost_type_form">
+        {% csrf_token %}
+    <div class="row mb-3">
+        <div class="col-6 cost-code-format">
+            <label>Cost Code Type :</label>
+            <span>{{cost_code_type.cost_code.level_type.level_name}}</span>
+        </div>
+    </div>
+  
+    <div class="row">
+       <div class="col-12">
+        <table id="id_create_cost_tbl" class="cost-code-table">
+            <thead>
+                <tr>
+                    <th>Component Name</th>
+                    <th>Cost Code</th>
+                </tr>
+
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input type="hidden" name="cost_code" id="cost_code_id" value="{{cost_code_typeid}}">
+                        <input type="hidden" name="cost_codeid" id="costcode_pk" value="{{cost_code_type.id}}">
+                        <input type="text" name="component_name" class="form-control comp_cls common_cls" autocomplete="off" value="{{cost_code_type.component_name}}">
+                        <span class="waring-err invoicenumspn"></span>
+                    </td>
+                  
+                    <td>
+                        <input type="text" name="component_cost_code" class="form-control comp_code_cls common_cls" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" autocomplete="off" maxlength="{{cost_code_type.cost_code.no_digits}}" data_id="{{cost_code_type.cost_code.sequence_gap}}" value="{{cost_code_type.component_cost_code}}">
+                        <span class="waring-err invoicenumspn"></span>
+                    </td>
+                
+                </tr>
+            </tbody>
+        </table>
+       </div>
+    </div>
+        <div class="text-center btn-cls">
+            <button type="submit" class="btn btn-clr final-cls waves-effect waves-float waves-light">Submit</button>
+        </div>
+    </form>
+</div>
+        
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+    var startwith = '{{cost_code_type.cost_code.start_with}}'
+    var nodigits = $('#cost_code_id').val()
+    var costypeid = $('#costcode_pk').val()
+</script>
+<script src="{% static 'js/cost_code/create_cost_code_type.js' %}"></script>
+{% endblock %}

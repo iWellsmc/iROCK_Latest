@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+
+<div>
+    
+    <div class="row">
+        <div class="col-12 text-end">
+            <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'projects:vendormasterlist' %}">Back</a></button>
+        </div>
+    </div>
+
+    <h3 class="from-head">Add Vendor</h3>
+   
+    <div class="row">
+        <div class="col-lg-3 col-md-1">
+        </div>
+
+        <div class="col-lg-6 col-md-10">
+        <div class="invite-cards">
+            <form  class="form-txt" id="vendorinvite" method="POST">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-12">
+                        <label class="vend-appor-hd">Vendor Name<span class="star-clr">*</span></label>
+                        <input type="text" name="vendor_name" id="vendor_name_id" class="form-control mb-3 name-cls" placeholder="Vendor Name">
+                    </div>
+                </div>
+                    <div class="row">
+                        <div class="col-2">
+                            <label class="vend-appor-hd">Title<span class="star-clr">*</span></label>
+                            <select name="title" class="form-control">
+                            <option value="">-Select-</option>
+                            {% for title in titles %}
+                            <option value="{{title}}">{{title}}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-5">
+                            <label class="vend-appor-hd">First Name<span class="star-clr">*</span></label>
+                            <input type="text" name="primary_first_name" id="first_name_id" class="form-control contact_person_cls" placeholder="First Name">
+                            <label>
+                        </div>
+                        <div class="col-5">
+                            <label class="vend-appor-hd">Last Name<span class="star-clr">*</span></label>
+                            <input type="text" name="primary_last_name" id="last_name_id" class="form-control contact_person_cls" placeholder="Last Name">
+                            <label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="vend-appor-hd">Email<span class="star-clr">*</span></label>
+                        <input type="text" name="email" id="id_email" class="form-control" placeholder="Email">
+                        <span class="waring-err"></span>
+                    </div>
+
+                <div class="text-center mt-4" id="btn">
+                    <!--Class removed from button phase-vendor -->
+                    <button type="submit" class="final-cls btn btn-clr text-right">Submit</button>
+                </div>
+
+            </form>
+        </div>
+        </div>
+
+        <div class="col-lg-3 col-md-1">
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script>
+
+
+$("#vendor_name_id").focusout(function(){
+    let vendorName = $.trim($(this).val())
+    getVendorName(vendorName)
+})
+function getVendorName (vendorName){
+    $.ajax({
+        type:"GET",
+        url:'/projects/checkcontractduplicate',
+        data:{'name':vendorName},
+        success: function(data){
+            if (data.data == 'exists'){
+                Swal.fire('Vendor Already Exists')
+                $('.final-cls').attr('disabled',true);
+            }
+            else{
+                $('.final-cls').attr('disabled',false);
+            }
+            }
+        })
+}
+$('#id_email').keyup(function() {
+var inputvalue = $(this).val();
+
+inputvalue = inputvalue.trim();
+
+$(this).val(inputvalue);
+})
+
+$('.contact_person_cls').keyup(function() {
+var $th = $(this);
+$th.val($th.val().replace(/\d+/g, ''))
+$th.val($th.val().replace(/(\s{2,})|[^a-zA-Z\.'']/g, ' '));
+// $th.val($th.val().replace(/^\s*/, ''));
+remove_dot = $th.val().replace(/\.{2,}/g, '.');
+$(this).val(remove_dot)
+});
+
+$.validator.addMethod(
+    "regex",
+    function(value, element, regexp) {
+        return this.optional(element) || regexp.test(value);
+    },
+    // "Accept Only Numbers"
+);
+
+
+
+$('.name-cls').keyup(function() {
+    var $th = $(this);
+    $th.val($th.val().replace(/(\s{2,})/g, ' '));
+    $th.val($th.val().replace(/^\s*/, ''));
+    });
+
+
+
+
+$(function() {
+    var general_setting="{{general_setting}}"
+    var id="{{company_id}}"
+    if (general_setting == '0'){
+        swal.fire({
+            text: "Kindly Update General Settings Before Creating the Vendor",
+            type: "success"
+            }).then(function() {
+                window.location.href='../generalsetting/'+id+'/'
+                // window.location.href='../generalsetting/'+id+'/'
+            });
+    }
+      $("form[id='vendorinvite']").validate({ 
+        rules: {
+
+            email:{
+                required: true,
+                email: true,
+                regex:/^\b[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b$/i,
+
+            },
+            vendor_name :{
+                required: true,
+                // character_only:true,
+            },
+            title :{
+                required: true,
+            },
+            primary_first_name :{
+                required: true,
+                // character_only: true
+            },
+            primary_last_name :{
+                required: true,
+                // character_only: true
+            },
+            
+        },
+      messages: {
+        email:
+               {
+                   required :"Please Provide an Email ID",
+                   email:"Please Provide a Valid Email ID",
+                   regex:"Please Provide a Valid Email ID",
+               },
+        vendor_name:
+        {
+            required :"Please Provide a Vendor Name",
+            // character_only :"Accept Only Alphabets",
+        },
+        title:
+        {
+            required :"This Field is Required",
+        },
+        primary_first_name:
+        {
+            required :"Please Provide a First Name",
+            // character_only :"Accept Only Alphabets",
+        },
+        primary_last_name:
+        {
+            required :"Please Provide a Last Name",
+            // character_only :"Accept Only Alphabets",
+        },
+            },
+    submitHandler: function(form) {
+        form.submit();
+        $('.final-cls').attr('disabled','disabled');
+           },
+
+       });
+});
+
+</script>
+
+{% endblock %}

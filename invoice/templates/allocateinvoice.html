@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/reports/allocateinvoice.css' %}">
+
+<div>
+    <div class="row">
+        <div class="col-9">
+
+        </div>
+        <div class="col-3 text-end">
+            <a class="btn btn-clr onClass" href="{% url 'invoice:add_paymentonaccount' %}">Back</a>
+        </div>
+    </div>
+
+  <h3 class="from-head">Allocate Unpaid Invoice</h3>
+  
+  <!-- <div class="row">
+    <div class="col-5 head_cls">
+        <table>
+            <tr class="ven-name">
+                <td><label>Vendor Name</label></td>
+                <td class="dot-colon">:</td>
+                <td><span id="ven_id"></span>{{paymentaccount.vendor.vendor_name}}</td>
+            </tr>
+            <tr class="vin-no">
+                <td><label>Paid Amount</label></td>
+                <td class="dot-colon">:</td>
+                <td><span id="vin_id">({{paymentaccount.currency.currency}})  {{paymentaccount.amount|commoseperator}} </span></td>
+                <td><label>Allocated Amount </label></td>
+                <td class="dot-colon">:</td>
+                <td><span id="vin_id">({{paymentaccount.currency.currency}}) <p class="allocated_amount"></p> </span></td>    
+                <td><label>Pending Amount </label></td>
+                <td class="dot-colon">:</td>
+                <td><span id="vin_id">({{paymentaccount.currency.currency}}) <p class="pending_amount">{%if paymentaccount.remaining_amount%}{{paymentaccount.remaining_amount}}{%else%}{{paymentaccount.amount}}{%endif%}</p> </span></td>
+            </tr>
+        </table>
+    </div>
+  </div> -->
+
+    <div class="row align-items-baseline">
+        <div class="qur-titl col-lg-3 col-md-6">
+            <h4>Vendor Name :</h4>
+            <span>{{paymentaccount.vendor.vendor_name}}</span>
+        </div>
+
+        <div class="qur-titl col-lg-3 col-md-6">
+                    <h4>Paid Amount : </h4>
+                    <p class="qur-rf-no">({{paymentaccount.currency.currency}})  {{paymentaccount.amount|commoseperator}}</p>
+        </div>
+
+        <div class="qur-titl col-lg-3 col-md-6">
+                    <h4>Pending Amount :</h4>
+                    <p class="qur-rf-no">({{paymentaccount.currency.currency}}) <p class="qur-rf-no pending_amount">{%if paymentaccount.remaining_amount%}{{paymentaccount.remaining_amount|commoseperator}}{%else%}{{paymentaccount.amount|commoseperator}}{%endif%}</p>
+        </div>
+
+        <div class="qur-titl col-lg-3 col-md-6">
+            <h4>Allocated Amount :</h4> 
+            <span>({{paymentaccount.currency.currency}}) <p class="allocated_amount">0</p></span>
+        </div>
+    </div>
+    <form method="POST">
+        {%csrf_token%}
+    <input class="draft_field" name='draft_field' type='hidden'>
+    <input class="saveallocate" name="saveallocate" type="hidden">
+    <input type="hidden" name="amountallocated" class="amountallocated" value={%if paymentaccount.remaining_amount%}{{paymentaccount.remaining_amount}}{%else%}{{paymentaccount.amount}}{%endif%}>
+    <input type="hidden" name="paymentacct_id" value={{paymentaccount.id}}>
+    <input type="hidden" name="vendor_vin" value={{paymentaccount.vendor.vin}}>
+<div class="table table-responsive table-scroll">
+  <table class="table irock-table" id="master_project_list"> <!-- class removed -> prj-back_clr settings-data-list-view data-list-view invoicelist tot-in  invoicevendor-table -->
+    <thead>
+        <tr>
+            <th>S/N</th> 
+            <th>Country</th>
+            <th>Invoice No</th>
+            <th>Project Name</th>
+            <th>Project Discipline</th>
+            <th>Net Amount Payable ({{paymentaccount.currency.currency}})</th>
+            <th>Allocate</th>
+        </tr>   
+
+        {%for invoice in invoicecurrencylist %}
+        <tr>
+            <td>{{forloop.counter}}</td>
+            {%getcountry invoice.invoice_id as country%}
+            <td>{{country|default_if_none:"---"}}</td>
+            <td>{{invoice.invoice_number}}</td>
+            <td>{{invoice.invoice.project_name}}</td>
+            <td>{%getprojectdiscipline invoice.invoice_id as discipline%}{{discipline}}</td>
+            <td>{{paymentaccount.currency.currency_symbol}}
+                {% invoicegrossamount invoice.id as invdisval %}
+                {% invoicetaxamount invoice.id as invdistax %}
+                <div>    {{invdisval|addvalues:invdistax}}
+                {%with total=invdisval.0|addvalues:invdistax%}{%with dem=total|add:request%}{%endwith%}{% endwith %}
+                </div>
+            </td>
+            <td>{% with draft=invoice.id|getpaymentaccountdraft:id %}     
+                <input type="checkbox" class="checkbox_allocate" data-id={{invoice.id}} {%if invoice.payment_account == 2 and draft.status == 2%}Checked {%endif%}>
+                {% endwith %}  
+                <input type="hidden" class="netamount" name="netamount" value="{{invdisval|addvaluesamount:invdistax}}">
+                <input type="hidden" class="invoiceid" name="invoiceid">
+            </td>
+        </tr>
+        {%empty%}
+        <td colspan="7">---</td>
+        <!-- <td><div class="border-empty-data">---</div></td> -->
+        {%endfor%}
+</table>
+</div>
+<div class="text-center">
+    <button type="submit" class="btn btn-clr com-save generate_report submit_btn ven-cr">Submit</button>
+    <button type="submit" class="btn btn-clr com-save generate_report draft_btn">Draft</button>
+</div>
+</form>
+    {%endblock%}
+    {% block scripts %}
+    {{ block.super }}
+    <script>
+    var csrf_token = '{{csrf_token}}'
+    </script>
+<script type="text/javascript" src="{% static 'js/invoice/allocateinvoice.js' %}"></script>
+<script>
+</script>
+
+{%endblock%}

@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/payment_instruction.css' %}">
+
+
+<div class="row">
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+            <button class="btn btn-clr btn-master waves-effect waves-float waves-light pc-bk-cls"><a href="{% url 'invoice:accountpayable' pk %}">Back</a></button>
+        </div>
+    <div class="col-6 bor-rgt">
+      <h5 class="head-inv-pre">Payment Instructions</h5>
+      <div class="table-responsive">
+        <table class="table table-bordered tab-styling">
+            <thead>
+                <th>Invoice No.</th><th>Net Payable Amount</th><th>Bank to Debit</th><th>Vendor Bank Details</th><th>Generated Instruction</th><th></th>
+            </thead>
+            <tbody>
+                {% for payment in payment_details %}
+                <tr>
+                    <td class="inv_name">
+                        {{payment.invoicecost.invoice_number}}
+                    </td>
+                    <td>
+                        {% if payment.invoicecost.new_netpayable %}
+                        {{payment.invoicecost.currency.currency_symbol}} {{payment.invoicecost.new_netpayable}}
+                        {% else %}
+                        {{payment.invoicecost.invoice_total_amount}}
+                        {% endif %}
+                        {% comment %} {{payment.invoicecost.invoice_total_amount}} {% endcomment %}
+                    </td>
+                    <td>    
+                        {{payment.companybank.bank_name.bank_name}}-{{payment.companybank.account_number.accountno}}
+                    </td>
+                    <td>
+                        {{payment.invoicecost.invoice_bank.bankname}}-{{payment.invoicecost.invoice_bank.accountnumber}}
+                    </td>
+                    <td>
+                        <!-- <a class="btn p-0" data-toggle="collapse" href="#collapseExample{{payment.id}}" role="button" aria-expanded="false" aria-controls="collapseExample" data-id="{{payment.id}}"> -->
+                        <a class="btn p-0 view_file" data_id="{{payment.pi_file}}">
+                        <span class="action-edit align-icons">
+                            <i class="fa fa-eye eyebutton inv_file1" title="View" style="font-size:17px; color:#95183a;"></i>
+                        </span>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+      </div>
+      <div class="">
+        <div><iframe class="doc_pay_ins_cls" width="100%" src="" frameborder="0"></iframe></div>
+    </div>
+    </div>
+    <div class="col-6">
+        <h5 class="head-inv-pre">Invoice and Supporting Documents</h5>
+
+        <div class="row">
+            <div class="col-6">
+                <button class="btn btn-clr commonbtn" value="invoice">
+                    {% for inv in maininvoices %}
+                        {% for invoice in pk|subinvoice:inv.id %}
+                            {{invoice.invoice_number}}
+                        {% endfor %}
+                        {% if not forloop.last %}
+                        ,
+                        {% endif %}
+                    {% endfor %}
+                </button>
+
+            </div>
+            <div class="col-6">
+                <button class="btn btn-clr commonbtn otherdocuments" value="document">Other Documents</button>
+            </div>
+        </div>
+        <div class="tab-bottom">
+            <div class="show_file_cls"></div>
+            <div><iframe class="doc_invhidcls" width="100%" src="" frameborder="0"></iframe></div>
+        </div>
+    </div>
+</div> 
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+
+<script>
+var invoice_id="{{pk}}" 
+var scheme="{{request.scheme}}"
+var gethost="{{request.get_host}}"
+var currentdomain=scheme+'://'+gethost
+var package_src = "{% static 'js/web/viewer.html' %}"
+</script>
+<script src="{% static 'js/invoice/paymentinstructiondata.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf_viewer.js"></script>
+<script>
+// $('.view_file').click(function(){
+//     let val=$(this).attr('data_id')
+//     let setfullurl=currentdomain+'/media/'+filename+''
+//     $('.doc_pay_ins_cls').attr({'src':setfullurl,height:'590px !important'})    
+// })
+
+// $('.commonbtn').click(function(){
+//     $('.commonbtn').removeClass('selected_btn')
+//     $(this).addClass('selected_btn')
+//     let val=$(this).val()
+//     $('.show_file_cls').html('')
+//     $('.doc_invhidcls').attr('src','')
+//     $.ajax({
+//             type:"GET",
+//             data:{'file_type':val,'invoice_id':invoice_id},
+//             url:'/invoice/getallfiles',
+//             success: function(data){
+//                 let html='';
+//                 $.each(data.files, function(index, value) {
+//                     let remove_name=(value.support_file).replace("invoicedocuments/","")
+//                     html +='<p class="fil-cls file-style" data_id='+value.support_file+'>'+remove_name+'</p>'
+//                 })
+//                 $('.show_file_cls').html(html)
+//             },})
+//     })
+
+//     $(document).on('click','.fil-cls',function(){
+//         $('.doc_invhidcls').attr('src','')
+//         $('.fil-cls').removeClass('selected-cls')
+//         $(this).addClass('selected-cls')
+//         let filename=$(this).attr('data_id');
+//         let setfullurl=currentdomain+'/media/'+filename+''
+//         $('.doc_invhidcls').attr({'src':setfullurl,height:'590px !important'})  
+//     })
+</script>
+
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/bankdetails.css' %}">
+<section id="data-list-view" class="data-list-view-header">
+ <div>
+   <h4 class="from-head">Bank Details</h4>
+    <div class="row justify-content-center">
+        <div class="col-9">
+        </div>
+       
+      <div class="col-3 text-end">
+        {% if request.user.roles_id == 3 %}
+            {% if rights.create == '1' %} 
+            <a class="btn btn-clr chck-tst add_btn" href="{% url 'finance:createbankuser' %}">Add Bank Details</a>
+            {% endif %}
+        {% else %}
+        <a class="btn btn-clr chck-tst add_btn" href="{% url 'finance:createbankuser' %}">Add Bank Details</a>
+        {% endif %}
+    </div>
+      <!-- <div class="row my-4">
+        <div class="col-9"> 
+          <div class="card all-noti-box">
+            <div class="show-noti">
+                <label>Show <select id="datafilters" class="changevalue select-style">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select> entries</label>
+        </div>
+        </div>
+        </div>
+        <div class="col-3 text-end">
+          <form method="get">
+              <input type="text" id="myInput" class="search-f-inf" name="q" placeholder="Search Bank Name" value="{{query}}">
+            
+            </form>
+        </div>
+    </div>
+      </div> -->
+    
+          <div class="table-responsive text-nowrap">
+            <table class="table settings-data-list-view creat-head data-list-view project_master all-tbl-hd list-user-table-width tab-res irock-table"
+            id="master_project_list">
+            <thead class="list-user">
+              <tr>
+                <th>S/N</th>
+                <th>Bank Name <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>
+                <th style="width: 10%;">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="table-list">
+                {% for i in userbank %}
+              <tr>
+                <td>{{forloop.counter }}</td>
+                <td class="td-left">{{i.bank_name}}</td>
+             
+             
+                {% if request.user.roles_id == 3 %}
+                <td>
+                <a class="text-decoration-none px-1" href="{% url 'finance:viewbankuser' pk=i.id %}">
+                  <span class="action-eye"><i class="fa fa-eye" title="View"></i></span>
+              </a>
+              {%endif%}
+              {% if request.user.roles_id == 3 %}
+                {% if rights.delete == '1' or rights.edit == '1' %}
+               
+                  {% if request.user.roles_id == 3 %}
+                  {% if rights.edit == '1' %} 
+                 
+                
+                  {% endif %}
+              {% else %}
+                
+             
+              {% endif %}
+                  {% if request.user.roles_id == 3 %}
+                  {% if rights.edit == '1' %} 
+                 
+                      <a class="text-decoration-none px-1" href="{% url 'finance:editbankuser' pk=i.id %}">
+                          <span class="action-edit"><i class="fa fa-edit" title="Edit"></i></span>
+                      </a>
+                  {% endif %}
+              {% else %}
+                
+                  <a class="text-decoration-none px-1" href="{% url 'finance:editbankuser' pk=i.id %}">
+                      <span class="action-edit"><i class="fa fa-edit" title="Edit"></i></span>
+                  </a>
+              {% endif %}
+
+              {% if request.user.roles_id == 3 %}
+              {% if rights.delete == '1' %} 
+
+                    <a class="delete_bank px-1" data-id="{{i.id}}" bank_name="{{i.bank_name}}" >
+                        <span class="action-delete"><i class="fa fa-trash" title="Delete" style="font-size:15px; color:#95183a;"></i></span>
+                    </a>
+
+                    {% endif %}
+                    {% else %}
+                    <a class="delete_bank px-1" data-id="{{i.id}}" bank_name="{{i.bank_name}}" >
+                      <span class="action-delete"><i class="fa fa-trash" title="Delete" style="font-size:15px; color:#95183a;"></i></span>
+                  </a>
+                  {% endif %}
+                </td>
+                {%endif%}
+              {% else %}
+              <td>
+                 <a class="text-decoration-none px-1" href="{% url 'finance:viewbankuser' pk=i.id %}">
+                  <span class="action-eye"><i class="fa fa-eye" title="View"></i></span>
+              </a>
+              {% get_bankcount i.id as variables %}
+              {% if variables == False %}
+                <a class="text-decoration-none px-1" href="{% url 'finance:editbankuser' pk=i.id %}" >
+                  <span class="action-edit"><i class="fa fa-edit" title="Edit"></i></span>
+              </a>
+              <!-- href="{% url 'finance:deletebankuser' pk=i.id %}" -->
+              <a class="delete_bank px-1"  data-id="{{i.id}}" bank_name="{{i.bank_name}}" >
+                <span class="action-delete"><i class="fa fa-trash" title="Delete" style="font-size:15px; color:#95183a;"></i></span>
+            </a>
+            {%endif%}
+              </td>
+                {%endif%}
+               
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="9" id="empty_class">---</td>
+              </tr>
+              {% endfor %}
+              </tbody>
+              </table>
+
+              </div>
+
+</section>
+{% endblock%}
+{% block scripts %}
+{{ block.super }}
+<script>
+  var csrf_token ='{{csrf_token}}'
+  var currency_count ='{{currency_count}}'
+  var comp_ids='{{companyid}}'
+</script>
+<script>
+  var generalSettingUrl = "{% url 'custom_auth:generalsetting' companyid=request.user.company.id %}";
+</script>
+<script type="text/javascript" src="{% static 'js/finance/list_userbank.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/projects/userslist.js' %}"></script>
+{% endblock %}
+

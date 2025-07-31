@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/user_Management/userroles.css' %}">
+<div class="row">
+    <!-- <div class="col-3">
+        <button type="button" class="btn btn-clr btn-master chck-tst mr-0"><a href="{% url 'InvoiceGuard:list-rolesandrights-form' %}">Back</a></button>
+    </div> -->
+    <div class="col-12 text-end">
+        <a class="btn btn-clr chck-tst" href="{% url 'InvoiceGuard:list-rolesandrights-form' %}">Back</a>
+    </div>
+</div>
+<section class="usesr-management-Edit-section">
+<div>
+
+    <h3 class="from-head">Add Roles and Rights</h3>
+    
+    <div class="row d-flex justify-content-center">
+        <div class="col-6">
+        <div class="invite-cards">
+            <form  class="form-txt" id="addtaxformid" method="POST" action="">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-12 mb-3 mt-3">
+                        <div>
+                            <label class="vend-appor-hd mb-3">Module<span class="star-clr">*</span></label>
+                        </div >
+                        <div class="bot-pha">
+                            <select name="module_id" id="taxtype" class="form-control form-select taxtypecls">
+                                <option value="">--Select--</option>
+                                {% for module in modules %}
+                                <option value="{{module.id}}">{{module}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <table id="tax_table_id" class="w-100">
+                            <thead>
+                                <th class="vend-appor-hd">Role<span class="star-clr">*</span></th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="wid-tx"><input type="text" autocomplete="off" name="role_id" id="taxnameid0" data-error="1" class="form-control taxnamecls bot-pha mt-3" placeholder="Role Name"></td>
+                                    <td class="same-line-tx"><button id='add' class='btn btn-clr add-btn pha-sebtn mt-3 ml-2' type='button' value='Add'> <i class="fa fa-plus"></i> </button>  <button id="delete" class="mt-3 btn btn-clr delete-btn" type="button" value="delete"> <i class="fa fa-minus"></i> </button>
+                                     </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="text-center phase-vendor" id="btn">
+                    <button type="submit" class="save-cls btn btn-clr text-right">Add Rights</button>
+                </div>
+
+            </form>
+        </div>
+        </div>
+
+       
+
+    </div>
+
+</div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script type="text/javascript" src="{% static 'js/invoiceguard/add_role.js' %}"></script>
+<script>
+    var csrf_token = '{{csrf_token}}'
+// var ids=1
+// $(document).on('click','#add',function(){
+//     var html ='<tr> <td class="wid-tx"><input type="text" autocomplete="off" data-error="2" name="role_id" id="taxnameid'+ids+'" class="form-control taxnamecls bot-pha" placeholder="Role Name"></td> <td class="same-line-tx"><button id="add" class="btn btn-clr add-btn pha-sebtn" type="button" value="Add"> <i class="fa fa-plus"></i> </button> <button id="delete" class="btn btn-clr delete-btn" type="button" value="delete"> <i class="fa fa-minus"></i> </button></td></tr>'
+//     $(this).closest('table').append(html)
+//     ids ++;
+
+// })
+
+
+// $(document).on('click','#delete',function(){
+//     var table_len=$('#tax_table_id tbody tr').length
+//     if (table_len > 1){
+//         $(this).closest('tr').remove()
+//     }
+
+// })
+
+// $(document).ready(function(){
+
+//     $('#addtaxformid').validate(); 
+//     $("[name=taxtype]").rules("add", {
+//         required: true,
+//         });  
+         
+//     $("[name=taxname]").each(function(){
+//         $(this).rules("add", {
+//             required: true,
+//         });
+//     })
+// })
+
+//     $(document).on('keyup','.taxnamecls',function(){
+//         //$(".taxnamecls").focusout(function(){
+//         var val=$(this).val().toLowerCase()
+//         $(this).closest('td').find('span').remove();
+//         var currentelement=$(this)
+//         $.ajax({
+//             type: "POST",
+//             headers: { "X-CSRFToken": "{{ csrf_token }}"},
+//             url: "{% url 'InvoiceGuard:validate-role-form' %}",
+//             data: {'role_name':$.trim(val)},
+//             success: function(data){
+//                 if (data.status == true){ 
+//                     // currentelement.attr('data-error',0); 
+//                     currentelement.closest('td').find('span').remove();
+//                     currentelement.after('<span class="waring-err">Role Already Exists</span>')
+//                 }
+//                 else{
+//                         currentelement.closest('td').find('span').remove();
+//                         $('.final-cls').prop('disabled',false)
+//                         var z=0;
+//                         $("input").each(function(){
+//                             if (val !='' && y !=''){
+//                             var y=$(this).val().toLowerCase();
+//                             if($.trim(val)==$.trim(y)){
+//                                 z=z+1;
+//                             }
+//                         }
+//                         });
+                        
+//                         if(z > 1){
+//                             currentelement.closest('td').find('span').remove();
+//                             // currentelement.addClass("error")
+//                             // currentelement.attr('data-error',0); 
+//                             currentelement.after('<span class="waring-err">Role Already Exists</span>')
+//                         }
+//                         else{
+//                             currentelement.removeClass("error")
+//                             currentelement.attr('data-error',1); 
+
+//                         }
+//                     }
+//             }
+//         });
+//     })
+
+//     $(document).on('click','.save-cls',function(e){
+//         e.preventDefault();
+//         var tax_type=$('.taxtypecls').find(':selected').val()
+//         var count = 0
+//         if (tax_type == ''){
+//             $('.taxtypecls').addClass('con_error')
+//             count ++;
+//         }
+//         $('.taxnamecls').each(function(){
+//             var val=$(this).val()
+//             if (val == ''){
+//                 count ++;
+//                 $(this).addClass('con_error')
+//             }
+//             var span_len=$(this).next('span')
+//             console.log(span_len)
+//             if (span_len.length > 0){
+//                 count ++;
+//             }
+            
+//         });
+//         if (count == 0){
+//             $('#addtaxformid').submit()
+//             $(this).prop('disabled',true)
+//         }
+        
+//     })
+
+//     $(document).on('keyup change','.con_error',function(){
+//         $(this).removeClass('con_error')
+//     })
+//     //$('.taxnamecls').keyup(function() {
+//         $(document).on('keyup','.taxnamecls',function(){
+//         var $th = $(this);
+//         $th.val($th.val().replace(/(\s{2,})/g, ' '));
+//         $th.val($th.val().replace(/^\s*/, ''));
+//         });
+</script>
+
+{% endblock %}

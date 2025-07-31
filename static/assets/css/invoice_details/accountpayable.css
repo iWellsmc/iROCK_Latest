@@ -1,0 +1,84 @@
+.head-inv-pre {
+    color: #AF2B50 !important;
+    font-size: 30px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    margin: 30px auto !important;
+}
+
+.table-contents th, td {
+    font-size: 16px !important;
+    padding: 10px !important;
+    width: 20% !important;
+}
+
+.table-contents th {
+    color: #AF2B50;
+    font-size: 16px;
+    font-weight: 600;
+    word-break: break-word;
+    /* width: 25%; */
+}
+
+.dot span {
+    color: #AF2B50;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 0px 15px;
+}
+
+.datas span {
+    color: #000;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.btn-pad {
+    padding: 10px;
+}
+
+.code-word {
+    color: #AF2B50;
+    font-size: 16px;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+.vin-ven {
+    display: flex;
+    justify-content: space-between;
+    margin: 15px auto;
+}
+
+.vin-ven h4 {
+    margin-bottom: 0px;
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.vin-ven p {
+    margin-bottom: 0px;
+    color: #000 !important;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.vin-no {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ven-name {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 50%;
+}
+
+.new_table {
+    width: 100%;
+    border: 1px solid #e3e3e3 !important;
+}

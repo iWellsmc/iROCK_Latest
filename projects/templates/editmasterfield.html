@@ -1,0 +1,745 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/projectmaster.css' %}">
+<section>
+    <div class="row">
+        <div class="col-12 text-end">
+            <button class="btn btn-clr chck-tst waves-effect waves-float waves-light" ><a href="{% url 'projects:listmaster'%}">Back</a></button>
+        </div>
+    </div>
+
+    <h3 class="from-head">Edit Field</h3>
+    <form method="POST" class="form-txt" id="edit-masterfield">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-5">
+                <label class="txt-name unique-colr">Country:</label>
+                <span class="txt-detail uniq-name">{{project_details.country.nicename}}</span>
+            </div>
+            <div class="col-7">
+                <label class="txt-name unique-colr">Project Name:</label>
+                <span class="txt-detail uniq-name">{{project_details.name}}</span>
+            </div>
+        </div>
+                <div class="row">
+                    <div class="col-4">
+                <label class="txt-name">Block Name</label>
+                </div>
+                <div class="col-4">
+                    <label class="txt-name">Field Name</label>
+                    </div>
+                <div class="col-4">
+                    <label class="txt-name">Field Environment</label>
+                    </div>
+                </div>
+            
+                {% for block in project_block %}
+                <div class="row block-row spacing-top">
+                    <div class="col-4">
+                        <input type="checkbox" name="block_name" data-id={{block.id}} value="{{block.id}}" class="block_name block-cls" {% if block.id|checkbolckhasfield:block > 0 %} checked=checked {% endif %}><span class="checkbox-text txt-detail text-wrap text_space">{{block.block_name}}</span>
+                    
+                    </div>
+                    <div class="col-8">
+                        {% if forloop.counter == 1 %}
+                            <!-- <label class="col-form-label">Field Name</label> -->
+                        {% endif %}
+                        <table id="field_table{{block.id}}" class="create_field">
+                            <tbody>
+                                {% for field in block.id|get_field:block%}
+                                <tr>
+                                    <td><input type="hidden" name="fieldid{{block.id}}" class="fieldid" value="{{field.id}}"><input list="browsers" autocomplete="off" type="text" name="fieldname{{block.id}}" value="{{field.field_name}}" class="form-control field-class" data-id="{{block.id}}"><datalist id="browsers"><option value="Not Applicable"></datalist></td>
+                                    <td>
+                                        <button id="field-add-row" class="btn btn-clr  waves-effect waves-float waves-light max-min" data-id="{{block.id}}" type="button" value="Add"><i class="fa fa-plus"></i></button>
+                                        <button id="field-delete-row" class="btn btn-clr waves-effect waves-float waves-light max-min" data-id="{{block.id}}"  type="button" value="Add"><i class="fa fa-minus"></i></button>
+                                    </td>
+                                    <td class="fld-enver">
+                                        {% with field.id|fieldenvironment:"Onshore-Standalone" as field_environment %}
+                                        <input type="hidden"name="project_environmenthdn-{{block.id}}-{{forloop.counter0}}" class="field-env-hdn" fieldid="{{field.id}}" value="{{field_environment}}">
+                                        {% endwith %}
+                                     <input type="checkbox" name="project_environment-{{block.id}}-{{forloop.counter0}}" data-id="{{block.id}}" class="environment-cls" id="id_project_environment" value="Onshore-Standalone" {% if field.id|checkfieldenvironment:"Onshore-Standalone" > 0 %} checked=checked {% endif %}>&emsp;<label>Onshore-Standalone</label><br>
+                                        
+                                     {% with field.id|fieldenvironment:"Onshore-Pad Type" as field_environment %}
+                                        <input type="hidden"name="project_environmenthdn-{{block.id}}-{{forloop.counter0}}" fieldid="{{field.id}}" value="{{field_environment}}">
+                                    {% endwith %}
+                                     <input type="checkbox" name="project_environment-{{block.id}}-{{forloop.counter0}}" data-id="{{block.id}}" class="environment-cls" id="id_project_environment" value="Onshore-Pad Type"
+                                     {% if field.id|checkfieldenvironment:"Onshore-Pad Type" > 0 %} checked=checked  {% endif %}>&emsp;<label>Onshore-Pad Type</label><br>
+                                     
+                                     {% with field.id|fieldenvironment:"Offshore-Swamp" as field_environment %}
+                                     <input type="hidden"name="project_environmenthdn-{{block.id}}-{{forloop.counter0}}" fieldid="{{field.id}}" value="{{field_environment}}">
+                                    {% endwith %}
+                                     <input type="checkbox" name="project_environment-{{block.id}}-{{forloop.counter0}}" data-id="{{block.id}}" class="environment-cls" id="id_project_environment" value="Offshore-Swamp" {% if field.id|checkfieldenvironment:"Offshore-Swamp" > 0 %} checked=checked  {% endif %}>&emsp;<label>Offshore-Swamp</label><br>
+
+                                     {% with field.id|fieldenvironment:"Offshore-Shallow Water" as field_environment %}
+                                     <input type="hidden"name="project_environmenthdn-{{block.id}}-{{forloop.counter0}}" fieldid="{{field.id}}" value="{{field_environment}}">
+                                    {% endwith %}
+                                     <input type="checkbox" name="project_environment-{{block.id}}-{{forloop.counter0}}" data-id="{{block.id}}" class="environment-cls" id="id_project_environment" value="Offshore-Shallow Water"  {% if field.id|checkfieldenvironment:"Offshore-Shallow Water" > 0 %} checked=checked  {% endif %}>&emsp;<label>Offshore-Shallow Water</label><br>
+                                    
+                                     {% with field.id|fieldenvironment:"Offshore-Deepwater" as field_environment %}
+                                     <input type="hidden"name="project_environmenthdn-{{block.id}}-{{forloop.counter0}}" fieldid="{{field.id}}" value="{{field_environment}}">
+                                    {% endwith %}
+                                     <input type="checkbox" name="project_environment-{{block.id}}-{{forloop.counter0}}" data-id="{{block.id}}" class="environment-cls" id="id_project_environment" value="Offshore-Deepwater" {% if field.id|checkfieldenvironment:"Offshore-Deepwater" > 0 %} checked=checked  {% endif %}>&emsp;<label>Offshore-Deepwater</label><br>
+                                     
+
+                                     {% with field.id|fieldenvironment:"Others" as field_environment %}
+                                     <input type="hidden"name="project_environmenthdn-{{block.id}}-Others-{{forloop.counter0}}"  fieldid="{{field.id}}" value="{{field_environment}}">
+                                    {% endwith %}
+                                     <input type="checkbox" name="project_environment-{{block.id}}-{{forloop.counter0}}" data-id="{{block.id}}" class="environment-cls checkbox-cls" id="id_project_environment" value="Others" {% if field.id|checkfieldenvironment:"Others" > 0 %} checked=checked {% endif %}>&emsp;<label>Others</label>
+                                     {% if field.id|checkfieldenvironment:"Others" > 0 %}
+                                     <table id="others{{block.id}}-{{forloop.counter0}}">
+                                        <tbody>
+                                            {%for  others in field.id|Otherenvironment:"Others" %}
+                                            <tr>
+                                            <td><input type="hidden" name="environmentid-{{block.id}}-Others-{{forloop.parentloop.counter0}}" class="others-cls" value="{{others.id}}">
+                                                <input list="browsers" autocomplete="off" type="text" name="environment-{{block.id}}-Others-{{ forloop.parentloop.counter0 }}" id="environment_id" data-id="{{block.id}}" index="{{ forloop.parentloop.counter0 }}" data-type="Others" class="form-control others-env-cls" value="{{others.project_environment_subtype}}"><datalist id="browsers"><option value="Not Applicable"></datalist></td>
+                                           <td class="fld-btn"> <button id="environment-add-row" data-id="{{block.id}}" index="{{ forloop.parentloop.counter0 }}" data-type="Others" class="btn-clr environment-add-row btn max-min" type="button" value="add"><i class="fa fa-plus"></i></button>
+                                            <button id="environment-delete-row" data-id="{{block.id}}" data-type="Others" class="btn-clr environment-delete-row btn max-min" type="button" value="delete"><i class="fa fa-minus"></i></button>
+                                            </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                     </table>
+                                     {% endif %}
+
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                             
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="text-center spacing-button">
+                    <button type="button" class="btn btn-clr text-center prev-btn" project-id={{project_details.id}}>Prev</button>
+                    <button type="button" class="btn btn-clr text-center submit-cls" data-type='1'>Save & Exit</button>
+                    <button type="button" class="btn btn-clr text-center submit-cls" data-type='2'>Save & Next</button>
+        
+                </div>
+            </div>
+        </form>
+</section>
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+var project_id="{{project_details.id}}"
+var is_filled=true;
+var lenfield=true;
+var duplicate=true;
+
+$(document).on("change",".block_name",function(){
+    var block_id=$(this).attr('data-id')
+    if (this.checked){
+        var new_row='<tr><td><input type="hidden" name="fieldid'+block_id+'" value=""><input list="browsers" autocomplete="off" name="fieldname'+block_id+'" type="text" class="form-control field-class" data-id='+block_id+'><datalist id="browsers"><option value="Not Applicable"></datalist></td>'
+        new_row +='<td class="same-line"><button id="field-add-row" data-id='+block_id+' class="btn-clr field-delete-row btn max-min" type="button" value="delete"><i class="fa fa-plus"></i></button><button id="field-delete-row" class="btn-clr field-delete-row btn max-min" type="button" value="delete"><i class="fa fa-minus"></i></button></td>'
+        new_row+='<td class="fld-enver"><input type="checkbox" name="project_environment-'+block_id+'-0" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Onshore-Standalone">&emsp;<label>Onshore-Standalone</label><br><input type="checkbox" name="project_environment-'+block_id+'-0" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Onshore-Pad Type">&emsp;<label>Onshore-Pad Type</label><br><input type="checkbox" name="project_environment-'+block_id+'-0" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Offshore-Swamp">&emsp;<label>Offshore-Swamp</label><br><input type="checkbox" name="project_environment-'+block_id+'-0" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Offshore-Shallow Water">&emsp;<label>Offshore-Shallow Water</label><br><input type="checkbox" name="project_environment-'+block_id+'-0" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Offshore-Deepwater">&emsp;<label>Offshore-Deepwater</label><br><input type="checkbox" name="project_environment-'+block_id+'-0" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Others">&emsp;<label>Others</label></td>/tr>'
+        $("#field_table"+block_id).append(new_row); 
+    }
+    else{
+//         var block_id=$(this).is(':checked')
+//         // if($(this).is(':checked')){
+//             $.ajax({
+//                 type:"GET",
+//                 data:{'block_id':$(this).val()},
+//                 url:'/projects/checkeditmasterblock',
+//                 success:function(data){
+//                     if(data.data == 'exists'){
+//                         alert(iweurejre)
+// //                 //$('.block-cls').attr("disabled", true);                        
+//                         Swal.fire({
+//                             icon:'warning',
+//                             title: 'There is already data associated with this '+block_ids+'',
+//                             confirmButtonColor: '#3085d6',
+//                             cancelButtonColor: '#d33',
+//                     })
+
+//                     }               
+//                    else{
+//                         $.ajax({
+//                             type:"GET",
+//                             data:{'block_id':$(this).val()},
+//                             url:'/projects/checkblock',
+//                             success:function(data){
+//                                 if(data.data == 'exists'){
+
+//                                 }   
+//                             }    
+
+//                         })
+
+//                     }
+//                 }
+//             })
+//         // }
+        $('#field_table'+block_id+' tr').remove();
+        // console.log({'del': $('#field_table'+block_id+' tr').remove()})
+    }
+    
+}) 
+ 
+$(document).on("click","#field-add-row", function(){
+    if (is_filled == true && lenfield == true){
+    var block_id=$(this).attr('data-id')
+
+    var environment = $('table#field_table'+block_id+' tr:last').index() + 1;
+    var new_row='<tr><td><input type="hidden" name="fieldid'+block_id+'" class="fieldid" value=""><input list="browsers" autocomplete="off" name="fieldname'+block_id+'" block_id="'+block_id+'" type="text" class="form-control field-class"><datalist id="browsers"><option value="Not Applicable"></datalist></td><td><button id="field-add-row" class="btn btn-clr add-btn waves-effect waves-float waves-light max-min" data-id='+block_id+' type="button" value="Add"><i class="fa fa-plus"></i></button><button id="field-delete-row" class="btn-clr field-delete-row btn max-min" type="button" value="delete"><i class="fa fa-minus"></i></button></td>'
+        new_row+='<td class="fld-enver"><input type="checkbox" name="project_environment-'+block_id+'-'+environment+'" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Onshore-Standalone">&emsp;<label>Onshore-Standalone</label><br><input type="checkbox" name="project_environment-'+block_id+'-'+environment+'" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Onshore-Pad Type">&emsp;<label>Onshore-Pad Type</label><br><input type="checkbox" name="project_environment-'+block_id+'-'+environment+'" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Offshore-Swamp">&emsp;<label>Offshore-Swamp</label><br><input type="checkbox" name="project_environment-'+block_id+'-'+environment+'" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Offshore-Shallow Water">&emsp;<label>Offshore-Shallow Water</label><br><input type="checkbox" name="project_environment-'+block_id+'-'+environment+'" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Offshore-Deepwater">&emsp;<label>Offshore-Deepwater</label><br><input type="checkbox" name="project_environment-'+block_id+'-'+environment+'" data-id="'+block_id+'" class="environment-cls" id="id_project_environment" value="Others">&emsp;<label>Others</label></td>/tr>'
+        $("#field_table"+block_id).append(new_row);
+    }
+    else{
+        //Swal.fire("field name already exists")
+    }
+
+})
+
+$(document).on("click", "#field-delete-row", function () {
+    var field_val=$(this).closest('td').prev('td').find('.field-class').val()
+    var field_id=$(this).closest('td').prev('td').find('.fieldid').val()
+    if (is_filled == true && lenfield==true){
+        var current_element=$(this)
+        if(field_id!='')
+        {
+        //     console.log(field_id)
+           
+        //     $.ajax({
+        //         type:"GET",
+        //         data:{'field_id':field_id},
+        //         url:'/projects/checkfieldedexists',
+        //         success: function(data){
+        //         if (data.data == 'exists'){
+        //             Swal.fire({
+        //                 icon:'warning',
+        //                 title: 'There is already data associated with this '+field_val+'',
+        //                 confirmButtonColor: '#3085d6',
+        //                 cancelButtonColor: '#d33',
+        //             })
+        //         }
+        //         else{
+                    $.ajax({
+                        type:"GET",
+                        data:{'field_id':field_id},
+                        url:'/projects/checkfieldedexists',
+                        success: function(data){
+                        if (data.data == 'exists'){
+                            Swal.fire({
+                                icon:'warning',
+                                title: 'There is already data associated with this '+field_val+',Do you want to delete this '+field_val+' anyway?',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Yes, I Confirm',
+                                cancelButtonText: 'No',
+                                }).then((result) => {
+                                if (result.isConfirmed) {
+                                    current_element.closest('tr').remove()
+                                    Swal.fire(''+field_val+' Field Deleted Successfully')
+                                }
+                                })
+                            }
+                            else if (data.data=="no_fieldenvironment"){
+                                Swal.fire({
+                                    icon:'warning',
+                                    title: 'There is no data associated with this '+field_val+',Do you want to delete this '+field_val+'?',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#3085d6',
+                                    cancelButtonColor: '#d33',
+                                    confirmButtonText: 'Yes, I Confirm',
+                                    cancelButtonText: 'No',
+                                    }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        current_element.closest('tr').remove()
+                                        Swal.fire(''+field_val+' Field Deleted Successfully')
+                                    }
+                                    })
+                                }
+                            }
+                       })
+                    // }
+                // }
+            // })
+        }
+        else{
+            $(this).closest('tr').remove()
+            is_filled=true;
+
+        }
+    }
+ 
+    
+})
+
+
+$(document).on("change",".environment-cls",function(){
+    var index=$(this).closest('tr').index()
+    var block_id=$(this).attr('data-id')
+    var value=$(this).val()
+    if (value=="Others"){
+    if ($(this).is(':checked')){
+        var new_row ='<table list="browsers" autocomplete="off" id="others'+block_id+'-'+index+'"><tbody><tr><td ><input list="browsers" autocomplete="off" type="text" name="environment-'+block_id+'-'+value+'-'+index+'" id="environment_id" data-id="'+block_id+'" data-type="'+value+'" index="'+index+'" class="form-control others-env-cls"><datalist id="browsers"><option value="Not Applicable"></datalist></td><td class="fld-btn"><button id="environment-add-row" data-id="'+block_id+'" data-type="'+value+'" class="btn-clr environment-add-row btn max-min " index="'+index+'" type="button" value ="add"><i class="fa fa-plus"></i></td></tr></tbody></table>'
+        $(this).closest('td').append(new_row);
+        // $(this).closest('td').append(new_row);
+    }
+    else{
+        $(this).closest('td').find('#others'+block_id+'-'+index+'').remove()
+        // $('#others'+block_id+'-'+index+'').remove();
+    }
+    }
+
+})
+
+
+
+$(document).on("click","#environment-add-row",function(){
+    if (is_filled == true && lenfield == true && duplicate== true){
+    var block_id=$(this).attr('data-id')
+    var value=$(this).attr('data-type')
+    var index=$(this).attr('index')
+    var new_row = '<tr><td><input type="hidden" name="environmentid-'+block_id+'-'+value+'-'+index+'" index="'+index+'" data-id="'+block_id+'" data-type="'+value+'" class="others-cls" value=" "><input list="browsers" autocomplete="off" type="text" name="environment-'+block_id+'-'+value+'-'+index+'" index="'+index+'" data-id="'+block_id+'" data-type="'+value+'" id="environment_id" class="form-control others-env-cls"><datalist id="browsers"><option value="Not Applicable"></datalist></td><td><button id="environment-add-row" data-id="'+block_id+'" data-type="'+value+'" class="btn-clr environment-add-row btn max-min" index="'+index+'" type="button" value ="add"><i class="fa fa-plus"></i><button id="environment-delete-row" data-id="'+block_id+'" data-type="'+value+'" class="btn-clr environment-delete-row btn max-min" type="button" value ="delete"><i class="fa fa-minus"></i></button></td></tr>'
+
+    $('#others'+block_id+'-'+index+'').append(new_row)
+    }
+    else{
+
+    }
+})
+
+
+
+
+// $(document).on("click",".environment-cls",function(){
+//     var hdid=$(this).prev('input').val()
+//     var fieldid=$(this).prev('input').attr('fieldid');
+
+//     var val=$(this).next('label').text();
+//     var current_element=$(this)
+//     if(field_environment_id !='')
+//         {
+//          $.ajax({
+//             type :"GET",
+//             data:{'field_environment_id':fieldid},
+//             url:'/projects/checkeditmasterfieldenv',
+//             success:function(data){
+//                 console.log(data)
+//                 if (data.data == 'exists'){
+//                     // alert('field environment already exists')
+//                     Swal.fire({
+//                             icon:'warning',
+//                             title: 'There is already data associated with this '+block_ids+'',
+//                             confirmButtonColor: '#3085d6',
+//                             cancelButtonColor: '#d33',
+//                     })
+//                 }
+//                 else{
+//                     $.ajax({
+//                         type:"GET",
+//                         data:{'field_env_id':hdid,
+//                             'fieldid':fieldid},
+//                         url:'/projects/checkfenvexist',
+//                         success: function(data){
+//                             console.log(data)
+//                             if (data.data == "exists"){
+//                                 Swal.fire({
+//                                     icon:'warning',
+//                                     title: 'There is already data associated with this '+val+',Do you want to delete this '+val+' anyway?',
+//                                     showCancelButton: true,
+//                                     confirmButtonColor: '#3085d6',
+//                                     cancelButtonColor: '#d33',
+//                                     confirmButtonText: 'Yes, I Confirm',
+//                                     cancelButtonText: 'No',
+//                                     }).then((result) => {
+//                                     if (result.isConfirmed) {
+//                                         Swal.fire(''+val+' Field environment Deleted Successfully')
+//                                         current_element.prev('input').remove();
+//                                     }
+//                                     else{
+//                                         current_element.prop("checked",true)
+//                                     }
+//                                     })
+
+//                             }
+//                             else if (data.data == "no_clusters"){
+//                                 Swal.fire({
+//                                     icon:'warning',
+//                                     title: 'There is no data associated with this '+val+',Do you want to delete this '+val+' anyway?',
+//                                     showCancelButton: true,
+//                                     confirmButtonColor: '#3085d6',
+//                                     cancelButtonColor: '#d33',
+//                                     confirmButtonText: 'Yes, I Confirm',
+//                                     cancelButtonText: 'No',
+//                                     }).then((result) => {
+//                                     if (result.isConfirmed) {
+//                                         Swal.fire(''+val+' Field environment Deleted Successfully')
+//                                         current_element.prev('input').remove();
+//                                     }
+//                                     else{
+//                                         current_element.prop("checked",true)
+//                                     }
+//                                     })
+
+//                                 }
+//                         }
+//                     })
+//                 } 
+//             }
+
+//         })
+        
+            
+//     }
+
+//     else{
+//         // $(this).closest('tr').remove()
+//         // is_filled=true;
+//     }
+  
+    
+// })
+
+
+$(document).on("click", "#environment-delete-row", function () {
+    var other_val=$(this).closest('td').prev('td').find('.others-cls').val()
+    console.log({'otherval':other_val})
+    var field_env=$(this).closest('td').prev('td').find('.others-env-cls').val()
+    var current_element=$(this)
+    var other_val=$(this).closest('td').prev('td').find('.others-cls').val()
+    var field_env=$(this).closest('td').prev('td').find('.others-env-cls').val()
+
+    if (field_env == ''){
+        $(this).closest('tr').remove()
+        is_filled=true;
+        
+    }
+    else{
+        if(other_val == ' ')
+        {
+            $(this).closest('tr').remove()
+        }
+        else
+        {
+        if (is_filled == true && lenfield==true && duplicate== true){
+            // alert('hy')
+            // var other_val=$(this).closest('td').prev('td').find('.others-cls').val()
+            // var field_env=$(this).closest('td').prev('td').find('.others-env-cls').val()
+            var current_element=$(this)
+            console.log({'other_val':other_val})
+            console.log({'field_env':field_env})
+            // if (field_env != '')
+            // {
+            //     $.ajax({
+            //         type :"GET",
+            //         data:{'field_environment_id':other_val},
+            //         url:'/projects/checkeditmasterfieldenv',
+            //         success:function(data){
+            //             console.log(data)
+            //             if (data.data == 'exists'){
+            //                 Swal.fire({
+            //                         icon:'warning',
+            //                         title: 'There is already data associated with this '+field_env+'',
+            //                         confirmButtonColor: '#3085d6',
+            //                         cancelButtonColor: '#d33',
+            //                 })
+            //             }
+                        // else{
+                            console.log({'other_field_env_id':other_val})
+                            $.ajax({
+                                type:"GET",
+                                data:{'other_field_env_id':other_val},
+                                url:'/projects/checkfieldenvexists',
+                                success: function(data){
+                                    console.log(data)
+                                    if (data.data == 'exists'){
+                                        Swal.fire({
+                                            icon:'warning',
+                                            title: 'There is already data associated with this '+field_env+',Do you want to delete this '+field_env+' anyway?',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#3085d6',
+                                            cancelButtonColor: '#d33',
+                                            confirmButtonText: 'Yes, I Confirm',
+                                            cancelButtonText: 'No',
+                                            }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                current_element.closest('tr').remove()
+                                                Swal.fire(''+field_env+' Field environment Deleted Successfully')
+                                                var other_type=$(document).find('table tr').length
+                                                console.log({'len':other_type})
+                                                if(other_type==1){
+                                                    $('.checkbox-cls').prop('checked',false)
+                                                }
+                                                else{
+                                                    $('.checkbox-cls').prop('checked',true)
+                                                }
+}
+                                            })
+                                        }
+                                    else if (data.data=="no_clusters"){
+                                        Swal.fire({
+                                            icon:'warning',
+                                            title: 'There is no data associated with this '+field_env+',Do you want to delete this '+field_env+'?',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#3085d6',
+                                            cancelButtonColor: '#d33',
+                                            confirmButtonText: 'Yes, I Confirm',
+                                            cancelButtonText: 'No',
+                                            }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                current_element.closest('tr').remove()
+                                                Swal.fire(''+field_env+' Field environment Deleted Successfully')
+                                                var other_type=$(document).find('table tr').length
+                                                console.log({'len':other_type})
+                                                if(other_type==1){
+                                                    $('.checkbox-cls').prop('checked',false)
+                                                }
+                                                else{
+                                                    $('.checkbox-cls').prop('checked',true)
+                                                }
+                                            }
+                                            })
+                                    }
+                                }
+                            })
+                        //$(this).closest('tr').remove()
+                        // }
+                    // }
+                // })
+                
+           }
+        else{
+            // $(this).closest('tr').remove()
+            // is_filled=true;
+        }
+    }
+    }
+})
+
+$(document).on("keyup",".field-class",function(){
+    var x=$(this).val().toLowerCase();
+    var blockid=$(this).attr('data-id')
+    var spanid=$(this).closest('tr').index()
+    if (x.length <= 14){
+        $('#field'+blockid+'-'+spanid+'').remove()
+        lenfield = true;
+    }
+    else {
+        $('#field'+blockid+'-'+spanid+'').remove()
+        $(this).closest('tr').find('td:first').append('<span class="waring-err" id=field'+blockid+'-'+spanid+'>Maximum 14 Characters only</span>')
+        lenfield = false;
+    }
+    var z=0;
+    var a=0
+    $(".field-class").each(function(){
+        if (x != 'not applicable'){
+            var y=$(this).val().toLowerCase();
+            if(x==y && y !=''){
+                z=z+1;
+            }
+        }
+    }); 
+    if(z>1){
+        $('#fieldspan'+blockid+'-'+spanid+'').remove()
+        $(this).addClass("error")
+        is_filled = false;
+        $(this).closest('tr').find('td:first').append('<span class="waring-err" id=fieldspan'+blockid+'-'+spanid+'>Field Name Already Exists</span>')
+    }
+    else{
+        $(this).removeClass("error")
+        is_filled = true;
+        $('#fieldspan'+blockid+'-'+spanid+'').remove()
+    }
+})
+
+$(document).on("keyup",".others-env-cls",function(){
+    var other_value;
+    other_value = $(this).val().toLowerCase();
+    var blockid;
+    blockid = $(this).attr('data-id')
+    var indexes;
+    indexes = $(this).attr('index')
+    var value=$(this).attr('data-type') 
+    if (other_value.length <= 25){
+        $('#otherspanduplicate'+value+'-'+blockid+'-'+indexes+'').remove()
+        duplicate = true;
+    }
+    else {
+
+        $('#otherspanduplicate'+value+'-'+blockid+'-'+indexes+'').remove()
+        //$(this).addClass("waring-err")
+        $(this).closest('tr').find('td:first').append('<span class="waring-err" id="otherspanduplicate'+value+'-'+blockid+'-'+indexes+'">Maximum Character 25 Character only</span>')
+        //$(this).closest('tr').find('td:first').append('<span class="waring-err" id=otherspan'+value+'-'+blockid+'-'+indexes+'>Maximum 25 Characters only</span>')
+        duplicate = false;
+    }
+    var val_count=0;
+    $(".others-env-cls").each(function(){
+        if (other_value != 'not applicable'){
+            var cur_val=$(this).val().toLowerCase();
+            if(other_value==cur_val && cur_val !=''){
+                val_count=val_count+1;
+            }
+        }
+    });
+    if(val_count>1){
+        $('#otherspan'+value+'-'+blockid+'-'+indexes+'').remove()
+        $(this).addClass("error")
+        is_filled = false;
+        $(this).closest('tr').find('td:first').append('<span class="waring-err" id=otherspan'+value+'-'+blockid+'-'+indexes+'>Field Environment Already Exists</span>')
+    }
+    else{
+        $(this).removeClass("error")
+        is_filled = true;
+        $('#otherspan'+value+'-'+blockid+'-'+indexes+'').remove()
+    }
+})
+
+$(document).on("click",".environment-cls",function(){
+    var val=$(this).prev('input').val()
+    //var asd=$(this).prev('input').removeAttr('value')
+    //var asd=$(this).prev('input').prop('value',false)
+    var value=$(this).val()
+    var current_element=$(this)
+    /*
+    if (val !='None' || val !=''){
+    $.ajax({
+        type:"GET",
+        data:{'field_env_id':val},
+        url:'/projects/checkfield',
+        success: function(data){
+            console.log(data)
+            if (data.data=="exists"){
+                Swal.fire({
+                    icon:'warning',
+                    title: 'There is already data associated with this '+value+',Do you want to delete this '+value+'?',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, I Confirm',
+                    cancelButtonText: 'No',
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire(''+value+' Field environment Deleted Successfully')
+                    }
+                    else if (result.isDismissed) {
+                        current_element.prop('checked',true)
+                    }
+        
+                    })
+            }
+            else if (data.data=="no_clusters"){
+                Swal.fire({
+                    icon:'warning',
+                    title: 'There is no data associated with this '+value+',Do you want to delete this '+value+'?',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, I Confirm',
+                    cancelButtonText: 'No',
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire(''+value+' Field environment Deleted Successfully')
+                        current_element.closest('td').find('.field-env-hdn').prop('value','')
+                    }
+                    else if (result.isDismissed) {
+                        current_element.prop('checked',true)
+                        current_element.closest('td').find('.field-env-hdn').attr('value','')
+                    }
+        
+                    })
+            }
+
+        }
+    })
+    }
+    else{
+        $(this).closest('td').find('.field-env-hdn').attr('value',val)
+    }*/
+})
+var empty_filled=true;
+var others_filled=true;
+$(".submit-cls").click(function(){
+    var data_type=$(this).attr('data-type')
+    var form=$("#edit-masterfield");
+    var block_count=0;
+    $('.block_name').each(function(){
+        if ($(this).is(":checked")) {
+            block_count++;
+        }
+    })
+    
+    if (block_count == 0){
+        is_filled = false;
+        Swal.fire({
+              icon: 'error',
+              title: 'Error...',
+              text: 'Atleast Select one Block',
+              })
+    }
+    
+    $('.field-class').each(function(){
+        if($(this).val()==""){
+            empty_filled = false;
+            $(this).addClass("error")
+            Swal.fire({
+                icon: 'error',
+                title: 'Error...',
+                text: 'The Field is required',
+                })
+        }
+        else{
+            empty_filled=true;
+        }
+    })
+    $('.others-env-cls').each(function(){
+        if ($(this).val()=='') {
+            others_filled = false;
+           Swal.fire({
+              icon: 'error',
+              title: 'Error...',
+              text: 'The Field environment is required',
+              })
+       }
+       else{
+        others_filled=true;
+       }
+    })
+    if (is_filled == false || lenfield ==false || empty_filled == false || others_filled == false || duplicate== false){
+        console.log('not create')
+    }
+    else{
+        $(this).prop('disabled', true);
+        $.ajax({
+          type:"POST",
+          container:"#edit-masterfield",
+          url:'/projects/editmasterfield/'+project_id,
+          data:form.serialize(),
+          success: function(data){
+            console.log(data)
+            if (data_type == '1' ){
+                var current_url=$(location).attr("href")
+                var replace_url=current_url.replace("editmasterfield/"+project_id+"","listmaster")
+                window.location.href = replace_url;
+            }
+            else{
+            var url = "{% url 'projects:editmastercluster' 123 %}";
+            document.location.href = url.replace('123', project_id);
+            }
+        }
+        })
+    }
+})
+
+
+$(document).on("click", ".prev-btn", function () {
+    var project_id=$(this).attr('project-id');
+    console.log(project_id)
+    var current_url=$(location).attr("href")
+    console.log(current_url)
+    var replace_url=current_url.replace("editmasterfield/"+project_id+"","editmasterblock/"+project_id+"")
+    window.location.href = replace_url; 
+})
+
+</script>
+{% endblock %}

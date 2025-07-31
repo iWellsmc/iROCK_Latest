@@ -1,0 +1,500 @@
+.modal-box_sty
+{
+    width:1250px !important;
+}
+.cont_tab-li
+{
+    border-right: 2px solid  var(--tableborder-color);
+}
+td.cont_tab-li:nth-child(2)
+{
+text-align:  var(--centertext-align) !important;
+}
+td.cont_tab-li:nth-child(3)
+{
+    text-align: var(--lefttext-align) !important;
+}
+.prj-back_clr th
+  {
+    background: transparent !important;
+    background-color: none !important;
+  }
+.text-al_cen
+{
+  word-break: break-word;
+}
+.upload-btn-wrapper {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+.im-port-cont:focus {
+  box-shadow: none;
+}
+.dow-temp-width {
+  width: 125% !important;
+}
+.ven-con-mas-pop{
+  width: 100% !important;
+}
+
+.lds-dual-ring.hidden {
+  display: none;
+}
+
+#amendment-bold{
+  font-weight: 600 !important;
+  text-align: unset !important;
+}
+
+.lds-dual-ring {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 5% auto;
+  border-radius: 50%;
+  border: 6px solid #fff;
+  border-color: #fff transparent #fff transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+
+@keyframes lds-dual-ring {
+  0% {
+      transform: rotate(0deg);
+  }
+
+  100% {
+      transform: rotate(360deg);
+  }
+}
+
+h5.head_cls {
+  color: white !important;
+  position: absolute;
+  right: 46%;
+  bottom: 500px !important;
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(212, 208, 208, 0.8);
+  z-index: 999;
+  opacity: 1;
+  transition: all 0.5s;
+}
+.down-excel-temp {
+  margin-bottom: 20px;
+}
+
+.pop-input-line:focus {
+  border-color: #95183a !important;
+}
+
+.pop-input-line {
+  color: #a01c3f !important;
+  font-weight: 500 !important;
+}
+
+.che-file-wd {
+  width: 100%;
+}
+
+.pop-hed {
+  color: #007b97;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.sear-box-ryt {
+  float: right;
+  margin: 25px 15px;
+}
+
+.search-f-inf {
+  border: 1px solid #96183a;
+  padding: 5px;
+  border-radius: 3px;
+}
+.search-f-inf:focus {
+  border: 1px solid #931738 !important;
+}
+
+button.v_search {
+  border: none;
+  background: #9c1b3d;
+  border-radius: 3px;
+  padding: 4px 6px 4px 6px;
+}
+
+.sea-rch-clr {
+  color: #fff !important;
+}
+.vin-width {
+  width: 30%;
+}
+
+.up-arr {
+  background: transparent;
+  border: none;
+  color: #a11d40;
+  padding: 0px;
+}
+
+.down-arr {
+  background: transparent;
+  border: none;
+  color: #a11d40;
+  padding: 0px;
+}
+
+td.contra-first-tbl {
+  border-right: 2px solid  var(--tableborder-color);
+  padding: 20px 20px;
+  border-bottom: 1px solid  var(--tableborder-color) !important;
+  word-break: break-word !important;
+}
+table.type-last-vend {
+  border-radius: 5px;
+  box-shadow: 0px 0px 5px;
+}
+
+.type-last-vend {
+  table-layout: fixed;
+  width: 100% !important;
+}
+/* table width */
+@media only screen and (min-width:768px) and (max-width:1024px)
+{
+.size-of_tbl
+{
+  width: 150vw !important;
+}
+}
+
+ .size-of_tbl th
+ {
+  border-top:1px solid  var(--tableborder-color) !important;
+ }
+ @media only screen and (min-width:768px) and (max-width:1200px)
+ {
+  .ser-vice-wid {
+    width: 300% !important;
+}
+.text-space_width
+{
+  width: 100% !important;
+}
+ }
+ .ser-vice-wid {
+  width: 140%;
+}
+
+ .btn.disabled, .btn:disabled {
+  opacity: .65 !important;
+}
+.wid-sn
+{
+  border-left: 1px solid  var(--tableborder-color) !important;
+}
+
+.addfiles-bottom-spae {
+  padding: 15px !important;
+}
+.box-addfiles {
+  border-bottom: 1px solid #9f9f9f70;
+  margin-bottom: 5px !important;
+}
+
+.cr-ven {
+  color: #8b1434;
+  font-size: 18px;
+  font-weight: 600 !important;
+  padding-right: 5px;
+  text-align: left;
+  width: 38%;
+}
+
+.ven-wid {
+  width: 20%;
+}
+
+.ame-co {
+  font-size: 16px;
+  font-weight: 600;
+  color: black;
+  word-break: break-word;
+  width: 55%;
+  text-align: left;
+}
+
+.che-padd {
+  text-align: left !important;
+  padding-left: 0px !important;
+  width: 0px;
+}
+@media only screen and (min-width:768px) and (max-width:1200px)
+{
+  .ame-co {
+    width: 38% !important;
+  }
+
+}
+.inp-copy-contr {
+  width: 100%;
+  max-width: 700px;
+}
+.inc-clr {
+  color: #00958e;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.copy-width {
+  width: 51%;
+  text-align: left;
+  padding-right: 5px;
+}
+table.inc-tax {
+  width: 100%;
+  border: 1px solid var(--tableborder-color);
+}
+
+.inc-tax td {
+  border: 1px solid var(--tableborder-color);
+  padding: 10px;
+  text-align:  var(--centertext-align);
+}
+.inc-tax td:first-child {
+  font-size: 16px;
+  font-weight: 500;
+  color: #AF2B50;
+  background: #f3f3f36b;
+  text-align: var(--lefttext-align);
+}
+
+.view-vct-tbl td {
+  text-align:  var(--centertext-align);
+}
+
+.t-ax-na {
+  color: #000;
+  font-size: 16px !important;
+  font-weight: 600;
+}
+
+.bor-cllr:focus {
+  border-color: #830000 !important;
+  outline: 0;
+}
+
+.bor-cllr {
+  width: 100% !important;
+  max-width: 450px !important;
+}
+
+.box-cs {
+  padding: 30px 0px;
+  margin-top: 10px;
+  border: 1px solid #c2c2c2;
+}
+.wid-percen {
+  width: 150px;
+}
+
+.line_border1 {
+  border-top: 1px solid #c2c2c2;
+  margin-top: 10px;
+}
+.box-txs {
+  padding: 30px 0px;
+  border: 1px solid #c2c2c2;
+  margin-top: 10px;
+}
+.maiin-cls {
+  width: fit-content;
+}
+
+.ex-width {
+  width: 100% !important;
+  max-width: 280px;
+}
+.texx-rgh {
+  text-align: right;
+}
+
+.contract-master-service-table td{
+  border-right: 0px !important ;
+  border-left: 0px !important ;
+  border-top: 0px !important ;
+}
+
+.contract-master-service-table-div{
+  box-shadow: 0px 0px 5px;
+}
+
+.contract-master-service-table th{
+  padding: 0.5rem !important;
+}
+
+.contract-master-service-table td{
+  padding: 0.5rem !important;
+}
+
+.td-center {
+  text-align: var(--centertext-align) !important;
+}
+
+.td-left {
+  text-align: var(--lefttext-align) !important;
+}
+
+/**********  **********/
+.seek-left td:nth-child(2),
+/* .seek-left tr:nth-child(1) td:nth-child(3) */
+/* .seek-left tr:nth-child(1) td:nth-child(4), */
+.seek-left td:nth-child(5) { 
+  white-space: normal !important;
+  text-align: var(--lefttext-align) !important;
+}
+/**********  **********/
+
+
+/********** import_cost_code_type  **********/
+.upload-table td span {
+  color: red;
+  font-weight: 500;
+}
+
+.note-upload {
+  /* width: 165px;
+  background: #bd2753;
+  border-radius: 7px;
+  padding: 5px; */
+  margin: 0px 0px 10px;
+}
+
+.note-upload h6 {
+  margin-bottom: 0px;
+  font-size: 16px;
+}
+
+.note-color {
+  color: #AF2B50;
+  font-size: 16px;
+}
+
+.second-text {
+  padding-left: 80px;
+}
+/********** import_cost_code_type  **********/
+
+/********** WCC  **********/
+.empty-wid {
+  width:0px
+}
+
+.nos-wid {
+  width: 145px;
+}
+/********** WCC  **********/
+
+/* Tab Response */
+@media screen and (min-width: 768px) and (max-width:1023px){
+.m-ven-cus-mas tr th{
+  width: 150px !important;
+}
+.ven-con-mas-pop .col-3 {
+  width: 50% !important;
+  margin: 10px 0;
+}
+
+/* create Vendor tax */
+.create-ven-tax td {
+  font-size: 15px;
+  width: auto;
+}
+.create-ven-tax .col-md-10 {
+  padding: 1% 0 0 10%;
+}
+
+}
+
+.icon-img-svg {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  filter: invert(14%) sepia(49%) saturate(4726%) hue-rotate(329deg) brightness(94%) contrast(94%);
+}
+
+.first-table>thead>tr>th{
+  padding: 10px 8px;
+}
+
+.first-table>tbody>tr>td{
+  padding: 10px 8px;
+}
+
+.first-table{
+  margin: 10px;
+  border: 1px solid var(--tableborder-color) !important;
+  /* border: 1px solid !important; */
+}
+
+.first-table>tbody>tr:first-child{
+  border-bottom: 1px solid var(--tableborder-color) !important;
+}
+
+.accordion-content>td{
+  padding: 0px !important;
+}
+
+.second-table>thead>tr>th{
+  padding: 10px 8px;
+}
+
+.second-table>tbody>tr>td{
+  padding: 10px 8px;
+}
+
+.view-ul>li>a{
+  color: #96183a ;
+}
+
+.big-text{
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.second-table{
+  border-bottom: 1px solid var(--tableborder-color) !important;
+}
+
+#amendment_table .txt-name{
+  font-size: 16px !important;
+}
+
+label.txt-name{
+  font-size: 16px !important;
+}
+
+.fix-width-action{
+  min-width: 150px;
+}
+
+input.taxwithpercls{
+  width: 100% !important;
+}
+
+.form-control:disabled, .form-control[readonly]{
+  background-color: transparent !important;
+}

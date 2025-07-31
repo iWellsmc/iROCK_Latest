@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block content %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load InvoiceGuardTags %}
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_process/flow.css' %}">
+
+<section id="data-list-view" class="data-list-view-header">
+
+    <!-- DataTable starts -->
+    <div>
+        <div class="row">
+            <div class="col-12 text-end">
+                <a class="btn btn-clr chck-tst" href="{% url 'InvoiceGuard:list-rolesandrights-form' %}">Back</a>
+            </div>
+        </div>
+        <h5 class="from-head">User Roles and Rights</h5>
+       
+        <div class="row">
+        </div>
+        <div class="table-responsive">
+            <table class="table company-data-list-view creat-head user-roles-and-rights usesr-management-section irock-table" id="alltaxes_list">
+
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>Role Name</th>
+                        <!-- <th>Role Name</th> -->
+                        <th>Actions</th>
+                        </tr>
+                </thead>
+                {% if roles_count > 0 %}
+                <tbody class="table-list">
+                    {% for obj in roles %}
+                    <tr>
+                        <td class="sno-center">{{forloop.counter}}</td>
+                        <td class="td-left">{{obj.role_name}}</td>
+                        <td  class="actions-center icc-pd">
+                            <!-- {% if request.user.roles_id == 3 %}
+                            {%if rights.view == '1' %} 
+
+                                {% endif %}
+                            {% else %}
+
+                            {% endif %} -->
+                            {% if request.user.roles_id == 3 %}
+                                {%if rights.edit == '1' %} 
+                                    <a class="text-decoration-none" href="{% url 'InvoiceGuard:edit-role-form' pk=obj.id %}">
+                                        <span class="action-edit"><i class="fa fa-edit" title="Edit"></i></span>
+                                    </a>
+                                {% endif %}
+                                {% else %}
+                                <a class="text-decoration-none" href="{% url 'InvoiceGuard:edit-role-form' pk=obj.id %}">
+                                    <span class="action-edit"><i class="fa fa-edit" title="Edit"></i></span>
+                                </a>
+                                {% endif %}
+                            {% if request.user.roles_id == 3 %}
+                                {%if rights.delete == '1' %} 
+                                <a class="delete_tax" data-id="{{obj.id}}" data-name="{{obj.role_name}}">
+                                    <!-- href="{% url 'projects:deletecompanytax' pk=obj.id %}" -->
+                                    <span class="action-delete"><i class="fa fa-trash" title="Delete"></i></span>
+                                </a>
+                                {% endif %}
+                                {% else %}
+                                <a class="delete_tax" data-id="{{obj.id}}" data-name="{{obj.role_name}}">
+                                    <!-- href="{% url 'projects:deletecompanytax' pk=obj.id %}" -->
+                                    <span class="action-delete"><i class="fa fa-trash" title="Delete"></i></span>
+                                </a>
+                                {% endif %}
+                                    
+
+                        </td>
+                    </tr>
+                    {% endfor %} 
+                </tbody>
+                {% else %}
+                <tr>
+                <td colspan="3" class="text-center">----</td>
+                </tr>
+                {% endif %}
+            </table>
+        </div>
+    
+    </div>
+    <!-- DataTable ends-->
+    <!-- add new sidebar ends -->
+</section>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<style>
+    .table>:not(:first-child) {
+    border-top: 0px solid currentColor;
+    }
+
+ .creat-head th {
+    border-right:1px solid var(--tableborder-color) !important;
+}  
+
+    
+</style>
+<script type="text/javascript" src="{% static 'js/invoiceguard/modulebasedrole.js' %}"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+
+$(document).on("click", ".delete_tax", function (e) {
+            e.preventDefault();
+            //let url = $(this).data('id');
+            let name = $(this).data('name');
+            //var pk = $(this).data('data-id');
+            var pk = $(this).attr('data-id');
+            console.log({'pk':pk})
+            //let name = $(this).attr('data-name');
+            Swal.fire({
+                title: 'Do You Want To Delete '+name+' ?',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, I Confirm',
+                cancelButtonText: 'No',
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    //return window.location.href = 'delete-userdepartment-form/'+url;
+                    $.ajax({
+                        url: '{% url "InvoiceGuard:delete-role-form" %}',
+                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                        data: {
+                            'pk': pk
+                        },
+                        type: 'POST',
+                        success: function(response) {
+                            if (response.status) {
+                                // reload the page
+                                window.location.reload();
+                                // Success message
+                            } else {
+                                // Error message
+                            }
+                        },
+                        error: function() {
+                            // Error message
+                        }
+                    });
+                  }
+                   });
+            return false;
+        });
+        
+    </script>
+   
+{% endblock %}

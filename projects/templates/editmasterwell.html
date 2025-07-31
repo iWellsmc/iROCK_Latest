@@ -1,0 +1,410 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/projectmaster.css' %}">
+<section>
+    <div class="row">
+        <div class="col-12 text-end">
+            <button class="btn btn-clr chck-tst waves-effect waves-float waves-light" ><a href="{% url 'projects:listmaster'%}">Back</a></button>
+        </div>
+    </div>
+    <h3 class="from-head">Edit Well</h3>
+    <form method="POST" class="form-txt" id="edit-masterwell">
+        {% csrf_token %}
+        <div class="row">
+            
+            <div class="col-5">
+                <label class="txt-name unique-colr">Country:</label>
+                <span class="txt-detail uniq-name">{{project_details.country.nicename}}</span>
+            </div>
+            <div class="col-7">
+                <label class="txt-name unique-colr">Project Name:</label>
+                <span class="txt-detail uniq-name">{{project_details.name}}</span>
+            </div>
+        </div>
+        <div class="table-responsive text-nowrap">
+        <div class="row size-of_tbl1">
+                <div class="row">
+                    <div class="col-2 text-center">
+                        <label class="txt-name">Block Name</label>
+                    </div>
+                    <div class="col-2 text-center">
+                        <label class="txt-name">Field Name</label>
+                    </div>
+                    <div class="col-2 text-left p-0">
+                        <label class="txt-name">Field Environment</label>
+                    </div>
+                    <div class="col-2 text-left">
+                        <label class="txt-name">Cluster</label>
+                    </div>
+                    <div class="col-2 text-left p-0">
+                        <label class="txt-name">Development Type</label>
+                    </div>
+                    <div class="col-2 text-left p-0">
+                        <label class="txt-name">Well</label>
+                    </div>
+                </div>
+                <!-- <label class="txt-name">Block Name</label> -->
+                {% for block in project_block %}
+                <div class="row block-row spacing-top">
+                    <div class="col-2 spacing-top">
+                        <span class="txt-detail blk-edit">{{block.block_name}}</span>
+                    </div>
+                    <div class="col-10">
+                        {% for field in block.id|get_field:"field" %} 
+                                <div class="row block-row spacing-top">
+                                    <div class="col-2">
+                                        <div><span class="checkbox-text txt-detail edit-fld">{{field.field_name}}</span></div>
+                                    </div>
+                                    <div class="col-10">
+                                        {% for environment in field.id|get_environment:"environment" %}
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <span class="checkbox-text txt-detail">{{environment.project_environment}}-{{environment.project_environment_subtype|default_if_none:"---"}}</span>
+                                            </div>
+                                            <div class="col-9">
+                                                {% for cluster in environment.id|get_clusters:field %} 
+                                                    <div class="cluster_headings txt-detail clust-nme1">{{cluster.cluster_name}}</div>
+                                                    {% for clustername in cluster.id|get_clustersub:cluster %}  
+                                                        <div class="row block-row spacing-top">
+                                                            <div class="col-4">
+                                                                <div class="clusternames chk-name1"><input type="checkbox" name="cluster_name" value="{{clustername.id}}" class="cluster_name" data-id="{{clustername.id}}" {% if clustername.id|checkclusterhasdevelopmenttype:clustername > 0 %} checked=checked {% endif %}><span class="checkbox-text txt-detail">{{clustername.cluster_subname}}</span></div>
+                                                            </div>
+                                                            <div class="col-8" id="developmentadd-{{clustername.id}}">
+                                                                {% if clustername.id|checkclusterhasdevelopmenttype:clustername > 0 %}
+                                                                {% for develop in development %}
+                                                                    <div class="row">
+                                                                        {% with clustername.id|get_development_type:develop as development_id %}
+                                                                        
+                                                                        <div class="col-6 stright-line dev-{{clustername.id}}">
+                                                                            <input type="hidden" name="developmenthdn-{{clustername.id}}" value="{{development_id}}">
+                                                                            
+                                                                            <input type="checkbox" data-id="{{clustername.id}}" class="development-cls" name="development-{{clustername.id}}" {% if clustername.id|checkdevelopmenttype:develop > 0%} checked=checked {% endif %} data-type="{{develop}}" value="{{develop}}"><label class="txt-detail">&emsp;{{develop|replace_development}}</label>
+                                                                        </div>
+                                                                        <div class="col-6 bottom-line" id="dev-{{clustername.id}}-{{develop}}">
+                                                                           
+                                                                            {% for well_types in welltypes %}
+                                                                            {% if clustername.id|checkdevelopmenttype:develop > 0%}
+                                                                            {% getwellmaindata development_id well_types as check_data %}
+                                                                            <div class="">
+                                                                               <div class="work-inter"> <input type="checkbox" name="well_type{{clustername.id}}-{{develop}}" dev-type="{{develop}}" value="{{well_types|cap_wells}}" data-type="{{well_types|wellname}}" class="well_type" {% if check_data.0 > 0 %} checked=checked {% endif %} data-id="{{clustername.id}}" ><span class="checkbox-text txt-detail">{{well_types}}</span></div>
+                                                                                {% if check_data.0 > 0 %}
+                                                                                <div>
+                                                                                    <table id="wells_table{{well_types|wellname}}-{{clustername.id}}-{{develop}}">
+                                                                                        <tbody>
+                                                                                            {% for well in development_id|getwellname:well_types %} 
+                                                                                            <tr>
+                                                                                                <td><input type="hidden" name="wellid_{{well_types|wellname}}{{clustername.id}}-{{develop}}" class="wellid" value="{{well.id}}"><input type="text" name="wellname_{{well_types|wellname}}{{clustername.id}}-{{develop}}" data-id="{{clustername.id}}" dev-type="{{develop}}" data-type="{{well_types|wellname}}" value="{{well.well_subname}}" class="form-control well-class"></td>
+                                                                                                <td class="same-line2">
+                                                                                                    <button id="well-add-row" class="btn btn-clr add-btn waves-effect waves-float waves-light max-min2" data-id="{{clustername.id}}" type="button" dev-type="{{develop}}" data-type="{{well_types|wellname}}" value="Add"><i class="fa fa-plus"></i></button>
+                                                                                                    <button id="well-delete-row" class="btn btn-clr add-btn waves-effect waves-float waves-light max-min2" data-id="{{clustername.id}}"  type="button" value="Add"><i class="fa fa-minus"></i></button>
+                                                                                                    </td>
+                                                                                                    
+                                                                                            </tr>
+                                                                                            {% endfor %} 
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div> 
+                                                                                {% endif %}
+                                                                            </div>
+                                                                            {% endif %}
+                                                                            {% endfor %}
+                                                                        </div>
+                                                                        {% endwith %}
+                                                                    </div>
+                                                                {% endfor %}
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>    
+                                </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+        </div>
+        </div>
+        
+
+
+
+
+        <div class="text-center spacing-button">
+            <button type="button" class="btn btn-clr text-center prev-btn" project-id={{project_details.id}}>Prev</button>
+            <button type="button" class="btn btn-clr text-center submit-cls">Save</button>
+        </div>
+    
+    </form>
+</section>
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+    var is_filled=true;
+    var lenfield=true;
+    $(document).on("click",".cluster_name",function(){
+        is_filled=true;
+        var cluster_id=$(this).attr('data-id')
+        var html='<div class="row"><div class="dev-'+cluster_id+'">'
+        if (this.checked){
+            html +='<div class="row"><div class="col-6 txt-detail stright-line"><input type="checkbox" data-id="'+cluster_id+'" class="development-cls" name="development-'+cluster_id+'" data-type="Oil_Development" value="Oil_Development">&emsp;<label>Oil Development</label><br></div><div class="col-6 " ><div class="bottom-line" id="dev-'+cluster_id+'-Oil_Development"></div></div></div>'
+            html +='<div class="row"><div class="col-6 txt-detail stright-line"><input type="checkbox" data-id="'+cluster_id+'" class="development-cls" name="development-'+cluster_id+'" data-type="Gas_Development" value="Gas_Development">&emsp;<label>Gas Development</label><br></div><div class="col-6" ><div class="bottom-line" id="dev-'+cluster_id+'-Gas_Development"></div></div></div>'
+            html +='<div class="row"><div class="col-6 txt-detail stright-line"><input type="checkbox" data-id="'+cluster_id+'" class="development-cls" name="development-'+cluster_id+'" data-type="Unconventional_Oil" value="Unconventional_Oil">&emsp;<label>Unconventional Oil</label><br></div><div class="col-6" ><div class="bottom-line" id="dev-'+cluster_id+'-Unconventional_Oil"></div></div></div>'
+            html +='<div class="row"><div class="col-6 txt-detail stright-line"><input type="checkbox" data-id="'+cluster_id+'" class="development-cls" name="development-'+cluster_id+'" data-type="Unconventional_Gas" value="Unconventional_Gas">&emsp;<label>Unconventional Gas</label><br></div><div class="col-6" ><div class="bottom-line" id="dev-'+cluster_id+'-Unconventional_Gas"></div></div></div>'
+            html +='</div></div>'
+            $('#developmentadd-'+cluster_id).html(html)
+        }
+        else{
+            var cluster_ids=$(this).attr('data-id')
+            $('#developmentadd-'+cluster_id+'').html('')
+        }
+    });
+    $(document).on("change",".development-cls",function(){
+        var value=$(this).val();
+        var data_type=$(this).attr('data-type');
+        var cluster_id=$(this).attr('data-id')
+        var html=''
+        if (this.checked){
+            html='<div class="work-inter"><input type="checkbox" name="well_type'+cluster_id+'-'+data_type+'" dev-type="'+data_type+'" value="Exploration Wells" data-type="exploration" class="well_type" data-id='+cluster_id+'><span class="checkbox-text txt-detail">Exploration Wells</span></div>'
+            html +='<div><input type="checkbox" name="well_type'+cluster_id+'-'+data_type+'" class="well_type" dev-type="'+data_type+'" data-type="appraisal" value="Appraisal Wells" data-id='+cluster_id+'><span class="checkbox-text txt-detail">Appraisal Wells</span></div>'
+            html +='<div class="work-inter"><input type="checkbox" name="well_type'+cluster_id+'-'+data_type+'" class="well_type" dev-type="'+data_type+'" data-type="development" value="Development Wells" data-id='+cluster_id+'><span class="checkbox-text txt-detail">Development Wells</span></div>'
+            html +='<div><input type="checkbox" name="well_type'+cluster_id+'-'+data_type+'" class="well_type" dev-type="'+data_type+'" data-type="pilot" value="Pilot Holes" data-id='+cluster_id+'><span class="checkbox-text txt-detail">Pilot Holes</span></div>'
+            html +='<div class="work-inter"><input type="checkbox" name="well_type'+cluster_id+'-'+data_type+'" dev-type="'+data_type+'" class="well_type" data-type="workovers" value="Workovers/Well Intervention" data-id='+cluster_id+'><span class="checkbox-text txt-detail">Workovers/Well Intervention</span></div>'
+            html +='<div><input type="checkbox" name="well_type'+cluster_id+'-'+data_type+'" class="well_type" dev-type="'+data_type+'" data-type="infill" value="Infill Wells" data-id='+cluster_id+'><span class="checkbox-text txt-detail">Infill Wells</span></div>'
+            $('#dev-'+cluster_id+'-'+data_type+'').html(html)
+        }
+        else{
+           $('#dev-'+cluster_id+'-'+data_type+'').html(" ")
+        }
+    })
+ 
+
+    $(document).on("change",".well_type",function(){
+        if (is_filled==true && lenfield == true){
+        var cluster_id=$(this).attr('data-id')
+        var well_type=$(this).attr('data-type')
+        var dev_type=$(this).attr('dev-type')
+        if (this.checked){
+            var html=''
+            html +='<table id="wells_table'+well_type+'-'+cluster_id+'-'+dev_type+'"><tbody>'
+            html +='<tr><td><input name="wellid_'+well_type+''+cluster_id+'-'+dev_type+'" type="hidden"><input type="text" name="wellname_'+well_type+''+cluster_id+'-'+dev_type+'" class="form-control well-class"></td>'
+             html +='<td class="same-line2"><button id="well-add-row" data-id='+cluster_id+' dev-type="'+dev_type+'" data-type='+well_type+' class="btn-clr well-add-row btn max-min2" type="button" value="delete"><i class="fa fa-plus"></i></button><button id="well-delete-row" class="btn-clr well-delete-row btn max-min2" type="button" value="delete"><i class="fa fa-minus"></i></button></td></tr></tbody></table>'
+            // $(this).next().after(html)
+            $(this).parent().after(html)
+            // console.log()
+}
+        else{
+            $('#wells_table'+well_type+'-'+cluster_id+'-'+dev_type+'').remove();
+        }
+    }
+    else{
+
+    }
+    })
+    $(document).on("click","#well-add-row", function(){
+
+        if (is_filled==true && lenfield == true){
+        var cluster_id=$(this).attr('data-id')
+        var well_type=$(this).attr('data-type')
+        var dev_type=$(this).attr('dev-type')
+        var new_row='<tr><td><input name="wellid_'+well_type+''+cluster_id+'-'+dev_type+'" type="hidden"><input name="wellname_'+well_type+''+cluster_id+'-'+dev_type+'" type="text" data-id='+cluster_id+' data-type='+well_type+' class="form-control well-class"></td><td class="same-line2"><button id="well-add-row" data-id='+cluster_id+' data-type='+well_type+' dev-type='+dev_type+' class="btn-clr well-add-row btn max-min2" type="button" value="delete"><i class="fa fa-plus"></i></button><button id="well-delete-row" class="btn-clr well-delete-row btn max-min2" type="button" value="delete"><i class="fa fa-minus"></i></button></td>'
+        //alert('wells_table'+well_type+'-'+cluster_id+'-'+dev_type+'')
+        $('#wells_table'+well_type+'-'+cluster_id+'-'+dev_type+'').append(new_row);
+        }
+        else{
+
+        }
+
+    })
+    $(document).on("click", "#well-delete-row", function () {
+        var well_val=$(this).closest('td').prev('td').find('.well-class').val()
+        var checkbox_status = $(this).closest('table').prev().find('.well_type')
+      
+       
+        if (well_val==''){
+            let tr_length = $(this).closest('tbody').find('tr').length-1
+            $(this).closest('tr').remove()
+            is_filled=true
+           if(tr_length==0){
+                checkbox_status.prop('checked',false)
+            }
+        }
+        else{
+            if (is_filled==true && lenfield == true){
+            var wellids=$(this).closest('td').prev('td').find('.well-class').val()
+            var well_id=$(this).closest('td').prev('td').find('.wellid').val()
+            var current_element=$(this)
+                if(wellids!='')
+                {
+                   $.ajax({
+                                            type:"GET",
+                                            data:{'well_id':well_id},
+                                            url:'/projects/checkwell',
+                                            success: function(data){
+                                                // console.log({'DATACHK':data})
+                                                if (data.data == 'exists'){
+                                                  
+                                                    Swal.fire({
+                                                        icon:'warning',
+                                                        title: 'There is already data associated with this '+wellids+',Do you want to delete this '+wellids+' anyway?',
+                                                        showCancelButton: true,
+                                                        confirmButtonColor: '#3085d6',
+                                                        cancelButtonColor: '#d33',
+                                                        confirmButtonText: 'Yes, I Confirm',
+                                                        cancelButtonText: 'No',
+                                                        }).then((result) => {
+                                                        if (result.isConfirmed) {
+                                                            current_element.closest('tr').remove()
+                                                            Swal.fire(''+wellids+' Well Deleted Successfully')
+                                                        }
+                                                        var other_type=$(document).find('table tr').length
+                                                        if(other_type==0){
+                                                         $('.well_type').prop('checked',false)
+                                                      }
+                                                        })
+                                                        }
+                                                else{
+                                                    
+                                                    Swal.fire({
+                                                        icon:'warning',
+                                                        title: 'There is no data associated with this '+wellids+',Do you want to delete this '+wellids+'?',
+                                                        showCancelButton: true,
+                                                        confirmButtonColor: '#3085d6',
+                                                        cancelButtonColor: '#db2020',
+                                                        confirmButtonText: 'Yes, I Confirm',
+                                                        cancelButtonText: 'No',
+                                                        }).then((result) => {
+                                                        if (result.isConfirmed) {
+                                                            current_element.closest('tr').remove()
+                                                            Swal.fire(''+wellids+' Well Deleted Successfully')
+                                                        }
+                                                        var other_type=$(document).find('table tr').length
+                                                        if(other_type==0){
+                                                         $('.well_type').prop('checked',false)
+                                                      }
+                                                        })
+                                                    }
+                                                    
+                                            }
+                                        })
+
+                                    // }
+                            // }
+
+                        // })
+                // }            
+ 
+                    }
+                    else{
+                        $(this).closest('tr').remove()
+                        is_filled=true;
+                    }
+            }
+    }
+    })
+
+
+    $(document).on("keyup",".well-class",function(){
+        var cluster_id=$(this).attr('data-id')
+        var well_type=$(this).attr('data-type')
+        var x=$(this).val().toLowerCase();
+        var spanid=$(this).closest('tr').index()
+        if (x.length < 23){
+            $('#wells'+cluster_id+'-'+well_type+'-'+spanid+'').remove()
+            lenfield = true;
+        }
+        else {
+            $('#wells'+cluster_id+'-'+well_type+'-'+spanid+'').remove()
+            $(this).closest('tr').find('td:first').append('<span class="waring-err"  id=wells'+cluster_id+'-'+well_type+'-'+spanid+'>Maximum 22 Characters only</span>')
+            lenfield = false;
+        }
+        var z=0;
+        $(".well-class").each(function(){
+            // if (x != 'not applicable'){
+            var y=$(this).val().toLowerCase();
+                if(x==y && y != ''){
+                    z=z+1;
+                }
+            // }
+        });
+        if(z>1){
+            $('#wellspan'+cluster_id+'-'+well_type+'-'+spanid+'').remove()
+            $(this).addClass("error")
+            is_filled = false;
+            $(this).closest('tr').find('td:first').append('<span class="waring-err" id=wellspan'+cluster_id+'-'+well_type+'-'+spanid+'>Well name already exists</span>')
+        }
+        else{
+            $(this).removeClass("error")
+            $('#wellspan'+cluster_id+'-'+well_type+'-'+spanid+'').remove()
+            is_filled = true;
+        }
+    })
+
+    
+    $(".submit-cls").click(function(){
+        var project_id="{{project_details.id}}"
+        var form=$("#edit-masterwell");
+        var cluster_count=0;
+        $('.cluster_name').each(function(){
+            if ($(this).is(":checked")) {
+                cluster_count++;
+            }
+        })
+        
+        if (cluster_count == 0){
+            is_filled = false;
+            Swal.fire({
+                icon: 'error',
+                title: 'Error...',
+                text: 'Atleast Select one Cluster',
+                })
+        }
+        $('.well-class').each(function(){
+            console.log($(this).val());
+            if($(this).val()==""){
+                is_filled=false
+                $(this).addClass("error")
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error...',
+                    text: 'The Well Name is required',
+                    })
+                
+    
+            }
+        })
+        if (is_filled==false || lenfield == false ){
+        }
+        else{
+            $(this).prop('disabled', true);
+            $.ajax({
+            type:"POST",
+            container:"#edit-masterwell",
+            url:'/projects/editmasterwell/'+project_id,
+            data:form.serialize(),
+            success: function(data){
+                var url = "{% url 'projects:listmaster' %}";
+                document.location.href = url
+            }
+            })
+        }
+    })
+    $(document).on("click", ".prev-btn", function () {
+        var project_id=$(this).attr('project-id');
+        console.log(project_id)
+        var current_url=$(location).attr("href")
+        console.log(current_url)
+        var replace_url=current_url.replace("editmasterwell/"+project_id+"","editmastercluster/"+project_id+"")
+        window.location.href = replace_url; 
+    })
+   
+</script>
+{% endblock %}

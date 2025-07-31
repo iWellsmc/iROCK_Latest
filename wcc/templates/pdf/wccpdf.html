@@ -1,0 +1,446 @@
+{% load widget_tweaks %}
+{% load static %}
+{% load invoice_custom_tags %}
+{% load cost_code_tags %}
+{% load custom_tags %}
+{% load credit_custom_tags %}
+{% load wcc_custom_tags %}
+<style>
+     table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #c5c3c3;
+            padding: 8px;
+            text-align: left;
+        }
+        .total-row td {
+            border: 1px solid #d6d3d3; /* Border for the total row */
+        }
+        .inv_rec_cls{
+            font-size: 12px;
+        }
+        .in-voice-bottom{
+            margin-bottom: 50px !important;
+        }
+        .page-footer{
+            margin-top:25px;
+        }
+        .fooer-table td{
+            border:none !important;
+        }
+        .return_status{
+            color:rgb(241 191 0) ;
+        }
+</style>
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/invoice.css' %}">
+
+<footer style="width: 99.7%;" >
+    <div style="border: 1px solid #e3e3e3; height: 0px; margin-bottom: 5px;" class="page-footer"></div>
+
+    <!-- <table>
+        <tr style="vertical-align: baseline;">
+            <td class="header_text">
+                Vendor Name :
+            </td>
+            <td class="header_val">
+                {{wcc_data.vendor.vendor_name}}
+            </td>
+        </tr>
+        <tr style="vertical-align: baseline;">
+            <td class="header_text">
+                Contract Ref No :
+            </td>
+            <td class="header_val">
+                {{contract_number}}
+            </td>
+        </tr>
+        <tr style="vertical-align: baseline;">
+            <td class="header_text">
+                WCC No :
+            </td>
+            <td class="header_val">
+                {{wcc_number|split_addspace}}
+            </td>
+        </tr>
+    </table> -->
+
+    <table class="fooer-table">
+        <tr style="vertical-align: baseline;">
+            <td class="caption-head">
+                Vendor Name
+            </td>
+            <td>:</td>
+            <td class="caption-value">
+                {{wcc_data.vendor.vendor_name}}
+            </td>
+        </tr>
+        <tr style="vertical-align: baseline;">
+            <td class="caption-head">
+                Contract Ref No
+            </td>
+            <td>:</td>
+            <td class="caption-value">
+                {{contract_number}}
+            </td>
+        </tr>
+        <tr style="vertical-align: baseline;">
+            <td class="caption-head">
+                WCC No 
+            </td>
+            <td>:</td>
+            <td class="caption-value">
+                {{wcc_number|split_addspace}}
+            </td>
+        </tr>
+    </table>
+    
+</footer>
+    <!-- <div id="view-page"> -->
+      
+
+</div>
+        <header>
+            
+            <title>WCC PDF</title>
+            <div class="row d-flex align-items-center">
+              <div class="logo">
+                            
+              </div>
+              
+              <div class="company-details">
+                  <h4 class="head-inv-pre-vend">{{request.company.company_name|safe}}</h4>
+                  <p >{{request.company.address|safe}}</p>  
+              </div>
+            </div>
+        </header>
+        <div class="row parent">
+            <div class="row my-3 pr-0 justify-content-end">
+                <div class="col-lg-9 col-md-6"></div>
+        
+           
+                    <div class="inv_rec_cls">
+                        <p class="font-weight-bold">WCC RECEIVED</p>
+                        <p>Date: <span>{{ submit_date_format }} </span></p>
+                    <p>By</p>
+                    <p>{{request.company.company_name|safe}}</p>
+               
+                  
+                    {% if wcc_approved_date.approval_status == 3 %}
+                        <p style="color: rgb(241 191 0);" class="return_status">Returned Date : {{ wcc_approved_date.wcc_approval_submit_date|confulldate:request.company.id }}</p>
+                    {% elif wcc_approved_date.approval_status == 2 %}
+                        <p style="color: darkgreen;" class="approved_status">Approved Date :  {{ wcc_approved_date.wcc_approval_submit_date|confulldate:request.company.id }}</p>
+                    {% elif wcc_approved_date.approval_status == 0 %}
+                        <p style="color: red;" class="reject_status">Rejected Date :  {{ wcc_approved_date.wcc_approval_submit_date|confulldate:request.company.id}}</p>
+                    {% endif %}
+
+
+            </div>
+    
+
+        <h3 class="from-head-wcc">WCC Summary</h3>
+        <h6 class="from-sub-head invoice_info">WCC Information</h6>
+        <table class="invoice-info table-heading-font">
+            <tbody>
+                <tr>
+                    <th>Period of Service</th>
+                    <td>{{wcc_data.fromdate|date:"d-M-Y"}} to {{wcc_data.todate|date:"d-M-Y"}}</td>   
+                </tr>
+                <tr>
+                    <th>Contract/Amendment Variation Order Number</th>
+                    {% getcontract wcc_data.contractid wcc_data.contracttype as Invdata %}
+                    <td>{{Invdata.0}}</td>
+                </tr>
+                <tr>
+                    <th>Name of Service</th>
+                    <td>{{wcc_data.name_service|default_if_none:"---"}}</td>
+                </tr>
+                <tr>
+                    <th>Type of Service</th>
+                    <td>{{wcc_data.types_service|default_if_none:"---"}}</td>
+                </tr>
+                <tr>
+                    <th>Brief Description of Service Rendered</th>
+                    <td>{{wcc_data.description_service|default_if_none:"---"}}</td>
+                </tr>
+                <tr>
+                    <th>Location of Service</th>
+                    <td>{{wcc_data.location_service|default_if_none:"---"}}</td>
+                </tr>
+                <tr>
+                    <th>Project Name</th>
+                    <td>{{wcc_data.project_name}}</td>
+                </tr>
+                <tr>
+                    <th>Block</th>
+                    <td>{{wcc_data.block|checkblockval}}</td>
+                </tr>
+                <tr>
+                    <th>Field</th>
+                    <td>{{wcc_data.field|checkfieldval}}</td>
+                </tr>
+                <tr>
+                    <th>Well</th>
+                    <td>{{wcc_data.well|checkwellval}}</td>
+                </tr>
+                <!-- <tr>
+                    <th>Cost Code</th>
+                    {% if costcodedata %}
+                    {% getcostcode_preview costcodedata.costcode_main costcodedata.order request.company as subcostcode %}
+                    {% getcostcode_string costcodedata.costcode_main costcodedata.order request.company as all_costcode_string %}
+                    <td>{{subcostcode}}-{{all_costcode_string}}</td>
+                    {% else %}
+                    <td>---</td>
+                    {% endif %}
+                </tr> -->
+            </tbody>
+        </table>
+        
+
+        <h5 class="head-inv-pre-sum-details">WCC Summary Details</h5>
+            <table class="inv-pretbl ">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>WCC No</th>
+                        <th>WCC Date</th>
+                        <th>Period of Service</th>
+                        <th>WCC Amount</th>
+                        <th id="file-width" style="width: 10% !important;">WCC File</th>
+                    </tr>
+                </thead>
+                <tbody>
+                   
+                    {% for wcc in wccworkvalues %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{wcc.wcc_number|default_if_none:"---"}}</td>
+                        <td>{{wcc.wcc_date|convert_credit_date:request.company.id|default_if_none:"---"}}</td>
+                        <td>{{wcc.wcc.fromdate|date:"d-M-Y"}} to {{wcc.wcc.todate|date:"d-M-Y"}}</td>
+                   <td>{% if wcc.wcc_amount %}{{currency_symbol}} {{wcc.wcc_amount}}{% else %}---{% endif %}</td>
+                        <td class="text-left" id="file-width" style="width: 10% !important;">
+                            {% if wcc.wcc_file %}
+                            <span href="{{wcc.wcc_file.url}}" style="width: 10% !important;" id="file-width">
+                                {% if wcc.wcc_file_name %}
+                                    {{ wcc.wcc_file_name }}
+                                {% else %}
+                                    {{wcc.wcc_file.name|cut:"wccfile/"}}
+                                {% endif %}
+                            </span>
+                            {% else %}
+                                ---
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr><td></td><td></td><td></td><td class="total-vv">Total Value {% for wcc in wccworkvalues %}{% if wcc.wcc_amount %}({{currency_data.currency}}){% else %} {% endif %}{% endfor %}</td><td class="total-amt-dol"> {% for wcc in wccworkvalues %}{% if wcc.wcc_amount %}{{wcc.wcc_amount}}{% else %}---{% endif %}{% endfor %}</td></tr>                  
+                </tbody>
+            </table>
+            
+            <h5 class="from-sub-head-wcc-support">WCC Supporting Documents</h5>
+            <table class="invoice-info in-voice-bottom">
+            <tbody>
+            {% for doc_detail in supports_docs %}
+                <tr>
+                    <th>{{doc_detail.name}}</th>    
+                    {% getwccsupportfile pk doc_detail.id as supportfiles %}
+                    <td>
+                    {% for file in supportfiles.0 %}
+                        <div><a target="_blank" href="{{file.wcc_support_file.url}}" style=" text-decoration: none;">{{file.wcc_support_file_name|cut:"wccfile/"}}</a></div>
+                    {% empty %}
+                        <div>---</div>
+                    {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+            
+            
+            
+            {% if wcc_data.contracttype != "original" %}
+            <tr>
+                <th>
+                    {{wcc_data.contracttype|capitalize_letter}} Contract
+                </th>
+                <td>
+                    {% getwccamendmentcontract_price_files contractmaster wcc_data.contracttype 1 as contract_files %}
+                        {%if contract_files.1 != 0  %}
+                            <div class="col-6">
+                                <div class="view-ul">
+                                {% for contract_file in contract_files.0 %}
+                                <p><a target="_blank" href="{% url 'invoice:view_contractfiles' pk=contract_file.id %}">{{ contract_file.original_file_name }}</a></p>
+                                {% empty %}
+                                 <li>---</li>
+                                {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+            
+
+
+
+            {% if wcc_data.contracttype != "original" %}
+
+            <tr>
+                <th>{{wcc_data.contracttype|capitalize_letter}} Price Table</th>
+                <td>  
+
+                        {% getwccamendmentcontract_price_files contractmaster wcc_data.contracttype 2 as pricetables %}
+                            {%if pricetables.1 != 0  %}
+                                <div class="col-6"> 
+                    <!-- <h4>Price Table Files</h4> -->
+                                    <div class="view-ul">
+                                        {% for file in pricetables.0 %}
+                                            <p><a target="_blank" href="{% url 'invoice:view_contractfiles' pk=file.id %}">{{ file.original_file_name }}</a></p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+
+
+      
+            <tr>
+                <th>
+                    Original Contract
+                </th>
+                <td>    
+                 {% get_wcc_originalcontract_price_files contractmaster wcc_data.contracttype 1 as contract_files %}
+                        {%if contract_files.1 != 0  %}
+                        <div class="col-6"> 
+                            <div class="view-ul">
+                                {% for contract_file in contract_files.0 %}
+                                <p> <a target="_blank" href="{% url 'invoice:view_contractfiles' pk=contract_file.id %}">{{ contract_file.original_file_name }}</a></p>
+                                {% empty %}
+                                 <p>---</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                </td>
+            </tr>
+          
+            <tr><th>Price Table</th>
+                <td>  
+                        {% get_wcc_originalcontract_price_files contractmaster wcc_data.contracttype 2 as pricetables %}
+                            {%if pricetables.1 != 0  %}
+                                <div class="col-6"> 
+                                    <div class="view-ul">
+
+                                    {% for file in pricetables.0 %}
+
+                                    <p><a target="_blank" href="{% url 'invoice:view_contractfiles' pk=file.id %}">{{ file.original_file_name }}</a></p>
+                                    {% endfor %}
+                                     <divl>
+                                </div>
+
+                            {% endif %}
+                </td>
+            </tr>
+
+
+
+
+            </tbody>
+            </table>
+
+
+     <div id="editor"></div>   
+    <!-- </div> -->
+
+    
+<style> 
+    .inv-pretbl{
+        counter-reset:Serial;
+    }
+    .serial_count td:first-child::before{
+        counter-increment: Serial;      
+        content: counter(Serial); 
+    } 
+    .coversheet-users {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .coversheet-users th,
+    .coversheet-users td {
+        border: 1px solid #dddddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    .coversheet-users th {
+        background-color: rgb(137, 23, 55); /* Maroon color */
+        color: white; /* White text color */
+    }
+</style>
+
+</div>
+
+
+{% if approved_users|length > 0 %}
+<div>
+    <!-- <h5 class="head-inv-pre">Approval Details:</h5> -->
+</div>
+<div class="row">
+    <div class="table-responsive">
+
+        
+            <table class="coversheet-users">
+                <thead>
+                    <th>Name & Designation</th>
+                    <th>Signature</th>
+                    <th>Comments</th>
+                    <th>Date</th>
+                </thead>
+                <tbody>
+                    {% for approved_by_user in approved_users %}
+                        {% get_user approved_by_user.user.id as flow_user %}
+                 
+                        <tr>
+                            <td>{{ flow_user.name }} {{ flow_user.lastname }}-{{ flow_user.designation_role }}</td>
+                            <td class="coversheet-users-image">
+                                {% if flow_user.signature_type %}
+                                    {% if flow_user.signature_type == "signature" %}
+                                    {% getEncoded flow_user.signature_image as encoded_image %}
+
+                                    <div> <img src="{{ encoded_image }}"></div>
+                                    {% elif flow_user.signature_type == "font" %}
+                                    <p style="font-family:'{{flow_user.signature_fontfamily.font_name}}';">
+                                        {{flow_user.signature_fontname}}</p>
+                                    {% else %}
+                                    {% getEncoded flow_user.signature_image as encoded_image %}
+
+                                    <div> <img src="{{ encoded_image }}"></div>
+                                    {% endif %}
+                                {% elif flow_user.signature_type == '' %}
+                                    {% if flow_user.signature_image %}
+                                    <img src="{{flow_user.signature_image.url}}">
+                                    {% elif flow_user.signature_fontfamily %}
+                                    <p style="font-family:'{{flow_user.signature_fontfamily.font_name}}';">
+                                        {{flow_user.signature_fontname}}</p>
+                                    {% elif flow_user.signature_image %}
+                                    <img src="{{flow_user.signature_image.url}}">
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td class="line-brk">{{ approved_by_user.comment|default_if_none:"---" }}</td>
+                            <td class="text-center">{{ approved_by_user.wcc_approval_submit_date|confulldate:request.company.id }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+         
+        {% endif %}
+    </div>
+</div>

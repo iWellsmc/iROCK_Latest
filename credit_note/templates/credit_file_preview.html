@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load credit_custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/creditnote.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/calculator.css' %}">
+<div class="row">
+    <div class="col-12 text-end">
+        <!-- <button class="btn btn-clr waves-effect waves-float waves-light" >
+            <a href="#" class="inv_bck_cls">Back</a>
+        </button> -->
+    </div>
+</div>
+
+
+<div class="whole_table_prev">
+        <h3 class="from-head">Credit Note Preview</h3>
+
+    <div class="row inv-row_wid">
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+        </div>
+        <div class="col-6 pb-2 bor-rgt">
+            <h5 class="head-inv-pre">Credit Note Summary Details</h5>
+            <table class="inv-pretbl">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>S.No</th>
+                        <th>Credit Note No.</th>
+                        <th>Date</th>
+                        <th>Ref. Invoice No.</th>
+                        
+                        <th>Gross Amount</th>
+                        <th>Tax</th>
+                        <th>Total</th>
+                        {% if exchange_rate == '2' %}
+                        <th>Payment Currency</th>   
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                        {% for credit in credit_note_invoice %}
+                        <tr>
+                            <td>
+                                <i class="fa fa-eye prev-eyee inv_file" value="{{credit.file}}" style="font-size:15px;color: #006e80 !important;"></i>
+                            </td>
+                            <td>{{forloop.counter}}</td>
+                            <td class="inv_name">{{credit.credit_note_no}}</td>
+                            <td>{{credit.date|convert_credit_date:credit.credit.company.id}}</td>
+                            <td>
+                                {% for invoice in credit.credit.id|credit_contract_invoices:"inv" %}
+                                    {{invoice}}{% if not forloop.last %},{% endif %}
+                                {% endfor %}
+                            </td>
+                           
+                            {% credit_base_amount credit.credit.total_value credit.percentage as gross_amount%}
+                            <td>{% if credit.exchange_rate == 'N/A' or  credit.exchange_rate == '' %}({{basecurrency}} {{gross_amount|floatformat:2}}){% else %}({{credit.symbol}} {{gross_amount|multiple_two_values:credit.exchange_rate}}){% endif %} </td>
+                            <td>
+                                {% if credit.exchange_rate == 'N/A' or  credit.exchange_rate == '' %}({{basecurrency}} {{credit.credit.exclusive_value|credit_excluive_tax:credit.percentage}})</td>{% else %}({{credit.symbol}} {{credit.credit.exclusive_value|credit_excluive_tax:credit.percentage|multiple_two_values:credit.exchange_rate}})</td>{% endif %}
+                                {% comment %} {{credit.credit.exclusive_value|credit_excluive_tax:credit.percentage}}) {% endcomment %}
+                            </td>
+                            <td>
+                                {% if credit.exchange_rate == 'N/A' or  credit.exchange_rate == '' %}({{basecurrency}} {{credit.payment_currency_amount|remove_currency_symbol}}){% else %}({{credit.payment_currency_amount|convert_int}}) {% endif %}
+                            </td>
+                            {% if exchange_rate == '2' %}<td>{{credit.symbol}}</td>{% endif %}
+                        </tr>
+                        {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-6 pb-2">
+            <h5 class="head-inv-pre">Supporting Documents</h5>
+            <div class="row">
+                {% for invoice in invoice_list %}
+                    <div class="col-4">
+                        <button type="button" class="invcls" data_id="{{invoice.id}}">
+                        {%for num in invoice.inv_num %}
+                            {{num}}{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                        </button>
+                    </div>
+                {% endfor %}
+                <div class="col-4">
+                    <button type="button" class="commonbtn " dataid="8">Other Documents</button>
+                    </div>
+
+                    <div class="col-4">
+                        <button type="button" class="commonbtn " dataid="9">Contracts</button>
+                        </div>
+
+                        <div class="col-4">
+                            <button type="button" class="commonbtn " dataid="10">Price Table</button>
+                            </div>
+            </div>
+        </div>
+        <div class="col-6 bor-rgt">
+        </div>
+
+        <div class="show_file_cls col-6">
+        </div>
+        <div class="invfilediv bor-rgt col-6">
+            <div><iframe class="doc_invhidcls" width="100%" src="" frameborder="0"></iframe></div>
+        </div>
+        <div class="selectedfilecls col-6">
+            <div><iframe width="100%" class="doc_selinvhidcls" src=""></iframe></div>
+        </div>
+        <div class="text-center btn-cls">
+            <input type="hidden" id="pk" value="{{pk}}">
+            <input type="hidden" id="scheme" value="{{request.scheme}}">
+            <input type="hidden" id="gethost" value="{{request.get_host}}"> 
+            <button type="button" id="submit" class="btn btn-clr text-left">
+                <a href="{% url 'credit:edit_credit_note' pk=pk %}">Close Preview</a></button>
+                <button type="button" class="btn btn-clr beige calbtn" data-toggle="modal" data-target="#exampleModalCenter2">Calculator</button>
+
+        </div>
+        <div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter2" data-backdrop="static" tabindex="-1"
+        role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+          <div class="modal-content" data-backdrop="static">
+    
+            <div class="modal-header comment-head">
+              <h5 class="modal-title" id="exampleModalCenterTitle">Calculator</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+    
+        <div class="modal-body calc-body">
+          <iframe src="{% url 'invoice:calculator' %}" title="description"></iframe>
+        </div>
+
+        <div class="modal-footer comment-foot">
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.2.228/pdf.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script>
+    $('.inv_bck_cls').click(function(){
+    window.history.back();
+})
+$(document).ready(function() {
+    // Make the modal draggable only by its header
+    $('#exampleModalCenter2').draggable({
+        handle: ".modal-header",
+        containment: "#container", // Limit dragging within the element with id="container"
+    });
+});
+    var package_src = "{% static 'js/web/viewer.html' %}"
+</script>
+<script src="{% static 'js/credit_note/credit_note_preview.js' %}"></script>
+{% endblock %}
+

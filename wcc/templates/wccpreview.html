@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load credit_custom_tags %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/invoice.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/invoicedata.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/calculator.css' %}">
+
+
+    <h3 class="from-head">WCC Preview</h3>
+
+    <div class="row">
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+            <button class="btn btn-clr btn-master waves-effect waves-float waves-light pc-bk-cls" style="display:None;" >
+
+            </button>
+        </div>
+        <div class="col-6 pb-2 bor-rgt">
+            <h5 class="head-inv-pre">WCC Summary Details</h5>
+            <div class="table-responsive">
+                <table class="inv-pretbl inv-prev_width">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>S.No</th>
+                            <th>WCC No</th>
+                            <th>WCC Date</th>
+                            <th>Period of Service</th>
+                            <th>WCC Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       
+                        {% for wcc in wccworkvalues %}
+                        <tr>
+                            <td>
+                                <i class="fa fa-eye prev-eyee inv_file" value="{{wcc.wcc_file}}" style="font-size:15px;"></i>
+                            </td>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{wcc.wcc_number|default_if_none:"---"}}</td>
+                            <td>{{wcc.wcc_date|convert_credit_date:request.company.id}}</td>
+                            <td>{{wcc.wcc.fromdate|date:"M-Y"}} to {{wcc.wcc.todate|date:"M-Y"}}</td>
+                            <td>{{currency_symbol}} {{wcc.wcc_amount}}</td>
+                        </tr>
+                        {% endfor %}
+                        
+                    </tbody>
+                </table>
+            </div>
+        
+        </div>
+        <div class="col-6 pb-2">
+            <h5 class="head-inv-pre">Supporting Documents</h5>
+
+            <div class="row">
+                {% for doc_detail in supports_docs %}
+                <div class="col-md-12 col-lg-4 padd-btn"> 
+                    <button type="button" class="commonbtn" dataid="{{doc_detail.id}}">{% if doc_detail.id == 3 %}Call Off Instructions{% else %}{{doc_detail.name}}{% endif %}</button>
+                </div> 
+            {% endfor %}
+            <div class="col-md-12 col-lg-4 padd-btn">
+                <button type="button" class="commonbtn" dataid="9">Contracts</button>
+            </div>
+            <div class="col-md-12 col-lg-4 padd-btn">
+                <button type="button" class="commonbtn" dataid="10">Price Table</button>
+            </div>
+            </div>
+
+        </div>
+        <div class="col-6 bor-rgt">
+
+        </div>
+
+        <div class="show_file_cls col-6">
+        </div>
+
+        <div class="invfilediv bor-rgt col-6">
+            <div><iframe class="doc_invhidcls" width="100%" src="" frameborder="0"></iframe></div>
+        </div>
+
+        <div class="selectedfilecls col-6">
+            <div><iframe width="100%" class="doc_selinvhidcls" src=""></iframe></div>
+        </div>
+        
+        <div class="text-center btn-cls">
+            <button type="button" class="btn btn-clr beige calbtn" value="2" data-toggle="modal" data-target="#exampleModalCenter2">Calculator</button>
+
+            <button type="button" id="submit" class="btn btn-clr text-left">
+                <a href="{% url 'wcc:wcceditformtwo' pk=pk%}">Close Preview</a>
+            </button>
+            
+        </div>
+        <div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter2" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+              <div class="modal-content" data-backdrop="static">
+                
+                <div class="modal-header comment-head">
+                  <h5 class="modal-title" id="exampleModalCenterTitle">Calculator</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+    
+                <div class="modal-body calc-body">
+                  <iframe src="{% url 'invoice:calculator' %}" title="description"></iframe>
+                </div>
+    
+                <div class="modal-footer comment-foot">
+                  <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Save & Close</button> -->
+                </div>
+                </div>
+            </div>
+          </div>
+        
+    </div>
+
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js" type="text/javascript"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.2.228/pdf.min.js"></script>
+<script>
+var wcc_id="{{pk}}" 
+// var vendor_id="{{vendor_id}}"
+// var contract_id="{{contract_id}}"
+// var contract_type="{{contract_type}}" 
+var scheme="{{request.scheme}}"
+var gethost="{{request.get_host}}"
+var currentdomain=scheme+'://'+gethost
+var package_src = "{% static 'js/web/viewer.html' %}"
+</script>
+<script src="{% static 'js/wcc/wccpreview.js' %}"></script>
+<script>
+    $(function () {
+  
+        $(".calculator-draggable").draggable();
+      });
+</script>
+{% endblock %}

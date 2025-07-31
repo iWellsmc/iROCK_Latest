@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+<section>
+    <h3 class="from-head">Create Cluster</h3>
+    <form method="POST" class="form-txt" id="create-mastercluster">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-5">
+                <label class="txt-name unique-colr">Country:</label>
+                <span class="txt-detail uniq-name">{{project_details.country.nicename}}</span>
+            </div>
+            <div class="col-7">
+                <label class="txt-name unique-colr">Project:</label>
+                <span class="txt-detail uniq-name">{{project_details.name}}</span>
+            </div>
+        </div>
+                <div class="row">
+                    <div class="col-3">
+                <label class="txt-name">Block</label>
+                </div>
+                <div class="col-3 p-0">
+                    <label class="txt-name">Field Name</label>
+                    </div>
+                    <div class="col-3 p-0">
+                        <label class="txt-name">Field Environment</label>
+                        </div>
+                    <div class="col-3 p-0">
+                        <label class="txt-name">Cluster</label>
+                    </div>
+                {% for block in project_block %}
+                <div class="row spacing-top">
+                    <div class="col-3">
+                        <span class="txt-detail">{{block.block_name}}</span>
+                    
+                    </div>
+                    <div class="col-9">
+                        {% if forloop.counter == 1%}
+                            <!-- <label class="txt-name">Field Name</label> -->
+                        {% endif %}
+                        {% for field in block.id|get_field:"field" %}  
+                        <div class="row sapcing-bottom">
+                            <div class="col-4 p-0">
+                                <div><span class="checkbox-text txt-detail">{{field.field_name}}</span></div>
+                            </div>
+                            <div class="col-8">
+                                {% for environment in field.id|get_environment:"environment" %}
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input type="checkbox" name="environment_name" value="{{environment.id}}" data-id="{{environment.id}}" class="environment_class"><span class="checkbox-text txt-detail">{{environment.project_environment}}-{{environment.project_environment_subtype}}
+                                        </span> 
+                                    </div>
+                                    <div class="col-6 cluster-spacing" id="cluster_type{{environment.id}}">
+                                    </div>
+                                </div>
+                            {% endfor %} 
+                        </div>
+                       
+                    </div>
+                    {% endfor %} 
+                </div>
+               
+               
+            </div>  {% endfor %}  
+        </div>
+        <div class="text-center spacing-button">
+            <button type="button" class="btn btn-clr text-center draft-cls" data-id="4" >Save as Draft</button>
+            <button type="button" class="btn btn-clr text-center back-cls" data-id="4" >Back</button>
+            <button type="button" class="btn btn-clr text-center submit-cls" data-id="4" >Create</button>
+        </div>
+    </form>
+</section>
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+    var is_filled = true;
+    var lenfield = true;
+    $(document).on("change",".environment_class",function(){
+        is_filled=true
+        var environment_id=$(this).attr('data-id')
+        if (this.checked){
+            var html=''
+            html +='<div><input type="checkbox" name="cluster_type'+environment_id+'" value="Well Pad" data-type="wellpad" class="cluster_type" data-id='+environment_id+'><span class="checkbox-text txt-detail">Well Pad</span></div>'
+            html +='<div><input type="checkbox" name="cluster_type'+environment_id+'" class="cluster_type" data-type="wellplatform" value="Well Platform" data-id='+environment_id+'><span class="checkbox-text txt-detail">Well Platform</span></div>'
+            html +='<div><input type="checkbox" name="cluster_type'+environment_id+'" class="cluster_type" data-type="subseaclusters" value="Subsea Clusters" data-id='+environment_id+'><span class="checkbox-text txt-detail">Subsea Clusters</span></div>'
+            $('#cluster_type'+environment_id).html(html)
+        }else{
+            $('#cluster_type'+environment_id).html('')
+        }
+    });
+    $(document).on("click",".cluster_type",function(){
+
+        if (is_filled==true && lenfield==true){
+            var environment_id=$(this).attr('data-id')
+            var cluster_type=$(this).attr('data-type')
+            if ($(this).is(':checked')){
+                var html=''
+                html +='<table class="creat-clubuttom" id="cluster_table'+cluster_type+''+environment_id+'"><tbody>'
+                html +='<tr><td><input list="browsers" autocomplete="off" type="text" name="clustername_'+cluster_type+''+environment_id+'" data-id='+environment_id+' data-type="'+cluster_type+'" class="form-control cluster-cls"><datalist id="browsers"><option value="Not Applicable"></datalist></td>'
+                html +='<td class="stri-line"><button id="cluster-add-row" data-id='+environment_id+' data-type='+cluster_type+' class="btn-clr cluster-add-row btn max-min1" type="button" value="delete"><i class="fa fa-plus"></i></button></td></tr></tbody></table>'
+                $(this).next().after(html)
+            }
+            else{
+                $("#cluster_table"+cluster_type+environment_id).remove();
+                //is_filled = true;
+                //lenfield = true;
+            }
+        }
+        else{
+            
+        }
+
+    })
+    $(document).on("click","#cluster-add-row", function(){
+        if (is_filled==true && lenfield == true){
+        var environment_id=$(this).attr('data-id')
+        var cluster_type=$(this).attr('data-type')
+        var new_row='<tr><td ><input list="browsers" autocomplete="off" name="clustername_'+cluster_type+''+environment_id+'" data-id='+environment_id+' data-type="'+cluster_type+'" type="text" class="form-control cluster-cls"><datalist id="browsers"><option value="Not Applicable"></datalist></td><td class="stri-line"><button id="cluster-delete-row" class="btn-clr cluster-delete-row btn max-min1" type="button" value="delete"><i class="fa fa-minus"></i></button></td>'
+
+        $("#cluster_table"+cluster_type+environment_id).append(new_row);
+        }
+        else {
+            //Swal.fire("Cluster name already exists")
+        }
+
+    })
+    $(document).on("click", "#cluster-delete-row", function () {
+        var  cluster_val=$(this).closest('td').prev('td').find('.cluster-cls').val()
+        if (cluster_val == ''){
+            $(this).closest('tr').remove()
+            is_filled=true
+        }
+        else{
+        if (is_filled == true && lenfield ==true){
+        $(this).closest('tr').remove()
+        }
+        else{
+            
+        }
+    }
+    })
+
+
+    $(document).on("keyup",".cluster-cls",function(){
+        var x=$(this).val().toLowerCase();
+        var cluster_type=$(this).attr('data-type')
+        var clusterid=$(this).attr('data-id')
+        var spanid=$(this).closest('tr').index()
+        if (x.length <= 18){
+            $('#cluster'+clusterid+'-'+cluster_type+'-'+spanid+'').remove()
+            lenfield = true;
+        }
+        else {
+            $('#cluster'+clusterid+'-'+cluster_type+'-'+spanid+'').remove()
+            $(this).closest('tr').find('td:first').append('<span class="waring-err" id=cluster'+clusterid+'-'+cluster_type+'-'+spanid+'>Maximum 18 Characters only</span>')
+            lenfield = false;
+        }
+        var z=0;
+        $(".cluster-cls").each(function(){
+            if (x != 'not applicable'){
+                var y=$(this).val().toLowerCase();
+                if(x==y && y !=''){
+                    z=z+1;
+                }
+            }
+        });
+        if(z>1){
+            $('#clusterspan'+clusterid+'-'+cluster_type+'-'+spanid+'').remove()
+            $(this).addClass("error")
+            is_filled = false;
+            $(this).closest('tr').find('td:first').append('<span class="waring-err" id=clusterspan'+clusterid+'-'+cluster_type+'-'+spanid+'>Cluster Name Already Exists</span>')
+        }
+        else{
+            $(this).removeClass("error")
+            $('#clusterspan'+clusterid+'-'+cluster_type+'-'+spanid+'').remove()
+            is_filled = true;
+        }
+    })
+    
+
+
+    $('.back-cls').click(function(){
+    var project_id="{{project_details.id}}"
+    var current_url=$(location).attr("href")
+    var replace_url=current_url.replace("createmastercluster/"+project_id+"","editprojectmasterfield/"+project_id+"")
+    window.location.href = replace_url;
+
+})
+
+
+$(".draft-cls").click(function(){
+    var data_id=$(this).attr('data-id');
+    var project_id="{{project_details.id}}"
+    var form=$("#create-mastercluster");
+        $.each($('.cluster-cls'),function() {
+            if ($(this).val()=='') {
+                 is_filled = false;
+                Swal.fire({
+                   icon: 'error',
+                   title: 'Error...',
+                   text: 'The cluster is required',
+                   })
+            }
+        })
+    if (is_filled==false || lenfield == false){
+    }
+    else{
+        $(this).prop('disabled', true);
+    $.ajax({
+    type:"POST",
+    container:"#create-mastercluster",
+    url:'/projects/createmastercluster/'+project_id,
+    data:form.serialize(),
+    success: function(data){
+        console.log(data)
+        var url = "{% url 'projects:listmaster'%}";
+        document.location.href = url;
+    }
+    })
+    }
+})
+
+
+    $(".submit-cls").click(function(){
+        var data_id=$(this).attr('data-id');
+        var project_id="{{project_details.id}}"
+        var form=$("#create-mastercluster");
+        var cluster_count=0;
+        $('.environment_class').each(function(){
+            if ($(this).is(":checked")) {
+                cluster_count++;
+            }
+        })
+        
+        if (cluster_count == 0){
+            is_filled = false;
+            Swal.fire({
+                icon: 'error',
+                title: 'Error...',
+                text: 'Atleast Select one Field Environment',
+                })
+        }
+
+            $.each($('.cluster-cls'),function() {
+                if ($(this).val()=='') {
+                     is_filled = false;
+                    Swal.fire({
+                       icon: 'error',
+                       title: 'Error...',
+                       text: 'The cluster is required',
+                       })
+                }
+            })
+            console.log(is_filled)
+            console.log(lenfield)
+        if (is_filled==false || lenfield==false){
+        }
+        else{
+            $(this).prop('disabled', true);
+        $.ajax({
+        type:"POST",
+        container:"#create-mastercluster",
+        url:'/projects/createmastercluster/'+project_id,
+        data:form.serialize(),
+        success: function(data){
+            console.log(data)
+            if (data_id=="4"){
+                Swal.fire({
+                    text: 'Do you want to add  Well (s) to this project?',
+                    showDenyButton: true,
+                    confirmButtonText: 'Yes',
+                    denyButtonText: 'No',
+                    allowOutsideClick:false,
+                    confirmButtonColor: '#77d61f',
+                    denyButtonColor:'#AF2B50',
+                    customClass: {
+                      actions: 'my-actions',
+                      confirmButton: 'order-2',
+                      denyButton: 'order-3',
+                    }
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                        var url = "{% url 'projects:createmasterwell' 123 %}";
+                        document.location.href = url.replace('123', project_id);
+                    } else if (result.isDenied) {
+                      var current_url=$(location).attr("href")
+                      var replace_url=current_url.replace("createmastercluster/"+project_id+"","listmaster")
+                      window.location.href = replace_url;
+                    }
+                  })
+            }
+        }
+        })
+        }
+    })
+
+
+</script>
+{% endblock %}

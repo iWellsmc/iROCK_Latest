@@ -1,0 +1,585 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load credit_custom_tags %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/accountpayable.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/signatory_user.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/calculator.css' %}"> 
+<h4 class='from-head'>Payment Confirmation</h4>
+    <div class="row">
+ 
+    {% include 'invoicedata.html' %} 
+    <div class="row">
+    <div class="">
+        <h5 class="head-inv-pre mid mt-5">Payment Instructions</h5>
+        <table class="table table-bordered tab-styling">
+        <thead>
+            <th>Invoice No.</th>
+            <th>Invoice Net Payable Amount</th>
+            {% if check_creditnote > 0 %}
+            <th>Credit Note Net Amount</th>
+            <th> Revised Net Payable Amount</th>
+            {% endif %}
+
+            {% if payment_split_count > 1 %}
+            <th>Already Paid Percentage</th>
+            <th>Already Paid Amount</th>
+            {%endif%}
+            <th>Payment Percentage</th>
+            <th>Payable Amount</th>
+            <th>Pending Amount</th>
+            <th>Bank to Debit</th>
+            <th>Vendor Bank Details</th>
+            <th>Generated Instruction</th>
+        </thead>
+        
+        <tbody>
+        {% for payment in payment_details %}
+        <tr>
+            <td>
+                {{payment.invoicecost.invoice_number}}
+                {%if payment.invoicecost.payment_account == 1%}(Allocated to Payment on Account){%endif%}
+            </td>
+            
+            {% getnetpayment_bysplit payment.invoicecost.invoice_id payment.invoicecost.id payment.invoicecost.new_netpayable as netamount %}
+            <td>
+                {{payment.invoicecost.invoice_currency}} {{netamount.netamount_separator}}
+                <!-- {% if payment.invoicecost.new_netpayable %}
+                {{payment.invoicecost.invoice_currency}} {{payment.invoicecost.new_netpayable}}
+                {% else %}
+                {{payment.invoicecost.invoice_currency}} {{payment.invoicecost.invoice_total_amount}}
+                {% endif %} -->
+            </td>
+            {% if check_creditnote > 0 %}
+            {% new_credit_investment payment.invoicecost request as total_credit %}
+            
+              <td>({{payment.invoicecost.invoice_currency}} {{total_credit}})</td>
+              
+              {% if payment.invoicecost.new_netpayable %}
+                    {% get_net_payableamount netamount.netpayment total_credit as net_payable %}
+                    {% else %}
+                    {% get_net_payableamount netamount.netpayment total_credit as net_payable %}
+              {% endif %}
+              <td>{{payment.invoicecost.invoice_currency}} {{net_payable}}</td>
+          {% endif %}
+            {% comment %} <td>
+                {{payment.payment_percentage|default_if_none:""}} %
+            </td> {% endcomment %}
+            
+            
+            {% if check_creditnote > 0 %}
+                {% if payment_split_count > 1 %}
+                <td>{% paid_payment_percentage payment.invoicecost.id payment.payment_percentage as paidpercentage %}   {{  paidpercentage }}%</td>
+                <td>{% paid_payment_amount payment.invoicecost.id  payment.payment_percentage net_payable as paidamount %}  {{payment.invoicecost.invoice_currency}} {{  paidamount }}</td>
+                {%endif%}
+            {%else%}
+                {% if payment_split_count > 1 %}
+                <td>{% paid_payment_percentage payment.invoicecost.id payment.payment_percentage as paidpercentage %}  {{  paidpercentage }}%</td>
+                <td>{% paid_payment_amount payment.invoicecost.id  payment.payment_percentage netamount.netamount_separator as paidamount %} {{payment.invoicecost.invoice_currency}}  {{  paidamount }}</td>
+                {%endif%}
+            {%endif%}
+            <td>
+                {% if payment.partial_status == 3 %}
+                    <span class="payment-percentage">
+                        {% if payment.invoicecost.payment_account == 1 %}
+                            100
+                        {% else %}
+                            {% if not edit %}
+                                {{ payment.payment_percentage }} %
+                            {% endif %}
+                        {% endif %}
+                    </span>
+                {% else %}
+                    <span class="payment-percentage">
+                        {% if payment.invoicecost.payment_account == 1 %}
+                            100
+                        {% else %}
+                            {% if not edit %}
+                                {{ payment.payment_percentage }}%
+                            {% endif %}
+                        {% endif %}
+                    </span>
+                {% endif %}
+                <!-- Other hidden inputs if needed -->
+            </td>
+            
+
+            <td>
+                {%if payment.invoicecost.payment_account == 1%}
+                {% if payment.invoicecost.new_netpayable %}
+                {{payment.invoicecost.invoice_currency}} {{payment.invoicecost.new_netpayable|default_if_none:""}}
+                {% else %}
+                {{payment.invoicecost.invoice_currency}} {{payment.invoicecost.invoice_total_amount|default_if_none:""}}
+                {% endif %}
+                {%else%}
+                {{payment.invoicecost.invoice_currency}} {{payment.payable_amount|convert_to_thousand_separator|default_if_none:"0"}}
+                {%endif%}
+            </td>
+            <td>
+                {{payment.invoicecost.invoice_currency}} 
+                {% Check_pending_amount payment.invoicecost.id request as pending_val %}
+                <!-- {{pending_val|convert_to_thousand_separator|default_if_none:"0"}} -->
+                {% check_payment_pending_amount pk payment.payment_count payment.invoicecost.id as percentage %}
+                <!-- {{ percentage|convert_to_thousand_separator|default_if_none:0 }} -->
+                {{payment.pending_amount|convert_to_thousand_separator|default_if_none:"0"}}
+            </td>
+            <td>    
+                {% if payment.companyuserstatus == 3 %}
+                    {{payment.masterbank.id|fetch_bank_details:request}}-{{payment.masterbank.id|fetbankaccountnumber}} 
+                {%else%}
+                    {{payment.companybank.bank_name.bank_name}}-{{payment.companybank.account_number.accountno|default_if_none:""}}
+                {%endif%}
+            </td>
+            <td>
+                {{payment.invoicecost.invoice_bank.bankname}}-{{payment.invoicecost.invoice_bank.accountnumber|default_if_none:""}}
+            </td>
+            <td>
+                <!-- <a class="btn p-0" data-toggle="collapse" href="#collapseExample{{payment.id}}" role="button" aria-expanded="false" aria-controls="collapseExample" data-id="{{payment.id}}"> -->
+                {%if payment.invoicecost.payment_account == 1%}
+                -
+                {%else%}
+                <!-- <span class="action-edit align-icons " data_id="{{payment.pi_file}}">
+                    <i class="fa fa-eye" title="View" style="font-size:17px; color:#95183a;"></i>
+                </span> -->
+                <a class="btn p-0 generate_payment_approval" data-toggle="collapse" href="#collapseExample{{payment.id}}" role="button" aria-expanded="false" aria-controls="collapseExample" data-id="{{payment.id}}" data-value="{{pay_id}}">
+                    <span class="action-edit align-icons pi_file">
+                      <i class="fa fa-eye eyebutton" title="View" style="font-size:17px; color:#95183a;"></i>
+                    </span>
+                  </a>
+                {%endif%}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="col-6">
+        <iframe class="pi_doc_invhidcls" id="payment_instruction" style="display: none;" width="100%" height="590px !important"> 
+        </iframe>
+    </div>
+    <div class="col-6">
+    </div>
+    </div>
+    {% if check_creditnote > 0 %}
+    <h3 class="head-inv-pre mid mt-5">Applied Credit Note Summary Details</h3>
+    <div class="table-responsive inv-view_wrap text-nowrap">
+    {% for actuals in get_used_creditnotes %}
+        <table class="table-responsive invoice-sum-info inv-pretbl"> <!-- class removed -> invoice-summary-table-width -->
+            <thead>
+                <tr>
+                    <th style="width: 5%;">S/No</th>
+                    <th style="width: 10%;">Credit Note No.</th>
+                    <th style="width: 10%;">Date</th>
+                    <th>Ref Invoice No</th>
+                    <th>Gross Amount</th>
+                    <th>Tax</th>
+                    <th> Total Amount inclusive of all taxes</th>
+                    <!-- <th>Applied Credit Value</th> -->
+                    <th>Payment Currency</th>
+                    <th style="width: 15%;">Credit Note File</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% get_creditnote_contract_invoice actuals as creditdatas %}
+                {% for i in creditdatas %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{i.credit_note_no}}</td>
+                    <td>{{i.date|convert_credit_date:i.credit.company.id}}</td>
+                    <td class="word-break-class">
+                        {% for invoice in i.credit.id|credit_contract_invoices:"inv" %}
+                            {{invoice}}{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    </td>
+                    {% check_exchage_value pk as exchangetype  %}
+                    {% check_exchage_percentage pk i.vendor_split_invoice.id as exchangepercentage%}
+                    {% credit_base_amount i.credit.total_value i.percentage as gross_amount%}
+                            <td class="">
+                                {% if i.credit.total_value %}
+                                    <!-- {% if exchange_rate == '1' %}
+                                        ({{credit.symbol}}
+                                    {% else %}
+                                        ({{basecurrency}}
+                                    {% endif %} -->
+
+                                    {% if exchangetype == 1 or exchangetype == '1' %}
+                                        {% comment %} ({{i.vendor_split_invoice.currency.currency_symbol}} {{gross_amount|floatformat:2}}) {% endcomment %}
+                                        {% exchange_grossamount gross_amount i.exchange_rate  as exchangeNetamount %}
+                                        ({{i.vendor_split_invoice.currency.currency_symbol}} {{exchangeNetamount}})
+                                    {% else %}
+                                        {% comment %} ({{i.vendor_split_invoice.currency.currency_symbol}} {{gross_amount|floatformat:2}})-- {{exchangetype}}--{{exchangepercentage}} {% endcomment %}
+                                        {% exchange_grossamount gross_amount exchangepercentage  as exchangeNetamount %}
+                                        ({{i.vendor_split_invoice.currency.currency_symbol}} {{exchangeNetamount}})
+                                    {%endif%}
+
+                                {% else %}
+                                    <!-- {% if exchange_rate == '1' %}
+                                        ({{credit.symbol}}
+                                    {% else %}
+                                        ({{basecurrency}}
+                                    {% endif %} -->
+                                    ({{i.vendor_split_invoice.currency.currency_symbol}} 0.00)
+                                {% endif %}</td>
+                            <td class="">
+                                <!-- {% if credit.credit.total_value %}{{credit.symbol}}{% endif %}  -->
+                                <!-- {% if exchange_rate == '1' %}
+                                ({{credit.symbol}}
+                                {% else %}
+                                ({{basecurrency}}
+                                {% endif %} -->
+                                {% if exchangetype == 1 or exchangetype == '1' %}
+                                    {% comment %} ({{i.vendor_split_invoice.currency.currency_symbol}} {{i.credit.exclusive_value|credit_excluive_tax:i.percentage}}) {% endcomment %}
+                                    {% credit_excluive_tax_with_exchangetype i.credit.exclusive_value i.percentage i.exchange_rate as exchangeTax %}
+                                    ({{i.vendor_split_invoice.currency.currency_symbol}} {{exchangeTax}})
+                                {% else %}
+                                {% comment %} ({{i.vendor_split_invoice.currency.currency_symbol}} {{i.credit.exclusive_value|credit_excluive_tax:i.percentage}})-- {{exchangetype}}--{{exchangepercentage}} {% endcomment %}
+                                {% credit_excluive_tax_with_exchangetype i.credit.exclusive_value i.percentage exchangepercentage as exchangeTax %}
+                                ({{i.vendor_split_invoice.currency.currency_symbol}} {{exchangeTax}})
+                                {%endif%}
+                            </td>
+                            <td class="">
+                                {% if exchangetype == 1 or exchangetype == '1' %}
+                                    ({{i.vendor_split_invoice.currency.currency_symbol}} {{i.payment_currency_amount|remove_symbol}})
+                                    
+                                {% else %}
+                                    {% comment %} ({{i.vendor_split_invoice.currency.currency_symbol}} {{i.payment_currency_amount|remove_symbol}})-- {{exchangetype}}--{{exchangepercentage}} {% endcomment %}
+                                    {% exchange_netamount i.payment_currency_amount exchangepercentage  as exchangeNetamount %}
+                                    ({{i.vendor_split_invoice.currency.currency_symbol}} {{exchangeNetamount}})
+                                {%endif%}
+
+                            </td>
+                            <!-- <td>{% applied_credit_value i actuals pk as applied_val %}
+                                ({{i.vendor_split_invoice.currency.currency_symbol}} {{applied_val}})</td> -->
+                            <td>{{i.vendor_split_invoice.currency.currency}}</td>
+                            <td class="text-algin-txt-left">
+                                {% if i.file != "" %}
+                                    <a class="inv-link" href="{{i.file.url}}" target="_blank">{{i.file.name|cut:"creditdocuments/"}}</a>
+                                {% endif %}
+                            </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endfor %}
+    </div>
+
+
+    <h3 class="from-sub-head">Revised Invoice Summary Details</h3>
+<div class="table-responsive inv-view_wrap text-nowrap">
+    <table class="table-responsive invoice-sum-info inv-pretbl invoice-summary-table-width">
+        <thead>
+            <tr>
+                <th>S/No</th>
+                <th> Invoice No/Applied Credit Note No</th>
+                <th>Invoice Net Payable Amount</th>
+                <th>Credit Note Net Amount</th>
+                <th>Revised Net Payable Amount</th>
+                <th>Payment Currency</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inv in maininvoices %}
+            {% for invoice in pk|subinvoice:inv.id %}
+            <tr>
+                <td>{{forloop.parentloop.counter}}</td>
+                <td>{{invoice.invoice_number}}{% for actuals in get_used_creditnotes %}
+                    {% get_creditnote_contract_invoice actuals as creditdatas %}{% for i in creditdatas %}{% if invoice.vendor_invoice.id == i.vendor_split_invoice.id %}/{{i.credit_note_no}}{% endif %}{% endfor %}{% endfor %}</td>
+                    {% getnetpayment_bysplit invoice.invoice.id invoice.id invoice.new_netpayable as netamount %}
+                    <td class="am-valu" >{{invoice.invoice_currency}}   {{ netamount.netamount_separator}}</td>
+                    <!-- <td class="am-valu">{{invoice.invoice_currency}} 
+                    {% if invoice.new_netpayable %}
+                    {{invoice.new_netpayable}}
+                    {% else %}
+                    {{invoice.invoice_total_amount}}
+                    {% endif %}
+                    {% comment %} {% invoiceafterdiscount invoice.invoice_percentage invoicedetail.total_discount_value invoice.invoice_exchange_rate as invdisval %}{% invoiceexclusivevalue invoice.invoice_percentage invoicedetail.total_exclusive_value invoice.invoice_exchange_rate as invexcval %}{{invdisval|addvalues:invexcval}} {% endcomment %}
+                    {% comment %} {%with total=invdisval|addvalues:invexcval%}{%with dem=total|add:request%}    {%endwith%}    {% endwith %} {% endcomment %}
+                </td> -->
+                {% new_credit_investment invoice request as total_credit %}
+                <td>({{invoice.invoice_currency}} {{total_credit}})</td>
+                <td class="payable_value">
+                    {% getnetpayment_bysplit invoice.invoice.id invoice.id invoice.new_netpayable as netamount %}
+                    {% new_credit_investment invoice request as total_credit %}
+                    {% if invoice.new_netpayable %}
+                    {% get_net_payableamount netamount.netpayment total_credit as net_payable %}
+                    {% else %}
+                    {% get_net_payableamount netamount.netpayment total_credit as net_payable %}
+                    {% endif %}
+                    {{invoice.invoice_currency}} {{net_payable}}
+                </td>
+                <td>{{invoice.currency.currency}}</td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+    {% endif %}
+    
+    
+    
+    <form method="POST" id="signatory_form">
+        {% csrf_token %}
+        {% for payment_id in payment_details %}
+      <input type="hidden" class="payment_id" value="{{payment_id.id}}" name="payment_id">
+      {% endfor %}
+        <div class="row color-btn justify-content-center my-5">
+            {% check_rolerights 'Confirm Cost Code' get_role_id as checkconfirm_costcode_rights %}
+            {% if checkconfirm_costcode_rights %}
+            <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2"> 
+              <button type="button" class="btn btn-clr status_cls green" value="1" data-toggle="modal" data-target="#confirm_cost_code">Confirm Cost Code</button>
+            </div>
+            {%endif%}
+            <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2"> 
+                {% if checkconfirm_costcode_rights %}
+                    {% if not invoice_details.is_conform_costcode %}
+                        <button type="button" class="btn btn-clr status_cls dark_green notconform_costcode" value="1">Send details for confirmation</button>
+                    {%else%}
+                        <button type="button" class="btn btn-clr status_cls dark_green" value="1" data-toggle="modal" data-target="#exampleModalCenter">Send details for confirmation</button>
+                    {%endif%}
+                {%else%}
+                    <button type="button" class="btn btn-clr status_cls dark_green" value="1" data-toggle="modal" data-target="#exampleModalCenter">Send details for confirmation</button>
+                {%endif%}
+            </div>
+
+            <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2"> 
+                <button type="button" class="btn btn-clr beige calbtn" value="2" data-toggle="modal" data-target="#exampleModalCenter2">Calculator</button>
+            </div>
+
+            {% for rights in roles_rights %}
+            <!-- {% if rights.right.right_name == "Approve Invoice" %}
+
+            {% endif %} -->
+            {% if rights.right.right_name == "View/Comment On Invoice" %}
+            <div class="col-xl-2 col-lg-3 col-md-4 text-center mt-2"> 
+                <button type="button" class="btn btn-clr rose" data-toggle="modal" data-target="#exampleModalCenter">Comment</button>
+            </div>
+            {% endif %}
+        {% endfor %}   
+        </div>
+        <input type="hidden" name="pay_id" value="{{pay_id}}">
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                <div class="modal-header comment-head">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Comments</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body comment-body">
+                    <textarea name="main_comments" id="main_comments" class="form-control cmnts"></textarea>
+                    </div>
+                <div class="modal-footer comment-foot">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="submit_id">Submit</button>
+                </div>
+                </div>
+            </div>
+            </div>
+
+
+            <div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter2" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+                <div class="modal-content" data-backdrop="static">
+                
+                <div class="modal-header comment-head">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Calculator</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+    
+                <div class="modal-body calc-body">
+                    <iframe src="{% url 'invoice:calculator' %}" title="description"></iframe>
+                </div>
+    
+                <div class="modal-footer comment-foot">
+                    <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Save & Close</button> -->
+                </div>
+                </div>
+            </div>
+            </div>
+
+    </form>
+    </div>
+    {% include 'conform_costcode_popup.html' %}
+
+        <!-- <h5 class="head-inv-pre">Payment Details</h5>
+        <div class="row">
+            <div class="col-1"></div>
+            <div class="col-10">
+                <form method="POST" id="acc_pay_id">
+                    {% csrf_token %}
+
+            <div class="vin-ven">
+                        <div class="vin-no">
+                            <h4>VIN No : &nbsp;</h4>
+                        <p>{{invoice.vendor.vin}}&nbsp; &nbsp;</p>
+                        </div>
+            </div>
+            <div class="vin-ven">
+                <div class="ven-name">
+                    <h4>Vendor Name : &nbsp;</h4>
+                    <p>{{invoice.vendor.vendor_name}}</p>
+                </div>
+            </div>
+
+                <div class="table-contents">
+                    <table class="new_table">
+                        <tbody>
+                            <tr>
+                                <th valign="top" class="new_table">Invoice No</th>
+                                {% for payment in payment_details %}
+                                <td valign="top" class="datas new_table"><span>
+                                    {{payment.invoicecost.invoice_number}}
+                                </span></td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <th valign="top" class="new_table">Net Payable Amount</th>
+                                    {% for payment in payment_details %}
+                                        <td valign="top" class="datas new_table"><span>
+                                            {{payment.invoicecost.invoice_total_amount}}
+                                        </span></td>
+                                    {% endfor %}
+                            </tr>
+                            <tr>
+                                <th valign="top" class="new_table">Bank to Debit</th>
+                                {% for payment in payment_details %}
+                                <td valign="top" class="datas new_table"><span>
+                                    {{payment.companybank.bank_name.bank_name}}-{{payment.companybank.account_number.accountno}}
+                                </span></td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <th valign="top" class="new_table">Vendor Bank Details</th>
+                                {% for payment in payment_details %}
+                                <td valign="top" class="datas new_table"><span>
+                                    {{payment.invoicecost.invoice_bank.bankname}}-{{payment.invoicecost.invoice_bank.accountnumber}}
+                                </span></td>
+                                {% endfor %}
+                            </tr>
+
+
+                            
+                        </tbody>
+
+                    </table>
+                </div>
+                <div class="my-3">
+                    <button class="btn btn-clr btn-pad"><a href="{% url 'invoice:paymentInstruction' pk %}">View Payment Instruction</a></button>
+                </div>
+                <div class="row align-items-center">
+                    <div class="col-3"><span class="code-word">Verification Code</span></div>
+                    <div class="col-3"><input type="text" name="verify_code" id="id_verify_code" class="form-control" maxlength="6" autocomplete="off"></div>
+                    <div class="col-6">
+                        <button type="button" class="btn btn-success" id="id_btn_verify" style="display:none">Verify</button>
+                        <button type="button" class="btn btn-clr" id="id_btn_send" >Send Verification Code</button>
+                    </div>
+                    
+                        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalCenterTitle">Comment</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                </div>
+                                <div class="modal-body">
+                                    <textarea name="main_comments" class="form-control"></textarea>
+                                </div>
+                                <div class="modal-footer">
+                                <button type="submit" class="btn btn-secondary submit_cls">Save</button>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+                    </div>
+                <div class row="row">
+                    <p id="countTime"></p>
+                    <button type="button" class="btn btn-clr" id="Submit_id" style="display: none;" data-toggle="modal" data-target="#exampleModalCenter">Submit</button>
+                </div>
+            </form>
+            </div>
+            <div class="col-1"></div>
+        </div>
+    </div> -->
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script>
+   $(function () {
+    $(".calculator-draggable").draggable();
+  });
+var invoiceid="{{pk}}" 
+var wcc_id="{{wcc_id}}"
+var scheme="{{request.scheme}}"
+var gethost="{{request.get_host}}"
+var user_signature="{{sign_data}}"
+var csrf_token = "{{ csrf_token }}"
+var currentdomain=scheme+'://'+gethost
+var package_src = "{% static 'js/web/viewer.html' %}"
+</script>
+<script src="{% static 'js/invoice/invoiceflowprocesstwo.js' %}"></script>
+<script src="{% static 'js/common/invoiceflow.js' %}"></script>
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script>
+    $('#id_btn_send').click(function(){
+        $(this).hide(500);
+        $(this).text('re-send Verificcation code');
+        $('#id_btn_verify').show(500);
+        timerFunc();
+    })
+
+    function timerFunc(){
+        var countdown = 30 * 60 * 1000;
+        var timerId = setInterval(function(){
+        countdown -= 1000;
+        var min = Math.floor(countdown / (60 * 1000));
+        var sec = Math.floor((countdown - (min * 60 * 1000)) / 1000);
+        if (countdown <= 0) {
+            $("#countTime").html('')
+            $('#id_btn_verify').hide(500);
+            $('#id_btn_send').show(500);
+            clearInterval(timerId);
+        } else {
+            $("#countTime").html('Verification code expired in '+min + " : " + sec);
+        }
+        }, 1000);
+    }
+
+    $('#id_btn_verify').click(function(){
+        let val=$(this).val()
+        // use ajax here to check verification correct or not
+        //if function get success show submit btn
+        $('#Submit_id').show();
+    })
+
+    $(document).on('click','.submit_cls',function(e){
+    let getformid=$(this).parents("form").attr("id")
+    let form=$("#"+getformid);
+    e.preventDefault();
+    console.log(form)
+    var submit_val=$(this).val();
+    $("<input>").attr({name: "submit_type",id: "hiddenId",type: "hidden",value: "1"}).appendTo("form");
+    $("<input>").attr({name: "submit_name",id: "nameId",type: "hidden",value: "Approved"}).appendTo("form");
+    // $("<input>").attr({name: "submit_type",id: "hiddenId",type: "hidden",value: submit_val}).appendTo("form");
+    $('#submit_id').attr('disabled',true)
+    $(this).attr('disabled',true)
+    form.submit();
+})
+</script> -->
+{% endblock %}

@@ -1,0 +1,189 @@
+.s-all {
+    color: #009391 !important;
+    font-size: 15px;
+   
+}
+.vend-thead td {
+    border-right: 1px solid var(--tableborder-color) !important;
+}
+.creat-head th{
+    border-bottom: 2px solid var(--tableborder-color) !important;
+}
+.creat-head td{
+    border-bottom: 1px solid var(--tableborder-color) !important;
+}
+.usercls{
+    width: 100%;
+    border: 1px solid  var(--tableborder-color) !important;
+}
+#empty_class{
+    text-align:  var(--centertext-align) !important;
+  }
+.usercls td {
+    padding: 10px 10px;
+    border: 1px solid  var(--tableborder-color) !important;
+}
+.usercls td {
+    text-align:  var(--centertext-align) !important;
+}
+.usercls-box label {
+    padding-left: 15px !important;
+    color: #000;
+    font-weight: 500;
+}
+.usercls th {
+    background: transparent !important;
+    text-transform: capitalize !important;
+    font-size: 15px !important;
+    text-align: center !important;
+    border-bottom: 1px solid  var(--tableborder-color) !important;
+}
+.usercls th {
+    color: #98193b;
+    border-right: 1px solid  var(--tableborder-color) !important;
+    padding: 10px 10px;
+}
+
+/* ------User Roles & Rights Details--------------- */
+#vendor-sort th{
+    text-transform: capitalize !important;
+}
+
+.sno-center {
+    text-align:  var(--centertext-align);
+}
+
+.actions-center {
+    text-align: var(--centertext-align);
+}
+
+.td-left {
+    text-align: var(--lefttext-align);
+}
+
+
+/* select all check box */
+/*project check-box*/
+.chk-cls-project {
+    position: absolute;
+    opacity: 0;
+    left: 0;
+}
+
+.chk-cls-project+label {
+    position: relative;
+    cursor: pointer;
+    padding: 0;
+}
+
+.chk-cls-project+label:before {
+    content: '';
+    margin-right: 10px;
+    display: inline-block;
+    vertical-align: text-top;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #9c1b3d;
+    border-radius: 50px; 
+}
+
+.chk-cls-project:hover+label:before {
+    background: #9c1b3d;
+}
+
+.chk-cls-project:focus+label:before {
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12);
+}
+
+.chk-cls-project:checked+label:before {
+    background: #007f83;
+    border-color: #007f83 !important;
+}
+
+.chk-cls-project:disabled+label {
+    color: #b8b8b8;
+    cursor: auto;
+}
+
+.chk-cls-project:disabled+label:before {
+    box-shadow: none;
+    background: #ddd;
+}
+
+.chk-cls-project:checked+label:after {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 10px;
+    background: white;
+    width: 2px;
+    height: 2px;
+    box-shadow: 2px 0 0 white, 4px 0 0 white, 4px -2px 0 white, 4px -4px 0 white, 4px -6px 0 white, 4px -8px 0 white;
+    transform: rotate(45deg);
+}
+/* select all end here */
+
+/* view button content */
+h4.proj-hd {
+    color: #9a1a3c;
+    font-weight: 500;
+    text-align: left;
+}
+.prt-viewlist{
+    margin-top: 0px !important;
+}
+.prj-tablists{
+    margin-top: 0 !important;
+}
+
+
+/* --view click-in roles & rights-- */
+.user-roles-and-rights .tree_menu {
+    position: relative;
+    cursor: pointer;
+}
+
+.user-roles-and-rights .tree_menu:after {
+    position: absolute;
+    content: '';
+    height: 2px;
+    background: #8b1434;
+    transition: .2s;
+    left: 0;
+    bottom: -4px;
+}
+
+.user-roles-and-rights .tree_menu:hover {
+    color: #8b1434;
+}
+
+.user-roles-and-rights .tree_menu.active {
+    margin-left: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #e9023fe0;
+    padding-left: 4px;
+}
+.user-roles-and-rights .tree_menu:active{
+    margin-left: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #e9023fe0;
+}
+
+.user-roles-and-rights .tree_menu.active::before{
+    position: absolute;
+    content: '\f0a4';
+    width: 9px;
+    transition: .2s;
+    left: -15px;
+    bottom: 0px;
+    font-family: 'FontAwesome';
+    color: #e9023fe0;
+}
+.brek-word{
+    word-break: break-word;
+}
+
+
+

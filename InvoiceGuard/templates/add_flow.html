@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_process/flow.css' %}">
+<div class="row">
+    <div class="col-12 text-end">
+        <button type="button" class="btn btn-clr chck-tst"><a href="{% url 'InvoiceGuard:list-flow-form' %}">Back</a></button>
+    </div>
+</div>
+
+<section class="usesr-management-Edit-section">
+<div>  
+    <h3 class="from-head">Add Flow</h3>
+    
+    <div class="row d-flex justify-content-center">
+    
+        <div class="col-6 col-lg-6 col-md-9">
+        <div class="invite-cards">
+            <form  class="form-txt" id="addtaxformid" method="POST" action="">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-12 mb-3 mt-3">
+                        <div>
+                            <select class="form-control form-select main_cls" name="item" style="display:none" >
+                                {% for process_name in process %}
+                                <option value="{{process_name.id}}" data-id="{{forloop.counter}}" class="item_{{ forloop.counter }} item_loop" >{{process_name.process_name}}</option>
+                                {% endfor %}
+                            </select>
+                            <label class="vend-appor-hd m-0">Flow Name<span class="star-clr">*</span></label>
+                        </div >
+                        <div class="bot-pha">
+                            <input type="text" autocomplete="off" name="flow_name" id="taxnameid0" data-error="1" class="form-control taxnamecls bot-pha mt-3" placeholder="Flow Name">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <table id="tax_table_id" class="w-100">
+                            <thead>
+                                <th class="vend-appor-hd pad-bot">Process<span class="star-clr">*</span></th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="wid-tx">
+                                        <select class="form-control form-select taxtypecls" name="process" id="{{forloop.counter}}" onchange="checkValue()">
+                                            <option value="">--- Select ---</option>
+                                            {% for process_name in process %}
+                                            <option value="{{process_name.id}}">{{process_name.process_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                    <td class="same-line-tx"><button id='add' class='btn btn-clr add-btn pha-sebtn mt-3' type='button' value='Add'> <i class="fa fa-plus"></i> </button>  
+                                     </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="text-center phase-vendor" id="btn">
+                    <button type="submit" class="save-cls btn btn-clr text-right">Submit</button>
+                </div>
+
+            </form>
+        </div>
+        </div>
+
+       
+
+    </div>
+
+</div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+     var csrf_token = '{{csrf_token}}'
+</script>
+<script type="text/javascript" src="{% static 'js/invoiceguard/add_flow.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script>
+
+</script>
+
+{% endblock %}

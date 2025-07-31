@@ -1,0 +1,410 @@
+{% extends "base.html" %}
+{% load custom_tags %}
+{% load InvoiceGuardTags %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_process/company-setting.css' %}">
+
+<div>
+  <h4 class="from-head">Financial Delegation of Authority</h4>
+  <input type='hidden' value='{{currency_count}}' id='currency_count'>
+  {% if currency_count != 0 %}
+  <div class="row justify-content-end">
+  {% if request.user.roles_id == 3 %}
+    {% if rights.create == '1' or rights.edit == '1' or rights.delete == '1' %}
+    <div class="col-3 text-end">
+      {% if signatory_count == 0 %}
+      <a class="btn btn-clr onClass" href="{% url 'InvoiceGuard:add-update-signatory-form' %}">Add</a>
+      {% else %}
+      <a class="btn btn-clr onClass" href="{% url 'InvoiceGuard:add-update-signatory-form' %}">Edit</a>
+      {% endif %}
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="col-3 text-end">
+      {% if signatory_count == 0 %}
+      <a class="btn btn-clr onClass" href="{% url 'InvoiceGuard:add-update-signatory-form' %}">Add</a>
+      {% else %}
+      <a class="btn btn-clr onClass" href="{% url 'InvoiceGuard:add-update-signatory-form' %}">Edit</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+
+
+  <!-- <div class="list_signatories">
+    <label for="signatory">Select Signatory</label>
+    <select class="select-style select-Signatory" id="signatory" name="signatory">
+      <option value=''>--Select--</option>
+      <option value="1">Company Level</option>
+      <option value="2">Project Level</option>
+    </select>
+  </div>  -->
+  
+  <table class="list_signatories">
+    <tr>
+      <td>
+        <label for="signatory">Select Financial Delegation  of Authority</label>
+      </td>
+      <td>:</td>
+      <td>
+        <select class="select-style select-Signatory" id="signatory" name="signatory">
+          <option value=''>--Select--</option>
+          <option value="1">Company Level</option>
+          <option value="2">Project Level</option>
+        </select>
+      </td>
+    </tr>
+  </table>
+  
+  <div id="company_level" style="display:none">
+
+  <!-- <div class="">
+    <div class="list_signatories">
+      <label for="">Select Signatory Type
+      <select class="select-style select-invoice">
+        <option value="1">With Invoice Amount</option>
+        <option value="2">Without Invoice Amount</option>
+      </select>
+    </label>
+    </div>
+  </div> -->
+  
+  <table class="list_signatories">
+    <tr>
+      <td>
+        <label for="signatory-type">Select Financial Delegation of Authority Type</label>
+      </td>
+      <td>:</td>
+      <td>
+        <select class="select-style select-invoice" id="signatory-type" name="signatory-type">
+          <option value="1">With Invoice Amount</option>
+          <option value="2">Without Invoice Amount</option>
+        </select>
+      </td>
+    </tr>
+  </table>
+
+  <div class="row">
+    <h4 class="from-head">Company - Financial Delegation  of Authority</h4>
+    <div class="col-12">
+      <table
+        class="table settings-data-list-view data-list-view with_invoice"
+        id="master_project_list">
+        <thead>
+          <tr>
+            <th class="">Currency <button class="filter-btn" data-filter="Sno"> <i class="fas fa-sort"></i></button></th>
+            <th class="">From Invoice Amount <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>
+            <th class="">To Invoice Amount <button class="filter-btn" data-filter="last-name"> <i class="fas fa-sort"></i></button></th>
+            <th id="text-initial">No of Signatories <button class="filter-btn" data-filter="designation"> <i class="fas fa-sort"></i></button></th>
+            <th>Users <button class="filter-btn" data-filter="dept"> <i class="fas fa-sort"></i></button></th>
+          </tr>
+        </thead>
+        <tbody class="table-list">
+          {%for signatory in with_invoice %}
+          <tr>
+            <td>{{signatory.currency.currency_symbol}}-{{signatory.currency.currency}} ({{signatory.currency.name}})
+            </td>
+            <td>{{signatory.min_amount|add_seperator|default_if_none:''}}</td>
+            <td>{{signatory.max_amount|add_seperator|default_if_none:''}}</td>
+            <td>
+              <p class="txt-word-break">
+                {{signatory.id|no_of_users|default_if_none:"---"}}</p>
+            </td>
+            <td class="td-left">
+              {% for user in signatory|SignatoryUser %}
+              <p class="txt-word-break">{{user.user|default_if_none:"---"}}&nbsp;{{user.user.lastname|default_if_none:"---"}}
+              </p>
+              {% endfor %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9" class="cls-nil">
+              ---
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <table
+        class="table settings-data-list-view data-list-view without_invoice"
+        id="master_project_list" style="display: none;">
+        <thead>
+          <tr>
+            <th class="">Currency <button class="filter-btn" data-filter="Sno"> <i class="fas fa-sort"></i></button></th>
+            <th id="text-initial">No of Signatories <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>
+            <th>Users <button class="filter-btn" data-filter="last-name"> <i class="fas fa-sort"></i></button></th>
+          </tr>
+        </thead>
+      <tbody class="table-list">
+        {%for signatory in without_invoice%}
+        <tr>
+          <td>{{signatory.currency.currency_symbol}}-{{signatory.currency.currency}} ({{signatory.currency.name}})
+          </td>
+          <td>
+            <p class="txt-word-break">
+              {{signatory.id|no_of_users|default_if_none:"---"}}</p>
+          </td>
+          <td class="td-left">
+            {% for user in signatory|SignatoryUser %}
+            <p class="txt-word-break">{{user.user|default_if_none:"---"}}&nbsp;{{user.user.lastname|default_if_none:"---"}}
+            </p>
+            {% endfor %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3" class="cls-nil">
+            ---
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div>
+  </div>
+
+{% comment %} 
+  <div class="Project_level pss-div" style="display:none;" id="Project_level">
+    <div class="col-1">
+      Select Project:
+    </div>
+    <div class="col-2">
+      <select class="form-control" name="get_project" id="get_project">
+        <option value="">-- Select --</option>
+        {% for project in projects %}
+        <option value="{{project.id}}">{{project}}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div> {% endcomment %}
+  
+  <table class="Project_level list_signatories" style="display:none;" id="Project_level">
+    <tr>
+      <td>
+        <label>Select Project</label>
+      </td>
+      <td>:</td>
+      <td>
+        <select class="select-project" name="get_project" id="get_project">
+          <option value="">-- Select --</option>
+          {% for project in projects %}
+          <option value="{{project.id}}">{{project}}</option>
+          {% endfor %}
+        </select>
+      </td>
+    </tr>
+  </table>
+
+
+  <div id="project_sign" class="pss-div" style="display:none;">
+    <h4 class="from-head">Project - Financial Delegation  of Authority</h4>
+
+    {% comment %} <div class="col-9 show-noti pt-0">
+      <label for="">Select Signatory Type
+      <select class="select-style select-invoice-project">
+        <option value="1">With Invoice Amount</option>
+        <option value="2">Without Invoice Amount</option>
+      </select>
+    </label>
+    </div> {% endcomment %}
+
+    <table class="list_signatories">
+      <tr>
+        <td>
+          <label>Select Signatory Type</label>
+        </td>
+        <td>:</td>
+        <td>
+          <select class="select-style select-invoice-project">
+            <option value="1">With Invoice Amount</option>
+            <option value="2">Without Invoice Amount</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+
+    <table class="with_invoice_project" id="master_project_list_project">
+      <thead>
+        <tr>
+          <th class="">Currency <button class="filter-btn" data-filter="Sno"> <i class="fas fa-sort"></i></button></th>
+          <th class="">From Invoice Amount <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>
+          <th class="">To Invoice Amount <button class="filter-btn" data-filter="last-name"> <i class="fas fa-sort"></i></button></th>
+          <th class="nos-sig"><p>No of Signatories <button class="filter-btn" data-filter="designation"> <i class="fas fa-sort"></i></button></p></th>
+          <th class="">Users <button class="filter-btn" data-filter="dept"> <i class="fas fa-sort"></i></button></th>
+        </tr>
+      </thead>
+      <tbody class="table-list newtrrow">   
+      </tbody>
+      </table>
+      <table class="without_invoice_project" id="master_project" style="display: none;">
+        <thead>
+          <tr>
+            <th class="">Currency <button class="filter-btn" data-filter="Sno"> <i class="fas fa-sort"></i></button></th>
+            <th class="nos-sig"><p>No of Signatories <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></p></th>
+            <th class="">Users <button class="filter-btn" data-filter="last-name"> <i class="fas fa-sort"></i></button></th>
+          </tr>
+        </thead>
+        <tbody class="table-list new_row">
+        </tbody>
+        </table>
+
+       
+  </div>
+
+
+
+</div>
+{% endblock%}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+  $(document).on('change','#get_project',function(){
+    let project=$(this).val()
+    let form=``
+    let form_2=``
+    let table_row=$('#master_project_list_project tbody')
+    let table_without_invoice=$('#master_project tbody')
+    if(project != ''){
+      $('#project_sign').css('display','block')
+      $.ajax({
+              type: "GET",
+              headers: { "X-CSRFToken": "{{ csrf_token }}"},
+              url: "{% url 'InvoiceGuard:get-signatory-project' %}",
+               data: {'pk':project},
+               success: function(response) {
+                let withinv_count=0
+                let withoutinv_count=0
+                let ajax_count=response.length
+                if(ajax_count >= 1){
+                $.each(response, function(index, item) {
+                  let null_val_min=item.min_amount
+                  let null_val_max=item.max_amount
+                  if(isNaN(parseFloat(null_val_min)) || isNaN(parseFloat(null_val_max))){
+                    null_val_min=''
+                    new_attr='readonly'
+                    null_val_max=''
+                  }
+                  else{
+                    null_val_min=parseFloat(null_val_min).toLocaleString();
+                    null_val_max=parseFloat(null_val_max).toLocaleString();
+                    new_attr=''
+  
+                  }
+                  if (item.invoice_type == '1'){
+                  withinv_count++
+                  form+=`<tr><td class="add-sign">`
+                  form+=`{% for countries in currency %}`
+                  country='{{countries.id}}'
+                  currency_id=''+item.currency_id+''
+                  if(currency_id == country){
+                    form+=`{{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}})`
+                  }
+                  form+=`{% endfor %}</td><td class="from-invoice">${null_val_min}</td><td class="To-Invoice">${null_val_max}</td><td class="small-td">2</td><td class="user-list">`
+  
+                  form+=`<p>{% for users in user %}`
+                userid='{{users.id}}'
+                  signatory_userid=''+item.users[0].user_id+''
+                      if(userid == signatory_userid){
+                        form+=`{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;`
+                      }
+                      form+=`{% endfor %}</p>`
+  
+                      form+=`<p>{% for users in user %}`
+                      userid='{{users.id}}'
+                      signatory_userid=''+item.users[1].user_id+''
+                      if(userid == signatory_userid){
+                        form+=`{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;`
+                      }
+                      form+=`{% endfor %}</p>`
+                      form +=`</td></tr>`
+                    }
+                    else{
+                      withoutinv_count++
+                      form_2+=`<tr><td class="add-sign">`
+                        form_2+=`{% for countries in currency %}`
+                        country='{{countries.id}}'
+                        currency_id=''+item.currency_id+''
+                        if(currency_id == country){
+                          form_2+=`{{countries.currency_symbol}}-{{countries.currency}} ({{countries.name}})`
+                        }
+                        form_2+=`{% endfor %}</td><td class="small-tzd">2</td><td class="user-list">`
+        
+                          form_2+=`<p>{% for users in user %}`
+                      userid='{{users.id}}'
+                        signatory_userid=''+item.users[0].user_id+''
+                            if(userid == signatory_userid){
+                              form_2+=`{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;`
+                            }
+                            form_2+=`{% endfor %}</p>`
+        
+                            form_2+=`<p>{% for users in user %}`
+                            userid='{{users.id}}'
+                            signatory_userid=''+item.users[1].user_id+''
+                            if(userid == signatory_userid){
+                              form_2+=`{{users.name}} {{users.lastname}}&nbsp;-- {{users.designation_role}} &nbsp; {% if users.roles.id == 2 %}-- Administration{% else %}{% if users.user_department_id is not None %}-- {{users.user_department_id|get_dept_name|default_if_none:''}}{% endif %}{% endif %}&nbsp;`
+                            }
+                            form_2+=`{% endfor %}</p>`
+                            form_2 +=`</td></tr>`
+                        
+
+
+                    }
+                  
+                //table_row.html(form)
+                //table_without_invoice.html(form_2)
+                //console.log('form',form)
+              });
+            }
+            console.log('withinv_count',withinv_count)
+            console.log('withoutinv_count',withoutinv_count)
+            if(withinv_count == 0){
+              table_row.html('<tr><td colspan="9" class="cls-nil">---</td></tr>') 
+            }
+            else{
+              table_row.html(form) 
+            }
+            if(withoutinv_count == 0){
+              table_without_invoice.html('<tr><td colspan="9" class="cls-nil">---</td></tr>') 
+            }
+            else{
+              table_without_invoice.html(form_2) 
+            }
+            }
+              
+             });
+    }
+    else{
+      $('.project_sign').css('display','none')
+    }
+  
+  })
+  
+</script>
+<script>
+  var generalSettingUrl = "{% url 'custom_auth:generalsetting' companyid=request.user.company.id %}";
+</script>
+
+<script type="text/javascript" src="{% static 'js/invoiceguard/list_signatories.js' %}"></script>
+<script>
+
+  // $(document).on('change','.select-invoice',function(){
+  //   if (parseInt($(this).val()) == 2){
+  //     $('.with_invoice').css('display','none')
+  //     $('.without_invoice').css('display','block')
+  //   }
+  //   else{
+  //     $('.without_invoice').css('display','none')
+  //     $('.with_invoice').css('display','block')
+  //   }
+  // })
+
+</script>
+<script type="text/javascript" src="{% static 'js/projects/userslist.js' %}"></script>
+{%endblock%}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}   
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/setting/generalsetting.css' %}">
+
+<h4 class="from-head">Company General Settings</h4>
+<div class="row">
+  <div class="col-9">
+  </div> 
+  <div class="col-3">
+    {% comment %}
+      <button class="btn btn-clr btn-master waves-effect waves-float waves-light pc-bk-cls" ><a href="{% url 'custom_auth:generalsetting' companyid=general.company.id%}">Back</a></button>
+    {% endcomment %}
+  </div>
+</div>
+<table class="view-com-list com-gen-sett irock-table">
+  <tr><th>Date Format</th><td>{{general.dateformat|Dateformat}}</td></tr>
+  {% comment %}<tr><th>Time Zone</th><td>{{general.timezone|default_if_none:"---"}}</td></tr>{% endcomment %}
+  <tr><th>Currency</th>{% with general.currency|get_currencies:"-" as currencies %}
+    <td class="point-remove">{% for currency in currencies %} <li> {{currency.currency}} {{currency.currency_symbol}} ({{currency.name}}) </li> {% endfor %}</td>{% endwith %}</tr>
+    <!-- this one comment is request be client issues -->
+    <!-- <tr><th>Unit</th><td>{{general.unit|category_replace}}</td></tr> --> 
+  {% comment %}<tr><th>Time Format</th><td>{{general.timeformat|default_if_none:"---"}} Hours</td></tr>{% endcomment %}
+  {% comment %} <tr><th>Vendor Invite Link Valid Time</th><td>{{general.vendor_invite_time}}-{{general.vendor_invite_unit|default_if_none:"---"}}</td></tr> {% endcomment %}
+  <tr>
+    <th>Revised Invoice Submission Days</th>
+    <td>{{general.vendor_registartion_time}} Days</td>
+  </tr>
+  <tr>
+    <th>Bank User</th>
+    <td>{% if general.bank_user == 1 %} Yes{% else %} - {% endif %}</td>
+  </tr>
+  <tr>
+    <th>Company Exchange Rate Url</th>
+    {% if length == 0 %}
+    <td>---</td>
+    {% else %}
+    <td>{{general.urlfield}}</td>
+    {% endif %}
+  </tr>
+</table>
+<div class="row">
+    <div class="text-center">
+        <button type="button" class="btn btn-clr btn-outline-danger mr-1 mb-1 waves-effect waves-light "><a href="{% url 'custom_auth:generalsetting' companyid=general.company.id %}" >Edit</a></button>
+      </div>
+</div>
+
+
+{% endblock %}

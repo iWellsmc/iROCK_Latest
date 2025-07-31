@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_process/company-setting.css' %}">
+<div>
+  <h4 class="from-head">WCC Approval Terms </h4>
+  
+  <div class="row justify-content-end">
+    <div class="col-12 text-end">
+      {% if request.user.roles_id == 3 %}
+          {% if rights.create == '1' or rights.edit == '1' %} 
+          <a class="btn btn-clr onClass" href="{% url 'custom_auth:EditWcctriggertime' companyid=companyid %}">Edit</a>
+          {% endif %}
+       {% else %}
+       <a class="btn btn-clr onClass" href="{% url 'custom_auth:EditWcctriggertime' companyid=companyid %}">Edit</a>
+       {% endif %}
+     
+   
+   </div>
+    </div>
+  <div class="row">
+    <div class="col-12">
+      <table
+        class="table settings-data-list-view data-list-view irock-table with_invoice"
+        id="master_project_list">
+        <thead>
+          <tr>
+            <!-- <th class="wid-iin com_curency">S/N</th> -->
+            <th class="wid-iin">WCC Approval Terms <button class="filter-btn" data-filter="first-name"> <i class="fas fa-sort"></i></button></th>
+            <th class="wid-iin" id="text-initial">Time Allowed per Station <button class="filter-btn" data-filter="last-name"> <i class="fas fa-sort"></i></button></th>
+            <!-- <th>Time Allowed Per Station</th> -->
+          </tr>
+        </thead>
+        <tbody class="table-list">
+          {% for i in masterinvoicetrigger %}
+          <tr>
+            <!-- <td>{{forloop.counter}}</td> -->
+            <td>All Work Completion Certificates</td>
+            {% comment %} <td>{{i.payment_terms_from}} - {{i.payment_terms_to}} Days</td> {% endcomment %}
+            <td>{{i.time_allotted}} {%if i.time_unit == 2 %}minutes{%elif i.time_unit == 1 %}days per station{%else%}hours{%endif%}</td>
+            <!-- <td>{{i.time_allotted}}</td> -->
+          <tr>
+            {% endfor %}
+        </tbody>
+      </table>
+     
+    </div>
+  </div>
+</div>
+{% endblock%}
+
+{% block scripts %}
+{{ block.super }}
+<script type="text/javascript" src=""></script>
+<script>
+
+</script>
+
+{%endblock%}

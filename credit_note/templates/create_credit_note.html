@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/creditnote.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/error_styles.css' %}">
+
+
+<div class="row">
+    <form  method="POST" id="creditnote1" enctype="multipart/form-data"> 
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-12 text-end">
+                <button class="btn btn-clr waves-effect waves-float waves-light" ><a href="{% url 'credit:credit_note_list' %}">Back</a></button>
+            </div>
+        </div>
+        <h3 class="from-head">Submit Credit Note</h3>
+        <div class="row">
+            
+            <div class="row cmf-prj">
+              
+            <div class="col-6">
+                <div class="create-credit">
+                <label>Contract No</label>
+                <input type="hidden" name="dateformat" id="companydateformat" value={{company.dateformat}}>
+                <input type="hidden" name="contract_type" id="cont_type" value="">
+                <input type="hidden" name="serial_number" id="serial_id" value="{{serial_no}}">
+                
+                <select name="contract" class="form-control form-select contractcls in-bor-clr">
+                    <option value="" >--Select Contract No--</option>
+                    {% for contract in all_contracts %} 
+                        <option value="{{contract.id}}" contract_type="{{contract.contract_type}}" currency_symbol="{{contract.currency_symbol}}" currency_id="{{contract.currency_id}}" currency="{{contract.contract_currency}}" active_status="{{contract.active_status}}" projectname="{{contract.project_name}}">{{contract.ref_num}} ({{contract.contract_type}})</option>
+                    {% endfor %}
+                </select>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="create-credit">
+                <label>Invoice No(s)</label>
+                <input type="hidden" id="invoicetotalcost" value="">
+                <select name="invoice" class="form-control form-select invoicecls inputcls">
+                    <!-- <option value="">--Select Invoice Nos for Allocation--</option> -->
+                </select>
+            </div>
+            </div>
+            
+            </div>
+        </div>
+        <div class="cur-show row" style="display: none;">
+
+            <div class="col-12">
+                <label class="currency-contract pt-3">Currency As Per Contract : <span id="change-currency"></span></label>
+            </div>
+            <!-- <div class="col-12 underline"></div> -->
+            <div class="col-12">
+                <div class="row bot-space">
+                    <div class="col-6">
+                        <label class="contractfilehead">Total Value of Invoice<i class="fa fa-info-circle i-con-clr-to" title="Total Value of Selected Invoice" ></i></label>
+                    </div>
+                    <div class="col-3">
+                        <input type="text" name="total_invoice_value" id="total_cost" class="form-control com_val in-bor-clr-start inp-ut-wid wid-to-box in-bor-clr change" readonly>
+                    </div>
+                    </div>
+                <div class="row align-items-center">
+                    <div class="col-6">
+                        <label class="contractfilehead">Total Value of Credit Note <i class="fa fa-info-circle paymentcurcls i-con-clr-to" title="Total value before taxes/levies" ></i></label>
+                    </div>
+                    <div class="col-3">
+                        <input type="text" name="total_value" id="total_val_id" class="form-control com_val in-bor-clr-start inp-ut-wid wid-to-box in-bor-clr totalvalue" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');">
+                        <input type="hidden" name="creditvalue_total" id="creditvalue_total" value="0">
+                        <input type="hidden" name="credit_sum" id="credit_sum" >
+                        <input type="hidden" name="credit_sum_count" id="credit_sum_count" >
+                        <input type="hidden" name="exchangetyp" id="exchangetyp" >
+                        <input type="hidden" name="basecurrency" id="basecurrency" >
+                    </div>
+                </div>
+                
+            </div>
+            <div class="col-12">
+                <div><label class="tax-lev">Taxes and Levies</label></div>
+                <div class="col-hed tax_lev_cls">Inclusive Taxes:  
+                    <span class="in-clu">
+                    </span>
+                </div>
+                <table class="exclusivetable"> 
+                    <!-- <i class="fa fa-info-circle paymentcurcls i-con-clr" title ="taxes/levies not included in invoice Prices as per contract." style="color:#000000"></i> -->
+                    <thead><tr><th class="in-sub-hd">Exclusive Taxes <i class="fa fa-info-circle paymentcurcls i-con-clr" title ="taxes/levies not included in credit note" style="color:#000000"></i>*:</th></tr> <tr><th class="in-sub-hd new-taxx">Tax Name</th>  <th class="in-sub-hd new-taxx">Tax Amount</th></tr>  </thead> <tbody> </tbody>
+                </table>
+            </div>
+           
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-6">
+                        <label class="contractfilehead">Total Exclusive Taxes and Levies</label>
+                    </div>
+                    <div class="col-3">
+                        <input type="text" readonly id="id_tot_exc" class="inv-val boorder-bb">
+                    </div>
+                    <div class="col-3">
+                    </div>
+                    <div class="col-6">
+                        <input type="hidden" name="final_exclusive_value" id="add_exclusive_value">
+                        <label class="contractfilehead">Gross Total Inclusive of all Taxes</label>
+                    </div>
+                    <div class="col-3">
+                        <input type="text" name="totalalltax" id="id_totalalltax" class="totalalltaxcls inv-val boorder-bb">
+                    </div>
+                    <div class="col-3">
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="table-responsive text-nowrap">
+                <table id="split-invoice-tbl" class="tab-details">
+                    <thead>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            </div>
+            <div class="col-12">
+                <div class="table-responsive text-nowrap">
+                <table class="support_tbl redu-width-credit">
+                    <thead>
+                        <th>Other Supporting Documents</th>
+                    </thead>
+                    <tbody>
+                        <tr class="tr_file_clone"><td><input type="file" name="support_file" class="form-control filesize" accept="image, .png, .jpeg, .pdf, .jpg"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span></td><td class=""> <button id="add-file-row" class="btn-clr add-file-row btn add-btn" type="button" value="add"><i class="fa fa-plus"></i></button> <button id="delete-file-row" class="btn-clr delete-file-row btn add-btn" type="button" value="delete"><i class="fa fa-minus"></i></button> </td></tr>
+                    </tbody>
+                </table>
+               </div>
+            </div>
+        </div>
+        <div class="btnsumcls invdetailcls" style="display:none;"><button type="button" class="sum-btn">Show Summary</button> <button type="button" class="hide-btn">Hide Summary</button></div>
+         <div class="rowcls insum_detail" style="display:none;">
+           <h6 class="sum-heed">Credit Note Summary Details</h6>
+           <!-- {% for contract in all_contracts %}  -->
+
+           <div class="main_cls">
+           
+            <!-- {% endfor %} -->
+
+
+        </div>
+            
+        </div>
+        </div>
+        <!-- <div class="text-center btn-cls">
+            <button type="submit" id="draft_id" class="btn btn-clr text-left draft-cls com-save" name="submit_type" value="0" style="display:none">Save as Draft</button>
+            <button type="submit" id="save_id" value="1" style="display:none" class="btn btn-clr text-left save-cls com-save">Save and Submit</button>
+            <button type="submit" id="next_id" value="2" style="display:none" class="btn btn-clr text-left next-cls com-save">Preview</button>
+        </div> -->
+    </form>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> 
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" ></script>
+<script src="{% static 'js/credit_note/create_credit_note.js' %}"></script>
+<script>
+    $(window).keydown(function(event){
+    if(event.keyCode == 13) {
+      event.preventDefault();
+      return false;
+    }
+  });
+</script>
+{% endblock %}

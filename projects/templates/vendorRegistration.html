@@ -1,0 +1,567 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+
+<style>
+.down{
+        transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+      }
+
+
+.arrow {
+        border: solid black;
+        border-width: 0 3px 3px 0;
+        display: inline-block;
+        padding: 3px;
+}
+
+</style>
+
+<div class="row">
+
+</div>
+    <h3 class="from-head">Vendor Company Contact Information</h3>
+    
+    <form  class="form-txt" id="vendorresitraion2">
+        {% csrf_token %}
+    <div class="row">
+        <div class="row">   
+            <div class="col-12">
+                <label class="txt-name unique-colr">Vendor Name:</label>
+                <span class="txt-detail uniq-name">{{vendorid.vendor_name}}</span>
+            </div>
+        </div>
+        <div class="col-sm-6"> 
+            <h4 class="vend-com-heading">Key/ Primary Contact Details:</h4>
+        </div>
+        <div class="col-sm-6"> 
+            <h4 class="vend-com-heading">Alternate/Secondary Contact Details:</h4>
+        </div>
+    </div>
+        
+    <div class="row">
+        <div class="col-sm-6 mid-line">
+            <div class="row vendor_bottom_space">
+
+                <div class="col-2">
+                    <label for="staticEmail" class="col-form-label">Title<span class="star-clr">*</span></label>
+                    <select name="Tile" id="Tile"  class="form-control">
+                        <option  value="" selected="selected">-Select-</option>
+                        <option value="Mr">Mr</option>
+                        <option value="Mrs">Mrs</option>
+                        <option value="Ms">Ms</option>
+                    </select>
+                  </div>
+       
+            <div class="col-3">
+              <label for="staticEmail" class="col-form-label">First Name<span class="star-clr">*</span></label>
+              <input type="text" id="firstname" name="firstname" class="form-control" placeholder="First Name">
+            </div>
+            
+            <div class="col-3">
+              <label for="staticEmail" class="col-form-label">Middle Name<span class="star-clr"></span></label>
+              <input type="text" id="middlename" name="middlename" class="form-control" placeholder="Middle Name">
+            </div>
+            <div class="col-3">
+              <label for="staticEmail" class="col-form-label">Last Name<span class="star-clr">*</span></label>
+              <input type="text" id="lastname" name="lastname" class="form-control" placeholder="Last Name">
+            </div>
+              </div>
+              <div class="vendor_bottom_space">
+              <label for="staticEmail" class="col-form-label">Designation<span class="star-clr">*</span></label>
+              <input type="text" id="Designation" name="Designation" class="form-control" placeholder="Designation"></div>
+              <div class="vendor_bottom_space">
+              <label for="staticEmail" class="col-form-label">Official Email Address*</label>
+              <input type="email" id="Email" name="Email" class="form-control" placeholder="Official Email Address"></div>
+              <div class="row vendor_bottom_space">
+                <div class="col-3">
+                    <label for="staticEmail" class="col-form-label">Country Code<span class="star-clr">*</span></label>
+                    <select id="phonecountrycode" name="phonecountrycode" class="form-control">
+                        <option  value="" selected="selected">---Select---</option>
+                        {% for code in phone%}
+                        <option value="{{code.id}}">{{code.iso}} {{code.phonecode}}</option> 
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                
+                <div class="col-3">
+                    <label for="staticEmail" class="col-form-label">Area Code<span class="star-clr">*</span></label>
+                    <input type="text" id="phone areacode" name="phoneareacode" class="form-control" placeholder="Area Code">
+                </div>
+
+                
+       
+                <div class="col-6">
+            <label for="staticEmail" class="col-form-label">Official Phone Number(Land Line)<span class="star-clr">*</span></label>
+            <input type="text" id="phone" name="phone" class="form-control" placeholder="Official Phone Number(Land Line)">
+        </div>
+        </div>
+        <div class="row vendor_bottom_space">
+            <div class="col-3">
+                    <label for="staticEmail" class="col-form-label">Country Code<span class="star-clr">*</span></label>
+                    <select id="mobilecoutrycode" name="mobilecoutrycode" class="form-control">
+                        <option  value="" selected="selected">---Select---</option>
+                        {% for code in phone%}
+                        <option value="{{code.id}}">{{code.iso}} {{code.phonecode}}</option>
+                        {% endfor %}
+                    </select>
+            </div>
+            
+            <div class="col-8">
+                <label for="staticEmail" class="col-form-label">Official Phone Number(Mobile No.)<span class="star-clr">*</span></label>
+            
+    
+                <input type="text" id="mobile" name="mobile" class="form-control" placeholder="Official Phone Number(Mobile No.)">
+            </div>
+            </div>
+              <input type="hidden" name="vendorid" id="vendor_id" value="{{vendorid.id}}">
+        </div>
+        <div class="col-sm-6">
+            <div class="row vendor_bottom_space">
+            <div class="col-2">
+            <label for="staticEmail" class="col-form-label">Title<span class="star-clr">*</span></label>
+            <select name="Title" id="Title"  class="form-control" placeholder="Title">
+                <option  value="" selected="selected" >-Select-</option>
+                <option value="Mr">Mr</option>
+                <option value="Mrs">Mrs</option>
+                <option value="Ms">Ms</option>
+            </select>
+            </div>
+            <div class="col-3">
+            <label for="staticEmail" class="col-form-label">First Name<span class="star-clr">*</span></label>
+            <input type="text" id="alternatefirstname" name="alternatefirstname" class="form-control" placeholder="First Name">
+            </div>
+            <div class="col-3">
+                <label for="staticEmail" class="col-form-label">Middle Name<span class="star-clr"></span></label>
+                <input type="text" id="alternatemiddlename" name="alternatemiddlename" class="form-control" placeholder="Middle Name">
+                </div>
+                <div class="col-3">
+                    <label for="staticEmail" class="col-form-label">Last Name<span class="star-clr">*</span></label>
+                    <input type="text" id="alternatelastname" name="alternatelastname" class="form-control" placeholder="Last Name">
+                    </div>
+        </div>
+        <div class="vendor_bottom_space">
+            <label for="staticEmail" class="col-form-label">Designation<span class="star-clr">*</span></label>
+            <input type="text" id="alternateDesignation" name="alternateDesignation" class="form-control" placeholder="Designation"></div>
+            <div class="vendor_bottom_space">
+            <label for="staticEmail" class="col-form-label">Official Email Address<span class="star-clr">*</span></label>
+            <input type="email" id="alternateEmail" name="alternateEmail" class="form-control" placeholder="Official Email Address">
+            </div>
+            <div class="row vendor_bottom_space">
+                <div class="col-3">
+                    <label for="staticEmail" class="col-form-label">Country Code<span class="star-clr">*</span></label>
+                    <select id="phonecountryalternatecode" name="phonecountryalternatecode" class="form-control" placeholder="Country Code">
+                        <option  value="" selected="selected">---Select---</option>
+                        {% for code in phone%}
+                        <option value="{{code.id}}">{{code.iso}} {{code.phonecode}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-3">
+                    <label for="staticEmail" class="col-form-label">Area Code<span class="star-clr">*</span></label>
+                    <input type="text" id="alternatephone areacode" name="alternatephoneareacode" class="form-control" placeholder="Area Code">
+                </div>
+                <div class="col-6">
+            <label for="staticEmail" class="col-form-label">Official Phone Number(Land Line)<span class="star-clr">*</span></label>
+            <input type="text" id="alternatephone" name="alternatephone" class="form-control" placeholder="Official Phone Number(Land Line)">
+        </div>
+        </div>
+        <div class="row vendor_bottom_space">
+            <div class="col-3">
+          
+        
+
+        
+                <label for="staticEmail" class="col-form-label">Country Code<span class="star-clr">*</span></label>
+                <select id="alternate_country_code" name="alternate_country_code" class="form-control">
+                    <option  value="" selected="selected">---Select---</option>
+                    {% for code in phone%}
+                    <option value="{{code.id}}">{{code.iso}} {{code.phonecode}}</option>
+                    {% endfor %}
+                </select>
+        </div>
+        <div class="col-8">
+            <label for="staticEmail" class="col-form-label">Official Phone Number(Mobile No.)<span class="star-clr">*</span></label>
+        
+
+            <input type="text" id="alternatemobile" name="alternatemobile" class="form-control" placeholder="Official Phone Number(Mobile No.)">
+        </div>
+        </div>
+        </div>
+       
+    </div>
+
+    
+<div class="row">
+    <div class="text-center btn-cls">
+        <button type="button" class="btn btn-clr text-center Back-cls" ><a href="{% url 'projects:editinsidevendorbasicinfo' pk=vendorid.id %}">Back</a></button>
+        <button type="button" class="btn btn-clr text-center next-cls" >Save and Next</button>
+    </div>
+</div>
+
+
+            
+        
+      </form>
+
+{%endblock%}
+
+
+{% block scripts %}
+{{ block.super }}
+
+
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+
+<script>
+
+
+    $(document).on('keyup','#Email',function(){
+        var val=$(this).val();
+        $.ajax({
+            type:"GET",
+            url:'/projects/checkuseremailexists',
+            data:{'email':val},
+            success: function(data){
+                console.log(data)
+                if (data.data == 'exists'){
+                    swal.fire('EMAIL ID ALREADY EXISTS')
+                    $('.next-cls').attr('disabled', true);
+                }
+                else{
+                    $('.next-cls').attr('disabled', false);
+                }
+            }
+        })
+    })
+
+
+    $(document).on('keyup','#alternateEmail',function(){
+        var val=$(this).val();
+        $.ajax({
+            type:"GET",
+            url:'/projects/checkuseremailexists',
+            data:{'email':val},
+            success: function(data){
+                console.log(data)
+                if (data.data == 'exists'){
+                    swal.fire('Email Already Exists')
+                    $('.next-cls').attr('disabled', true);
+                }
+                else{
+                    $('.next-cls').attr('disabled', false);
+                }
+            }
+        })
+    })
+
+
+var checkinput ;
+
+$.validator.addMethod(
+        "regex",
+        function(value, element, regexp) {
+            return this.optional(element) || regexp.test(value);
+        },)
+
+        $("#vendorresitraion2").validate({
+        rules: {
+            
+            
+            Tile:{
+                required:true,
+               
+            },
+            firstname:{
+                required:true,
+                regex:/^[a-zA-Z ]+$/,
+                
+            },
+            
+            lastname:{
+                required:true,
+                regex:/^[a-zA-Z ]+$/,
+                
+            },
+            Title:{
+                required:true,
+                
+            },
+            alternatefirstname:{
+                required:true,
+                regex:/^[a-zA-Z ]+$/,
+                
+            },
+            alternatelastname:{
+                required:true,
+                regex:/^[a-zA-Z ]+$/,
+                
+            },
+            alternateDesignation:{
+                required:true,
+                
+            },
+            Designation:{
+                required:true,
+                
+            },
+            Email:{
+                required:true,
+                email: true,
+                regex:/^[.-\w]+@[\w\-]{3,}((.)\w{2,})+$/,
+                
+            },
+            alternateEmail:{
+                required:true,
+                email: true,
+                regex:/^[.-\w]+@[\w\-]{3,}((.)\w{2,})+$/,
+                
+            },
+            phonecountrycode:{
+                required:true,
+                
+            },
+            phoneareacode:{
+                required:true,
+                
+            },
+            phone:{
+                required:true,
+                regex:/^[0-9]*$/,
+                
+            },
+            phonecountryalternatecode:{
+                required:true,
+                
+            },
+            
+            alternatephoneareacode:{
+                required:true,
+                
+            },
+            alternatephone:{
+                required:true,
+                regex:/^[0-9]*$/,
+                
+            },
+            
+
+            mobilecoutrycode:{
+                required:true,
+               
+            },
+            mobile:{
+                required:true,
+                regex:/^[0-9]*$/,
+               
+            },
+            alternate_country_code:{
+                required:true,
+                
+               
+            },
+            alternatemobile:{
+                required:true,
+                regex:/^[0-9]*$/,
+                
+               
+            },
+     
+
+        },
+        messages: {
+            Tile:{
+                required:"Please Provide a Title",
+                
+            },
+            firstname:{
+                required:"Please Provide a First Name",
+                regex:"Enter Alphabetical Letter Only",
+                
+            },
+            lastname:{
+                required:"Please Provide a Last Name",
+                regex:"Enter Alphabetical Letter Only",
+
+                
+            },
+            Title:{
+              required:"Please Provide a Title",
+            },
+            alternatefirstname:{
+                required:"Please Provide a First Name",
+                regex:"Enter Alphabetical Letter Only",
+                
+            },
+            alternatelastname:{
+                required:"Please Provide a Last Name",
+                regex:"Enter Alphabetical Letter Only",
+                
+            },
+
+            alternateDesignation: {
+              required: "Please Enter The Designation",
+              
+             
+            },
+            
+            Designation: {
+              required: "Please Enter The Designation",
+              
+             
+            },
+            Email: {
+                required: "please Enter The Website",
+                email: "Please Provide an Valid Email id",
+                regex:"Please Provide an Valid Email id",
+            },
+            alternateEmail: {
+                required: "Please Enter The Website",
+                email: "Please Provide an Valid Email id",
+                regex:"Please Provide an Valid Email id",
+            },
+            phonecountrycode: {
+                required: "Pease Select Country Code",
+                regex:"Please Provide Numeric Value",
+                
+                
+                
+            },
+            phoneareacode: {
+                required: "Please Select Area Code ",
+                
+                
+                
+            },
+
+            phone: {
+                required: "Please Enter Phone Number",
+                regex:"Please Provide Numeric Value",
+
+                
+                
+                
+            },
+
+            phonecountryalternatecode: {
+                required: "Please Select Country Code",
+                
+                
+                
+                
+            },
+            alternatephoneareacode: {
+                required: "Please Select Area Code ",
+                
+                
+                
+            },
+
+            alternatephone: {
+                required: "Please Enter Phone Number",
+                regex:"Please Provide Numeric Value",
+
+                
+                
+                
+            },
+
+            mobilecoutrycode: {
+                required: "Please Enter Country Code",
+
+                
+                
+                
+            },
+
+
+            mobile: {
+                required: "Please Enter The Mobile Number",
+                regex:"Please Provide Numeric Value",
+
+                
+                
+                
+            },
+
+            
+            alternate_country_code: {
+                required: "Please Enter Country Code",
+
+                
+                
+                
+            },
+
+
+            alternatemobile: {
+                required: "Please Enter The Mobile Number",
+                regex:"Please Provide Numeric Value",
+
+                
+                
+                
+            },
+
+ 
+            errorElement : 'span',
+            },
+
+        
+
+
+
+        })
+ 
+
+        $(".next-cls").click(function(){  
+        if($("#vendorresitraion2").valid()){ 
+            checkinput = true; 
+        }
+        else{
+            checkinput =false;
+        }
+    });
+
+
+
+$(document).on("click" ,".next-cls" ,function(){
+var vendorid=$('#vendor_id').val();
+var form= $("#vendorresitraion2"); 
+if (checkinput==true){
+    $(this).prop('disabled', true);
+$.ajax({
+    type:"POST",
+    url:'/projects/createvendornext',
+    data:form.serialize(),
+    success: function(data){
+        
+            var vendorids=vendorid
+            var current_url=$(location).attr("href")
+            var url = current_url.replace('vendorregistration/'+vendorid,'vendorservice/'+vendorid);
+            document.location.href = url;
+
+
+
+    }
+
+
+
+
+})
+
+}
+
+});
+
+
+
+</script>
+
+
+
+{%endblock%}

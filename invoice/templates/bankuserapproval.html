@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+            <button class="btn btn-clr btn-master waves-effect waves-float waves-light pc-bk-cls back-bank-us"><a href="{% url 'invoice:vendorbasedinvoice' %}">Back</a></button>
+        </div>
+    <h3 class="from-head">Payment Details</h3>
+    {% comment %} <div class="row">
+        <div class="col-3">Vendor Name :</div>
+        <div class="col-9">{{invoice_detail.vendor.vendor_name}}</div>
+    </div> {% endcomment %}
+    
+    <form method="POST" name="" id="">
+        {% csrf_token %}
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table table-bordered tab-styling payment-table-css">
+               
+                <tbody>
+                    <tr>
+                        <td class="heading-clr-payment">Vendor Name</td>
+                        <td>{{invoice_detail.vendor.vendor_name}}</td>
+                    </tr>
+                    <tr>
+
+                        <td class="heading-clr-payment">Invoice No.</td>
+                        {% for payment in payment_details %}
+                            <td>{{payment.invoicecost.invoice_number}}</td>
+                            <input name="invcost_id" type="hidden" value="{{payment.invoicecost.id}}" id="invoicecost_id">
+                            <input name="inv_id" type="hidden" value="{{payment.invoicecost.invoice.id}}" id="invoice_id">
+                            <input name="pay_id" type="hidden" value="{{payment.id}}" id="payment_id">
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td class="heading-clr-payment">Invoice Amount</td>
+                        {% for payment in payment_details %}
+                            <td>{{payment.invoicecost.invoice_total_amount}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td class="heading-clr-payment">Net Payable Amount</td>
+                        {% for payment in payment_details %}
+                            <td>{{payment.invoicecost.invoice_currency}} {{payment.payable_amount|convert_to_thousand_separator}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td class="heading-clr-payment">Bank to Debit</td>
+                        {% for payment in payment_details %}
+                            <td>{{payment.companybank.bank_name.bank_name}}-{{payment.companybank.account_number.accountno}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td class="heading-clr-payment">Vendor Bank Details</td>
+                        {% for payment in payment_details %}
+                            <td>{{payment.invoicecost.invoice_bank.bankname}}-{{payment.invoicecost.invoice_bank.accountnumber}}</td>
+                        {% endfor %}
+                    </tr>
+                        
+
+                </tbody>
+            </table>
+          </div>
+
+            <div class="row">
+                {% comment %} <div class="col-4"><h5 class="verifi-codee">Verification Code :</h5></div> {% endcomment %}
+                <div class="col-12">
+                    <div class="status-btn-types">
+                        <div class="btn-types-input">
+                            <label>Verification Code :</label>
+                            <input type="text" name="verification_code" id="id_verification_code" maxlength="6" autocomplete="off" oninput="this.value = this.value.replace(/ /g, '').replace(/[^0-9.]/g, '');" class="form-control" readonly="true">
+                            <div class="button-status-color">
+                                <button type="button" class="btn btn-success send_cls" id="id_send">Send</button>
+                                <button type="button" class="btn btn-clr" id="id_verify"  style="display:none">Verify</button>
+                            </div>
+                        </div>
+                       
+                        <p id="id_resend" style="display:none">Didn't Recieve the Code? <span class="send_cls" style="cursor: pointer;">Resend</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="row pay_voucher" style="display:none">
+                <div class="col-3">Payment Voucher :</div>
+                <div class="col-9">
+                    <div class="">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="file" name="payment_voucher" class="form-control filecls filesize"><span class="maxmp">(Max: 25MB)</span><br><span class="file-error-message"></span>
+                                        <button id="add_file" class="btn btn-clr add-btn" type="button" value="add"><i class="fa fa-add"></i></button> <button id="remove_file" class="btn btn-clr add-btn" type="button" value="minus"><i class="fa fa-minus"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center btn-cls">
+                <button type="submit" id="final_Save_id" value="1" style="display: none;" class="dis-cls btn btn-clr text-left work">Submit</button>
+            </div>
+        </form>
+
+    </div>    
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script src="{% static 'js/invoice/bankuserapproval.js' %}"></script>
+{% endblock %}

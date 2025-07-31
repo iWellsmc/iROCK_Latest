@@ -1,0 +1,306 @@
+.tot-in td:nth-child(2) {
+    text-align: var(--centertext-align);
+}
+
+.tot-in td:last-child {
+    text-align: var(--centertext-align);
+}
+
+.vend-thead th {
+    text-align: center;
+}
+
+.vend-thead td:nth-child(1) {
+    text-align: var(--centertext-align) !important;
+
+}
+
+input.con_error {
+    border: 1px solid red !important;
+}
+/* #total_val_id{
+    border: 1px solid red !important;
+} */
+
+
+
+.vend-thead td:nth-child(4) {
+    text-align: var(--centertext-align) !important;
+}
+
+.vend-thead td {
+    border-right: 1px solid var(--tableborder-color);
+}
+
+.ref_left {
+    text-align: left !important;
+}
+
+.prj-back_clr th {
+    background: transparent !important;
+}
+
+.all-tbl-hd th {
+    text-transform: capitalize !important;
+}
+
+.align_items{
+    text-align: left;
+}
+
+.invoice-info {
+    width: 100%;
+    margin: 0 auto;
+    border: 1px solid #c7c7c7;
+}
+
+.invoice-info th,
+.invoice-info td {
+    border-bottom: 1px solid #c7c7c7 !important;
+    padding: 8px;
+    color: #000;
+}
+
+.invoice-info th {
+    width: 50%;
+    border-right: 1px solid #c7c7c7 !important;
+    color: #000;
+    font-weight: 600;
+}
+
+.invoice-info a,
+.invoice-info a:hover,
+.inv-pretbl a,
+.inv-pretbl a:hover {
+    color: #96183a;
+    font-weight: 500;
+}
+
+.am-valu {
+    text-align: center !important;
+}
+.cred-table_wid th:nth-child(1){
+    width: 5%;
+}
+.cred-table_wid th:nth-child(2){
+    width: 15%;
+}
+.cred-table_wid th:nth-child(3){
+    width: 10%;
+}
+.cred-table_wid th:nth-child(4){
+    width: 15%;
+}
+.cred-table_wid th:nth-child(5){
+    width: 12%;
+}
+.cred-table_wid th:nth-child(6){
+    width: 10%;
+}
+.cred-table_wid th:nth-child(7){
+    width: 10%;
+}
+.cred-table_wid th:nth-child(8){
+    width: 10%;
+}
+
+@media screen and (min-width:768px) and (max-width:1023px) {
+    .create-credit label {
+        font-size: 16px;
+    }
+
+    .from-head {
+        font-size: 24px;
+    }
+
+    .hed-inv-gro {
+        font-size: 16px;
+    }
+
+    .hed-inv-gross {
+        font-size: 16px;
+    }
+
+    .sum-date {
+        font-size: 16px;
+    }
+
+    .contractfilehead {
+        font-size: 16px;
+    }
+
+    .hed-inv-gr {
+        font-size: 17px;
+    }
+
+    .cred-table_wid>table {
+        width: 200%;
+    }
+    .whole_table_prev{
+        overflow-x: auto;
+    }
+    .inv-row_wid {
+        width: 200vw;
+    }
+}
+@media screen and (min-width:1024px) and (max-width:1199px) {
+    .cred-table_wid>table {
+        width: 200%;
+    }
+    .whole_table_prev{
+        overflow-x: auto;
+    }
+    .inv-row_wid {
+        width: 150vw;
+    }
+}
+
+@media screen and (min-width:1200px) and (max-width:1399px) {
+    .whole_table_prev{
+        overflow-x: auto;
+    }
+    .inv-row_wid {
+        width: 130vw;
+    }
+}
+
+
+/**********  **********/
+.tab-data td {
+    white-space: normal !important;
+    word-break: break-word !important;
+}
+
+.sup-doc a {
+    white-space: normal !important; 
+}
+
+.sup-doc td div {
+    text-align: left !important;
+}
+
+@media (min-width:768px) and (max-width:1199px) {
+    .tab-data {
+        width: 150vw !important;
+    }
+}
+@media (min-width:768px) and (max-width:1023px) {
+    .credit-nt-sum {
+        width: 100% !important;
+    }
+    .credit-nt-sum th{
+        padding: 0 30px;
+    }
+}
+@media (min-width:1024px) and (max-width:1199px) {
+.credit-nt-sum{
+        width: 100% !important;
+    }
+}
+/********** shankar **********/
+
+/**********  **********/
+
+/********** create_credit_note.html **********/
+.tab-details {
+    width: 100%;
+}
+
+
+.tab-details th {
+    padding: 10px 10px !important;
+}
+
+.tab-details td [type="text"] {
+    text-align: var(--centertext-align) !important;
+    padding: 10px 10px !important;
+}
+
+@media (max-width:1089px) {
+    .tab-details {
+        width: 126vw;
+    }
+}
+/********** create_credit_note.html **********/
+
+/********** edit_credit_note.html **********/
+.tab-edit-details {
+    width: 100%;
+}
+
+.tab-edit-details th, td {
+
+    white-space: normal !important;
+    vertical-align: middle !important;
+}
+.tab-edit-details th {
+    padding: 10px 10px !important;
+}
+
+.tab-edit-details td {
+    word-break: break-word !important;
+    padding: 10px 10px !important;
+}
+
+.tab-edit-details th:nth-child(4) {
+    width: 12% !important;
+}
+
+.tab-edit-details td [type="text"] {
+    text-align: var(--centertext-align) !important;
+}
+
+.tab-edit-details td:nth-child(8) {
+    text-align: unset !important;
+}
+
+.create-credit label {
+    margin-bottom: 0px !important;
+}
+
+.contractfilehead {
+    margin-bottom: 0px !important;
+}
+
+.bot-space {
+    align-items: center;
+}
+
+.cr_fls {
+    margin-bottom: 0px !important;
+}
+
+.tr_file_clone td {
+    padding: 5px 0px !important;
+}
+
+.support_tbl {
+    margin-left: 0px !important;
+}
+
+
+@media (max-width:1199px) {
+    .tab-edit-details {
+        width: 160vw;
+    }
+}
+
+@media (min-width:1200px) and (max-width:1392px) {
+    .tab-edit-details th:nth-child(8) {
+        width: 22% !important;
+    }
+}
+input.con_error {
+    border: 1px solid red !important;
+}
+
+
+/********** edit_credit_note.html **********/
+@media (min-width:1024px) and (max-width:1392px) {
+.cus-date {
+    width: 120px;
+}
+.credit-m{
+    width: 210px;
+}
+}

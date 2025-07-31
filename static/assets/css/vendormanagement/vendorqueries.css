@@ -1,0 +1,146 @@
+.vin-data {
+    width:170px !important;
+    text-align: var(--centertext-align) !important;
+}
+.vendor-data {
+    text-align: var(--lefttext-align) !important;
+    width:160px !important;
+}
+.one-class {
+    border: 1px solid var(--tableborder-color);
+}
+.one-class th {
+    background: transparent !important;
+}
+.one-class td {
+    border-right: 1px solid var(--tableborder-color);
+}
+.one-class td:nth-child(1) {
+    text-align:  var(--centertext-align);
+}
+
+.one-class td:nth-child(3) {
+    word-break: break-word !important;
+}
+
+.one-class td:nth-child(4) {
+    word-break: break-word !important;
+}
+
+.middle {
+    text-align:  var(--centertext-align) !important;
+}
+
+
+/********** query history **********/
+.qry-top-hd {
+    border-bottom: 2px solid #b1b1b1;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.qur-titl {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+}
+
+.qur-titl h4 {
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.qur-titl span {
+    color: #000 !important;
+    font-size: 15px;
+    font-weight: 500;
+    padding-left: 4px;
+}
+
+.qur-rf-no {
+    word-break: break-word;
+    margin-left: 5px;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.rec-in {
+    background: #bbbbbb;
+    float: left;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 3px solid #979797;
+}
+
+.txt-clrr {
+    font-size: 16px;
+    font-weight: 500;
+    color: black;
+    width: 100%;
+    max-width: 700px;
+    word-break: break-word;
+}
+
+.f-name {
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.nmc-nme {
+    font-weight: 500;
+    font-size: 15px;
+    color: #000;
+    padding-left: 5px;
+}
+
+.nmc-nme a {
+    font-weight: 500;
+    font-size: 15px;
+    color: #000 !important;
+    padding-left: 5px;
+}
+
+.rec-date {
+    float: left;
+    color: black;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.send-date {
+    float: right;
+    color: black;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.sta-dan {
+    padding: 5px 20px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+
+/********** query history **********/
+
+
+/********** query history responsive**********/
+@media (min-width:768px) and (max-width:1199px) {
+    .one-class {
+        width: 100vw !important;
+    }
+}
+
+@media (min-width:768px) and (max-width:991px) {
+    .qur-titl {
+        justify-content: flex-start;
+    }
+}
+/********** query history responsive**********/
+
+
+

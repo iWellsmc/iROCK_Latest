@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load InvoiceGuardTags %}
+{% load custom_tags %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href='/static/assets/css/invoice_process/company-setting.css'>
+
+<div>
+  <div class="row">
+    <div class="col-7">
+    </div>
+    <div class="col-5 text-end">
+      <a class="btn btn-clr onClass" href="{% url 'finance:listbankuser' %}">Back</a>
+  </div>
+  </div>
+  <h4 class="from-head">Bank Details</h4>
+  
+  <div class="row">
+    <div class="col-12">
+      <form method="post" name="main" class="mainform">
+        {% csrf_token %}
+        <div class="sign-table-con table-responsive">
+      <table class="table irock-table edituser-table" id="master_project_list">
+        <thead>
+          <tr>
+            <th class="">Bank Name*</th>
+            <th class="">Currency*</th>
+            <th class="">Account Number*</th>
+            <th class="create-wid">Other Details</th>
+         
+
+          </tr>
+        </thead>
+        <tbody class="table-list">
+         <tr>
+           <td class="from-invoice"><input type="text" class="bank_name form-control" name="bankname" value="{{userbank.bank_name}}" data-id="{{userbank.id}}"></td>
+            <td class="from-invoice"> 
+                <!-- <label for="staticEmail" class="col-form-label gener-hd">Currency<span class="star-clr">*</span></label>  -->
+                {% if currency != ''%}
+                    <input type="hidden"  {% convert_jsonformat currency as list_currency %}
+                     value="{{list_currency}}" id="hdn_currency">
+                {%else%}
+                <input type="hidden" value="" id="hdn_currency">
+                {% endif%}
+            <select class="currency-cls dn_currencys" multiple="multiple" id="id_currency" name="currency" class="form-control gener-hd-input" placeholder="Currency" >
+                {%for country in bankcurrency %}
+               <option value="{{country.id}}">{{country.currency_symbol}}-{{country.currency}} ({{country.name}})</option>
+                {% endfor %}
+            </select><br>
+            </td>
+            <td class="add-sign acountnumber">
+                    {% for i in userbankactno %}
+                <div class='edit_align_items'>
+                    <input type="text" class="actno form-control" name="actno" value="{{i.accountno}}"> 
+                    <input type="hidden" class="actno form-control" name="actnodataid" value="{{i.id}}"> 
+                    <button id='addact' class='btn btn-clr add-btn addact ml-2 mr-1' type='button' value='Add'><i class="fa fa-plus"></i> </button>
+                </div>
+                    {%endfor%}
+              </td>
+              <td class="td-left">
+                <textarea rows="4" cols="40" name="otherdetails" class="form-control otherdetails" value="">{{userbank.otherdetails|default_if_none:''}}</textarea> 
+              </td>
+            </tr>
+        </tbody>
+      </table>
+    </div>
+      <div class="save_button text-center">
+        <button id="mainsave" class='btn btn-clr mainsave' type="submit">Save</button> 
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+{% endblock%}
+{% block scripts %}
+{{ block.super }}
+<script>
+  var csrf_token = "{{ csrf_token }}"
+  </script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>  
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script src="{% static 'js/finance/edituserbank.js' %}"></script>   
+ 
+<script>
+
+
+    $(document).ready(function() {
+        var data=$('#hdn_currency').val()
+        $('.timezonecls').select2();
+        $('.select2-selection__arrow').remove()
+        console.log(data)
+        if (data != ''){
+            data = data.replace("[",'');
+            data = data.replace("]",'');
+            data = data.replaceAll("'",'');
+            data = data.replaceAll(" ",'');
+            console.log(data);        
+            var convert_list = data.split(',');
+            console.log(convert_list)
+            $(".currency-cls").val(convert_list)
+        }
+        $('.currency-cls').select2({
+            placeholder: "Select Currency"
+        });
+    })
+</script>
+
+{% endblock %}

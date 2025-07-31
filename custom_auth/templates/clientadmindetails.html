@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %} 
+{% load static %}            
+{% load custom_tags %}
+
+<div class="row">  
+    {% if request.user.roles_id == 2 %}
+        <h4 class="from-head">Client Admin Details</h4>
+    {%endif%}
+    {% if request.user.roles_id == 3 %}
+        <h4 class="from-head">User Details</h4>
+    {%endif%}
+    <div class="row">
+        <div class="col-9 pb-3">
+            <button type="submit" class="btn btn-clr text-center" ><a href="{% url 'custom_auth:userpasswordreset' pk=user.id %}">Change Password</a></button>
+            <button type="submit" class="btn btn-clr text-center" ><a href="{% url 'custom_auth:editclientadmindetails' pk=user.id %}">Edit Profile</a></button>
+        </div>
+        <div class="col-3">
+            <button type="button" class="btn btn-clr btn-master mr-0">
+                <a href="{% url 'dashboard:dashboard'%}">
+                    Back
+                </a>
+            </button>
+        </div>
+    </div> 
+    <div class="row">
+        <div class="col-12 user-viem-boxs">
+    <table class="user-view-page-ui tbl-width-user">
+        <tbody>
+            <tr>
+                <th>First Name</th><td>{{user.name}}</td>
+            </tr>
+            <tr>
+                <th>Last Name</th><td>{{user.lastname}}</td>
+            </tr>
+            <tr>
+                <th>Designation</th><td>{{user.designation_role|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+                <th>Email</th><td>{{user.email}}</td>
+            </tr>
+            {% comment %} <tr>
+                <th>Official Phone Number (Land Line)</th><td>{{user.phone_countrycode|convertnum}}-{{user.areacode|default_if_none:"---"}}-{{user.phone|default_if_none:"---"}}-{{user.phone_number_extenstion|default_if_none:"---"}}</td>
+            </tr>
+            <tr>
+                <th>Official Phone Number (Mobile Line)</th><td>{{user.mobile_countrycode|convertnum}}-{{user.mobile|default_if_none:"---"}}</td>
+            </tr> {% endcomment %}
+        </tbody>
+    </table>
+    </div>
+    </div>
+
+
+</div>
+
+
+{% endblock %}

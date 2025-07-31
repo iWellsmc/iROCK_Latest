@@ -1,0 +1,350 @@
+{% load static %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html class="loading" lang="en" data-textdirection="ltr">
+<!-- BEGIN: Head-->
+ 
+<head>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script> -->
+    <!-- <script src="https://jqueryvalidation.org/files/dist/jquery.validate.min.js"></script> -->
+    <!-- <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script> -->
+
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+   <title>Forgot Password</title>
+   <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600" rel="stylesheet">
+   <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/logo/irock.png' %}">
+ 
+   <!-- BEGIN: Vendor CSS-->
+   <link rel="stylesheet" type="text/css" href="{% static 'vendors/css/vendors.min.css' %}">
+   <!-- END: Vendor CSS-->
+ 
+   <!-- BEGIN: Theme CSS-->
+   <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-extended.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/colors.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/components.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/themes/dark-layout.css' %}">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/themes/semi-dark-layout.css' %}">
+
+  <!-- BEGIN: Page CSS-->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/core/menu/menu-types/vertical-menu.css' %}">
+  <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/core/colors/palette-gradient.css' %}"> -->
+  <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/pages/authentication.css' %}"> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+   <!-- END: Page CSS-->
+   <!-- BEGIN: Custom CSS-->
+   <!-- <link rel="stylesheet" type="text/css" href="{% static 'vendors/css/forms/select/select2.min.css' %}"> -->
+   <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+   <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+
+   <!-- END: Custom CSS-->
+</head>
+
+<!-- END: Head-->
+ 
+<!-- BEGIN: Body-->
+ 
+<body class="vertical-layout vertical-menu-modern 1-column  navbar-floating footer-static bg-full-screen-image  menu-collapsed blank-page blank-page" data-open="click" data-menu="vertical-menu-modern" data-col="1-column">
+   <!-- BEGIN: Content-->
+   <div class="app-content content">
+       <div class="content-overlay"></div>
+       <div class="header-navbar-shadow"></div>
+       <div class="content-wrapper">
+           <div class="content-header row">
+           </div>
+           <div class="content-body rg-bk">
+               <section class="row flexbox-container">
+                   <div class="col-xl-8 col-10 d-flex justify-content-center">
+                       <div class="card bg-authentication m-0 reg-box">
+                           <div class="row">
+                               <div class="col-lg-12 col-12">
+                                   <div class="reg-card">
+                                       <!-- <div class="card-header"> -->
+                                           <div class="card-title">
+                                               <h1 class="reg-head text-center">Forgot Password</h1>
+                                           </div>
+                                       <!-- </div> -->
+                                       <div class="card-content ">
+                                            <div class="row">
+                                                <div class="col-9">
+                                                </div>
+                                                <div class="col-3">
+                                                    <!-- <button type="button" class="btn btn-color btn-enq" style="float: right;margin-right: 21px;"><a href="{% url 'custom_auth:login' %}" >Back</a></button> -->
+                                                    <a class=" btn-enq" href="{% url 'custom_auth:vendorlogin' %}" >Back</a>
+                                                </div>
+                                            </div>
+                                           <div class="card-body pt-0">
+                                               <form method="POST" name="registerform" id="forgotpasswordform" class="reg-form enq-pro forgotpasswordform" enctype="multipart/form-data" >
+                                                {% csrf_token %}
+                                                <div class="row">
+                                                    <div class="col-2"></div>
+                                                    <div class="col-8">
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                            <label for="inputCompanyName">VIN<span class="star-clr">*</span></label> 
+                                                            <input type="text" name="cin" id="cinnum" class="form-control email_checking" placeholder="VIN Number">
+                                                            <span id="email-error-span" class="error"></span>
+                                                           </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="controls">
+                                                            <label for="inputCompanyName">Email<span class="star-clr">*</span></label> 
+                                                            <input type="text" name="email" id="emailid" class="form-control email_checking" placeholder="Email">
+                                                            <!-- <span id="email-error-span"></span> -->
+                                                            <input type="hidden" name="id" value="" class="userid">
+                                                            <input type="hidden" name="name" value="" class="username">
+                                                            <input type="hidden" name="lastname" value="" class="userlastname">
+                                                           </div>
+                                                        </div>
+                                                    </div>            
+                                                    <div class="col-2">
+                                                    </div>
+                                                </div> 
+                                                 <div class="text-center spacing-button">
+                                                    <button type="submit" id="idsubmit" class="btn btn-inline mb-50 btn-color btn-enq-sub">Submit</button>
+                                                </div>
+                                               </form>
+                                           </div>
+                                       </div>
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+               </section>
+           </div>
+       </div>
+   </div>
+   <!-- END: Content-->
+ 
+   <!-- BEGIN: Vendor JS-->
+   <script src="{% static 'vendors/js/vendors.min.js' %}"></script>
+   <!-- BEGIN Vendor JS-->
+   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" ></script>
+   <script>
+    $(document).ready(function() {
+        $('#idsubmit').attr('disabled', true);    
+    });
+    $(document).on('change','.email_checking',function(){
+        $('#email-error-span').text('');
+        var val=$('#emailid').val();
+        var token = '{{csrf_token}}';
+        if (val != ""){
+            $.ajax({
+                headers: { "X-CSRFToken": token },
+                type:"POST",
+                url:'checkcompanyuseremailexists',
+                data:{'email':val,'cin_number':$('#cinnum').val()},
+                success: function(data)
+                {
+                    console.log(data)
+                    if (data.data == 'exists'){
+                        $('.userid').val(data.id)
+                        $('.username').val(data.name)
+                        $('.userlastname').val(data.last_name)
+                        $('#idsubmit').attr('disabled', false);
+                        $('#email-error-span').empty()
+                    }
+                    else{
+                        if($('#cinnum').val()!=''){
+                        $('#email-error-span').text('Please Provide Registered VIN and Email ID');
+                        $('#idsubmit').attr('disabled', true);
+                    }}
+                }
+               /* error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                    if ($('#emailid').val() != '' && $('#cinnum').val() != ''){
+                    $('#email-error-span').text("Email ID not registered")
+                    }
+                    if ($('#emailid').val() == ''){
+                        $('#email-error-span').text("");
+                    }
+                    $('#idsubmit').attr('disabled', true);
+                    console.log("Status: " + textStatus);
+                    console.log("Error: " + errorThrown); 
+                } */
+                })  
+        }
+        else{
+            $('#email-error-span').empty()
+        }
+
+    })
+    //
+
+    function addDash(element){
+        ele = element.split('-').join(''); // Remove dash (-) if mistakenly entered.
+        var finalVal;
+        var a = ele
+        var b = "-";
+        var position = 3;
+        if (ele.length >3 ){
+            var output = [a.slice(0, position), b, a.slice(position)].join('');
+        }
+        else{
+            var output = ele
+        }
+    
+        // console.log(output);
+        // finalVal = ele.match(/.{1,3}/g).join('-');
+        return output
+    }
+    
+        $(document).on('keyup','#cinnum',function(){
+            var val=$(this).val()
+            if (val.length > 9){
+                $(this).val(val.slice(0,-1))
+            }
+            if ($(this).val() != ''){
+                $(this).val($(this).val().toUpperCase());
+                var val=$(this).val()
+                var value=addDash(val)
+                $(this).val(value)
+            }
+            var val=$(this).val()
+            var regex = /^[a-zA-Z0-9-]+$/;
+            if(!regex.test(val)){
+                console.log('invalid')
+                $(this).val('')
+            }
+        })
+    
+    $.validator.addMethod("checkcin", function(value, element) {
+        console.log(element.value)
+        if(/^[a-zA-Z0-9- ]*$/.test(element.value) == false) {
+            return false    
+        }
+        else{
+            return  true
+        }
+    })
+
+
+    //
+    /*{ function addDash(element){
+        ele = element.split('-').join(''); // Remove dash (-) if mistakenly entered.
+        let finalVal = ele.match(/.{1,3}/g).join('-');
+        return finalVal
+    }
+    
+    $(document).on('keyup','#cinnum',function(){
+        var val=$(this).val()
+        
+        if (val.length > 7){
+            $(this).val(val.slice(0,-1))
+        }
+        if ($(this).val() != ''){
+            $(this).val($(this).val().toUpperCase());
+            var val=$(this).val()
+            var value=addDash(val)
+            $(this).val(value)
+        }
+    })
+    $(document).on('keyup','#cinnum',function(){
+        var val=$(this).val()
+        var regex = /^[a-zA-Z0-9-]+$/;
+        if(!regex.test(val)){
+            console.log('invalid')
+            $(this).val('')
+        }
+    }) }*/
+    $.validator.addMethod("email", function(value, element) {
+        // alert('sfds');
+        var expr = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        return expr.test(value);
+    });
+
+    //$.validator.addMethod("cin", function(value, element) {
+      //  console.log(element.value)
+      //  if(/^[a-zA-Z0-9- ]*$/.test(element.value) == false) {
+      //      return false    
+       // }
+       // else{
+      //      return  true
+      //  }
+        
+        // return this.optional(element) || value == value.match(/^[a-zA-Z\s]+$/);
+        // --                                    or leave a space here ^^
+   // });
+
+    $(".forgotpasswordform").validate({
+        rules: {
+            email: {
+            required: true,
+            email: true,
+            },
+            cin:{
+                required:true
+            }
+        },
+        messages: {
+            email:{
+              required:"Please Provide an Email ID",
+              email: "Please Provide a Valid Email ID",
+            },
+            cin:{
+                required:"Please Provide VIN Number"
+            },
+            errorElement : 'span',
+            },
+        submitHandler: function(form) {
+            $('#idsubmit').attr('disabled','disabled');
+            Swal.fire({
+                        position: 'top',
+                        icon: 'success',
+                        title: 'Password Reset Link Sent Successfully',
+                        showConfirmButton: true,
+                        timer:6000
+                        })
+            form.submit();
+            
+        }
+    });
+    
+   </script>
+   <!-- BEGIN: Page Vendor JS-->
+   <!-- END: Page Vendor JS-->
+ 
+   <!-- BEGIN: Theme JS-->
+   <!-- <script src="{% static 'js/core/app-menu.js' %}"></script>
+
+   <script src="{% static 'js/core/app.js' %}"></script>
+   <script src="{% static 'js/custom.js' %}"></script>
+
+
+   <script src="{% static 'js/scripts/components.js' %}"></script>
+   <!-- END: Theme JS-->
+   <!-- <script src="{% static 'vendors/js/forms/validation/jquery.validate.min.js' %}"></script> -->
+   <!-- <script src="{% static 'vendors/js/forms/select/select2.full.min.js' %}"></script> -->
+   <!-- <script src="{% static 'js/scripts/forms/select/form-select2.js' %}"></script> --> -->
+
+   <!-- BEGIN: Page JS-->
+   <!-- END: Page JS-->
+
+
+</body>
+<!-- END: Body-->
+<style>
+ .card
+ {
+     width:100%;
+ }
+ /* body {
+    {% comment %} background-image: url("{% static 'images/iwells-map.jpg' %}"); {% endcomment %}
+    background-size: cover;
+    background-position: center;
+}    */
+.totalusersdiv,.operatorsubtype,.operatortype
+{
+    display: none;
+}
+</style>
+</html>

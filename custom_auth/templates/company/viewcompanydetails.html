@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_tags %}
+{% block content %} 
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets\css\profile\companyprofile.css' %}">
+    <h4 class="from-head">Company Details</h4>
+    <div class="row">
+      <div class="col-9">
+      </div>
+      <div class="col-3">
+        <button type="button" class="btn btn-clr btn-master mr-0">
+          <a href="{% url 'dashboard:dashboard'%}">
+            Back
+          </a>
+        </button>
+      </div>
+    </div>
+    <table class="view-com-list com-details">
+      <!-- <tr><th>First Name</th><td>{{company.first_name|default_if_none:"---"}}</td></tr> -->
+      <!-- <tr><th>Last Name</th><td>{{company.last_name|default_if_none:"---"}}</td></tr> -->
+      <tr><th>Company Name</th><td>{{company.company_name|default_if_none:"---"}}</td></tr>
+      <tr><th>Category of Entity</th><td>{% if company.category_entity == '' %} - {% else %}{{company.category_entity|default_if_none:"---"|category_replace}}{% endif %}</td></tr>
+      <tr><th>Email</th><td>{{company.email|default_if_none:"---"}}</td></tr>
+      <tr><th>Address</th><td>{% if company.address == '' %} --- {% else %}{{company.address|default_if_none:"---"|safe}}{% endif %}</td></tr>
+      <tr><th>Phone Number (Land Line)</th><td>{{company.phone_countrycode|default_if_none:"---"}}-{{company.areacode|default_if_none:"---"}}-{{company.phonenumber|default_if_none:"---"}}</td></tr>
+      <tr><th>Phone Number (Mobile No)</th><td>{{company.mobile_countrycode}}-{{company.mobile|default_if_none:"---"}}</td></tr>
+      <tr><th>Website</th><td>{% if company.website == '' %} --- {% else %}{{company.website|default_if_none:"---"}}{% endif %}</td></tr>
+    </table>
+    <div class="row">
+        <div class="text-center">
+            <button type="button" class="btn btn-clr btn-outline-danger mr-1 mb-1 waves-effect waves-light "><a href="{% url 'custom_auth:editcompany' pk=company.id %}" >Edit</a></button>
+          </div>
+    </div>
+
+
+{% endblock %}

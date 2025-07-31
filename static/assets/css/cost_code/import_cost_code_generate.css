@@ -1,0 +1,73 @@
+.col-form-label {
+    color: #017474 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+}
+
+.import-costcode-table {
+    width: 100%;
+}
+
+.import-costcode-table th {
+    text-align: center;
+    color: #000 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    width: 19% !important;
+}
+
+.import-costcode-table th, td {
+    padding: 10px 10px;
+}
+
+.import-costcode-table td:nth-child(1) {
+    padding-left: 0px !important;
+}
+
+.import-costcode-table select {
+    padding: 5px 10px;
+    border: 1px solid var(--tableborder-color);
+    border-radius: 5px;
+    /* text-align: center; */
+    width: 100%;
+    -webkit-appearance: none;
+}
+
+.import-costcode-table label {
+    margin-bottom: 0px;
+    color: grey;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.cost_code_preview {
+    color: #000;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.cost_code_preview span {
+    color: red;
+    font-weight: 500 !important;
+}
+
+
+/********** import cost code generate **********/
+.scroll-top-proj {
+    position: fixed;
+    bottom: 0%;
+    right: 0%;
+    background: transparent;
+    width: 60px !important;
+    height: 60px;
+    z-index: 11;
+    }
+
+.scroll-top-proj::before {
+    content: '\f062';
+    z-index: 99;
+    font-size: 40px;
+    color: #98193b;
+    font-family: 'FontAwesome';
+    border: none;
+}

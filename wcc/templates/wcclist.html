@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% load static %}
+{% load invoice_custom_tags %}
+{% load wcc_custom_tags %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/WCC/wcclist.css' %}">
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li  {% if message.tags %} class="{{ message.tags }} msg-cls"{% endif %} style="display:none;"> {{ message }} </li>
+    {% endfor %}
+</ul>
+{% endif %}
+<div>
+    <h3 class="from-head">Total WCC Submitted to Date</h3>
+    <div class="row">
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+            {% if vendorid.active_status == 1 %}
+            {% if vendor_status == True %}
+            {% if  count > 0 %}
+                <button type="button" class="btn btn-clr btn-master mr-0"><a href="{% url 'wcc:createwcc' %}">Submit WCC</a></button>
+            {%else%}
+            <button type="button" class="btn btn-clr btn-master mr-0 wccnotadded">Submit WCC</button>
+            {%endif%}
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    <div id="loader" class="loader"></div>
+
+    <div class="table-responsive text-nowrap inv-table_wid">
+        <table class="table prj-back_clr settings-data-list-view data-list-view invoicelist tot-in irock-table wccvendor-table" id="master_project_list">
+            <thead >
+                <tr >
+                    <th>S/N</th> 
+                    <th class="">WCC No <button class="filter-btn" data-filter="inv-num"> <i class="fas fa-sort"></i></button></th>     
+                    <th class="period-of-serv-width">Period of Service <button class="filter-btn" data-filter="pay-status"> <i class="fas fa-sort"></i></button></th>
+                    <th>Submitted Date <button class="filter-btn" data-filter="submit-date"> <i class="fas fa-sort"></i></button></th>
+                    <th>Approval Status <button class="filter-btn" data-filter="approval"> <i class="fas fa-sort"></i></button></th>
+                    <th>Approval/Returned/Rejected Date <button class="filter-btn" data-filter="appr-date"> <i class="fas fa-sort"></i></button></th>
+                    <th>Invoice Status <button class="filter-btn" data-filter="pay-status"> <i class="fas fa-sort"></i></button></th>
+                    <th class="status-width-wcc">Status <button class="filter-btn" data-filter="status"> <i class="fas fa-sort"></i></button></th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody class="table-list">
+                <!-- {% for wcc in wcclist %}
+                    {% with wcc.id|check_wcc_invoice as data_count %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        {% getwccvalues wcc.id as wccvalues %}
+
+                        {% if wccvalues.wcc_number != null %}
+                        <td>{{wccvalues.wcc_number|default_if_none:"---"}}</td>
+                        {% else %}
+                        <td>---</td>
+                        {% endif %}
+                        <td>{{wcc.fromdate|date:"M-Y"}} to {{wcc.todate|date:"M-Y"}}</td>
+                        <td>{{wcc.wcc_submit_date|confulldate:wcc.company.id|default_if_none:"---"}}</td>
+                        <td class="td-left">
+                            {% if wcc.wcc_status == 0 %}
+                                Awaiting Approval
+                            {% elif wcc.wcc_status == 1 %}
+                                Approved
+                            {% elif wcc.wcc_status == 2 %}
+                                Returned
+                            {% else %}
+                                Rejected
+                            {% endif %}
+                        </td>
+                        <td>{{wcc.wcc_status_date|confulldate:wcc.company.id|default_if_none:"---"}}</td>
+                        <td class="td-left">
+                            {% if data_count == 0 %}
+                                Not Mapped to Invoice
+                            {% else %}
+                                Mapped to Invoice
+                            {% endif %}
+                        </td>
+                        <td class="td-left">
+                            {% if wcc.status == 1 %}
+                            Submitted
+                            {% else %}
+                            Draft
+                            {% endif %}
+                        </td>
+                        <td class="eye_test text-wrap">
+                            <a class="btn px-1" href="{% url 'wcc:wccview' wcc.id %}">
+                                <i class="fa fa-eye" title="View"></i>
+                            </a>
+                            {% if vendorid.active_status == 1 %}
+                            {% if vendor_status == True %}
+                                {% if wcc.status != 1 %}
+                                <a class="btn px-1" href="{% url 'wcc:wcceditformone' wcc.id %}">
+                                    <i class="fa fa-edit" title="edit"></i>
+                                </a>
+                                {% endif %}
+                            {% endif %}
+                            {% if wcc.wcc_status == 1 %} 
+                                {% if data_count == 0 %}
+                                    <a class="btn px-1" href="{% url 'invoice:createinvoice' %}?wcc_id={{ wcc.id|urlencode }}">
+                                        <i class="fa-solid fa-file-invoice" title="Submit Invoice"></i>
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endwith %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center">---</td>
+                {% endfor %} -->
+
+
+                <!-- insert table using wcclist.js ajax function -->
+            </tbody>
+        </table>
+    </div>
+</div>
+        
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script>
+    $( document ).ready(function() {
+    var notyf = new Notyf({
+        duration: 2000,
+        position: {
+          x: 'right',
+          y: 'top',
+        },
+        types: [
+          {
+            type: 'success',
+            background: '#D3D3D',
+            icon: {
+              className: 'fa fa-check-circle',
+              tagName: 'i',
+              color: '#000',
+            },
+          },
+        ]
+      });
+  
+    var msg=$('.msg-cls').text();
+    if (msg){
+      notyf.open({
+      type: 'success',
+      message: msg,
+    }); 
+    }
+  })
+  $(document).on('click','.wccnotadded',function(){
+    Swal.fire("No Contract is Added.Please Contact Client Administrator")
+  })
+</script>
+<script type="text/javascript" src="{% static 'js/wcc/wcclist.js' %}"></script>
+{% endblock %}

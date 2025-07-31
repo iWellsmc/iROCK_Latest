@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block content %}
+{% load widget_tweaks %}
+{% load static %}
+{% load custom_tags %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add bird</title>
+</head>
+
+
+    <div>
+
+        <h3 class="from-head">User Department</h3>
+        <div class="row">
+            <div class="col-9">
+            </div>
+            <div class="col-3">
+                <button type="button" class="btn btn-clr btn-master chck-tst"><a >Back</a></button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3">
+            </div>
+    
+            <div class="col-6">
+            <div class="invite-cards">
+                <form  class="form-txt" id="addtaxformid" method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-12">
+                            <table id="forms">
+                                <thead>
+                                    <th class="vend-appor-hd">Department Name<span class="star-clr">*</span></th>
+                                </thead>
+                                <tbody>
+                                        {{bird_formset.management_form}}
+                                        {% for form in bird_formset %}
+                                        <tr class="form-row">
+                                        {{form}}                                       <td><button class='btn btn-clr add-btn pha-sebtn add-form' type='button' value='Add'> <i class="fa fa-plus"></i> </button>
+                                            <button id="delete" class="btn btn-clr delete-btn" type="button" value="delete"> <i class="fa fa-minus"></i></button></td>
+                                            </tr>
+                                        {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="text-center phase-vendor" id="btn">
+                        <button type="submit" class="save-cls btn btn-clr text-right">Submit</button>
+                    </div>
+    
+                </form>
+            </div>
+            </div>
+    
+            <div class="col-3">
+            </div>
+    
+        </div>
+    
+    </div>
+
+
+
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script>
+    var addButton = $(".add-form");
+        var formsetPrefix = "{{ bird_formset.prefix }}";
+        var formsetTotalForms = "{{ bird_formset.total_form_count }}";
+        var formsetMaxForms = "{{ bird_formset.max_num }}".replace(',', '');
+        // jquery document on click function snippet code
+        // ready function snippet
+
+        $(document).ready(function(){
+            /*
+        $(document).on("click", ".add-form", function () {
+        console.log({'formsetTotalForms':formsetTotalForms,'formsetMaxForms':formsetMaxForms})
+        //addButton.addEventListener("click", function() {
+            if (parseInt(formsetTotalForms) < parseInt(formsetMaxForms)) {
+                console.log({'before':'{{ bird_formset.empty_form|escapejs }}'});
+                console.log({'before escapejs':'{{ bird_formset.empty_form }}'});
+                var newFormHtml = '{{ bird_formset.empty_form.as_p|escapejs }}'.replace(/__prefix__/g, formsetTotalForms);
+                var newForm = $(newFormHtml).insertBefore(addButton.closest("tr"));
+                console.log({'formsetPrefix':formsetPrefix,'formsetTotalForms':formsetTotalForms,'formsetMaxForms':formsetMaxForms});
+                formsetTotalForms++;
+                $("#id_" + formsetPrefix + "-TOTAL_FORMS").val(formsetTotalForms);
+            }
+        });
+
+*/
+        $("#forms").on("click", ".add-form", function() {
+            var row = $(this).closest(".form-row");
+            var newRow = row.clone();
+            var formCount = $("#id_" + row.find("[name$='TOTAL_FORMS']").attr("id")).val();
+            newRow.find(":input").each(function() {
+                var name = $(this).attr("name").replace("-" + (formCount - 1) + "-", "-" + formCount + "-");
+                var id = "id_" + name;
+                $(this).attr({"name": name, "id": id}).val("").removeAttr("checked");
+            });
+            newRow.find(".errorlist").remove();
+            newRow.insertBefore($(this).closest("tr"));
+            $("#id_" + row.find("[name$='TOTAL_FORMS']").attr("id")).val(parseInt(formCount) + 1);
+        });
+    });
+</script>
+{% endblock %}
+
+
+
+
+

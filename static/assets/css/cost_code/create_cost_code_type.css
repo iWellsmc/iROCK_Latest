@@ -1,0 +1,60 @@
+.cost-code-format {
+    display: flex;
+    align-items: center;
+}
+
+.cost-code-format label {
+    /* width: 200px !important; */
+    padding-right: 5px;
+    margin-bottom: 0;
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.cost-code-format span {
+    color: #000;
+    font-size: 15px;
+    font-weight: 600;
+}
+.cncc-table {
+    width: 50%;
+    margin: auto;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px;
+}
+
+.cncc-table th {
+    padding: 10px 10px;
+
+}
+.cncc-table td {
+    padding: 10px;
+    /* vertical-align: baseline; */
+}
+
+.cncc-table tr:last-child {
+    padding: 10px 10px;
+}
+
+.cncc-table th {
+    color: #017474;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+}
+
+.waves-effect.waves-light .waves-ripple {
+    background: transparent !important;
+}
+
+.span_cls {
+    color: red;
+}
+
+
+@media screen and (min-width: 768px) and (max-width:1024px){
+.cncc-tab-res{
+    width: 80%;
+}
+}

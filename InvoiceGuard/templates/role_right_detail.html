@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/user_Management/userroles.css' %}">
+
+
+
+
+<head>
+  </head>
+
+  
+
+  <h3 class="from-head">User Roles & Rights Details</h3>
+  <div class="row">
+    <div class="col-9">
+    </div>
+    <!-- <div class="col-3">
+        <button type="button" class="btn btn-clr btn-master chck-tst mr-0 mb-4"><a href="{% url 'InvoiceGuard:list-rolesandrights-form' %}">Back</a></button>
+    </div> -->
+    <div class="col-3">
+      <a class="btn btn-clr btn-master chck-tst mr-0 mb-4" href="{% url 'InvoiceGuard:list-rolesandrights-form' %}">Back</a>
+    </div>
+</div>
+      <div class="vends-invite-lists">
+       
+        <table  id="vendor-sort" class="table settings-data-list-view data-list-view creat-head project_master vend-thead vend-tt vend-border vin-no ascen-descen-class irock-table user-role-tbl-width">
+            <thead>
+                <tr>
+                    <th>Module</th> 
+                    <th>Roles</th>
+                    <th>Rights</th>
+                </tr>
+            </thead>
+            <tbody class="table-list wid-size-vend" id="myTable">
+                  <tr>
+                  <td>{{getModuleRole.module}}</td>
+                  <td>{{getModuleRole.role_name}}</td>
+                  <td>
+                  {% for right in get_right %}
+                  {{right.right}}
+                  <br>
+                  {% endfor %}
+                </td>
+                  </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>    
+{%endblock%}

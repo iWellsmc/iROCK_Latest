@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+
+
+<div>
+    <div class="row">
+        <div class="col-12 text-end">
+            <button type="button" class="btn btn-clr"><a href="{% url 'projects:contractmasterlist' %}">Back</a></button>
+        </div>
+    </div>
+
+    <h3 class="from-head">Generate Specific Report</h3>
+    <div class="row">
+        <div class="col-12 text-end">
+            <button type="button" class="btn btn-clr chck-tst"  data-target="#exampleModal"><a href="{% url 'projects:contractmasterreport' %}" target="_blank">Report of All Contracts</a></button>
+        </div>
+    </div>
+    {% if messages %} 
+    <ul class="messages">
+        {% for message in messages %}
+        <p class="filter-error">{{ message }}</p>
+        <!--<p{% if message.tags %} class="error"{% endif %}>{{ message }}</p>-->
+        {% endfor %}
+    </ul>
+  {% endif %}
+
+    <form method="POST" class="bot-sp-sea" id="specific_contract">
+        {% csrf_token %}
+        <div class="row">
+            <!--All Projects-->
+            <select name="allprojects" id="allprojectsid" style="display:none">
+                <option value="">--Select--</option>
+                {% for projects in allprojects %}
+                <option value="{{projects.id}}">{{projects.projectname.name}}</option>
+                {% endfor %}
+            </select>
+
+            <div class="col-12 spa-ce-bottom">
+                <label class="g-s-report">Types of Service</label>
+                <select name="type_services" class="form-control form-select typecls in-put-gen">
+                    <option value="" selected>--Select--</option>
+                    <option value="service">Service</option>
+                    <option value="supply">Supply</option>
+                    <option value="service_supply">Service & Supply</option>
+                </select>
+            </div>
+
+            <div class="col-12 spa-ce-bottom">
+                <label class="g-s-report">Name of Contract</label>
+                <select name="name_contract" class="form-control form-select name_contractcls in-put-gen">
+                    <option value="" selected>--Select--</option>
+                    {% for nameservice in allnameservice %}
+                    <option value="{{nameservice}}">{{nameservice}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-12 spa-ce-bottom">
+                <label class="g-s-report">Project Name</label>
+                <select name="project" class="form-control form-select projectcls in-put-gen">
+                    <option value="" selected>--Select--</option>
+                    {% for projects in allprojects %}
+                    <option value="{{projects.id}}">{{projects.projectname.name}}</option>
+                    {% endfor %}
+                    
+                </select>
+            </div>
+
+            <div class="col-12 changedisciplinecls spa-ce-bottom">
+                <label class="g-s-report">Project Discipline</label>
+                <select name="discipline" class="form-control form-select disciplinecls in-put-gen">
+                    <option value="" selected>--Select--</option>
+                </select>
+            </div>
+
+            <div class="col-12 spa-ce-bottom">
+                <label class="g-s-report">Currency</label>
+                <select name="currency" class="form-control form-select in-put-gen">
+                <option value="" selected>--Select--</option>
+                {% for currency in currencies %}
+                <option value="{{currency.id}}">{{currency.currency_symbol}}</option>
+                {% endfor %}
+                </select>
+            </div>
+
+            <div class="text-center spacing-button">
+                <button type="submit" class="btn btn-clr text-center" >Submit</button>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+{{ block.super }}
+
+<script>
+
+if (!localStorage.getItem("reload")) {
+    /* set reload to true and then reload the page */
+    localStorage.setItem("reload", "true");
+    location.reload();
+}
+/* after reloading remove "reload" from localStorage */
+else {
+    localStorage.removeItem("reload");
+    // localStorage.clear(); // or clear it, instead
+}
+
+    $(document).on('change','.typecls',function(){
+        var val=$(this).val()
+        var html=''
+        var project_html=''
+            $('.name_contractcls').html('<option value="" selected>--Select--</option>')
+            $('.disciplinecls').html('<option value="" selected>--Select--</option>')
+            // $('.projectcls').html('<option value="" selected>--Select--</option>')
+            $('.divdisciplinetypecls').remove()
+        if (val != ''){
+            $.ajax({
+                type:"GET",
+                url:'/projects/specificreportgenerate',
+                data:{'typeservice':val},
+                success: function(data){
+                    // console.log(data.projects)
+                    html+='<option value="">--Select--</option>'
+                    $.each(data.data,function(key,val){
+                        html +='<option value="'+val+'">'+val+'</option>'
+                    })
+                    $('.name_contractcls').html(html)
+                    // projects
+                    project_html+='<option value="">--Select--</option>'
+                    $.each(data.projects,function(key,val){
+                        console.log(val)
+                        project_html +='<option value="'+val.id+'">'+val.projectname+'</option>'
+                    })
+                    $('.projectcls').html(project_html)
+                }
+            })
+        }
+        else{
+            $(".projectcls").html(' ')
+            $("#allprojectsid option").clone().appendTo('.projectcls');
+        }
+    })
+
+    $(document).on('change','.name_contractcls',function(){
+        var val=$(this).val()
+        var service_val=$('.typecls').find(':selected').val()
+        var html=''
+            $('.disciplinecls').html('<option value="" selected>--Select--</option>')
+            $('.projectcls').html('<option value="" selected>--Select--</option>')
+            $('.divdisciplinetypecls').remove()
+
+        if (val != ''){
+            $.ajax({
+                type:"GET",
+                url:'/projects/specificreportgenerate',
+                data:{'nameservice':val,'typeservice':service_val},
+                success: function(data){
+                    console.log(data)
+                    var html = '<option value="" selected>--Select--</option>'
+                    $.each(data.data,function(key,val){
+                    html += '<option value="'+val.id+'">'+val.projectname+'</option>'
+                    })
+                    $('.projectcls').html(html)
+                }
+            })
+        }
+        else{
+            var project_html=''
+            if (service_val != ''){
+                $.ajax({
+                type:"GET",
+                url:'/projects/specificreportgenerate',
+                data:{'typeservice':service_val},
+                success: function(data){
+                    // projects
+                    project_html+='<option value="">--Select--</option>'
+                    $.each(data.projects,function(key,val){
+                        console.log(val)
+                        project_html +='<option value="'+val.id+'">'+val.projectname+'</option>'
+                    })
+                    $('.projectcls').html(project_html)
+                }
+                })
+            }
+            else{
+                // var companyoptiondict={}
+                // var companycurlist=[]
+                // $("#allprojectsid option").each(function(){
+                //     var thisOptionValue=$(this).val();
+                //     var thistext=$(this).text()
+                //     companyoptiondict={"id":thisOptionValue,"symbol":thistext}
+
+                //     companycurlist.push(companyoptiondict)
+                    
+                // });
+                $("#allprojectsid option").clone().appendTo('.projectcls');
+            }
+        }
+        
+    })
+    
+    function toTitleCase(val) {
+        return val.replace(/(?:^|\s)\w/g, function(match) {
+            return match.toUpperCase();
+        });
+    }
+    
+
+    $(document).on('change','.projectcls',function(){
+        var projectid=$(this).val()
+        var service_val=$('.typecls').val()
+        var nameservice=$('.name_contractcls').val()
+            $('.disciplinecls').html('<option value="" selected>--Select--</option>')
+            $('.divdisciplinetypecls').remove()
+
+
+        $.ajax({
+            type:"GET",
+            url:'/projects/specificreportgenerate',
+            data:{'nameservice':nameservice,'typeservice':service_val,'projectid':projectid},
+            success: function(data){
+                console.log(data)
+                var html = '<option value="" selected>--Select--</option>'
+                $.each(data.data,function(key,val){
+                html += '<option value="'+val.id+'">'+val.projectdiscipline+'</option>'
+                })
+                $('.disciplinecls').html(html)
+            }
+        })
+    })
+
+
+
+    $(document).on('change','.disciplinecls',function(){
+            $('.divdisciplinetypecls').remove()
+            var service_val=$('.typecls').val()
+            var nameservice=$('.name_contractcls').val()
+            var projectid=$('.projectcls').val()
+            var val=$(this).val()
+            var currentelement=$(this) 
+            $.ajax({
+                type:"GET",
+                url:'/projects/specificreportgenerate',
+                data:{'nameservice':nameservice,'typeservice':service_val,'projectid':projectid,'discipline':val},
+                success: function(data){
+                    console.log(data)
+                    var html ='<div class="col-12 divdisciplinetypecls spa-ce-bottom">'
+                        html+='<label class="g-s-report">Project Discipline Type</label>'
+                        html+='<select name="disciplinetype" class="form-control form-select disciplinetypecls in-put-gen">'
+                        html+= '<option value="" selected>--Select--</option>'
+                        $.each(data.data,function(key,val){
+                            html += '<option value="'+val.id+'">'+val.disciplinetype+'</option>'
+                        })
+                        html +='</select>'
+                        html+='</div>'
+                        $(currentelement).closest('div').after(html)
+                }
+            })
+
+
+    })
+
+
+</script>
+
+{% endblock %}

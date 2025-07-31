@@ -1,0 +1,241 @@
+.head-inv-pre {
+    color: #AF2B50 !important;
+    font-size: 1.5rem !important;
+    text-align: left !important;
+}
+.inv_file1.inv-high-cls {
+    color: #006e80 !important;
+}
+
+.btn-space {
+    margin-bottom: 3px !important;
+}
+
+.color-btn button {
+    width: 100% !important;
+}
+
+.ash_confirm {
+    /* background-color: #d6d6d6 !important;
+    color: #000 !important; */
+    background-color: #607e4b !important;
+}
+
+.gen_blue  {
+    background-color: #003e9a !important;
+}
+
+.rose {
+    background-color: #bd2753 !important;
+    /* background-color: #8faadc !important; */
+}
+
+.beige {
+  background-color: #c55e0b !important;
+}
+
+.violet {
+    background-color: #9C27B0 !important;
+}
+
+.proceed_blue {
+    background-color: #03a9f4 !important;
+}
+
+.dark_green {
+    background-color: #607e4b !important;
+}
+
+
+iframe.first-view {
+    width: 50% !important;
+    height: 590px !important;
+}
+
+/********** generate table **********/
+.gen-table {
+    width: 100%;
+    border: 1px solid var(--tableborder-color);
+}
+
+.gen-table th {
+    color: var(--irock-green);
+    background-color: #fff !important;
+    text-transform: capitalize !important;
+    text-align: center !important;
+    font-size: 15px !important;
+    font-weight: 600;
+    border: 1px solid var(--tableborder-color) !important;
+}
+
+.gen-table td {
+    color: #000;
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center !important;
+    border: 1px solid var(--tableborder-color) !important;
+}
+
+.gen-table thead tr {
+    border-bottom: 2px solid var(--tableborder-color);
+}
+
+.head-inv-pre.cen {
+    text-align: center !important;
+}
+/********** generate table **********/
+
+
+
+/********** generate popup **********/
+.large-pop {
+    /* max-width: 1000px; */
+    max-width:1350px;
+}
+
+.large-pop th {
+    color: var(--irock-green);
+    background-color: #fff !important;
+    text-transform: capitalize !important;
+    text-align: center !important;
+    font-size: 15px !important;
+    font-weight: 600;
+    border-right: 1px solid var(--tableborder-color) !important;
+}
+
+.large-pop thead tr {
+    border-bottom: 2px solid var(--tableborder-color);
+}
+
+.large-pop td {
+    color: #000;
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center !important;
+}
+
+.pig {
+    color: #AF2B50 !important;
+    font-size: 1.5rem !important;
+    text-align: center !important;
+}
+
+.select-popup select {
+    padding: 5px 25px;
+    border: 1px solid var(--tableborder-color);
+    border-radius: 5px;
+}
+.bg-color-foot {
+    background-color: #ffe9e9 !important;
+}
+
+.gen-cls:hover {
+    box-shadow: 0 8px 10px -8px #8D1636 !important;
+}
+
+.con-gr {
+    background-color: #27ae60 !important;
+}
+
+.con-gr:hover {
+    box-shadow: 0 8px 10px -8px #27ae60 !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #bd2753 !important;
+    border-color: #bd2753 !important;
+}
+
+.select2-selection__choice__remove {
+    display: none !important;
+}
+
+/********** generate popup **********/
+
+
+/********** Comment Pop-up **********/
+.comment-head {
+    background-color: #FFE9E9 !important;
+    border: none !important;
+}
+.calbtn{
+    padding: 5px 10px !important;
+}
+/* .comment-head button {
+    padding: 0px !important;
+} */
+
+.comment-head span {
+    font-size: 28px;
+    color: #96193a !important;
+    /* padding: 0px 10px !important; */
+    line-height: 0 !important;
+    /* outline: 1px solid #96193a;
+    outline-offset: -10px; */
+    border-radius: 25px;
+    /* padding: 0px 12px 5px 12px !important; */
+    padding: 0px 12px 5.8px 12px !important;
+}
+
+.comment-body {
+    background-color: #FFE9E9 !important;
+}
+
+.comment-foot {
+    background-color: #FFE9E9 !important;
+    border: none;
+    justify-content: center;
+    padding: 10px 15px !important;
+}
+
+.comment-foot button {
+    background-color: #BD2753 !important;
+    margin: 0px !important;
+}
+
+.comment-foot button:hover {
+    box-shadow: 0 8px 10px -8px #8D1636 !important;
+}
+
+
+/********** Calculator **********/
+.calc-body {
+    margin: auto auto;
+}
+/********** Calculator **********/
+
+.cal-close{
+    background: none;
+    border: none;
+}
+.error-border {
+    border: 1px solid red;
+}
+
+/* 15.05.24 */
+.pending-payable {
+    width: 165px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    border: none;
+    padding: 5px;
+}
+
+.already-paid-amount{
+    width: 190px;
+} 
+
+.payment-percentage{
+    width: 112px;
+    margin: auto;
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: 5px;
+    padding: 4px 5px;
+}
+
+.bank-to-debit-width{
+    width: 250px;
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    padding: 4px 5px;
+    border-radius: 5px;
+}

@@ -1,0 +1,228 @@
+.error-border {
+    border: 1px solid red 
+}
+.vendor-missed {
+    border: 1px solid var(--tableborder-color);
+}
+.vendor-missed thead {
+    border-top: 1px solid var(--tableborder-color) !important;
+}
+.vendor-missed th {
+    text-align: center;
+    background: transparent !important;
+    word-break: unset;
+}
+.vendor-missed td {
+    border-right: 1px solid var(--tableborder-color);
+}
+.vendor-missed td:nth-child(1) {
+    text-align: var(--centertext-align);
+}
+
+.vendor-missed td:nth-child(3) {
+    word-break: break-word !important;
+}
+
+.vendor-missed td:nth-child(5) {
+    word-break: break-word !important;
+}
+
+.vendor-missed td:nth-child(6) {
+    word-break: break-word !important;
+}
+
+.vendor-missed td:nth-child(7) {
+    word-break: break-word !important;
+}
+
+.middle {
+    text-align: var(--centertext-align);
+}
+
+.td-left {
+    text-align: var(--lefttext-align);
+}
+.rec-in{
+    background: #bbbbbb;
+    float: left;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 3px solid #979797;
+}
+
+/********** Missed Contract History **********/
+.qry-top-hd {
+    border-bottom: 2px solid #b1b1b1;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.qur-titl {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+}
+
+.qur-titl h4 {
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.qur-titl span {
+    color: #000 !important;
+    font-size: 15px;
+    font-weight: 500;
+    padding-left: 4px;
+}
+
+.qur-rf-no {
+    word-break: break-word;
+    margin-left: 5px;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+
+.txt-clrr { 
+    font-size: 16px;
+    font-weight: 500;
+    color: black;
+    width: 100%;
+    max-width: 700px;
+    word-break: break-word;
+}
+
+.f-name {
+    color: #AF2B50;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.nmc-nme {
+    font-weight: 500;
+    font-size: 15px;
+    color: #000;
+    padding-left: 5px;
+}
+
+.nmc-nme a {
+    font-weight: 500;
+    font-size: 15px;
+    color: #000 !important;
+    padding-left: 5px;
+}
+
+.rec-date {
+    float: left;
+    color: black;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.send-date {
+    float: right;
+    color: black;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.sta-dan {
+    padding: 5px 20px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+
+.label-message {
+    font-size: 14px;
+    color: #bd2753;
+    font-weight: 500;
+}
+
+.pop-shadow:hover {
+    box-shadow: 0 8px 25px -8px #bd275394 !important;
+}
+
+/********** Missed Contract History **********/
+
+
+/********** Vendor Missed Contract list Responsive **********/
+@media (min-width:1220px) {
+    .text-nowrap {
+        white-space: unset !important;
+    }
+}
+
+@media (min-width:768px) and (max-width:1220px) {
+    .vendor-missed {
+        width: 200vw !important;
+    }
+}
+
+@media (min-width:768px) and (max-width:991px) {
+    .qur-titl {
+        justify-content: flex-start;
+    }
+}
+/********** Vendor Missed Contract list Responsive **********/
+
+/********** Comment Pop-up **********/
+.comment-head {
+    background-color: #FFE9E9 !important;
+    border: none !important;
+}
+
+.comment-head button {
+    padding: 0px !important;
+}
+
+.comment-head span {
+    font-size: 28px;
+    color: #96193a !important;
+    /* padding: 0px 10px !important; */
+    line-height: 0 !important;
+    /* outline: 1px solid #96193a;
+    outline-offset: -10px; */
+    border-radius: 25px;
+    /* padding: 0px 12px 5px 12px !important; */
+    padding: 0px 12px 5.8px 12px !important;
+}
+
+.comment-body {
+    background-color: #FFE9E9 !important;
+}
+
+.comment-foot {
+    background-color: #FFE9E9 !important;
+    border: none;
+    justify-content: center;
+    padding: 10px 15px !important;
+}
+
+.comment-foot button {
+    background-color: #BD2753 !important;
+    margin: 0px !important;
+}
+
+.comment-foot button:hover {
+    box-shadow: 0 8px 10px -8px #8D1636 !important;
+}
+
+.inv_receipt{
+    text-align: center;
+}
+
+/********** Comment Pop-up **********/
+
+/********** Disputed Invoice Query **********/
+.upload_file_data {
+    margin: 8px auto;
+}
+
+.upload_file_data div {
+    margin: 8px auto;
+}
+

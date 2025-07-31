@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+{% block content %}
+
+<div>
+  <div class="row">
+    <div class="col-12 text-end">
+      <!-- button place here -->
+      <a href="{% url 'projects:userlist' %}" class="btn btn-clr add-btn">Back</a>
+    </div>
+  </div>
+
+  <h4 class="from-head">User Migration</h4>
+  <div class="row">
+    <div class="col-12">
+      <label class="txt-name unique-colr">User :</label>
+      <span class="txt-detail uniq-name">{{migrate_user.name}} {{migrate_user.lastname|default_if_none:''}}</span>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-12">
+      <div class="table-responsive text-nowrap">
+        <form method="post" id="migrate-user-form">
+          {% csrf_token %}
+          <table
+            class="table settings-data-list-view creat-head data-list-view project_master all-tbl-hd list-user-table-width tab-res irock-table"
+            id="master_project_list">
+            <thead class="list-user">
+              <tr>
+                <th>S/N</th>
+                <th class="wid-iin">Project</th>
+                <th class="wid-iin">Country</th>
+                <th class="wid-iin">Role</th>
+                <th>Migrate To</th>
+              </tr>
+            </thead>
+            <tbody class=" table-list">
+              {%for project in project_user %}
+              <tr>
+                <td>{{forloop.counter}}</td>
+                <td class="txt-left">{{project.project}}</td>
+                <td class="txt-left">{{project.project.country}}</td>
+                <td class="txt-left">{{request.company.category_entity|category_replace|category_replace}}</td>
+                <td class="txt-left">
+                  <select name="user_id{{project.id}}" class="form-control form-select">
+                    <option value="">--Select--</option>
+                    {% filter_by_project project.project.id request migrate_user.id as migrate_files %}
+                    {% for i in migrate_files %}
+                       <option value="{{i.id}}">{{i.name}} {{i.lastname|default_if_none:''}} ({{i.designation_role}})</option>
+                    {% endfor %}
+                  </select>
+                </td>
+              </tr>
+              {% endfor %}
+          </table>
+          <div class="save_button text-center">
+            <button id="mainsave" class='btn btn-clr add-btn' type="submit">Save</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script>
+  // remove the class is-invalid on change
+  $(document).on('change', 'select', function () {
+    $(this).removeClass('is-invalid')
+  })
+
+  $('form').on('submit', function (e) {
+    $('select').each(function (index, value) {
+      if ($(value).val() == '') {
+        $(value).addClass('is-invalid')
+      } else {
+        $(value).removeClass('is-invalid')
+      }
+    });
+    if ($('.is-invalid').length > 0) {
+      return false
+    }
+    else {
+      $('#mainsave').attr('disabled', true)
+      return true
+    }
+  });
+</script>
+
+{% endblock %}

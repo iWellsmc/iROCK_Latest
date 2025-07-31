@@ -1,0 +1,1914 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/projectmaster.css' %}">
+<div>
+  <div id="loader" class="lds-dual-ring hidden overlay">
+    <h5 class="head_cls">Please Wait Data Uploading...Do not Refresh the Page</h5>
+  </div>
+    <form method="POST" enctype="multipart/form-data" id="contractform">
+        {% csrf_token %}
+    <div>
+        <div class="upload-btn-wrapper ">
+            {% comment %} <input type="hidden" name="error_count" {% if same_vendor_count > 0 or same_vendor_email_count > 0 or emptydata_vendor_count > 0%} value="1" {% else %} value="0" {% endif%}> {% endcomment %}
+            <button type="submit" class="btn btn-clr import_vendor_save imp-btn-space">Save</button>
+            <button type="button" class="btn btn-clr imp-btn-space"><a href="{% url 'projects:contractmasterlist' %}">Back</a></button>
+            {% comment %} <button  type="button" class="btn btn-clr"><a href="{% url 'projects:downloadimportvendorexcel' %}">Download</a></button> {% endcomment %}
+        </div>
+    </div>
+    <div class="row">
+      <h4 class="from-head">Upload Contract File Details</h4>
+      {%if convert_str%}
+      <div class="col-12">
+        <input type="hidden" name="ajaxdata" id="id_ajax" value="">
+          <p class="vend-imp-clr" id="errornameid">Error Rows</p>
+          <input type="hidden" id="numid" value="{{convert_str}}">
+          <p class="error-red-clr"  id="errorlistid" ></p>
+          <p class="error-red-clr" id="ajaxerror" ></p>
+      </div>
+      {% endif %}
+      <div class="col-4 search-bot-space">
+        <label class="vend-imp-clr">Search Serial No:</label>
+        <div class="row">
+            <div class="col-8">
+                <input type="text" name="search" id="searchid" value="" placeholder="Search Serial No" class="form-control search-box-err">
+            </div>
+            <div class="col-4">
+                <button type="button" class="getrow btn btn-clr">search</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+      <div class="col-4 flex-project-type">
+        <label class="check-uphd proj-name">Project:</label>
+        <span class="check-uppara">{{project.projectname}}</span>
+      </div>
+
+      <div class="col-4 flex-project-type">
+        <label class="check-uphd proj-dis">Project Discipline:</label>
+        <span class="check-uppara">{{project_discipline|convert_projectdiscipline}}</span>
+      </div>
+
+      <div class="col-4 flex-project-type">
+        <label class="check-uphd proj-type">Discipline Type:</label>
+        <span class="check-uppara">{{disciplinetype.discipline_subtype}}</span>
+      </div>
+
+    </div>
+
+    <div class="col-8"></div>
+      <input type="hidden" name="companydate" id="date" value="{{companydateformat}}">
+      <div class="row">
+        <div class="col-12 imports-tbl-contra table-responsive text-nowrap">
+      <table class="table usr-ryt irock-table">
+          <thead>
+              <tr> 
+                  <th>S/N</th>
+                  <th>Vendor Name</th>
+                  <th>Type of Contract</th>
+                  <th>Type of Service</th>
+                  <th>Name of Contract</th>
+                  <th>Contract Reference Number</th>
+                  <th>Amendment/Addendum for Contract (Original Contract Ref. No)</th>
+                  <th>Executed Date</th>
+                  <th>Currency</th>
+                  <th>Value</th>
+                  <th></th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for contract in contracts %}
+            <tr>
+              <td>{{forloop.counter}}</td>
+              <td>
+                <select name="vendorname" {% if contract.vendor_name == None %} class="form-control error-show vendornamecls" {% else %} class="form-control vendornamecls" {% endif %}>
+                  <option value="" selected>-Select-</option>
+                  {% for vendors in all_vendors %}
+                  <option {% if contract.vendor_name == vendors%} selected {% endif %} value="{{vendors}}">{{vendors}}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="type_contract" {% if contract.type_contract == None %} class="form-control error-show typecontractcls" {% else %} class="form-control typecontractcls" {% endif %}>
+                  <option value="" selected>-Select-</option>
+                  {% for contracts in contract_types %}
+                  <option {% if contract.type_contract == contracts%} selected {% endif %} value="{{contracts}}">{{contracts}}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="type_service" {% if contract.type_service == None %} class="form-control error-show typeservicecls" {% else %} class="form-control typeservicecls" {% endif %}>
+                  <option value="" selected>-Select-</option>
+                  {% for key,services in service_type.items %}
+                  <option {% if contract.type_service == key%} selected {% endif %} value="{{services}}">{{key}}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <input type="text" name="name_contract" {% if contract.name_contract == None %} class="form-control error-show namecontractcls" {% else %} class="form-control namecontractcls" {% endif %} value="{{contract.name_contract|default_if_none:"---"}}">
+              </td>
+
+              {% comment %} <td>
+                <select name="project_discipline" {% if contract.project_discipline == None %} class="form-control error-show projectdisciplinecls" {% else %} class="form-control projectdisciplinecls" {% endif %}>
+                  <option value="" selected>-Select-</option>
+                  {% for key,discpline in projectdiscpline.items %}
+                  <option {% if contract.project_discipline == key%} selected {% endif %} value="{{discpline}}">{{key}}</option>
+                  {% endfor %}
+                  </select>
+              </td>
+              <td>
+                <select name="disciplinetype" {% if contract.discipline_type == None %} class="form-control error-show disciplinetypecls" {% else %} class="form-control disciplinetypecls" {% endif %}>
+                  <option value="" selected>-Select-</option>
+                  {% for key,discplinetype in discplinetypes.items %}
+                  <option {% if contract.discipline_type == key %} selected {% endif %} value="{{discplinetype}}">{{key}}</option>
+                  {% endfor %}
+                  </select>
+              </td> {% endcomment %}
+
+              <td style="width:12%;">
+                {% checkvendorcontractexistscompany contract.con_num companyid as vendorcontractcount %}
+                <input type="text" name="ref_num" {% if contract.con_num == None %} class="form-control error-show connumcls" {% else %} class="form-control connumcls" {% endif %} value="{{contract.con_num|replacecommaid}}">
+                <span {% if vendorcontractcount > 0%} class="waring-err">Contract Already Exists</span> {% else %} <span class=""></span>{% endif %}
+              </td>
+              <td style="width:12%;">
+                <input type="text" name="amendment" {% if contract.type_contract == 'Original Contract' and contract.amendment_refnum == None %} class="form-control amendmentrefnumcls" value=" " readonly{% elif  contract.type_contract == 'Amendment' and contract.amendment_refnum == None%} class="form-control error-show amendmentrefnumcls" {% elif  contract.type_contract == 'Addendum' and contract.amendment_refnum == None%} class="form-control error-show amendmentrefnumcls" {% else %} class="form-control amendmentrefnumcls"  {% endif %} value="{{contract.amendment_refnum|replacecommaid}}">
+                <span class="waring-err"></span>
+              </td>
+              <td>
+                <input type="text" name="date" {% if contract.executed_date == None %} class="form-control error-show dateformat-cls" {% else %} class="form-control dateformat-cls" {% endif %} value="{{contract.executed_date|convert_contract_date:companyid}}">
+                
+              </td>
+              <td>
+                <select name="currency" {% if contract.max_value_currency == None %} class="form-control error-show currencycls" {% else %} class="form-control currencycls" {% endif %}>
+                  <option value="" selected>-Select-</option>
+                  {% for cur in currencies %}
+                  <option {% if contract.max_value_currency == cur.currency %} selected {% endif %} value="{{cur.id}}">{{cur.currency}}</option>
+                  {% endfor %}
+                  </select>
+                
+              </td>
+              <td>
+                <datalist id="no_limit">
+                  <option value="No Max Limit">
+                </datalist>
+                <input type="text" name="amount" {% if contract.max_value_amount == None %} class="form-control error-show amount-cls" {% elif contract.max_value_amount|amountseperator == '' %} class="form-control error-show amount-cls" {% else %} list="no_limit" class="form-control amount-cls" {% endif %} value="{{contract.max_value_amount|amountseperator}}">
+              </td>
+              <td>
+                <button id="delete-row" class="btn btn-clr add-btn waves-effect waves-float waves-light" type="button" value="minus"><i class="fa fa-minus"></i></button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        </div>
+        </div>
+      </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" ></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" ></script>
+
+<script>
+
+  
+  var hdn_dateformat=$('#date').val()
+  console.log(hdn_dateformat)
+  if (hdn_dateformat ==''){
+    $('body').on('focus',".dateformat-cls", function(){
+        $(this).datepicker({
+            dateFormat: 'dd-M-yy',
+            maxDate:new Date(),
+            yearRange: '1900:+0',
+            changeMonth:true,
+            changeYear:true,
+        });
+      });
+}
+else{
+    $('body').on('focus',".dateformat-cls", function(){
+        $(this).datepicker({
+            dateFormat: hdn_dateformat,
+            maxDate:new Date(),
+            yearRange: '1900:+0',
+            changeMonth:true,
+            changeYear:true,
+        });
+      });
+}
+
+function numberWithCommas(number) {
+
+  var parts = number.toString().split(".");
+
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  console.log(parts)
+  return parts.join(".");
+}
+
+$(document).on('change','.namecontractcls,.connumcls',function(){
+  if($('#errorlistid').text()==''){
+    $('#errornameid').hide()
+  }
+  else{
+    $('#errornameid').show()
+  }
+})
+
+$(document).on('change','.amount-cls',function(){
+  if($('#errorlistid').text()==''){
+    $('#errornameid').hide()
+  }
+  else{
+    $('#errornameid').show()
+  }
+ //$(".amount_currency_cls").each(function() {
+      var num = $(this).val();
+      var commaNum = numberWithCommas(num);
+      $(this).val(commaNum);
+  //});
+})
+
+$(document).on('change','.amount-cls',function(){
+  if($('#errorlistid').text()==''){
+    $('#errornameid').hide()
+  }
+  else{
+    $('#errornameid').show()
+  }
+        $(this).next('span').remove();
+        var val=$(this).val()
+        if (val!='No Max Limit')
+        {
+        $(this).val(val.replace(/([-€~!@#$%^&*()_+=`{}\[\]\|\\:;'<>A-Za-z])+/g, ''));
+        }
+       
+        var number=$(this).val()
+        if ( number !=''){
+            if (number==0){
+                $(this).after('<span class="waring-err">Value cannot be Zero</span>')
+            }
+            else{
+                $(this).next('span').remove();
+            }
+        }
+        else{
+            $(this).next('span').remove();
+        }
+        $(".amount-cls").each(function() {
+            var num = $(this).val();
+            var removecomma=num.replace(/,/g, '');
+            var commaNum = numberWithCommas(removecomma);
+            $(this).val(commaNum);
+        });
+        if($(this).val().indexOf('.')!=-1){         
+            if($(this).val().split(".")[1].length > 2){                
+                if( isNaN( parseFloat( this.value ) ) ) return;
+                this.value = parseFloat(this.value).toFixed(2);
+            }  
+         }            
+         return this; //for chaining
+    });
+
+    $(document).on('click','.con_file_id' ,function (){
+        filedata = new FormData($('form').get(0));
+       
+       $.ajax({
+           url: '/projects/contractmasterlist',
+           type: 'post',
+           data: filedata,
+           cache: false,
+           processData: false,
+           contentType: false,
+           success: function(data) {
+            var current_url=$(location).attr("href")
+            var replace_url=current_url.replace("contractmasterlist","checkvendorcontractimport")
+            window.location.href = replace_url;
+           }
+       })
+    })
+
+    $(document).on('change','.vendornamecls',function(){
+      if($('#errorlistid').text()==''){
+        $('#errornameid').hide()
+      }
+      else{
+        $('#errornameid').show()
+      }
+      var val=$(this).val()
+      if(val.length > 0){
+          $(this).removeClass("error-show")
+  
+      }
+      else{
+          $(this).addClass("error-show")
+      }
+      
+      var v_name=$(this).closest('tr').find('td:eq(1)').find('.vendornamecls').val()
+      var contract=$(this).closest('tr').find('td:eq(2)').find('.typecontractcls').val()
+      var service=$(this).closest('tr').find('td:eq(3)').find('.typeservicecls').val()
+      var name_contract=$(this).closest('tr').find('td:eq(4)').find('.namecontractcls').val()
+      //var p_dis=$(this).closest('tr').find('td:eq(5)').find('.projectdisciplinecls').val()
+      //var dis_type=$(this).closest('tr').find('td:eq(6)').find('.disciplinetypecls').val()
+      var con_ref=$(this).closest('tr').find('td:eq(5)').find('.connumcls').val()
+      var con_refspan=$(this).closest('tr').find('td:eq(5)').find('span').text()
+      var amendment=$(this).closest('tr').find('td:eq(6)').find('.amendmentrefnumcls').val()
+      var amendmentspan=$(this).closest('tr').find('td:eq(6)').find('span').text()
+      var date=$(this).closest('tr').find('td:eq(7)').find('.dateformat-cls').val()
+      var currency=$(this).closest('tr').find('td:eq(8)').find('.currencycls').val()
+      var amount=$(this).closest('tr').find('td:eq(9)').find('.amount-cls').val()
+      if (contract == 'Original Contract'){
+        
+        if (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || date == '' || currency == '' || amount == ''){
+          
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+        }
+      }
+      else{
+        
+        if  (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || amendment == ' ' || amendment == '' || amendmentspan.length >1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+        }
+      }
+      checkallinput()
+    })
+
+    $(document).on('change','.typecontractcls',function(){
+      if($('#errorlistid').text()==''){
+        $('#errornameid').hide()
+      }
+      else{
+        $('#errornameid').show()
+      }
+      var val=$(this).val()
+      if(val.length > 0){
+          $(this).removeClass("error-show")
+          if (val == 'Original Contract'){
+            $(this).closest('tr').find('.amendmentrefnumcls').removeClass('error-show').attr('readonly',true).val('')
+            $(this).closest('tr').find('td:eq(5)').find('span').html(' ')
+          }
+          else{
+            $(this).closest('tr').find('.amendmentrefnumcls').addClass('error-show').attr('readonly',false)
+            
+          }
+  
+      }
+      else{
+          $(this).addClass("error-show")
+          $(this).closest('tr').find('.amendmentrefnumcls').addClass('error-show')
+      }
+      var v_name=$(this).closest('tr').find('td:eq(1)').find('.vendornamecls').val()
+      var contract=$(this).closest('tr').find('td:eq(2)').find('.typecontractcls').val()
+      var service=$(this).closest('tr').find('td:eq(3)').find('.typeservicecls').val()
+      var name_contract=$(this).closest('tr').find('td:eq(4)').find('.namecontractcls').val()
+      //var p_dis=$(this).closest('tr').find('td:eq(5)').find('.projectdisciplinecls').val()
+      //var dis_type=$(this).closest('tr').find('td:eq(6)').find('.disciplinetypecls').val()
+      var con_ref=$(this).closest('tr').find('td:eq(5)').find('.connumcls').val()
+      var con_refspan=$(this).closest('tr').find('td:eq(5)').find('span').text()
+      var amendment=$(this).closest('tr').find('td:eq(6)').find('.amendmentrefnumcls').val()
+      var amendmentspan=$(this).closest('tr').find('td:eq(6)').find('span').text()
+      var date=$(this).closest('tr').find('td:eq(7)').find('.dateformat-cls').val()
+      var currency=$(this).closest('tr').find('td:eq(8)').find('.currencycls').val()
+      var amount=$(this).closest('tr').find('td:eq(9)').find('.amount-cls').val()
+      if (contract == 'Original Contract'){
+        
+        if (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+          
+        }
+      }
+      else{
+        
+        if  (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || amendment == ' ' || amendment == '' || amendmentspan.length >1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+        }
+      }
+      checkallinput()
+    })
+
+    $(document).on('change','.typeservicecls',function(){
+      if($('#errorlistid').text()==''){
+        $('#errornameid').hide()
+      }
+      else{
+        $('#errornameid').show()
+      }
+      var val=$(this).val()
+      if(val.length > 0){
+          $(this).removeClass("error-show")
+  
+      }
+      else{
+          $(this).addClass("error-show")
+      }
+      
+      var v_name=$(this).closest('tr').find('td:eq(1)').find('.vendornamecls').val()
+      var contract=$(this).closest('tr').find('td:eq(2)').find('.typecontractcls').val()
+      var service=$(this).closest('tr').find('td:eq(3)').find('.typeservicecls').val()
+      var name_contract=$(this).closest('tr').find('td:eq(4)').find('.namecontractcls').val()
+      //var p_dis=$(this).closest('tr').find('td:eq(5)').find('.projectdisciplinecls').val()
+      //var dis_type=$(this).closest('tr').find('td:eq(6)').find('.disciplinetypecls').val()
+      var con_ref=$(this).closest('tr').find('td:eq(5)').find('.connumcls').val()
+      var con_refspan=$(this).closest('tr').find('td:eq(5)').find('span').text()
+      var amendment=$(this).closest('tr').find('td:eq(6)').find('.amendmentrefnumcls').val()
+      var amendmentspan=$(this).closest('tr').find('td:eq(6)').find('span').text()
+      var date=$(this).closest('tr').find('td:eq(7)').find('.dateformat-cls').val()
+      var currency=$(this).closest('tr').find('td:eq(8)').find('.currencycls').val()
+      var amount=$(this).closest('tr').find('td:eq(9)').find('.amount-cls').val()
+      if (contract == 'Original Contract'){
+        
+        if (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+          
+        }
+      }
+      else{
+        
+        if  (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || amendment == ' ' || amendment == '' || amendmentspan.length >1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+        }
+      }
+
+      checkallinput()
+    })
+
+
+    $(document).on('click','.add-btn',function(){
+      if($('#errorlistid').text()==''){
+          $('#errornameid').hide()
+        }
+        else{
+          $('#errornameid').show()
+        }
+  })
+
+    $(document).on('keyup','.namecontractcls',function(){
+      if($('#errorlistid').text()==''){
+        $('#errornameid').hide()
+      }
+      else{
+        $('#errornameid').show()
+      }
+      var val=$(this).val()
+      if(val.length > 0){
+          $(this).removeClass("error-show")
+  
+      }
+      else{
+          $(this).addClass("error-show")
+      }
+      
+      var v_name=$(this).closest('tr').find('td:eq(1)').find('.vendornamecls').val()
+      var contract=$(this).closest('tr').find('td:eq(2)').find('.typecontractcls').val()
+      var service=$(this).closest('tr').find('td:eq(3)').find('.typeservicecls').val()
+      var name_contract=$(this).closest('tr').find('td:eq(4)').find('.namecontractcls').val()
+      //var p_dis=$(this).closest('tr').find('td:eq(5)').find('.projectdisciplinecls').val()
+      //var dis_type=$(this).closest('tr').find('td:eq(6)').find('.disciplinetypecls').val()
+      var con_ref=$(this).closest('tr').find('td:eq(5)').find('.connumcls').val()
+      var con_refspan=$(this).closest('tr').find('td:eq(5)').find('span').text()
+      var amendment=$(this).closest('tr').find('td:eq(6)').find('.amendmentrefnumcls').val()
+      var amendmentspan=$(this).closest('tr').find('td:eq(6)').find('span').text()
+      var date=$(this).closest('tr').find('td:eq(7)').find('.dateformat-cls').val()
+      var currency=$(this).closest('tr').find('td:eq(8)').find('.currencycls').val()
+      var amount=$(this).closest('tr').find('td:eq(9)').find('.amount-cls').val()
+      if (contract == 'Original Contract'){
+        
+        if (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          var errors=$('#errorlistid').text()
+          if ((errors.length) >0){
+            var errorsplit=errors.split(',')
+          }
+          else{
+            var errorsplit=[]
+          }
+          console.log(errorsplit)
+          if ((errorsplit).length > 0){
+            if ($.inArray(ids, errorsplit) !== -1)
+            {
+                console.log('yes')
+            }
+            else{
+                errorsplit.push(ids)
+            }
+          }
+        else{
+          errorsplit.push(ids)
+        }
+        var myJSON = JSON.stringify(errorsplit);
+        var con_data=myJSON.replace(/\"/g, "");
+        var remove=con_data.replace("[", "");
+        var remove_symbol=remove.replace("]", "");
+        $('#errorlistid').html(remove_symbol)
+
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log('aa',errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+          
+        }
+      }
+      else{
+        
+        if  (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || amendment == ' ' || amendment == '' || amendmentspan.length >1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+  
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+        }
+      }
+
+      checkallinput()
+    })
+
+    /**
+    $(document).on('change','.projectdisciplinecls',function(){
+      var val=$(this).val()
+      if(val.length > 0){
+          $(this).removeClass("error-show")
+  
+      }
+      else{
+          $(this).addClass("error-show")
+      }
+      
+      var v_name=$(this).closest('tr').find('td:eq(1)').find('.vendornamecls').val()
+      var contract=$(this).closest('tr').find('td:eq(2)').find('.typecontractcls').val()
+      var service=$(this).closest('tr').find('td:eq(3)').find('.typeservicecls').val()
+      var name_contract=$(this).closest('tr').find('td:eq(4)').find('.namecontractcls').val()
+      var p_dis=$(this).closest('tr').find('td:eq(5)').find('.projectdisciplinecls').val()
+      var dis_type=$(this).closest('tr').find('td:eq(6)').find('.disciplinetypecls').val()
+      var con_ref=$(this).closest('tr').find('td:eq(7)').find('.connumcls').val()
+      var con_refspan=$(this).closest('tr').find('td:eq(7)').find('span').text()
+      var amendment=$(this).closest('tr').find('td:eq(8)').find('.amendmentrefnumcls').val()
+      var amendmentspan=$(this).closest('tr').find('td:eq(8)').find('span').text()
+      var date=$(this).closest('tr').find('td:eq(9)').find('.dateformat-cls').val()
+      var currency=$(this).closest('tr').find('td:eq(10)').find('.currencycls').val()
+      var amount=$(this).closest('tr').find('td:eq(11)').find('.amount-cls').val()
+      if (contract == 'Original Contract'){
+        
+        if (v_name == '' || contract == '' || service == '' || name_contract == '' || p_dis == '' || dis_type == '' || con_ref == '' || con_refspan.length > 1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+  
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+          
+        }
+      }
+      else{
+        
+        if  (v_name == '' || contract == '' || service == '' || name_contract == '' || p_dis == '' || dis_type == '' || con_ref == '' || con_refspan.length > 1 || amendment == ' ' || amendment == '' || amendmentspan.length >1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+  
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+        }
+      }
+
+      checkallinput()
+    })
+
+    $(document).on('change','.disciplinetypecls',function(){
+      var val=$(this).val()
+      if(val.length > 0){
+          $(this).removeClass("error-show")
+  
+      }
+      else{
+          $(this).addClass("error-show")
+      }
+      
+      var v_name=$(this).closest('tr').find('td:eq(1)').find('.vendornamecls').val()
+      var contract=$(this).closest('tr').find('td:eq(2)').find('.typecontractcls').val()
+      var service=$(this).closest('tr').find('td:eq(3)').find('.typeservicecls').val()
+      var name_contract=$(this).closest('tr').find('td:eq(4)').find('.namecontractcls').val()
+      var p_dis=$(this).closest('tr').find('td:eq(5)').find('.projectdisciplinecls').val()
+      var dis_type=$(this).closest('tr').find('td:eq(6)').find('.disciplinetypecls').val()
+      var con_ref=$(this).closest('tr').find('td:eq(7)').find('.connumcls').val()
+      var con_refspan=$(this).closest('tr').find('td:eq(7)').find('span').text()
+      var amendment=$(this).closest('tr').find('td:eq(8)').find('.amendmentrefnumcls').val()
+      var amendmentspan=$(this).closest('tr').find('td:eq(8)').find('span').text()
+      var date=$(this).closest('tr').find('td:eq(9)').find('.dateformat-cls').val()
+      var currency=$(this).closest('tr').find('td:eq(10)').find('.currencycls').val()
+      var amount=$(this).closest('tr').find('td:eq(11)').find('.amount-cls').val()
+      if (contract == 'Original Contract'){
+        
+        if (v_name == '' || contract == '' || service == '' || name_contract == '' || p_dis == '' || dis_type == '' || con_ref == '' || con_refspan.length > 1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+  
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+          
+        }
+      }
+      else{
+        
+        if  (v_name == '' || contract == '' || service == '' || name_contract == '' || p_dis == '' || dis_type == '' || con_ref == '' || con_refspan.length > 1 || amendment == ' ' || amendment == '' || amendmentspan.length >1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+  
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+        }
+      }
+
+      checkallinput()
+    })
+
+  **/
+
+
+    $(document).on('change','.connumcls',function(){
+      if($('#errorlistid').text()==''){
+        $('#errornameid').hide()
+      }
+      else{
+        $('#errornameid').show()
+      }
+      $(this).next('span').text(' ')
+      var val=$(this).val()
+      if(val.length > 0){
+          $(this).removeClass("error-show")
+      }
+      else{
+          $(this).addClass("error-show")
+      }  
+      if ($(this).closest('tr').find('td:eq(2)').find('.typecontractcls').val() != 'Original Contract'){
+        $(this).closest('tr').find('td:eq(6)').find('span').html(' ')
+        var v_name=$(this).closest('tr').find('td:eq(1)').find('.vendornamecls').val()
+        var con_ref=$(this).closest('tr').find('td:eq(6)').find('.amendmentrefnumcls').val()
+        var a=$(this)
+
+        $.ajax({
+          type: "GET",
+          url:'/projects/checkcontractamendment',
+          data: {'refnum':con_ref,'v_name':v_name,'amendment':val},
+          success: function(data){
+            console.log(data)
+            if (data.data == 'exists'){
+              a.next('span').addClass('waring-err').text('Contract already exists in the contract master')
+            }
+          }
+        })
+        var vendor_duplicate=0
+          $('input.connumcls').each(function() {
+              var value=$(this).val()
+              if (value == val){
+                vendor_duplicate+=1
+              }
+          });
+    
+        if (vendor_duplicate >1){
+            $(this).next('span').addClass('waring-err').html('Contract Duplicate')
+            $('.import_vendor_save').attr('disabled', true);
+        }
+
+      }
+      else{
+        var z=0
+        $('input.connumcls').each(function() {
+            var value=$(this).val()
+            
+            var a=$(this)
+            if ($(this).next('span').text() == 'Contract Duplicate'){
+                $(this).next('span').html('')
+            }
+    
+            if (value != ''){
+                if (value == val){
+                    z+=1
+                }
+            }
+            $.ajax({
+                type: "GET",
+                url:'/projects/checkcontractrefduplicate',
+                data: {'refnum':value},
+                success: function(data)
+                {
+                    if (data.data == 'exists'){
+                        a.next('span').addClass('waring-err').html('Contract already exists in the contract master')
+                        $('.import_vendor_save').attr('disabled', true);
+                    }
+                    else{
+                        //currentelement.next('span').html(' ')
+                        //$('.import_vendor_save').attr('disabled', false);
+                    }
+                }
+            })
+            
+        });
+    
+        $('table > tbody  > tr').each(function(index, tr) { 
+          var v_name=$(this).find('td:eq(5)').find('.connumcls').val()
+            var vendor_duplicate=0
+            $('input.connumcls').each(function() {
+                var value=$(this).val()
+                if (value == v_name){
+                  vendor_duplicate+=1
+                }
+            });
+            if (vendor_duplicate >1){
+                $(this).find('td:eq(5)').find('span').addClass('waring-err').text('Contract Duplicate')
+            }
+        });
+    
+        if (z >1){
+            $(this).next('span').addClass('waring-err').html('Contract Duplicate')
+            $('.import_vendor_save').attr('disabled', true);
+        }
+      }
+      
+      var v_name=$(this).closest('tr').find('td:eq(1)').find('.vendornamecls').val()
+      var contract=$(this).closest('tr').find('td:eq(2)').find('.typecontractcls').val()
+      var service=$(this).closest('tr').find('td:eq(3)').find('.typeservicecls').val()
+      var name_contract=$(this).closest('tr').find('td:eq(4)').find('.namecontractcls').val()
+     // var p_dis=$(this).closest('tr').find('td:eq(5)').find('.projectdisciplinecls').val()
+     // var dis_type=$(this).closest('tr').find('td:eq(6)').find('.disciplinetypecls').val()
+      var con_ref=$(this).closest('tr').find('td:eq(5)').find('.connumcls').val()
+      var con_refspan=$(this).closest('tr').find('td:eq(5)').find('span').text()
+      var amendment=$(this).closest('tr').find('td:eq(6)').find('.amendmentrefnumcls').val()
+      var amendmentspan=$(this).closest('tr').find('td:eq(6)').find('span').text()
+      var date=$(this).closest('tr').find('td:eq(7)').find('.dateformat-cls').val()
+      var currency=$(this).closest('tr').find('td:eq(8)').find('.currencycls').val()
+      var amount=$(this).closest('tr').find('td:eq(9)').find('.amount-cls').val()
+      if (contract == 'Original Contract'){
+        
+        if (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+  
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+          
+        }
+      }
+      else{
+        
+        if  (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || amendment == ' ' || amendment == '' || amendmentspan.length >1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+  
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+        }
+      }
+
+      checkallinput()
+    })
+    
+    $(document).on('change','.amendmentrefnumcls',function(){
+      if($('#errorlistid').text()==''){
+        $('#errornameid').hide()
+      }
+      else{
+        $('#errornameid').show()
+      }
+     var val=$(this).val()
+      if(val.length > 0){
+          $(this).removeClass("error-show")
+  
+      }
+      else{
+          $(this).addClass("error-show")
+      }
+      $(this).closest('tr').find('td:eq(6)').find('span').html(' ')
+      var a=$(this)
+      var v_name=$(this).closest('tr').find('td:eq(1)').find('.vendornamecls').val()
+      var con_ref=$(this).closest('tr').find('td:eq(6)').find('.amendmentrefnumcls').val()
+      var amendmentduplicate=0
+      var checkcontract=0
+      if (val !='' && val != ' '){
+        
+      $.ajax({
+        type: "GET",
+        url:'/projects/checkcontractamendmentref',
+        data: {'refnum':con_ref,'v_name':v_name},
+        success: function(data){
+          //console.log(data)
+          if (data.data == 'no_data'){
+            checkcontract=0
+            //a.closest('tr').find('td:eq(8)').find('span').addClass('waring-err').text('Wrong Reference Number')
+          }
+          else{
+            checkcontract=1
+          }
+          
+          $('table > tbody  > tr').each(function(index, tr) {
+            var contract=$(this).find('td:eq(2)').find('.typecontractcls').val()
+            
+            if (contract == "Original Contract"){
+              var refvalue=$(this).find('td:eq(5)').find('.connumcls').val()
+              console.log(refvalue)
+              if (val != '' && val !=' ' && refvalue !=''){
+                if (val == refvalue){
+                  amendmentduplicate+=1 
+                }
+              }
+            }
+          }) 
+          console.log('c',checkcontract)    
+          console.log('a',amendmentduplicate)
+          if (val != '' && val != ' '){
+            if (amendmentduplicate == 0 && checkcontract == 0){
+              a.closest('tr').find('td:eq(5)').find('span').text('Original Contract reference number does not exist in the contract master')
+            }
+            else if (amendmentduplicate > 1 && checkcontract == 1){
+              a.find('td:eq(6)').find('span').html(' ')
+            }
+          }
+        }
+      })
+
+    }
+    
+    var v_name=$(this).closest('tr').find('td:eq(1)').find('.vendornamecls').val()
+    var contract=$(this).closest('tr').find('td:eq(2)').find('.typecontractcls').val()
+    var service=$(this).closest('tr').find('td:eq(3)').find('.typeservicecls').val()
+    var name_contract=$(this).closest('tr').find('td:eq(4)').find('.namecontractcls').val()
+    //var p_dis=$(this).closest('tr').find('td:eq(5)').find('.projectdisciplinecls').val()
+    //var dis_type=$(this).closest('tr').find('td:eq(6)').find('.disciplinetypecls').val()
+    var con_ref=$(this).closest('tr').find('td:eq(5)').find('.connumcls').val()
+    var con_refspan=$(this).closest('tr').find('td:eq(5)').find('span').text()
+    var amendment=$(this).closest('tr').find('td:eq(6)').find('.amendmentrefnumcls').val()
+    var amendmentspan=$(this).closest('tr').find('td:eq(6)').find('span').text()
+    var date=$(this).closest('tr').find('td:eq(7)').find('.dateformat-cls').val()
+    var currency=$(this).closest('tr').find('td:eq(8)').find('.currencycls').val()
+    var amount=$(this).closest('tr').find('td:eq(9)').find('.amount-cls').val()
+    if (contract == 'Original Contract'){
+      
+      if (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || date == '' || currency == '' || amount == ''){
+        var ids=$(this).closest('tr').find('td:eq(0)').text()
+        console.log('c',ids)
+        var errors=$('#errorlistid').text()
+        var errorsplit=errors.split(',')
+        if ($.inArray(ids, errorsplit) !== -1 )
+        {
+            console.log('yes')
+        }
+        else{
+            errorsplit.push(ids)
+        }
+        var myJSON = JSON.stringify(errorsplit);
+        var con_data=myJSON.replace(/\"/g, "");
+        var remove=con_data.replace("[", "");
+        var remove_symbol=remove.replace("]", "");
+        $('#errorlistid').html(remove_symbol)
+
+      }
+      else{
+        var ids=$(this).closest('tr').find('td:eq(0)').text()
+        console.log('c',ids)
+        var errors=$('#errorlistid').text()
+        var errorsplit=errors.split(',')
+        errorsplit= $.grep(errorsplit, function(value) {
+          return value != ids;
+        }); 
+        console.log(errorsplit)
+        var myJSON = JSON.stringify(errorsplit);
+        var con_data=myJSON.replace(/\"/g, "");
+        var remove=con_data.replace("[", "");
+        var remove_symbol=remove.replace("]", "");
+        $('#errorlistid').html(remove_symbol)
+        
+      }
+    }
+    else{
+      
+      if  (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || amendment == ' ' || amendment == '' || amendmentspan.length >1 || date == '' || currency == '' || amount == ''){
+        var ids=$(this).closest('tr').find('td:eq(0)').text()
+        console.log('c',ids)
+        var errors=$('#errorlistid').text()
+        var errorsplit=errors.split(',')
+        if ($.inArray(ids, errorsplit) !== -1 )
+        {
+            console.log('yes')
+        }
+        else{
+            errorsplit.push(ids)
+        }
+        var myJSON = JSON.stringify(errorsplit);
+        var con_data=myJSON.replace(/\"/g, "");
+        var remove=con_data.replace("[", "");
+        var remove_symbol=remove.replace("]", "");
+        $('#errorlistid').html(remove_symbol)
+
+      }
+      else{
+        var ids=$(this).closest('tr').find('td:eq(0)').text()
+        console.log('c',ids)
+        var errors=$('#errorlistid').text()
+        var errorsplit=errors.split(',')
+        errorsplit= $.grep(errorsplit, function(value) {
+          return value != ids;
+        }); 
+        console.log(errorsplit)
+        var myJSON = JSON.stringify(errorsplit);
+        var con_data=myJSON.replace(/\"/g, "");
+        var remove=con_data.replace("[", "");
+        var remove_symbol=remove.replace("]", "");
+        $('#errorlistid').html(remove_symbol)
+      }
+    }
+
+    checkallinput()
+    })
+
+    $(document).on('change','.dateformat-cls',function(){
+      if($('#errorlistid').text()==''){
+        $('#errornameid').hide()
+      }
+      else{
+        $('#errornameid').show()
+      }
+      var val=$(this).val()
+      if(val.length > 0){
+          $(this).removeClass("error-show")
+  
+      }
+      else{
+          $(this).addClass("error-show")
+      }
+      
+      var v_name=$(this).closest('tr').find('td:eq(1)').find('.vendornamecls').val()
+      var contract=$(this).closest('tr').find('td:eq(2)').find('.typecontractcls').val()
+      var service=$(this).closest('tr').find('td:eq(3)').find('.typeservicecls').val()
+      var name_contract=$(this).closest('tr').find('td:eq(4)').find('.namecontractcls').val()
+      //var p_dis=$(this).closest('tr').find('td:eq(5)').find('.projectdisciplinecls').val()
+      //var dis_type=$(this).closest('tr').find('td:eq(6)').find('.disciplinetypecls').val()
+      var con_ref=$(this).closest('tr').find('td:eq(5)').find('.connumcls').val()
+      var con_refspan=$(this).closest('tr').find('td:eq(5)').find('span').text()
+      var amendment=$(this).closest('tr').find('td:eq(6)').find('.amendmentrefnumcls').val()
+      var amendmentspan=$(this).closest('tr').find('td:eq(6)').find('span').text()
+      var date=$(this).closest('tr').find('td:eq(7)').find('.dateformat-cls').val()
+      var currency=$(this).closest('tr').find('td:eq(8)').find('.currencycls').val()
+      var amount=$(this).closest('tr').find('td:eq(9)').find('.amount-cls').val()
+      if (contract == 'Original Contract'){
+        
+        if (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+  
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+          
+        }
+      }
+      else{
+        
+        if  (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || amendment == ' ' || amendment == '' || amendmentspan.length >1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+        }
+      }
+
+      checkallinput()
+    })
+
+    $(document).on('change','.currencycls',function(){
+      if($('#errorlistid').text()==''){
+        $('#errornameid').hide()
+      }
+      else{
+        $('#errornameid').show()
+      }
+      var val=$(this).val()
+      if(val.length > 0){
+          $(this).removeClass("error-show")
+  
+      }
+      else{
+          $(this).addClass("error-show")
+      }
+      
+      var v_name=$(this).closest('tr').find('td:eq(1)').find('.vendornamecls').val()
+      var contract=$(this).closest('tr').find('td:eq(2)').find('.typecontractcls').val()
+      var service=$(this).closest('tr').find('td:eq(3)').find('.typeservicecls').val()
+      var name_contract=$(this).closest('tr').find('td:eq(4)').find('.namecontractcls').val()
+      //var p_dis=$(this).closest('tr').find('td:eq(5)').find('.projectdisciplinecls').val()
+      //var dis_type=$(this).closest('tr').find('td:eq(6)').find('.disciplinetypecls').val()
+      var con_ref=$(this).closest('tr').find('td:eq(5)').find('.connumcls').val()
+      var con_refspan=$(this).closest('tr').find('td:eq(5)').find('span').text()
+      var amendment=$(this).closest('tr').find('td:eq(6)').find('.amendmentrefnumcls').val()
+      var amendmentspan=$(this).closest('tr').find('td:eq(6)').find('span').text()
+      var date=$(this).closest('tr').find('td:eq(7)').find('.dateformat-cls').val()
+      var currency=$(this).closest('tr').find('td:eq(8)').find('.currencycls').val()
+      var amount=$(this).closest('tr').find('td:eq(9)').find('.amount-cls').val()
+      if (contract == 'Original Contract'){
+        
+        if (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+          
+        }
+      }
+      else{
+        
+        if  (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || amendment == ' ' || amendment == '' || amendmentspan.length >1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+        }
+      }
+
+      checkallinput()
+    })
+
+    
+    $(document).on('keyup','.amount-cls',function(){
+      if($('#errorlistid').text()==''){
+        $('#errornameid').hide()
+      }
+      else{
+        $('#errornameid').show()
+      }
+      var val=$(this).val()
+      if(val.length > 0){
+          $(this).removeClass("error-show")
+  
+      }
+      else{
+          $(this).addClass("error-show")
+      }
+      
+      var v_name=$(this).closest('tr').find('td:eq(1)').find('.vendornamecls').val()
+      var contract=$(this).closest('tr').find('td:eq(2)').find('.typecontractcls').val()
+      var service=$(this).closest('tr').find('td:eq(3)').find('.typeservicecls').val()
+      var name_contract=$(this).closest('tr').find('td:eq(4)').find('.namecontractcls').val()
+      //var p_dis=$(this).closest('tr').find('td:eq(5)').find('.projectdisciplinecls').val()
+      //var dis_type=$(this).closest('tr').find('td:eq(6)').find('.disciplinetypecls').val()
+      var con_ref=$(this).closest('tr').find('td:eq(7)').find('.connumcls').val()
+      var con_refspan=$(this).closest('tr').find('td:eq(7)').find('span').text()
+      var amendment=$(this).closest('tr').find('td:eq(8)').find('.amendmentrefnumcls').val()
+      var amendmentspan=$(this).closest('tr').find('td:eq(8)').find('span').text()
+      var date=$(this).closest('tr').find('td:eq(9)').find('.dateformat-cls').val()
+      var currency=$(this).closest('tr').find('td:eq(10)').find('.currencycls').val()
+      var amount=$(this).closest('tr').find('td:eq(11)').find('.amount-cls').val()
+      if (contract == 'Original Contract'){
+        
+        if (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+          
+        }
+      }
+      else{
+        
+        if  (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || amendment == ' ' || amendment == '' || amendmentspan.length >1 || date == '' || currency == '' || amount == ''){
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          if ($.inArray(ids, errorsplit) !== -1 )
+          {
+              console.log('yes')
+          }
+          else{
+              errorsplit.push(ids)
+          }
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+        }
+        else{
+          var ids=$(this).closest('tr').find('td:eq(0)').text()
+          console.log('c',ids)
+          var errors=$('#errorlistid').text()
+          var errorsplit=errors.split(',')
+          errorsplit= $.grep(errorsplit, function(value) {
+            return value != ids;
+          }); 
+          console.log(errorsplit)
+          var myJSON = JSON.stringify(errorsplit);
+          var con_data=myJSON.replace(/\"/g, "");
+          var remove=con_data.replace("[", "");
+          var remove_symbol=remove.replace("]", "");
+          $('#errorlistid').html(remove_symbol)
+        }
+      }
+
+      checkallinput()
+    })
+    
+
+    var s_num=[];
+    $('table > tbody  > tr').each(function(index, tr) { 
+      var v_name=$(this).find('td:eq(1)').find('.vendornamecls').val()
+      var contract=$(this).find('td:eq(2)').find('.typecontractcls').val()
+      var service=$(this).find('td:eq(3)').find('.typeservicecls').val()
+      var name_contract=$(this).find('td:eq(4)').find('.namecontractcls').val()
+      //var p_dis=$(this).find('td:eq(5)').find('.projectdisciplinecls').val()
+      //var dis_type=$(this).find('td:eq(6)').find('.disciplinetypecls').val()
+      var con_ref=$(this).find('td:eq(5)').find('.connumcls').val()
+      var con_refspan=$(this).find('td:eq(5)').find('span').text()
+      var amendment=$(this).find('td:eq(6)').find('.amendmentrefnumcls').val()
+      var amendmentspan=$(this).find('td:eq(6)').find('span').text()
+      var a=$(this)
+
+      var date=$(this).find('td:eq(7)').find('.dateformat-cls').val()
+      var currency=$(this).find('td:eq(8)').find('.currencycls').val()
+      var amount=$(this).find('td:eq(9)').find('.amount-cls').val()
+        if(v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || amendment == '' || date == '' || currency == '' || amount == ''){
+          s_num.push($(this).closest('tr').children('td:first').text())
+        }
+      var vendorcontract_duplicate=0
+      var amendmentduplicate=0
+      $('input.connumcls').each(function() {
+          var value=$(this).val()
+          
+        if (amendment != '' && amendment !=' ' && value !=''){
+          if (amendment == value){
+          
+            amendmentduplicate+=1
+          }
+        }
+
+      });
+
+
+      $('input.connumcls').each(function() {
+          var value=$(this).val()
+          if (con_ref != '' && value !=''){
+            if (value == con_ref){
+              vendorcontract_duplicate+=1  
+            }
+          }
+      });
+      
+      //if (con_ref !='' && amendment != '' && amendment !=' ' && v_name !=''){
+      //var ab=0
+      $.ajax({
+        type: "GET",
+        url:'/projects/checkcontractamendment',
+        data: {'refnum':amendment,'v_name':v_name,'amendment':con_ref},
+        async: false,
+        success: function(data)
+        {
+            if (data.data == 'new'){
+              amendmentduplicate +=1
+            }
+            else if(data.data == 'exists'){
+              amendmentduplicate +=1
+              a.find('td:eq(5)').find('span').addClass('waring-err').text('Amendment Already Exists')
+              a.find('td:eq(6)').find('span').text('')
+              s_num.push(a.closest('tr').children('td:first').text())
+            }
+            if (amendment != '' && amendment != ' '){
+                if (amendmentduplicate == 0){
+                  a.find('td:eq(6)').find('span').text('Original Contract reference number does not exist in the contract master')
+                  s_num.push(a.closest('tr').children('td:first').text())
+              }
+            }
+            //console.log(array)
+            //arr3 = $.merge( s_num, array )
+            //$('#ajaxerror').text(array)
+        }
+        
+    })
+    //console.log('abc',s_num)
+  //}
+
+
+      if (vendorcontract_duplicate >1){
+          $(this).find('td:eq(5)').find('span').addClass('waring-err').text('Contract Duplicate')
+          s_num.push($(this).closest('tr').children('td:first').text())
+          checkallinput()
+      }
+      //if (amendment != '' && amendment != ' '){
+      //  if (amendmentduplicate == 0){
+      //    $(this).find('td:eq(8)').find('span').text('Wrong Reference Number')
+      //    s_num.push($(this).closest('tr').children('td:first').text())
+      //  }
+      //}
+
+    })  
+    console.log(s_num)
+    var count_val=$('#numid').val()
+    if ((s_num).length > 0){
+      var unique = s_num.filter(function(elem, index, self) {
+        return index === self.indexOf(elem);
+      })
+        var myJSON = JSON.stringify(unique);
+        var con_data=myJSON.replace(/\"/g, "");
+        var remove=con_data.replace("[", "");
+        var remove_symbol=remove.replace("]", "");
+        Swal.fire('This rows have errors S.No '+remove_symbol)
+        //$('#errorlistid').removeAttr('style')
+        $('#errorlistid').html(remove_symbol)
+        var remove_val_split=remove_symbol.split(',')
+        var first_Val=remove_val_split[0]
+        $('table > tbody  > tr').each(function(index, tr) { 
+        
+          if ($(this).closest('tr').children('td:first').text() == first_Val){
+              var row = $('tr');
+              var table = $('table');
+              table.find('tr').removeClass('coloractive')
+              var w = $(window);
+              var row = table.find('tr').eq(+first_Val)
+              if (row.length){
+                console.log({'first_Val':first_Val})
+                  //table.find('tr').removeClass('coloractive').eq(+first_Val).find('td:first').addClass('coloractive');
+                  w.scrollTop( row.offset().top - (w.height()/2) );
+              }
+          }
+      })
+      $('.import_vendor_save').attr('disabled', true);
+    }
+    else{
+      $('.import_vendor_save').attr('disabled', false);
+    }
+     
+    
+    $('.getrow').click(function(){
+      var row = $('tr');
+      var table = $('table');
+      var value=$(this).parents('div').find('div:first').find('#searchid').val();
+      console.log(value)
+      var w = $(window);
+      
+      $('table > tbody  > tr').each(function(index, tr) { 
+          $(this).find('td:eq(0)').removeClass('coloractive')
+      })
+      var row = table.find('tr')
+      .removeClass('active')
+      .eq( +value )
+      .addClass('active');
+      
+      if (row.length){
+        console.log('value',+value)
+          //table.find('tr').removeClass('coloractive').eq(+value).find('td:first').addClass('coloractive');
+          w.scrollTop( row.offset().top - (w.height()/2) );
+      }
+  });
+
+
+function checkallinput(){ 
+
+  var savecount = 0;
+  $('table > tbody  > tr').each(function(index, tr) { 
+    var v_name=$(this).find('td:eq(1)').find('.vendornamecls').val()
+    var contract=$(this).find('td:eq(2)').find('.typecontractcls').val()
+    var service=$(this).find('td:eq(3)').find('.typeservicecls').val()
+    var name_contract=$(this).find('td:eq(4)').find('.namecontractcls').val()
+    var con_ref=$(this).find('td:eq(5)').find('.connumcls').val()
+    var con_refspan=$(this).find('td:eq(5)').find('span').text()
+    var amendment=$(this).find('td:eq(6)').find('.amendmentrefnumcls').val()
+    var amendmentspan=$(this).find('td:eq(6)').find('span').text()
+    var date=$(this).find('td:eq(7)').find('.dateformat-cls').val()
+    var currency=$(this).find('td:eq(8)').find('.currencycls').val()
+    var amount=$(this).find('td:eq(9)').find('.amount-cls').val()
+    
+    if (contract == 'Original Contract'){
+      console.log('if')
+      if (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || date == '' || currency == '' || amount == ''){
+        console.log(tr)
+        savecount +=1
+        console.log(savecount)
+      }
+      
+    }
+    else if (contract == 'Amendment' || contract == 'Addendum'){
+      console.log('else')
+      if(v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || amendment == '' || amendmentspan.length >1 || date == '' || currency == '' || amount == '' || amendment == ' '){
+        console.log(tr)
+        savecount +=1
+      }
+      
+    }
+    else if (contract == ''){
+      savecount +=1
+    }
+    console.log({'Type Of Contract':contract})
+    console.log({'amendment':amendment})
+  })
+  console.log({'savecount':savecount})
+  if (savecount > 0){
+    $('.import_vendor_save').attr('disabled', true);
+
+  }
+  else{
+    console.log('yes')
+    
+    $('.import_vendor_save').attr('disabled', false);
+  }
+}
+
+$(document).on('click','.import_vendor_save',function(){
+  $('#loader').removeClass('hidden')
+})
+
+$(document).on('click','#delete-row',function(){
+  var current_refnum=$(this).closest('tr').find('td:eq(5)').find('.connumcls').val()
+  var contract_type=$(this).closest('tr').find('td:eq(2)').find('.typecontractcls').val()
+
+  if (contract_type == 'Original Contract'){
+    Swal.fire({
+      title: 'Are you sure you want to delete',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes,I Confirm',
+      cancelButtonText: 'No',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $('table > tbody  > tr').each(function(index, tr) {
+          var amendment=$(this).find('td:eq(6)').find('.amendmentrefnumcls').val() 
+          if (current_refnum == amendment){
+            console.log($(this).closest('tr').children('td:first').text())
+            $(this).closest('tr').remove()
+          }
+        })
+        $(this).closest('tr').remove()
+        var count=1
+        var s_no=[];
+        $('table > tbody  > tr').each(function(index, tr) { 
+          $(this).find('td:eq(0)').text(count)
+          var v_name=$(this).find('td:eq(1)').find('.vendornamecls').val()
+          var contract=$(this).find('td:eq(2)').find('.typecontractcls').val()
+          var service=$(this).find('td:eq(3)').find('.typeservicecls').val()
+          var name_contract=$(this).find('td:eq(4)').find('.namecontractcls').val()
+          //var p_dis=$(this).find('td:eq(5)').find('.projectdisciplinecls').val()
+         // var dis_type=$(this).find('td:eq(6)').find('.disciplinetypecls').val()
+          var con_ref=$(this).find('td:eq(5)').find('.connumcls').val()
+          var con_refspan=$(this).find('td:eq(5)').find('span').text()
+          var amendment=$(this).find('td:eq(6)').find('.amendmentrefnumcls').val()
+          var amendmentspan=$(this).find('td:eq(6)').find('span').text()
+          var date=$(this).find('td:eq(7)').find('.dateformat-cls').val()
+          var currency=$(this).find('td:eq(8)').find('.currencycls').val()
+          var amount=$(this).find('td:eq(9)').find('.amount-cls').val()
+
+          if (contract == 'Original Contract'){
+            if (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || date == '' || currency == '' || amount == ''){
+              s_no.push($(this).closest('tr').children('td:first').text())
+            }
+          }
+          else{
+            if  (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || amendment == '' || amendmentspan.length >1 || date == '' || currency == '' || amount == ''){
+              s_no.push($(this).closest('tr').children('td:first').text())
+            }
+          }
+          count ++;
+        })
+        var myJSON = JSON.stringify(s_no);
+        var con_data=myJSON.replace(/\"/g, "");
+        var remove=con_data.replace("[", "");
+        var remove_symbol=remove.replace("]", "");
+        //Swal.fire('This rows have errors S.No '+remove_symbol)
+        $('#errorlistid').html(remove_symbol)
+        }
+        if($('#errorlistid').text()==''){
+          $('#errornameid').hide()
+        }
+        else{
+          $('#errornameid').show()
+        }
+    })
+  }
+  else{
+      var count=1
+      var s_no=[];
+      $(this).closest('tr').remove()
+      $('table > tbody  > tr').each(function(index, tr) { 
+        $(this).find('td:eq(0)').text(count)
+        var v_name=$(this).find('td:eq(1)').find('.vendornamecls').val()
+        var contract=$(this).find('td:eq(2)').find('.typecontractcls').val()
+        var service=$(this).find('td:eq(3)').find('.typeservicecls').val()
+        var name_contract=$(this).find('td:eq(4)').find('.namecontractcls').val()
+        //var p_dis=$(this).find('td:eq(5)').find('.projectdisciplinecls').val()
+        //var dis_type=$(this).find('td:eq(6)').find('.disciplinetypecls').val()
+        var con_ref=$(this).find('td:eq(5)').find('.connumcls').val()
+        var con_refspan=$(this).find('td:eq(5)').find('span').text()
+        var amendment=$(this).find('td:eq(6)').find('.amendmentrefnumcls').val()
+        var amendmentspan=$(this).find('td:eq(6)').find('span').text()
+        var date=$(this).find('td:eq(7)').find('.dateformat-cls').val()
+        var currency=$(this).find('td:eq(8)').find('.currencycls').val()
+        var amount=$(this).find('td:eq(9)').find('.amount-cls').val()
+        if (contract == 'Original Contract'){
+          if (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || date == '' || currency == '' || amount == ''){
+            s_no.push($(this).closest('tr').children('td:first').text())
+          }
+        }
+        else{
+          if  (v_name == '' || contract == '' || service == '' || name_contract == '' || con_ref == '' || con_refspan.length > 1 || amendment == '' || amendmentspan.length >1 || date == '' || currency == '' || amount == ''){
+            s_no.push($(this).closest('tr').children('td:first').text())
+          }
+        }
+        count ++;
+      })
+      
+      var myJSON = JSON.stringify(s_no);
+      var con_data=myJSON.replace(/\"/g, "");
+      var remove=con_data.replace("[", "");
+      var remove_symbol=remove.replace("]", "");
+      //Swal.fire('This rows have errors S.No '+remove_symbol)
+      $('#errorlistid').html(remove_symbol)
+    }
+  checkallinput()
+})
+
+$(document).ready(function(){
+  if($('#errorlistid').text()==''){
+      $('#errornameid').hide()
+    }
+    else{
+      $('#errornameid').show()
+    }
+})
+
+</script>
+
+{% endblock %}

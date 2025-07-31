@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_process/company-setting.css' %}">
+<div>
+  <h4 class="from-head">Invoice Trigger Timing </h4>
+  <div class="save_button text-end">
+    <button id="mainsave" class='btn btn-clr add-btn pha-sebtn addbtn mr-0' type="submit">Add</button> 
+  </div>
+  <div class="row justify-content-end">
+  </div>
+  <div class="row">
+    <div class="col-12">
+      
+      <form method="POST">
+        {% csrf_token %}
+      <table
+        class="table settings-data-list-view data-list-view irock-table with_invoice invoice_trigger"
+        id="master_project_list">
+        <thead>
+          <tr>
+            <th class="wid-iin com_curency">S/N</th>
+            <th class="wid-iin">Invoice Payment From Day</th>
+            <th class="wid-iin">Invoice Payment To Day</th>
+            <th class="wid-iin">Time allowed Per Station</th>
+            <th id="text-initial">Time allowed Per Station</th>
+          </tr>
+        </thead>
+     
+        
+        <tbody class="table-list-invoice">
+          <input type="hidden" id="inv_check_id" value="{{invoice_check}}">
+          {% for i in masterinvoicetrigger %}
+          <tr>
+            <td style="vertical-align: middle;">{{forloop.counter}}</td>
+            <input type="hidden" name="pk" class="form-control" value="{{i.id}}" >
+            <td><input type="text" name="payment_terms_from" class="form-control invoicefromdate" value="{{i.payment_terms_from}}"readonly ></td>
+            <td><input type="text" name="payment_terms_to" class="form-control invoicetodate" value="{{i.payment_terms_to}}" readonly ></td>
+            <td>
+              <select name="time_unit" class="form-control form-select">
+                {% for format in time_format %}
+                  <option value="{{format.key}}" {% if i.time_unit == format.key %}selected{% endif %}>{{format.value}}</option>
+                {% endfor%}
+              </select>
+              <!-- <input type="text"   class="form-control"value="{% if i.time_unit == 2 %}Minutes{% elif i.time_unit == 1 %} Days{%else%}Hours {% endif %}"> -->
+              <!-- <input type="hidden" name="time_unit"value="{% if i.time_unit == 1 %}1{%else%}0{% endif %}"> -->
+           </td>
+          
+           <td><input type="text" name="time_allotted" class="form-control time_allotted" value="{{i.time_allotted}}"></td>
+           
+          </tr>
+         
+            {% endfor %}
+          
+        </tbody>
+      </table>
+      <div class="save_button text-center">
+        <button id="mainsave" class='btn btn-clr add-btn pha-sebtn mainsave' type="submit">Submit</button> 
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+{% endblock%}
+
+{% block scripts %}
+{{ block.super }}
+<script type="text/javascript" src="{%static 'js/custom_auth/editinvoicetriggertime.js'%}"></script>
+<script>
+
+</script>
+
+{%endblock%}

@@ -1,0 +1,149 @@
+div#company_list_length {
+    color: #951739;
+    font-weight: 600;
+    padding-bottom: 20px !important;
+}
+
+div#company_list_filter {
+    color: #941839;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.enq-list td:last-child {
+    text-align: center !important;
+}
+
+.enq-list th {
+    border-right: 1px solid #d7d7d7 !important;
+    border-bottom: 2px solid #e3e3e3 !important
+}
+
+.enq-list td:nth-child(5) {
+    text-align: center !important;
+}
+
+.refesh-ii {
+    color: maroon;
+    font-size: 20px;
+}
+
+.refesh-ii:hover {
+    color: #006d72;
+}
+
+.send-ii {
+    color: maroon;
+    font-size: 20px;
+}
+
+.send-ii:hover {
+    color: #006d72;
+}
+
+.che-box-enq { 
+    color: #006d72 !important;
+    font-size: 20px !important;
+}
+
+.table>:not(:first-child) {
+    border-top: 0px solid currentColor;
+    }
+
+    .creat-head th {
+    border-top: 1px solid #e3e3e3 !important;
+}
+
+input[type="search"] {
+    outline: none !important;
+}
+
+.text-nowrap td:nth-child(1) {
+    text-align: center !important;
+}
+
+.text-nowrap td:nth-child(2) {
+    word-break: break-word !important;
+}
+
+.text-nowrap td:nth-child(4) {
+    word-break: break-word !important;
+}
+
+.text-nowrap td:nth-child(5) {
+    word-break: break-word !important;
+}
+
+#company_list_length select:focus-visible {
+    outline: none; 
+}
+
+.paginate_button:hover {
+    border: 1px solid #979797 !important;
+    background: linear-gradient(to bottom, white 0%, #dcdcdc 100%) !important;
+}
+
+.paginate_button:active {
+    border: 1px solid #979797 !important;
+    background: linear-gradient(to bottom, white 0%, #dcdcdc 100%) !important;
+}
+
+.maroon {
+    border-color: #8D1636 !important;
+    background-color: #8D1636 !important;
+    color: #fff !important;
+}
+
+.maroon:active {
+    border-color: #8D1636 !important;
+    background-color: #8D1636 !important;
+    color: #fff !important;
+}
+
+.maroon:hover {
+    border-color: #8D1636 !important;
+    background-color: #8D1636 !important;
+    color: #fff !important;
+    box-shadow: 0 8px 25px -8px #8D1636 !important;
+}
+
+.maroon:focus {
+    border-color: #8D1636 !important;
+    background-color: #8D1636 !important;
+    color: #fff !important;
+}
+
+.enq-list tbody tr {
+        border-bottom: 1px solid #e3e3e3 !important;
+}
+
+div.dataTables_wrapper div.dataTables_length select {
+    width: auto !important;
+}
+
+/* .company-data-list-view tr th.sorting:first-child {
+    background-image: unset !important;
+} */
+
+/********** enquiry users responsive **********/
+@media (min-width:768px) and (max-width:1199px) {
+    .text-nowrap table {
+        width: 160vw !important;
+    }
+}
+
+@media (min-width:1200px) and (max-width:1349px) {
+    .text-nowrap table th:nth-child(3) {
+        width: 25% !important;
+    }
+}
+/********** enquiry users responsive **********/
+
+
+
+/********** admin login page **********/
+.lg-input {
+    height: 45px !important;
+}
+
+/********** admin login page **********/

@@ -1,0 +1,528 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/vendor-login/invoice.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/invoicedata.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/invoice_details/calculator.css' %}">
+
+    <h3 class="from-head">Invoice Preview</h3>
+
+    <div class="row">
+        <div class="col-9">
+        </div>
+        <div class="col-3">
+            <button class="btn btn-clr btn-master waves-effect waves-float waves-light pc-bk-cls" style="display:None;" ><a href="{% url 'invoice:editinvoicestepthree' pk=pk status=0 %}{% if wcc_id %}?wcc_id={{wcc_id}}{% endif %}">Back</a></button>
+        </div>
+        <div class="col-6 pb-2 bor-rgt">
+            <h5 class="head-inv-pre">Invoice Summary Details</h5>
+            <div class="table-responsive">
+            <table class="inv-pretbl inv-prev_width">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>S.No</th>
+                        <th>Inv No</th>
+                        <th>Inv Date</th>
+                        <th>Period of Service</th>
+                        <!-- <th>Contract No</th> -->
+                       
+                        <th>Gross Amount</th>
+                        <th>Tax</th>
+                        <th>Total</th>
+                        {% for inv in maininvoices %}
+                        {% if forloop.first %}
+                        {% if inv.exchange_rate == '2' %}
+                        <th>Payment Currency</th>   
+                        {% endif %}
+                        {% endif %}
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                   
+                    {% for inv in maininvoices %}
+                    {% checkallinvoice pk inv.id as invcount %}
+                    {% for invoice in pk|subinvoice:inv.id %}
+                    <tr>
+                        <td><i class="fa fa-eye prev-eyee inv_file" value="{{invoice.id|getinvoicefiles:invoice.invoice.id}}" style="font-size:15px;"></i></td>
+                        <td>{{forloop.parentloop.counter}}</td>
+                        <td class="inv_name">{{invoice.invoice_number}}</td>
+                        <td>{{invoice.invoice_date|convertinvoicedate:request.company.id}}</td>
+                        <td>{{invoice.invoice.fromdate|date:"M-Y"}} to {{invoice.invoice.todate|date:"M-Y"}}</td>
+                        
+                        <!-- <td>{{invoice.invoice.contractid|getcontractname:invoice.invoice.contracttype}}</td> -->
+                        <td>{% if invoice.invoice_exchange_rate == 'N/A' or  invoice.invoice_exchange_rate == '' %} {{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}} {% endif %} {% invoiceafterdiscount invoice.invoice_percentage invoicedetail.total_discount_value invoice.invoice_exchange_rate as invdisval %}{{invdisval}}</td>
+                        <td>{% if invoice.invoice_exchange_rate == 'N/A' or  invoice.invoice_exchange_rate == '' %} {{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}} {% endif %}  {% invoiceexclusivevalue invoice.invoice_percentage invoicedetail.total_exclusive_value invoice.invoice_exchange_rate as invexcval %}{{invexcval}}</td>
+                        <td>{% if invoice.invoice_exchange_rate == 'N/A' or  invoice.invoice_exchange_rate == '' %} {{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}} {% endif %} {% invoiceafterdiscount invoice.invoice_percentage invoicedetail.total_discount_value invoice.invoice_exchange_rate as invdisval %}{% invoiceexclusivevalue invoice.invoice_percentage invoicedetail.total_exclusive_value invoice.invoice_exchange_rate as invexcval %} {{invdisval|addvalues:invexcval}}</td>
+                        {% if inv.exchange_rate == '2' %}<td>{% if forloop.parentloop.counter == 1 %}{{basecurreccy}}{% else %}{{invoice.currency.currency_symbol}}{% endif %}</td>{% endif %}
+                    </tr>
+                    {% endfor %}
+                    {% endfor %}
+                    
+                </tbody>
+            </table>
+            <!-- {% for invoicefile in invoicefiles %}
+                {% if invoicefile.support == "1" %} -->
+                    <!-- <div> -->
+                        <!-- <button type="button" class="clickcls" onclick="myFunction()" value="{{invoicefile.support_file.url}}">{{invoicefile.support_file.name}}</button>  -->
+                        <!-- <button class="show-pdf-button" value="{{invoicefile.support_file.url}}">{{invoicefile.support_file.name}}</button>  -->
+                    <!-- </div> -->
+                <!-- <div><iframe class="doc" src="{{ invoicefile.support_file.url}}"></iframe></div> -->
+                <!-- <div><iframe class="doc_hidecls" style="display:none;"src="http://localhost:8000/media/invoicedocuments/Contract_-_Supply_of_WH__XMT_and_Services.pdf"></iframe></div>
+                {% endif %}
+            {% endfor %}  -->
+            <!-- <div id="pdf-main-container">
+                <div id="pdf-loader"></div>
+                <div id="pdf-contents">
+                    <div id="pdf-meta">
+                        <div id="pdf-buttons">
+                            <button id="pdf-prev">Previous</button>
+                            <button id="pdf-next">Next</button>
+                        </div>
+                        <div id="page-count-container">Page <div id="pdf-current-page"></div> of <div id="pdf-total-pages"></div></div>
+                    </div>
+                    <div class="addscroll">
+                        <canvas id="pdf-canvas" width="500" height="500"></canvas>
+                    </div>
+                    <div id="page-loader">.</div>
+                </div>
+            </div> -->
+                <!-- {% for invoicefile in invoicefiles %} -->
+
+                    <!-- <div><iframe class="doc" src="{{ invoicefile.support_file.url}}"></iframe></div> -->
+
+                    <!-- <embed src="{{ invoicefile.support_file.url }}" width = "200" height = "240" style =" margin-left: auto; margin-right: auto; display: block;">Click me</a> -->
+                <!-- {% endfor %} -->
+        
+        </div>
+        </div>
+        <div class="col-6 pb-2">
+            <h5 class="head-inv-pre">Supporting Documents</h5>
+            <div class="row">
+                {% for support in support_dcouments %}
+                    <div class="col-md-12 col-lg-4 padd-btn"> 
+                        <button type="button" class="commonbtn" wcc_id="{{wcc_id|default_if_none:"---"}}" dataid="{{support.data}}">{{support.name}}</button>
+                    </div>
+                {% endfor %}
+            </div>
+            
+
+
+
+            <!-- <div id="pdf-main-container" style="display:none">
+                 <div id="pdf-loader">
+                <div id="pdf-contents">
+                    <div id="pdf-meta">
+                        <div id="pdf-buttons">
+                            <button id="pdf-prev">Previous</button>
+                            <button id="pdf-next">Next</button>
+                        </div>
+                        <div id="page-count-container">Page <div id="pdf-current-page"></div> of <div id="pdf-total-pages"></div></div>
+                    </div>
+                    <div class="addscroll">
+                        <canvas id="pdf-canvas" width="500" height="500"></canvas>
+                    </div>
+                    <div id="page-loader">.</div>
+                </div>
+            </div> -->
+        </div>
+        <div class="col-6 bor-rgt">
+
+        </div>
+
+        <div class="show_file_cls col-6">
+        </div>
+
+        <div class="invfilediv bor-rgt col-6">
+            <!-- <h5 class="hd-inv"></h5> -->
+            <div><iframe class="doc_invhidcls" width="100%" src="" frameborder="0"></iframe></div>
+        </div>
+
+        <div class="selectedfilecls col-6">
+            <div><iframe width="100%" class="doc_selinvhidcls" src=""></iframe></div>
+        </div>
+        
+        <div class="text-center btn-cls">
+            <button type="button" class="btn btn-clr beige calbtn" value="2" data-toggle="modal" data-target="#exampleModalCenter2">Calculator</button>
+
+            <button type="button" id="submit" class="btn btn-clr text-left">
+                <a href="{% url 'invoice:editinvoicestepthree' pk=pk status=0 %}{% if wcc_id %}?wcc_id={{wcc_id}}{% endif %}">
+                Close Preview</a></button>
+        </div>
+        <div class="modal fade calculator-draggable calc-wid" id="exampleModalCenter2" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" data-backdrop="static" data-keyboard="false" role="document">
+              <div class="modal-content" data-backdrop="static">
+                
+                <div class="modal-header comment-head">
+                  <h5 class="modal-title" id="exampleModalCenterTitle">Calculator</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+    
+                <div class="modal-body calc-body">
+                  <iframe src="{% url 'invoice:calculator' %}" title="description"></iframe>
+                </div>
+    
+                <div class="modal-footer comment-foot">
+                  <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Save & Close</button> -->
+                </div>
+                </div>
+            </div>
+          </div>
+        
+    </div>
+
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.2.228/pdf.min.js"></script>
+
+<script>
+var invoiceid="{{pk}}" 
+var vendor_id="{{vendor_id}}"
+var contract_id="{{contract_id}}"
+var contract_type="{{contract_type}}" 
+var scheme="{{request.scheme}}"
+var gethost="{{request.get_host}}"
+var currentdomain=scheme+'://'+gethost
+var wcc_id="{{wcc_id}}"
+var package_src = "{% static 'js/web/viewer.html' %}"
+</script>
+<script src="{% static 'js/invoice/invoicepreview.js' %}"></script>
+<script>
+    $(function () {
+  
+        $(".calculator-draggable").draggable();
+      });
+// $(document).on('click','.inv_file',function(){
+//     $('.inv_file').removeClass('inv-high-cls')
+//     var inv_name=$(this).closest('tr').find('.inv_name').text()
+//     $('.hd-inv').text(inv_name)
+//     var url=$(this).attr('value')
+//     $(this).addClass('inv-high-cls')
+//     // var setfullurl=currentdomain+'/media/invoicedocuments/'+url+'#toolbar=0'
+//     var setfullurl=currentdomain+'/media/invoicedocuments/'+url+''
+
+//     // console.log(setfullurl)
+//     $('.doc_invhidcls').attr({'src':setfullurl,height:'590px !important'})
+// })
+
+// /* pdf js
+// //     var _PDF_DOC,
+// //     _CURRENT_PAGE,
+// //     _TOTAL_PAGES,
+// //     _PAGE_RENDERING_IN_PROGRESS = 0,
+// //     _CANVAS = document.querySelector('#pdf-canvas');
+
+// // // initialize and load the PDF
+// // async function showPDF(pdf_url) {
+// //     document.querySelector("#pdf-loader").style.display = 'block';
+
+// //     // get handle of pdf document
+// //     try {
+// //         _PDF_DOC = await pdfjsLib.getDocument({ url: pdf_url });
+// //     }
+// //     catch(error) {
+// //         alert(error.message);
+// //     }
+
+// //     // total pages in pdf
+// //     _TOTAL_PAGES = _PDF_DOC.numPages;
+    
+// //     // Hide the pdf loader and show pdf container
+// //     document.querySelector("#pdf-loader").style.display = 'none';
+// //     document.querySelector("#pdf-contents").style.display = 'block';
+// //     document.querySelector("#pdf-total-pages").innerHTML = _TOTAL_PAGES;
+    
+// //     // show the first page
+// //     showPage(1);
+// // }
+
+// // // load and render specific page of the PDF
+// // async function showPage(page_no) {
+// //     _PAGE_RENDERING_IN_PROGRESS = 1;
+// //     _CURRENT_PAGE = page_no;
+
+// //     // disable Previous & Next buttons while page is being loaded
+// //     document.querySelector("#pdf-next").disabled = true;
+// //     document.querySelector("#pdf-prev").disabled = true;
+
+// //     // while page is being rendered hide the canvas and show a loading message
+// //     document.querySelector("#pdf-canvas").style.display = 'none';
+// //     document.querySelector("#page-loader").style.display = 'block';
+
+// //     // update current page
+// //     document.querySelector("#pdf-current-page").innerHTML = page_no;
+    
+// //     // get handle of page
+// //     try {
+// //         var page = await _PDF_DOC.getPage(page_no);
+// //     }
+// //     catch(error) {
+// //         alert(error.message);
+// //     }
+
+// //     // original width of the pdf page at scale 1
+// //     var pdf_original_width = page.getViewport(1).width;
+    
+// //     // as the canvas is of a fixed width we need to adjust the scale of the viewport where page is rendered
+// //     var scale_required = _CANVAS.width / pdf_original_width;
+
+// //     // get viewport to render the page at required scale
+// //     var viewport = page.getViewport(scale_required);
+
+// //     // set canvas height same as viewport height
+// //     _CANVAS.height = viewport.height;
+
+// //     // setting page loader height for smooth experience
+// //     document.querySelector("#page-loader").style.height =  _CANVAS.height + 'px';
+// //     document.querySelector("#page-loader").style.lineHeight = _CANVAS.height + 'px';
+
+// //     // page is rendered on <canvas> element
+// //     var render_context = {
+// //         canvasContext: _CANVAS.getContext('2d'),
+// //         viewport: viewport
+// //     };
+        
+// //     // render the page contents in the canvas
+// //     try {
+// //         await page.render(render_context);
+// //     }
+// //     catch(error) {
+// //         alert(error.message);
+// //     }
+
+// //     _PAGE_RENDERING_IN_PROGRESS = 0;
+
+// //     // re-enable Previous & Next buttons
+// //     document.querySelector("#pdf-next").disabled = false;
+// //     document.querySelector("#pdf-prev").disabled = false;
+
+// //     // show the canvas and hide the page loader
+// //     document.querySelector("#pdf-canvas").style.display = 'block';
+// //     document.querySelector("#page-loader").style.display = 'none';
+// // }
+
+// // // click on "Show PDF" buuton
+// // // document.querySelector(".show-pdf-button").addEventListener('click', function() {
+// // var scheme="{{request.scheme}}"
+// // var gethost="{{request.get_host}}"
+// // var currentdomain=scheme+'://'+gethost
+// // $(document).on('click','.show-pdf-button',function(){
+// //     let url=this.getAttribute('value')
+// //     console.log(url)
+// //     extension = url.split('.').pop();
+// //     console.log(extension)
+// //     if (extension == "jpeg"){
+// //         var ctx = $("canvas")[0].getContext("2d"),
+// //         img = new Image();
+// //         ctx.canvas.width = 600; ctx.canvas.height = 849; 
+// //         img.onload = function() { 
+// //             ctx.drawImage(img, 0, 0,600,849); 
+// //         }; 
+// //         img.src = currentdomain+url;
+// //         // img.onload = function(){
+// //         //     ctx.drawImage(img, 0, 0, 1000, 1000);
+// //         // };
+// //         // img.src = "http://localhost:8000"+url;
+// //         }
+// //         else{
+// //             showPDF(currentdomain+url);
+// //         }
+// //     // this.style.display = 'none';
+// //     // showPDF('http://localhost:8000/'+url)
+
+// // });
+
+// // // click on the "Previous" page button
+// // document.querySelector("#pdf-prev").addEventListener('click', function() {
+// //     if(_CURRENT_PAGE != 1)
+// //         showPage(--_CURRENT_PAGE);
+// // });
+
+// // // click on the "Next" page button
+// // document.querySelector("#pdf-next").addEventListener('click', function() {
+// //     if(_CURRENT_PAGE != _TOTAL_PAGES)
+// //         showPage(++_CURRENT_PAGE);
+// // });
+
+// */
+// $(document).on('click','.commonbtn',function(){
+//     $('.commonbtn').removeClass('support_high-cls')
+//     $('.doc_selinvhidcls').attr('src','')
+//     var val=$(this).attr('dataid')
+//     $(this).addClass('support_high-cls')
+//     var gettext=$(this).text()
+//     // console.log(gettext)
+//     $.ajax({
+//             type:"GET",
+//             data:{'supportid':val,'invoiceid':invoiceid},
+//             url:'/invoice/getsupportfiles',
+//             success: function(data){
+//                 console.log({'getsupportfiles':data})
+//                 // var html="<div><h5>"+gettext+"</h5>"
+//                 var html="" 
+//                 if (val == "9"){
+//                     if(data.contracttype != 'original'){
+//                         console.log('original')
+//                         if (data.con_file.length > 1){
+//                             console.log('length > 1')
+//                             $(data.con_file).each(function(index,value){
+//                                 if (index==1){
+//                                     html +='<div class="confile-cls file-style" type='+index+'>Amendment/Addendum : '+value+'</div>'
+//                                     }
+//                                     else{
+//                                     html +='<div class="confile-cls file-style" type='+index+'>Original Contract : '+value+'</div>'
+//                                     }
+//                             })
+//                         }                    }
+//                     else{
+//                     $('.doc_selinvhidcls').attr('src','')
+//                     // var setfullurl=currentdomain+'/media/'+data.con_file+'#toolbar=0'
+//                     var setfullurl=currentdomain+'/media/'+data.con_file+''
+
+//                     $('.doc_selinvhidcls').attr({'src':setfullurl,height:'590px !important'}) 
+//                 }}
+//                 else if (val == "10"){
+//                     if(data.contracttype != 'original'){
+//                         if (data.price_file.length > 1){
+//                             console.log('length > 1')
+//                             $(data.price_file).each(function(index,value){
+//                                 if (index==1){
+//                                     html +='<div class="confile-cls file-style" type='+index+'>Amendment/Addendum : '+value+'</div>'
+//                                     }
+//                                     else{
+//                                     html +='<div class="confile-cls file-style" type='+index+'>Original Price Table : '+value+'</div>'
+//                                     }
+//                             })
+//                         }
+//                     }
+//                         else{
+//                         $('.doc_selinvhidcls').attr('src','')
+//                         // var setfullurl=currentdomain+'/media/'+data.price_file+'#toolbar=0'
+//                         var setfullurl=currentdomain+'/media/'+data.price_file+''
+    
+//                         $('.doc_selinvhidcls').attr({'src':setfullurl,height:'590px !important'}) 
+//                     } 
+//                 }
+//                 else{
+//                     if (data.filecount > 1){
+//                         $(data.files).each(function(index,value){
+//                             remove_name=(value.support_file).replace("invoicedocuments/","")
+//                             html +='<div class="fil-cls file-style">'+remove_name+'</div>'
+//                         })
+//                     }
+//                     else if (data.filecount == 1){
+//                         $('.doc_selinvhidcls').attr('src','')
+//                         var setfullurl=""
+//                         $(data.files).each(function(index,value){
+//                             //var setfullurl=currentdomain+'/media/'+value.support_file+'#toolbar=0'
+//                             var setfullurl=currentdomain+'/media/'+value.support_file+''
+//                             $('.doc_selinvhidcls').attr({'src':setfullurl,height:'590px !important'})  
+//                         })
+//                     }
+//                     else{
+//                         html +='<div class="file-style">No Files in '+gettext+'</div>'
+//                     }
+//                 }
+//                 $('.show_file_cls').html(html)
+//             }
+//             })
+// })
+
+// $(document).on('click','.fil-cls',function(){
+//     $('.fil-cls').removeClass('sel-file-cls')
+//     $(this).addClass('sel-file-cls')
+//     $('.doc_selinvhidcls').attr('src','')
+//     var file=$(this).text()
+//     let type=$(this).attr('type')
+//     if (type == 1){
+//         file=file.replace("Amendment/Addendum : ","")
+//     }
+//     else{
+//         file=file.replace("Original Contract : ","")
+//     }
+//     // var setfullurl=currentdomain+'/media/invoicedocuments/'+file+'#toolbar=0'
+//     var setfullurl=currentdomain+'/media/invoicedocuments/'+file+''
+
+//     $('.doc_selinvhidcls').attr({'src':setfullurl,height:'590px !important'})
+// })
+// $(document).on('click','.confile-cls',function(){
+//     $('.confile-cls').removeClass('sel-file-cls')
+//     $(this).addClass('sel-file-cls')
+//     $('.doc_selinvhidcls').attr('src','')
+//     var file=$(this).text()
+//     let type=$(this).attr('type')
+//     if (type == 1){
+//         file=file.replace("Amendment/Addendum : ","")
+//     }
+//     else{
+//         file=file.replace("Original Contract : ","")
+//         file=file.replace("Original Price Table : ","")
+//     }
+//     // var setfullurl=currentdomain+'/media/invoicedocuments/'+file+'#toolbar=0'
+//     var setfullurl=currentdomain+'/media/'+file+''
+
+//     $('.doc_selinvhidcls').attr({'src':setfullurl,height:'590px !important'})
+// })
+// // //selectedfilecls
+// // $(document).on('click','#submit',function(e){
+// //     e.preventDefault()
+// //     Swal.fire({
+// //             text: 'Are you sure you wish to submit?',
+// //             showDenyButton: true,
+// //             // showCancelButton: true,
+// //             // textColor:'#77d61f',
+// //             confirmButtonColor: '#77d61f',
+// //             denyButtonColor:'#AF2B50',
+// //             confirmButtonText: 'Yes',
+// //             denyButtonText: 'No',
+// //             customClass: {
+// //               actions: 'my-actions',
+// //             //   cancelButton: 'order-1 right-gap',
+// //               confirmButton: 'order-2',
+// //               denyButton: 'order-3',
+// //             }
+// //           }).then((result) => {
+// //             if (result.isConfirmed) {
+// //                 window.location.href = '../invoicelist';
+// //                 return true;
+// //             //   var current_url=$(location).attr("href")
+// //             //   var replace_url=current_url.replace("createmaster/",'createblock/'+project_id+'')
+// //             //   window.location.href = replace_url;
+// //                 // $(".step-1").hide();
+// //                 // $(".step-2").show();
+// //             //   Swal.fire('Saved!', '', 'success')
+// //             } else if (result.isDenied) {
+                
+// //             //   var current_url=$(location).attr("href")
+// //             //   var replace_url=current_url.replace("createmaster/","listmaster/")
+// //             //   window.location.href = replace_url;
+// //               // Swal.fire('Changes are not saved', '', 'info')
+// //             }
+// //           })
+// // })
+
+// // $(document).on('click','#submit',function(){
+// //     $.ajax({
+// //             type: "GET",
+// //             url:"/invoice/invoicecompleted",
+// //             data: {
+// //               'invoiceid':invoiceid,'vendor_id':vendor_id,'contract_id':contract_id,'contract_type':contract_type,
+// //             },
+// //             // cache: false,
+// //             success: function(data)
+// //             { 
+// //                 window.location.href = '../invoicelist';
+// //             }
+// //     })
+// // })
+</script>
+{% endblock %}

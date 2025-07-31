@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load custom_tags %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/master/projectmaster.css' %}">
+
+<section id="data-list-view " class="data-list-view-header">
+ 
+          <!-- <div class="card"> -->
+            
+            <div class="">
+              <!-- Class removed -  card-header cd-head px-0 -->
+              <div class="row">
+            <div class="col-12">
+              <h4 class="from-head">Project Master</h4>
+              </div>
+              <div class="col-9 col-sm-8">
+                <form method="POST">
+                  {% csrf_token %}
+                  <div class="row">
+                    <div class="col-3 col-md-3" id="countries">
+                      <select id="country_id" name="country_name" class="form-control form-select list-control">
+                        <option value=" " selected>--Select Country--</option>
+                        {% for country in get_countries %}
+                        <option value="{{country.country_id}}" {% if country.country_id == post_country %} selected{% endif %}>{{country.country_name}}</option>
+                      {% endfor %}
+                      </select>
+                    </div>
+                    <div class="col-3 col-md-3" id="projects">
+                      <select id="project_id" name="project_name" class="form-control form-select list-control">
+                        <option value=" " selected>--Select Project--</option>
+                        {% for project in project_country %}
+                          <option value="{{project.id}}" {% if project.id == post_project %} selected{% endif %}>{{project.name}}</option>
+                        {% endfor %}
+
+                      </select>
+                    </div>
+                    <div class="col-3 col-md-5">
+                      <button type="submit" class="btn btn-clr " id="country_btn">Search</button>
+                      <button type="submit" class="btn btn-clr"><a href="{% url 'projects:listmaster' %}">Reset</a></button>
+                    </div>
+                  </div>
+              </form>
+              </div>
+
+              <div class="col-3 col-md-4 text-end">
+              {% if request.user.roles_id == 3 %}
+                {%if rights.create == '1' %}
+                  <button type="button" class="btn btn-clr"><a href="{% url 'projects:createmaster' %}">Create Project Master</a></button>
+                  {% endif %}
+              {%else%}
+                <button type="button" class="btn btn-clr"><a href="{% url 'projects:createmaster' %}">Create Project Master</a></button>
+              {% endif %}
+              </div>
+            </div>
+            </div>
+            <div class="">
+              <!-- Class removed - card-body card-plist p-0 -->
+
+            <div class="table-responsive text-nowrap">
+              <table class="table settings-data-list-view data-list-view project_master irock-table prj-back_clr" id ="master_project_list">
+      
+                  <thead >
+                      <tr >
+                          <!-- <th></th> -->
+                          <th>S/N</th> 
+                          <th>country</th>     
+                          <th>projects</th>
+                          <th>actions</th>
+                      </tr>
+                  </thead>
+                  <tbody class=" table-list">
+                    {% if master_count == 0 %}
+                    <tr>
+                      <td colspan="7" class="cls-nil">
+                        ---
+                      </td>
+                    </tr>
+                    {% elif  master_count > 0%}
+                      {% for obj in listmaster %} 
+                      {% comment %} {% if counter == 1%} {% endcomment %}
+                      {% comment %} {% else %} {% endcomment %}
+                      <tr>
+                        </td>
+                          
+                          <td>{{forloop.counter|default_if_none:"---"}}</td>
+                          <td class="td-left">{{obj.country.nicename|default_if_none:"asdsa"}}</td>
+                          <td class="td-left">{{obj.name|default_if_none:"---"}}</td>
+                          <td>
+                            {% if request.user.roles_id == 3 %} 
+                              {% if rights.view == '1' %}
+                                <a class="btn p-0 showtoggle" data-toggle="collapse" href="#collapseExample{{obj.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                  <span class="action-edit align-icons">
+                                    <i class="fa fa-eye " title="View" ></i>
+                                  </span>
+                                </a>
+                              {% endif %}
+                            {% else %}
+                              <a class="btn p-0 showtoggle" data-toggle="collapse" href="#collapseExample{{obj.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                <span class="action-edit align-icons">
+                                  <i class="fa fa-eye" title="View" ></i>
+                                </span>
+                              </a>
+                            {% endif %}
+                            {% if request.user.roles_id == 3 %} 
+                              {% if rights.edit == '1' %}
+                              {% if obj.id|checkprojectexists:request.company == 0 %}
+                                <a href="{% url 'projects:editmasterproject' pk=obj.id %}" >
+                                  <span class="action-edit align-icons"><i class="fa fa-pencil" title="Edit"></i></span>
+                                </a>
+                              {% endif %}
+                              {% endif %}
+                            {% else %}
+                            {% if obj.id|checkprojectexists:request.company == 0 %}
+                              <a class="text-decoration-none" href="{% url 'projects:editmasterproject' pk=obj.id %}" >
+                                <span class="action-edit align-icons"><i class="fa fa-pencil" title="Edit"></i></span>
+                              </a>
+                            {% endif %}
+                            {% endif %}
+                            {% if request.user.roles_id == 3 %} 
+                              {% if rights.delete == '1' %}
+                              {% if obj.id|checkprojectexists:request.company == 0 %}
+                              <a class="projectmaster_delete" data-id="{{obj.id}}" project-name="{{obj.name}}">
+                                <span class="action-delete align-icons"><i class="fa fa-trash-o" title="Delete"></i></span>
+                              </a>
+                              {% endif %}
+                              {% endif %}
+                            {% else %}
+                            {% if obj.id|checkprojectexists:request.company == 0 %}
+                              <a class="projectmaster_delete" data-id="{{obj.id}}" project-name="{{obj.name}}">
+                                <span class="action-delete align-icons"><id class="fa fa-trash-o" title="Delete" ></i></span>
+                              </a>
+                              {% endif %}
+                              {% endif %}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td colspan="5" class="p-0">
+                            <div class="collapse" id="collapseExample{{obj.id}}">
+                              <div class="card card-body shadow-none master-crd size-of_tbl1 m-0">
+                                <div class="row" class="master-tlt-bottom">
+                                  <div class="col-2 list-txt">Block</div>
+                                  <div class="col-2 list-txt">Field</div>
+                                  <div class="col-3 list-txt text-wrap text_space">Field Environment</div>
+                                  <div class="col-2 list-txt">Cluster</div>
+                                  <div class="col-3 list-txt text-wrap text_space">Development Type</div>
+                                  {% comment %} <div class="col list-txt wells_name_cls" ></div> {% endcomment %}
+                                </div>
+                                {% for block in obj.id|get_block:"block" %}  
+                                <div class="row master-space">
+                                  <div class="col-2 colum-line">
+                                      <table class="list-bck">
+                                      <tr>
+                                        <td class="border-0 p-0">
+                                          <p class="block-cls prjt-viewfont text-wrap" data-id= "{{block.id}}" >{{block.block_name}}</p>
+                                        </td>
+                                      </tr> 
+                                    </table>
+                                  </div>
+                                  <div class="col-2 colum-line field-id" id="field_div{{block.id}}">
+                                  </div>
+                                  <div class="col-3 colum-line environment-id" id="environment_div{{block.id}}">
+                                  </div>
+                                  <div class="col-5 colum-line cluster-id" id="cluster_div{{block.id}}">
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-7">
+                                  </div>
+                                  <div class="col-5 welltype-cls" id="welltype{{block.id}}">
+                                  </div> 
+                                </div>
+                                <hr>
+                                {% endfor %}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                        {% comment %} {% endif %} {% endcomment %}
+                        {% endfor %}
+                        {% endif %}
+                  </tbody>
+              </table>
+              <!--
+              {% if users.has_other_pages %}
+                <ul class="pagination">
+                  {% if users.has_previous %}
+                    <li><a href="?page={{ users.previous_page_number }}">&laquo;</a></li>
+                  {% else %}
+                    <li class="disabled"><span>&laquo;</span></li>
+                  {% endif %}
+                  {% for i in users.paginator.page_range %}
+                    {% if users.number == i %}
+                      <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                    {% else %}
+                      <li><a href="?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                  {% endfor %}
+                  {% if users.has_next %}
+                    <li><a href="?page={{ users.next_page_number }}">&raquo;</a></li>
+                  {% else %}
+                    <li class="disabled"><span>&raquo;</span></li>
+                  {% endif %}
+                </ul>
+              {% endif %}
+              -->
+          </div>
+        </div>
+    <!-- </div>  -->
+    
+    </section>
+
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script src="{% static 'js/projects/masterproject.js' %}"></script>
+
+{% endblock %}
+<!--\ -->
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+  $(document).ready(function() {
+     
+  $(".showtoggle").on('click', function() {
+    let nxttr = $(this).closest('tr').next('tr');
+    console.log(nxttr)
+    $(this).closest('table tbody').find('.collapse').not(nxttr.find('.collapse')).removeClass('show');
+  });
+
+});
+
+$(document).ready(function(){
+  $('.projectmaster_delete').click(function(){
+    var id = $(this).data('id');
+    var project_name = $(this).data('project-name');
+    swal({
+      title: "Are you sure?",
+      text: "You want to delete this project "+project_name,
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    })
+    .then((willDelete) => {
+      if (willDelete) {
+        window.location.href = "{% url 'projects:deletemasterproject' pk='"+id+"' %}";
+      }
+    });
+  });
+  swal({
+    title: "Are you sure?",
+    text: "Once deleted, you will not be able to recover this imaginary file!",
+    icon: "warning",
+    buttons: true,
+    dangerMode: true,
+  })
+  .then((willDelete) => {
+    if (willDelete) {
+      swal("Poof! Your imaginary file has been deleted!", {
+        icon: "success",
+      });
+    } else {
+      swal("Your imaginary file is safe!");
+    }
+  });
+});
+
+
+
+</script>

@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% block content %}
+{% load custom_tags %}
+{% load invoice_custom_tags %}
+{% load InvoiceGuardTags %}
+{% load static %}
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'assets/css/user_Management/userroles.css' %}">
+<section id="data-list-view" class="data-list-view-header">
+
+    <!-- DataTable starts -->
+    <div>
+        <h5 class="from-head">User Roles and Rights</h5>
+        <div class="row">
+            <div class="col-8"> 
+            </div>
+            <!-- <div class="col-3">
+                <button type="button" class="btn btn-clr btn-master chck-tst mr-0"><a href="{% url 'InvoiceGuard:add-usergroup-form' %}">Add Roles and Rights</a></button>
+            </div> -->
+            <div class="col-4">
+                {% if request.user.roles_id == 3 %}
+                {%if rights.create == '1' %} 
+                    <button type="button" class="btn btn-clr btn-master chck-tst mr-0 mb-3"><a href="{% url 'InvoiceGuard:add-usergroup-form' %}">Add Roles and Rights</a></button>
+                {% endif %}
+                {% else %}
+                    <button type="button" class="btn btn-clr btn-master chck-tst mr-0 mb-3"><a href="{% url 'InvoiceGuard:add-usergroup-form' %}">Add Roles and Rights</a></button>
+                {% endif %}
+
+            </div>
+        </div>
+        <div class="table-responsive text-nowrap">
+            <table class="table company-data-list-view creat-head user-roles-and-rights usesr-management-section irock-table" id="alltaxes_list">
+
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>Module Name</th>
+                        <!-- <th>Role Name</th> -->
+                        <th>Actions</th>
+                        </tr>
+                </thead>
+                <tbody class="table-list">
+                
+                    {% for obj in modules_data %}
+                    <tr>
+                        <td class="sno-center">{{forloop.counter}}</td>
+                        <td class="td-left">{{obj.module_name}}</td>
+                        <!-- <td>{{obj.role_name}}</td> -->
+                        <td  class="actions-center icc-pd">
+                            {% if request.user.roles_id == 3 %}
+                            {%if rights.view == '1' %} 
+                            <a class="btn p-0 showtoggle" data-toggle="collapse" href="#collapseExample{{obj.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                <span class="action-edit align-icons">
+                                  <i class="fa fa-eye showtoggle" title="View"></i>
+                                </span>
+                              </a> 
+                                {% endif %}
+                            {% else %}
+                            <a class="btn p-0 showtoggle" data-toggle="collapse" href="#collapseExample{{obj.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                <span class="action-edit align-icons">
+                                  <i class="fa fa-eye showtoggle" title="View" ></i>
+                                </span>
+                              </a> 
+                            {% endif %}
+                            {% if request.user.roles_id == 3 %}
+                                {%if rights.edit == '1' %} 
+                                    <a class="text-decoration-none" href="{% url 'InvoiceGuard:role-withrights-view'%}?module_id={{obj.id}}">
+                                        <span class="action-edit"><i class="fa fa-edit" title="Edit"></i></span>
+                                    </a>
+                                {% endif %}
+                                {% else %}
+                                <a class="text-decoration-none" href="{% url 'InvoiceGuard:role-withrights-view'%}?module_id={{obj.id}}">
+                                    <span class="action-edit"><i class="fa fa-edit" title="Edit"></i></span>
+                                </a>
+                                {% endif %}
+                            <!-- <a class="btn p-0" href="{% url 'InvoiceGuard:role-right-view' pk=obj.id %}"> -->
+                                <!-- <span class="action-edit align-icons">
+                                  <i class="fa fa-eye eyebutton" title="View"></i> -->
+                                <!-- </span> -->
+                              <!-- </a> -->
+
+                                    <!-- <a class="text-decoration-none" href="{% url 'InvoiceGuard:edit-role-form' pk=obj.id %}">
+                                        <span class="action-edit"><i class="fa fa-edit" title="Edit" style="font-size:15px; color:#95183a;"></i></span>
+                                    </a> -->
+                                    
+                                    <!-- <a class="delete_tax" data-id="{{obj.id}}" data-name="{{obj.role_name}}"> -->
+                                        <!-- href="{% url 'projects:deletecompanytax' pk=obj.id %}" -->
+                                        <!-- <span class="action-delete"><i class="fa fa-trash" title="Delete" style="font-size:15px; color:#95183a;"></i></span>
+                                    </a> -->
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="12" class="p-0">
+                          <div class="collapse" id="collapseExample{{obj.id}}">
+                            <div class="card card-body shadow-none master-crd">
+                                <!-- <ul id="myTabs" class="nav nav-pills nav-justified new-tab" role="tablist" data-tabs="tabs"> -->
+                                  <!-- <li class="active"><a class="prjlist-menu" href="#project_overview{{obj.id}}" data-toggle="tab">Project Overview</a></li> -->
+                                  <!-- <li  class="active"><a class="prjlist-menu" href="#block_field{{obj.id}}" data-toggle="tab">Project Discipline</a></li> -->
+                               <!-- </ul> -->
+                                  <div role="tabpanel" class="tab-pane active prt-viewlist" id="roles{{obj.id}}">
+                                    <div class="row prj-tablists">
+                                      <div class="col-5">
+                                        <h4 class="proj-hd">Roles</h4>
+                                      </div>
+                                      <div class="col-5">
+                                        <h4 class="proj-hd">Rights</h4>
+                                      </div>
+                                    </div>
+                                    <div class="row" id="name">
+                                      <div class="col-12">
+                                        {% for role in obj.id|get_related_roles:request.company.id %}
+                                        <div class="row prj-decview">
+                                          <div class="col-5 colum-line">
+                                            <p class="role-cls prjt-viewfont brek-word" role_id="{{role.id}}" module_id="{{obj.id}}">{{role.role_name}}</p>
+                                          </div>
+                                          <div class="col-7 sub-main-cls role-right-cls-{{role.id}}">
+                                          </div>
+                                        </div>
+                                        {% empty %}
+                                        <div class="row prj-decview">
+                                            <div class="col-3 colum-line">
+                                              <p class="prjt-viewfont">---<p>
+                                            </div>
+                                            <div class="col-9">
+                                                <p class="prjt-viewfont">---<p>
+                                            </div>
+                                        {% endfor %}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                            </div>
+                          </div>  
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="9" id="empty_class">---</td>
+                    </tr>
+                    {% endfor %} 
+                </tbody>
+            </table>
+        </div>
+    
+    </div>
+    <!-- DataTable ends-->
+    <!-- add new sidebar ends -->
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>  var csrf_token = '{{csrf_token}}';</script>
+<script type="text/javascript" src="{% static 'js/invoiceguard/list_role.js' %}"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+//       $(document).ready(function() {
+//      $(".showtoggle").on('click', function() {
+ 
+//  let nxttr = $(this).closest('tr').next('tr');
+//  console.log(nxttr)
+//  $(this).closest('table tbody').find('.collapse').not(nxttr.find('.collapse')).removeClass('show');
+// });
+
+// });    
+  
+    // $(document).ready( function () {
+
+    //   $('#alltaxes_list').DataTable({
+    //     language: {
+    //         emptyTable: "---"
+    //     }});
+      // delete tax sweet alert
+        //$('.delete_tax').click(function(e){
+        //     $(document).on("click", ".delete_tax", function (e) {
+        //     e.preventDefault();
+        //     //let url = $(this).data('id');
+        //     let name = $(this).data('name');
+        //     //var pk = $(this).data('data-id');
+        //     var pk = $(this).attr('data-id');
+        //     console.log({'pk':pk})
+        //     //let name = $(this).attr('data-name');
+        //     Swal.fire({
+        //         title: 'Do You Want To Delete '+name+' ?',
+        //         showCancelButton: true,
+        //         confirmButtonColor: '#3085d6',
+        //         cancelButtonColor: '#d33',
+        //         confirmButtonText: 'Yes, I Confirm',
+        //         cancelButtonText: 'No',
+        //       }).then((result) => {
+        //         if (result.isConfirmed) {
+        //             //return window.location.href = 'delete-userdepartment-form/'+url;
+        //             $.ajax({
+        //                 url: '{% url "InvoiceGuard:delete-role-form" %}',
+        //                 headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        //                 data: {
+        //                     'pk': pk
+        //                 },
+        //                 type: 'POST',
+        //                 success: function(response) {
+        //                     if (response.status) {
+        //                         // reload the page
+        //                         window.location.reload();
+        //                         // Success message
+        //                     } else {
+        //                         // Error message
+        //                     }
+        //                 },
+        //                 error: function() {
+        //                     // Error message
+        //                 }
+        //             });
+        //           }
+        //            });
+        //     return false;
+        // });
+    // });
+
+  //  $(document).on('click','.role-cls',function(){
+  //      var id=$(this).attr('role_id')
+  //      $('.sub-main-cls').html('')
+  //      $('.projectblock-cls').removeClass("tree_menu active");
+  //      $(this).addClass('tree_menu active')
+  //    // remove active in previous clicked
+  //    $(this).parent().parent().siblings().find('.role-cls').removeClass('hand-icon active')
+  //    $.ajax({
+  //        url: '{% url "InvoiceGuard:role-base-rights" %}',
+  //        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+  //        data: {
+  //            'role_id': id
+  //        },
+  //        type: 'POST',
+  //        success: function(response) {
+  //            var html='';
+  //            if (response.datas.length == 0){
+  //                html += '-'
+  //            }
+  //            $.each(response.datas,function(key,val){
+  //                html += '<div class="row"><div class="col-12 colum-line"><p class="tree-content hand-icon projectfield-cls prjt-viewfont">'+val.right_id__right_name+'</p></div></div>'
+  //            })
+  //            $('.role-right-cls-'+id+'').html(html)
+  //        },
+  //        error: function() {
+                // Error message
+  //        }
+  //    });
+  //  })
+
+  </script>
+  
+{% endblock %}
